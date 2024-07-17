@@ -15,7 +15,7 @@
   \******************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("const ski = __webpack_require__ (/*! ./lib/ski */ \"./lib/ski.js\");\n\nmodule.exports = { ...ski };\nif (typeof window !== 'undefined') {\n    window.SKI = SKI;\n}\n\n\n//# sourceURL=webpack://ski-interpreter/./index.js?");
+eval("const ski = __webpack_require__ (/*! ./lib/ski */ \"./lib/ski.js\");\n\nmodule.exports = { ...ski };\nif (typeof window !== 'undefined') {\n    window.SKI = ski.SKI;\n}\n\n\n//# sourceURL=webpack://ski-interpreter/./index.js?");
 
 /***/ }),
 
