@@ -13,4 +13,4 @@ let expr = ski.parse(process.argv[2]);
 
 do {
     console.log(''+expr);
-} while (expr = expr.eval());
+} while (expr = expr.step());
