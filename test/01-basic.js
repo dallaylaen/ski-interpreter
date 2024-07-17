@@ -50,4 +50,12 @@ describe( 'SKI', () => {
         expect(''+result).to.equal('g(f(x))');
         done();
     });
+
+    it ('can parse unknown words', done => {
+        const ski = new SKI;
+        const expr = ski.parse("food bard");
+        expect(''+expr).to.equal("food(bard)");
+        expect(expr.step()).to.equal(null);
+        done();
+    })
 });
