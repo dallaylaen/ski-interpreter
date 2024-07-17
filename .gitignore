@@ -1,0 +1,11 @@
+.*.sw[pon]
+.nyc*
+coverage
+node_modules
+package-lock.json
+out
+*.skip
+*.skip.*
+*.out
+*.out.json
+.idea
