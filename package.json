@@ -1,0 +1,19 @@
+{
+  "name": "ski-interpreter",
+  "version": "1.0.0",
+  "description": "Simple Konbinator Interpreter",
+  "main": "index.js",
+  "scripts": {
+    "test": "nyc mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dallaylaen/ski-interpreter.git"
+  },
+  "author": "Konstantin Uvarin",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/dallaylaen/ski-interpreter/issues"
+  },
+  "homepage": "https://github.com/dallaylaen/ski-interpreter#readme"
+}
