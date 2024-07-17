@@ -1,0 +1,25 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es2021": true
+    },
+    "extends": [
+        "standard"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 12
+    },
+    "rules": {
+        "semi": 0,
+        "no-extra-semi": 2,
+        "indent": [ "error", 2 ],
+        "no-multi-spaces": 0,
+        "curly": [ 2, "multi-or-nest" ],
+        "space-in-parens": 0,
+        "operator-linebreak": [ 2, "before" ],
+        "no-unused-vars": [ 2, { "args": "none", "varsIgnorePattern": "^_$|^reject$|^unused" } ],
+        "comma-dangle": [ 2, "only-multiline" ],
+        "key-spacing": [2, {"align":"value"}]
+    }
+}
