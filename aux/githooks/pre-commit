@@ -1,0 +1,28 @@
+#!/bin/sh
+
+die () {
+    echo >&2 "$@"
+    exit 1
+}
+FAIL=''
+assert () {
+    if [ "x$1" = 'x!' ]; then
+        shift
+        echo "# Executing (negated) $*"
+        "$@" && FAIL="$FAIL\nFailed ! $@"
+    else
+        echo "# Executing $*"
+        "$@" || FAIL="$FAIL\nFailed $@"
+    fi
+}
+
+for i in `git diff --name-only --cached --diff-filter=AM | grep 'lib/.*\.js'`; do
+    echo "# check $i"
+    assert eslint "$i"
+    assert ! grep -q "' $'" $i
+done
+assert npm test
+
+if [ ! -z "$FAIL" ]; then
+    die "$FAIL"
+fi
