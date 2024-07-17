@@ -1,52 +1,105 @@
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8"/>
     <title>SKI combinatory logic interpreter</title>
     <link rel="shortcut icon" type="image/gif" href="favicon.ico">
     <script src="js/build/ski-interpreter.js"></script>
+    <link rel="stylesheet" href="misc/main.css">
 </head>
 <body>
     <h1>SKI combinatory logic interpreter</h1>
 
     Edit code below, then press Run!
-    <div id="cons" style="height: 10em; overflow:scroll; resize:vertical"></div>
+    <div id="cons" style="height: 10em; overflow:scroll; resize:vertical; font-family: monospace"></div>
 
-    <input name="code" id="code">
-    <button onclick="return run()" style="background-color: lime">Run!</button>
+    <div stype="flex"><input name="code" id="code" style="width:100%"></div>
+    <button onclick="return toggleRun()" id="gostop" style="background-color: lime">???</button>
 <script>
-    function out(text, opt={}) {
-        const canvas = document.createElement(opt.tag || 'pre');
-        canvas.style.color = opt.color || 'black';
-        canvas.style.border = 'dotted 1px '+(opt.color || 'black');
-        const container = document.getElementById('cons');
-        container.appendChild(canvas);
-        canvas.innerHTML = text; // TODO insecure
-        container.scrollTop = canvas.offsetTop;
-    };
+    const cons = document.getElementById('cons');
+
+    function teletype(opt={}) {
+        const sheet = append(cons, opt.tag ?? 'div');
+        sheet.style.color = opt.color ?? 'black';
+        sheet.style.border = 'dotted 1px '+(opt.color || 'black');
+        return function (text, opt={}) {
+            const line = append(sheet, opt.tag ?? 'span');
+            if (opt.color)
+                line.style.color = opt.color;
+            if (opt.bgcolor)
+                line.style.background = opt.bgcolor;
+            if (opt.padding)
+                line.style.paddingLeft = line.style.paddingRight = opt.padding+"em";
+            line.innerHTML = text;
+            if (!opt.nobr)
+                append( sheet, 'br' );
+            cons.scrollTop = sheet.offsetTop;
+        }
+    }
+
+    function append(parent, type) {
+        const child = document.createElement(type);
+        parent.appendChild(child);
+        return child;
+    }
 
     const code = document.getElementById('code');
     const href = window.location.href.replace( /\?.*$/, '' );
+    const gostop = document.getElementById('gostop');
+
+    let count = 0;
+    let running;
+
+    function toggleRun() {
+        if (running) {
+            running = false;
+        } else {
+            gostop.innerHTML = "Stop!";
+            running = true;
+            run();
+        }
+    }
 
     function run() {
+        const out = teletype();
+
         const src = code.value;
         const link = href+'?code='+encodeURIComponent(src);
-        out( '<a href="'+link+'" target="_blank">'
-            +'code sample permalink</a>', { tag: 'div' } );
-        new Promise( done => {
+        out( ++count, {nobr: true, color: 'white', bgcolor: 'blue', padding: 1})
+        out( '<a href="'+link+'" target="_blank">'+'code sample permalink</a>',
+            {padding: 1});
+
+        const tick = expr => {
+            out(''+expr);
+            if (!running) {
+                out ("...interrupted!", {color: "red"});
+                resetGo();
+                return;
+            }
+
+            const next = expr.step();
+            if (next) {
+                setTimeout(() => tick(next), 0);
+            } else {
+                out('&nbsp;&nbsp;', {bgcolor: 'black'});
+                resetGo();
+            }
+        };
+
+        try {
             const ski = new SKI;
             let expr = ski.parse(src);
+            tick(expr);
+        } catch (err) {
+            out(err, {color: 'red'});
+            resetGo();
+        }
+    }
 
-            // TODO do it via promise so that it's stoppable
-            do {
-                const next = expr.step();
-                out(''+expr);
-                expr = next;
-            } while (expr);
-
-            done( );
-        })
-            .then(  _   => out("<br>---</br>"))
-            .catch( err => out(err, {color: 'red'}));
+    function resetGo () {
+        console.log("resetGo");
+        running = false;
+        gostop.innerHTML = "Go!";
     }
 
     function getParams() {
@@ -68,11 +121,11 @@
     } else if (!code.value.match(/\S/))
         code.value = 'S K I x';
 
-    out(
-        "Your output goes here. "
-        +"Use <code>out(text, { color: color });</code> to display data if needed.",
-        { color: "green", tag: 'span' }
+    teletype()(
+        "Your output goes here. ",
+        { color: "green" }
     );
+    resetGo();
 </script>
 </body>
 </html>
