@@ -66,7 +66,10 @@
     function run() {
         const out = teletype();
 
-        const src = code.value;
+        const maybeAssign = code.value.match(/^\s*([a-z][a-z_0-9]*)\s*=\s*(.*)$/);
+        const src = maybeAssign ? maybeAssign[2] : code.value;
+        const saveAs = maybeAssign ? maybeAssign[1] : undefined;
+
         const link = href+'?code='+encodeURIComponent(src);
         out( ++count, {nobr: true, color: 'white', bgcolor: 'blue', padding: 1})
         out( '<a href="'+link+'" target="_blank">'+'code sample permalink</a>',
@@ -91,6 +94,8 @@
 
         try {
             let expr = ski.parse(src);
+            if (saveAs)
+                ski.add(saveAs, expr);
             tick(expr);
         } catch (err) {
             out(err, {color: 'red'});
