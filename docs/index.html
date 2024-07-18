@@ -60,6 +60,9 @@
         }
     }
 
+    // global state to keep declared vars declared
+    let ski = new SKI;
+
     function run() {
         const out = teletype();
 
@@ -87,7 +90,6 @@
         };
 
         try {
-            const ski = new SKI;
             let expr = ski.parse(src);
             tick(expr);
         } catch (err) {
