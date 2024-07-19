@@ -13,8 +13,19 @@
     Edit code below, then press Run!
     <div id="cons" style="height: 10em; overflow:scroll; resize:vertical; font-family: monospace"></div>
 
-    <div stype="flex"><input name="code" id="code" style="width:100%"></div>
-    <button onclick="return toggleRun()" id="gostop" style="background-color: lime">???</button>
+    <div>
+        <form onsubmit="return toggleRun()">
+        <div stype="flex"><input name="code" id="code" style="width:100%"></div>
+        <button onclick="return toggleRun()" id="gostop" style="background-color: lime">???</button>
+        </form>
+    </div>
+
+    <div id="help">
+        Known combinators that can be used in expressions:
+        <ul id="known">
+
+        </ul>
+    </div>
 <script>
     const cons = document.getElementById('cons');
 
@@ -37,11 +48,7 @@
         }
     }
 
-    function append(parent, type) {
-        const child = document.createElement(type);
-        parent.appendChild(child);
-        return child;
-    }
+
 
     const code = document.getElementById('code');
     const href = window.location.href.replace( /\?.*$/, '' );
@@ -58,6 +65,7 @@
             running = true;
             run();
         }
+        return false;
     }
 
     // global state to keep declared vars declared
@@ -94,8 +102,10 @@
 
         try {
             let expr = ski.parse(src);
-            if (saveAs)
+            if (saveAs) {
                 ski.add(saveAs, expr);
+                showKnown();
+            }
             tick(expr);
         } catch (err) {
             out(err, {color: 'red'});
@@ -127,11 +137,42 @@
     } else if (!code.value.match(/\S/))
         code.value = 'S K I x';
 
+
+    const listKnown = document.getElementById("known");
+    function showKnown() {
+        listKnown.innerHTML = '';
+        const list = ski.list();
+        for (let name of Object.keys(list).sort()) {
+            const entry = list[name];
+            const out = append(listKnown, 'li');
+            out.classList.add('note');
+            append(out, 'b').innerHTML = name;
+            append(out, 'span').innerHTML = " ";
+            if (entry.note)
+                append(out, 'i').innerHTML = entry.note;
+            else
+                append(out, 'tt').innerHTML = entry.impl;
+        }
+    }
+
+    /**
+     *
+     * @param parent
+     * @param type
+     * @return {HTMLElement}
+     */
+    function append(parent, type) {
+        const child = document.createElement(type);
+        parent.appendChild(child);
+        return child;
+    }
+
     teletype()(
         "Your output goes here. ",
         { color: "green" }
     );
     resetGo();
+    showKnown();
 </script>
 </body>
 </html>
