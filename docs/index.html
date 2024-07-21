@@ -88,7 +88,7 @@
         const src = maybeAssign ? maybeAssign[2] : code.value;
         const saveAs = maybeAssign ? maybeAssign[1] : undefined;
 
-        const link = href+'?code='+encodeURIComponent(src);
+        const link = href+'?code='+encode(src);
         out( ++count, {nobr: true, color: 'white', bgcolor: 'blue', padding: 1})
         out( '<a href="'+link+'" target="_blank">'+'code sample permalink</a>',
             {padding: 1});
@@ -175,6 +175,16 @@
         const child = document.createElement(type);
         parent.appendChild(child);
         return child;
+    }
+
+    function encode (s) {
+        // FB and possibly others don't recognize '(' and ')' in URLs,
+        // so have to encode these chars correctly
+        const parens = {
+            '(': '%28',
+            ')': '%29',
+        }
+        return encodeURIComponent(s).replace(/[()]/g, c => parens[c]);
     }
 
     teletype()(
