@@ -37,36 +37,47 @@
         </ul>
     </div>
 <script>
+    /**
+     *   References to static page elements
+     */
     const cons = document.getElementById('cons');
-
-    function teletype(opt={}) {
-        const sheet = append(cons, opt.tag ?? 'div');
-        sheet.style.color = opt.color ?? 'black';
-        sheet.style.border = 'dotted 1px '+(opt.color || 'black');
-        return function (text, opt={}) {
-            const line = append(sheet, opt.tag ?? 'span');
-            if (opt.color)
-                line.style.color = opt.color;
-            if (opt.bgcolor)
-                line.style.background = opt.bgcolor;
-            if (opt.padding)
-                line.style.paddingLeft = line.style.paddingRight = opt.padding+"em";
-            line.innerHTML = text;
-            if (!opt.nobr)
-                append( sheet, 'br' );
-            cons.scrollTop = line.offsetTop;
-        }
-    }
-
-
-
     const code = document.getElementById('code');
     const href = window.location.href.replace( /\?.*$/, '' );
     const gostop = document.getElementById('gostop');
+    const listKnown = document.getElementById("known");
 
+    /**
+     *   Global state of the interpreter
+     */
+
+    let ski = new SKI;
     let count = 0;
-    let running;
+    let running = false;
 
+    init();
+
+    /**
+     * Page-specific functions
+      */
+
+    function init() {
+        teletype()(
+            "Your output goes here. ",
+            {color: "green"}
+        );
+        teletype()(
+            ['i', 'k', 's'].map(sym => '<img src="3rd-party/img/card_' + sym + '.png">').join('&nbsp;')
+        )
+        resetGo();
+        showKnown();
+        const init = getParams().code;
+        if (init) {
+            code.value = init;
+        } else if (!code.value.match(/\S/))
+            code.value = 'S K I x';
+    }
+
+    // page functions
     function toggleRun() {
         if (running) {
             running = false;
@@ -77,9 +88,6 @@
         }
         return false;
     }
-
-    // global state to keep declared vars declared
-    let ski = new SKI;
 
     function run() {
         const out = teletype();
@@ -128,27 +136,6 @@
         gostop.innerHTML = "Run!";
     }
 
-    function getParams() {
-        // Somewhat ad hoc but it's javascript ^_^
-        const raw = window.location.search.substr(1) || '';
-        const out = {};
-        raw.split('&').forEach( pair => {
-            const [ name, value ] = pair.split('=');
-            if (value === undefined) return; // TODO die
-            out[name] = decodeURIComponent(value);
-        })
-        return out;
-    }
-
-    // TODO also store code in localstorage
-    const init = getParams().code;
-    if (init) {
-        code.value = init;
-    } else if (!code.value.match(/\S/))
-        code.value = 'S K I x';
-
-
-    const listKnown = document.getElementById("known");
     function showKnown() {
         listKnown.innerHTML = '';
         const list = ski.list();
@@ -166,6 +153,35 @@
     }
 
     /**
+     * create a function that takes test and appends it to specific region
+     * in a specific <div>
+     * @param {Object} opt
+     * @return {(function(string, Object?): void)}
+     */
+    function teletype(opt={}) {
+        const sheet = append(cons, opt.tag ?? 'div');
+        sheet.style.color = opt.color ?? 'black';
+        sheet.style.border = 'dotted 1px '+(opt.color || 'black');
+        return function (text, opt={}) {
+            const line = append(sheet, opt.tag ?? 'span');
+            if (opt.color)
+                line.style.color = opt.color;
+            if (opt.bgcolor)
+                line.style.background = opt.bgcolor;
+            if (opt.padding)
+                line.style.paddingLeft = line.style.paddingRight = opt.padding+"em";
+            line.innerHTML = text;
+            if (!opt.nobr)
+                append( sheet, 'br' );
+            cons.scrollTop = line.offsetTop;
+        }
+    }
+
+    /**
+     *   HTML-related utility functions
+     */
+
+    /**
      *
      * @param parent
      * @param type
@@ -175,6 +191,18 @@
         const child = document.createElement(type);
         parent.appendChild(child);
         return child;
+    }
+
+    function getParams() {
+        // Somewhat ad hoc but it's javascript ^_^
+        const raw = window.location.search.substring(1) || '';
+        const out = {};
+        raw.split('&').forEach( pair => {
+            const [ name, value ] = pair.split('=');
+            if (value === undefined) return; // TODO die
+            out[name] = decodeURIComponent(value);
+        })
+        return out;
     }
 
     function encode (s) {
@@ -187,15 +215,6 @@
         return encodeURIComponent(s).replace(/[()]/g, c => parens[c]);
     }
 
-    teletype()(
-        "Your output goes here. ",
-        { color: "green" }
-    );
-    teletype()(
-        ['i', 'k', 's'].map (sym => '<img src="3rd-party/img/card_'+sym+'.png">').join('&nbsp;')
-    )
-    resetGo();
-    showKnown();
 </script>
 </body>
 </html>
