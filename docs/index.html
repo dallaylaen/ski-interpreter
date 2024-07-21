@@ -10,8 +10,7 @@
 <body>
     <h1>Simple Kombinator Interpreter</h1>
 
-    Edit code below, then press Run!
-    <div id="cons" style="height: 10em; overflow:scroll; resize:vertical; font-family: monospace"></div>
+    <div id="cons" style="height: 20em; overflow:scroll; resize:vertical; font-family: monospace"></div>
 
     <div>
         <form onsubmit="return toggleRun()">
@@ -21,7 +20,18 @@
     </div>
 
     <div id="help">
-        Known combinators that can be used in expressions:
+        <p>
+            Welcome to the
+            <a href="https://en.wikipedia.org/wiki/Combinatory_logic" target="_blank">combinatory logic<a>
+            interpreter.
+        </p>
+        <p>
+            Type an expression in the above entry field and click "run!".
+            A valid expression contains one or more terms and parenthesis around groups of terms.
+            Unknown terms will be left as is.
+            New terms can be declared by prepending "name = " to the expression.
+        </p>
+        <p>Known combinators that can be used in expressions:</p>
         <ul id="known">
 
         </ul>
@@ -115,7 +125,7 @@
 
     function resetGo () {
         running = false;
-        gostop.innerHTML = "Go!";
+        gostop.innerHTML = "Run!";
     }
 
     function getParams() {
@@ -171,6 +181,9 @@
         "Your output goes here. ",
         { color: "green" }
     );
+    teletype()(
+        ['i', 'k', 's'].map (sym => '<img src="3rd-party/img/card_'+sym+'.png">').join('&nbsp;')
+    )
     resetGo();
     showKnown();
 </script>
