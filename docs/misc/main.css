@@ -12,6 +12,7 @@
 #cons {
     font-family: monospace;
     color: #363636;
+    overflow-wrap: break-word;
 }
 
 .pane {
