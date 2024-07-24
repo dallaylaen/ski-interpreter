@@ -8,34 +8,26 @@
     <link rel="stylesheet" href="misc/main.css">
 </head>
 <body>
-    <h1>Simple Kombinator Interpreter</h1>
+<div class="all">
+    <div class="layout main">
+        <div class="pane" id="cons" style="width: 60%">
+        </div>
 
-    <div id="cons" style="height: 20em; overflow:scroll; resize:vertical; font-family: monospace"></div>
-
-    <div>
+        <div id="info" class="pane" style="width: 39%; font-family: monospace">
+            <div><b>Known terms that can be used in expressions:</b></div>
+            <ul id="known"></ul>
+        </div>
+    </div>
+    <div class="layout">
         <form onsubmit="return toggleRun()">
-        <div stype="flex"><input name="code" id="code" style="width:100%"></div>
-        <button onclick="return toggleRun()" id="gostop" style="background-color: lime">???</button>
+            <div style="float: right; ">
+                <button onclick="return toggleRun()" id="gostop" style="background-color: lime">???</button>
+            </div>
+            <div style="overflow: hidden; "><input name="code" id="code" style="width:100%"></div>
         </form>
     </div>
+</div>
 
-    <div id="help">
-        <p>
-            Welcome to the
-            <a href="https://en.wikipedia.org/wiki/Combinatory_logic" target="_blank">combinatory logic<a>
-            interpreter.
-        </p>
-        <p>
-            Type an expression in the above entry field and click "run!".
-            A valid expression contains one or more terms and parenthesis around groups of terms.
-            Unknown terms will be left as is.
-            New terms can be declared by prepending <tt>"name&nbsp;=&nbsp;"</tt> to the expression.
-        </p>
-        <p>Known combinators that can be used in expressions:</p>
-        <ul id="known">
-
-        </ul>
-    </div>
 <script>
     /**
      *   References to static page elements
@@ -61,7 +53,21 @@
       */
 
     function init() {
-        teletype()(
+        const greet = teletype();
+        greet(
+            'Welcome to the '+
+            '<a href="https://en.wikipedia.org/wiki/SKI_combinator_calculus" target="_blank">' +
+            'combinatory logic<a> interpreter.',
+            {tag: 'p'}
+        );
+        greet(
+            'Type an expression in the entry field and click "run!". ' +
+            'A valid expression contains one or more terms and parenthesis around groups of terms. ' +
+            'Unknown terms will be left as is. ' +
+            'New terms can be declared by prepending <code>"name&nbsp;=&nbsp;"</code> to the expression.',
+            {tag: 'p'}
+        );
+        greet(
             "Your output goes here. ",
             {color: "green"}
         );

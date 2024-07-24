@@ -1,3 +1,42 @@
 .flex {
     display: inline-block;
+    float: left;
+    border: solid red 1px;
+}
+
+.rightmost {
+    display: inline-block;
+    float: right;
+}
+
+#cons {
+    font-family: monospace;
+}
+
+.pane {
+    display: inline-block;
+    float: left;
+    overflow: scroll;
+    height: 25em;
+}
+
+.layout {
+    display: block;
+    float: none;
+}
+.layout:after {
+    display: block;
+    clear: both;
+    content: '';
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
 }
