@@ -10,7 +10,7 @@
 <body>
 <div class="all">
     <div class="layout main">
-        <div class="pane" id="cons" style="width: 60%">
+        <div class="pane" id="cons" style="width: 59%">
         </div>
 
         <div id="info" class="pane" style="width: 39%; font-family: monospace">
@@ -163,8 +163,9 @@
      */
     function teletype(opt={}) {
         const sheet = append(cons, opt.tag ?? 'div');
-        sheet.style.color = opt.color ?? 'black';
-        sheet.style.border = 'dotted 1px '+(opt.color || 'black');
+        if (opt.color)
+            sheet.style.color = opt.color;
+        sheet.style.border = 'dotted 1px '+(opt.color ?? 'black');
         return function (text, opt={}) {
             const line = append(sheet, opt.tag ?? 'span');
             if (opt.color)

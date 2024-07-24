@@ -11,6 +11,7 @@
 
 #cons {
     font-family: monospace;
+    color: #363636;
 }
 
 .pane {
@@ -39,4 +40,16 @@ html, body {
 ul {
     margin: 0;
     padding: 0;
+}
+
+#info {
+    padding-left: 1em;
+}
+
+.pa {
+    color: darkgray;
+}
+
+#known {
+    padding-left: 2em;
 }
