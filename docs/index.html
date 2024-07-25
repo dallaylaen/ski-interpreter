@@ -20,10 +20,11 @@
     </div>
     <div class="layout">
         <form onsubmit="return toggleRun()">
-            <div style="float: right; ">
+            <div style="width: 99%"><input name="code" id="code" style="width:100%"></div>
+            <div style="float: left; ">
+                <input type="checkbox" id="verbose" onchange="toggleVerb()">Verbose
                 <button onclick="return toggleRun()" id="gostop" style="background-color: lime">???</button>
             </div>
-            <div style="overflow: hidden; "><input name="code" id="code" style="width:100%"></div>
         </form>
     </div>
 </div>
@@ -37,11 +38,13 @@
     const href = window.location.href.replace( /\?.*$/, '' );
     const gostop = document.getElementById('gostop');
     const listKnown = document.getElementById("known");
+    const verbose = document.getElementById("verbose");
 
     /**
      *   Global state of the interpreter
      */
 
+    let showlines = 10;
     let ski = new SKI;
     let count = 0;
     let running = false;
@@ -78,6 +81,12 @@
             code.value = init;
         } else if (!code.value.match(/\S/))
             code.value = 'S K I x';
+        toggleVerb();
+    }
+
+    function toggleVerb () {
+        console.log(verbose.checked);
+        showlines = verbose.checked ? Infinity : 10;
     }
 
     // page functions
@@ -104,8 +113,28 @@
         out( '<a href="'+link+'" target="_blank">'+'code sample permalink</a>',
             {padding: 1});
 
+        const tick = getRunner(out);
+
+        try {
+            let expr = ski.parse(src);
+            if (saveAs) {
+                ski.add(saveAs, expr);
+                showKnown();
+            }
+            tick(expr);
+        } catch (err) {
+            out(err, {color: 'red'});
+            resetGo();
+        }
+    }
+
+    function getRunner(out) {
+        let step = 0;
+        let line;
         const tick = expr => {
-            out(''+expr);
+            if (!line || step++ <= showlines)
+                line = out('');
+            line.rewrite('' + expr);
             if (!running) {
                 out ("...interrupted!", {color: "red"});
                 resetGo();
@@ -120,18 +149,7 @@
                 resetGo();
             }
         };
-
-        try {
-            let expr = ski.parse(src);
-            if (saveAs) {
-                ski.add(saveAs, expr);
-                showKnown();
-            }
-            tick(expr);
-        } catch (err) {
-            out(err, {color: 'red'});
-            resetGo();
-        }
+        return tick;
     }
 
     function resetGo () {
@@ -174,10 +192,15 @@
                 line.style.background = opt.bgcolor;
             if (opt.padding)
                 line.style.paddingLeft = line.style.paddingRight = opt.padding+"em";
-            line.innerHTML = text;
+            line.rewrite = function(str) {
+                this.innerHTML = str;
+                return this;
+            }
+            line.rewrite(text);
             if (!opt.nobr)
                 append( sheet, 'br' );
             cons.scrollTop = line.offsetTop;
+            return line;
         }
     }
 
