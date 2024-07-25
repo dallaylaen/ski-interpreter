@@ -61,3 +61,12 @@ ul {
     color: white;
     height: 1.5em;
 }
+
+button input {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+
+}
