@@ -54,3 +54,10 @@ ul {
 #known {
     padding-left: 2em;
 }
+
+.bigcontrol {
+    width: 13%;
+    background-color: lime;
+    color: white;
+    height: 1.5em;
+}

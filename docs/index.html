@@ -21,9 +21,14 @@
     <div class="layout">
         <form onsubmit="return toggleRun()">
             <div style="width: 99%"><input name="code" id="code" style="width:100%"></div>
-            <div style="float: left; ">
-                <input type="checkbox" id="verbose" onchange="toggleVerb()">Verbose
-                <button onclick="return toggleRun()" id="gostop" style="background-color: lime">???</button>
+            <div>
+                <button class="bigcontrol" onclick="return insert('S')">S</button>
+                <button class="bigcontrol" onclick="return insert('K')">K</button>
+                <button class="bigcontrol" onclick="return insert('I')">I</button>
+                <button class="bigcontrol" onclick="return insert('(')">)</button>
+                <button class="bigcontrol" onclick="return insert(')')">)</button>
+                <button class="bigcontrol" onclick="return toggleVerb()"><input type="checkbox" id="verbose" disabled="true">Verbose</button>
+                <button class="bigcontrol" onclick="return toggleRun()" id="gostop">???</button>
             </div>
         </form>
     </div>
@@ -85,8 +90,9 @@
     }
 
     function toggleVerb () {
-        console.log(verbose.checked);
+        verbose.checked = !verbose.checked;
         showlines = verbose.checked ? Infinity : 10;
+        return false;
     }
 
     // page functions
@@ -171,6 +177,18 @@
             else
                 append(out, 'tt').innerHTML = entry.impl;
         }
+    }
+
+    function insert (text) {
+        const orig = code.value;
+        const prefix = orig.substring(0,  code.selectionStart);
+        const postfix = orig.substring(code.selectionEnd);
+
+        code.value = prefix + text + postfix;
+        code.selectionStart = prefix.length + text.length;
+        code.selectionEnd   = prefix.length + text.length;
+
+        return false;
     }
 
     /**
