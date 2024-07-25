@@ -19,12 +19,14 @@
     display: inline-block;
     float: left;
     overflow: scroll;
-    height: 25em;
+    height: 100%;
 }
 
 .layout {
     display: block;
     float: none;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
 }
 .layout:after {
     display: block;
@@ -69,4 +71,16 @@ button input {
     padding-left: 0.5em;
     padding-right: 0.5em;
 
+}
+
+#top {
+    padding-top: 0.5em;
+}
+
+#bottom {
+    padding-bottom: 0.5em;
+}
+
+#main {
+    height: 20em;
 }

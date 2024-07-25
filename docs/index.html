@@ -9,7 +9,8 @@
 </head>
 <body>
 <div class="all">
-    <div class="layout main">
+    <div class="layout" id="top"></div>
+    <div class="layout main" id="main">
         <div class="pane" id="cons" style="width: 59%">
         </div>
 
@@ -18,7 +19,7 @@
             <ul id="known"></ul>
         </div>
     </div>
-    <div class="layout">
+    <div class="layout" id="bottom">
         <form onsubmit="return toggleRun()">
             <div style="width: 99%"><input name="code" id="code" style="width:100%"></div>
             <div>
@@ -31,6 +32,9 @@
                 <button class="bigcontrol" onclick="return toggleRun()" id="gostop">???</button>
             </div>
         </form>
+        <div>
+            &copy;2024 Konstantin Uvarin. <a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">source code</a>
+        </div>
     </div>
 </div>
 
@@ -44,6 +48,12 @@
     const gostop = document.getElementById('gostop');
     const listKnown = document.getElementById("known");
     const verbose = document.getElementById("verbose");
+
+    // TODO move all of the above in here
+    const elem = {};
+    for (const name of ['top', 'bottom', 'main'])
+        elem[name] = document.getElementById(name);
+
 
     /**
      *   Global state of the interpreter
@@ -87,7 +97,9 @@
         } else if (!code.value.match(/\S/))
             code.value = 'S K I x';
         verbose.checked = false;
-        code.addEventListener("keydown", onKey);
+        code.addEventListener('keydown', onKey);
+        window.addEventListener('resize', onResize);
+        onResize();
     }
 
     function onKey (event) {
@@ -97,6 +109,14 @@
                 toggleRun();
             return false;
         }
+        return true;
+    }
+
+    function onResize() {
+        // FIXME should be done via css instead...
+        const height = window.innerHeight - elem.top.offsetHeight - elem.bottom.offsetHeight;
+
+        elem.main.style.height = height + 'px';
         return true;
     }
 
