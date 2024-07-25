@@ -84,3 +84,8 @@ button input {
 #main {
     height: 20em;
 }
+
+.clickable {
+    text-decoration: none;
+    color: inherit;
+}

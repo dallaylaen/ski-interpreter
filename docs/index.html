@@ -14,7 +14,7 @@
         <div class="pane" id="cons" style="width: 59%">
         </div>
 
-        <div id="info" class="pane" style="width: 39%; font-family: monospace">
+        <div id="info" class="pane" style="width: 39%;">
             <div><b>Known terms that can be used in expressions:</b></div>
             <ul id="known"></ul>
         </div>
@@ -81,8 +81,12 @@
         greet(
             'Type an expression in the entry field and click "run!". ' +
             'A valid expression contains one or more terms and parenthesis around groups of terms. ' +
-            'Unknown terms will be left as is. ' +
-            'New terms can be declared by prepending <code>"name&nbsp;=&nbsp;"</code> to the expression.',
+            'Unknown terms will be left as is. ',
+            {tap: 'p'}
+        );
+        greet(
+            'New terms can be declared by prepending <code>"name&nbsp;=&nbsp;"</code> to the expression.' +
+            'They will appear in the box on the right and can be clicked to add them to the expression',
             {tag: 'p'}
         );
         greet(
@@ -199,14 +203,17 @@
         const list = ski.list();
         for (let name of Object.keys(list).sort()) {
             const entry = list[name];
-            const out = append(listKnown, 'li');
-            out.classList.add('note');
+            const li = append(listKnown, 'li');
+            const out = append(li, 'a');
+            out.classList.add('note', 'clickable');
+            out.href = '#';
+            out.onclick = event => insert(name);
             append(out, 'b').innerHTML = name;
             append(out, 'span').innerHTML = " ";
             if (entry.note)
                 append(out, 'i').innerHTML = entry.note;
             else
-                append(out, 'tt').innerHTML = entry.impl;
+                append(out, 'tt').innerHTML = '= '+entry.impl;
         }
     }
 
@@ -214,6 +221,10 @@
         const orig = code.value;
         const prefix = orig.substring(0,  code.selectionStart);
         const postfix = orig.substring(code.selectionEnd);
+
+        // add spaces around if we're not an elementary term
+        if (!text.match(/^[()A-Z]$/))
+            text = (prefix.match(/(?:^| )$/) ? '' : ' ') + text + (postfix.match(/^(?: |$)/) ? '' : ' ');
 
         code.value = prefix + text + postfix;
         code.selectionStart = prefix.length + text.length;
