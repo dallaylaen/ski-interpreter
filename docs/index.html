@@ -86,7 +86,18 @@
             code.value = init;
         } else if (!code.value.match(/\S/))
             code.value = 'S K I x';
-        toggleVerb();
+        verbose.checked = false;
+        code.addEventListener("keydown", onKey);
+    }
+
+    function onKey (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            if (!running)
+                toggleRun();
+            return false;
+        }
+        return true;
     }
 
     function toggleVerb () {
@@ -212,12 +223,12 @@
                 line.style.paddingLeft = line.style.paddingRight = opt.padding+"em";
             line.rewrite = function(str) {
                 this.innerHTML = str;
+                cons.scrollTop = line.offsetTop;
                 return this;
             }
             line.rewrite(text);
             if (!opt.nobr)
                 append( sheet, 'br' );
-            cons.scrollTop = line.offsetTop;
             return line;
         }
     }
