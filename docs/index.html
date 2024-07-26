@@ -95,15 +95,25 @@
         );
         resetGo();
         showKnown();
-        const init = getParams().code;
-        if (init) {
-            code.value = init;
-        } else if (!code.value.match(/\S/))
-            code.value = 'S K I x';
         verbose.checked = false;
         code.addEventListener('keydown', onKey);
         window.addEventListener('resize', onResize);
         onResize();
+
+        const params = getParams();
+        if (params.code) {
+            code.value = params.code;
+        } else if (!code.value.match(/\S/))
+            code.value = 'S K I x';
+
+        if (params.terms) {
+            const terms = decodeURIComponent(params.terms);
+            for (let pair of terms.split(',')) {
+                const [name, impl] = pair.split(':');
+                ski.add(name, impl);
+            }
+            showKnown();
+        }
     }
 
     function onKey (event) {
@@ -149,9 +159,8 @@
         const src = maybeAssign ? maybeAssign[2] : code.value;
         const saveAs = maybeAssign ? maybeAssign[1] : undefined;
 
-        const link = href+'?code='+encode(src);
         out( ++count, {nobr: true, color: 'white', bgcolor: 'blue', padding: 1})
-        out( '<a href="'+link+'" target="_blank">'+'code sample permalink</a>',
+        out( '<a href="'+permalink(code.value)+'" target="_blank">'+'code sample permalink</a>',
             {padding: 1});
 
         const tick = getRunner(out);
@@ -231,6 +240,14 @@
         code.selectionEnd   = prefix.length + text.length;
 
         return false;
+    }
+
+    function permalink(sample) {
+        const terms = ski.getTerms();
+        const saved = Object.keys(terms)
+            .filter(name => !terms[name].isNative())
+            .map(name => name+':'+terms[name].expand()).join(',');
+        return '?code=' + encode(sample) + '&terms=' + encode(saved);
     }
 
     /**
