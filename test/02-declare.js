@@ -34,10 +34,15 @@ describe( 'SKI', () => {
         ski.add('n2', 'inc I');
         const expr = ski.parse('n2 n2 n2 x y');
 
-        const result = expr.run( 10000);
+        const canonic = expr.expand();
+        expect( ''+canonic ).to.match(/^[SKI()]+\(x\)\(y\)$/);
 
+        const result = expr.run( 10000);
         expect( (''+result).replace(/[() ]/g, '') )
             .to.equal('x'.repeat(16)+'y');
+
+        const alt = canonic.run(10000);
+        expect(''+alt).to.equal(''+result);
 
         done();
     });
