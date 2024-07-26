@@ -27,4 +27,18 @@ describe( 'SKI', () => {
 
         done();
     });
+
+    it('can perform some complex computations, correctly', done => {
+        const ski = new SKI();
+        ski.add('inc', 'S(S(K(S))(K))');
+        ski.add('n2', 'inc I');
+        const expr = ski.parse('n2 n2 n2 x y');
+
+        const result = expr.run( 10000);
+
+        expect( (''+result).replace(/[() ]/g, '') )
+            .to.equal('x'.repeat(16)+'y');
+
+        done();
+    });
 });
