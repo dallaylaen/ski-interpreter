@@ -22,7 +22,7 @@ describe( 'SKI', () => {
 
         const known = ski.list();
 
-        expect (known.S.note).to.match(/S.*->/);
+        expect (known.S.note).to.match(/x.*y.*z.*->.*x.*z.*\(y.*z\)/);
         expect (known.sub.note).to.equal('just an alias');
 
         done();
