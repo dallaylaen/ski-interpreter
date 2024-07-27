@@ -159,7 +159,7 @@
         const saveAs = maybeAssign ? maybeAssign[1] : undefined;
 
         const head = out( '<a href="'+permalink(code.value)+'" target="_blank"><b>Expression #'+(++count)+'</b></a>',
-            {tag: 'div', nobr: true, padding: 1, bgcolor: 'lightgrey'});
+            {tag: 'div', nobr: true, class: 'con-header'});
         append(head, 'span').innerHTML = '  steps: ';
         const iterfield = append(head, 'span');
         iterfield.innerHTML = '-';
@@ -276,6 +276,8 @@
                 line.style.background = opt.bgcolor;
             if (opt.padding)
                 line.style.paddingLeft = line.style.paddingRight = opt.padding+"em";
+            if (opt.class)
+                line.classList.add(opt.class);
             line.rewrite = function(str) {
                 this.innerHTML = ''+str;
                 cons.scrollTop = line.offsetTop;

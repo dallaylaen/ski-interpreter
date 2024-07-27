@@ -89,3 +89,7 @@ button input {
     text-decoration: none;
     color: inherit;
 }
+
+.con-header {
+    background-color: lightgray;
+}
