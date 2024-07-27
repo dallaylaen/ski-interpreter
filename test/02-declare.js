@@ -7,6 +7,7 @@ describe( 'SKI', () => {
         ski.add('sub', 'S(K(SI))K');
 
         const term = ski.parse('sub x y');
+
         const result = term.run();
 
         expect( ''+result).to.equal('y(x)');
@@ -20,10 +21,15 @@ describe( 'SKI', () => {
         const ski = new SKI;
         ski.add('sub', 'S', 'just an alias');
 
-        const known = ski.list();
+        const known = ski.getTerms();
 
         expect (known.S.note).to.match(/x.*y.*z.*->.*x.*z.*\(y.*z\)/);
         expect (known.sub.note).to.equal('just an alias');
+
+        let expr = known.sub;
+        expect( expr.isNative() ).to.equal(false);
+        expr = expr.step();
+        expect( expr.isNative() ).to.equal(true);
 
         done();
     });
