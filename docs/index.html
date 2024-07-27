@@ -9,13 +9,18 @@
 </head>
 <body>
 <div class="all">
-    <div class="layout" id="top"></div>
+    <div class="layout" id="top">
+        <div>
+            <button id="mode-free" class="mode-pick" onclick="return modePick(this)">Console</button>
+            <button id="mode-quest" class="mode-pick" onclick="return modePick(this)">Quests</button>
+        </div>
+    </div>
     <div class="layout main" id="main">
         <div class="pane" style="width: 69%">
-            <div>
-                [Console | Exercises ]
+            <div id="teletype" class="scroll">
+
             </div>
-            <div id="cons" class="scroll">
+            <div id="quests" class="scroll hidden">
 
             </div>
         </div>
@@ -55,7 +60,7 @@
 
     // TODO move all of the above in here
     const elem = {};
-    for (const name of ['top', 'bottom', 'main', 'known', 'cons'])
+    for (const name of ['top', 'bottom', 'main', 'known', 'teletype'])
         elem[name] = document.getElementById(name);
 
     /**
@@ -152,6 +157,10 @@
             run();
         }
         return false;
+    }
+
+    function modePick (item) {
+        console.log(item);
     }
 
     function run() {
@@ -267,7 +276,7 @@
      * @return {(function(string, Object?): void)}
      */
     function teletype(opt={}) {
-        const sheet = append(elem.cons, opt.tag ?? 'div');
+        const sheet = append(elem.teletype, opt.tag ?? 'div');
         if (opt.color)
             sheet.style.color = opt.color;
         sheet.style.border = 'dotted 1px '+(opt.color ?? 'black');
@@ -283,8 +292,7 @@
                 line.classList.add(opt.class);
             line.rewrite = function(str) {
                 this.innerHTML = ''+str;
-                console.log(elem.cons, line);
-                elem.cons.scrollTop = line.offsetTop;
+                elem.teletype.scrollTop = line.offsetTop;
                 return this;
             }
             line.rewrite(text);

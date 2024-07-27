@@ -9,7 +9,7 @@
     float: right;
 }
 
-#cons {
+#teletype {
     font-family: monospace;
     color: #363636;
     overflow-wrap: break-word;
@@ -111,4 +111,12 @@ button input {
 
 .success {
     color: green;
+}
+
+.hidden {
+    display: none;
+}
+
+.mode-pick {
+    color: dodgerblue;
 }
