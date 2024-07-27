@@ -1,15 +1,21 @@
 const { expect } = require('chai');
-const { SKI } = require('../index');
+const { SKI, Quest } = require('../index');
 
-describe('SKI.test', () => {
-    it ('can evaluate expressions with ease', done => {
-        const ski = new SKI();
-        const wanted = ski.parse('y(x)');
-        const found = ski.parse('S(K(SI))K');
-        expect( wanted.test(found, 'x y').pass ).to.equal(true);
-        expect( wanted.test(found, 'x').pass ).to.equal(false);
-        expect( () => wanted.test(found, 'zebra')).to.throw(/[Uu]nknown.*\bzebra\b/);
+describe('Quest', () => {
+    it( 'can validate I', done => {
+        const quest = new Quest()
+            .add('x', 'x');
+        const ski = new SKI;
+        const result = quest.check(ski.parse('SKK'));
+
+        expect( result.pass ).to.equal(true);
+
+        // try to fool the parser with eponymous free var
+        const bad = quest.check(ski.parse('Kx'));
+        expect( bad.pass ).to.equal(false);
 
         done();
     });
+
+
 })
