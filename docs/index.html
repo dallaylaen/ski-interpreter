@@ -174,7 +174,7 @@
             }
             tick(expr);
         } catch (err) {
-            out(err, {color: 'red'});
+            out(err, {class: 'error'});
             resetGo();
         }
     }
@@ -185,7 +185,7 @@
         const tick = expr => {
             // check interrupt
             if (!running) {
-                out ("...interrupted!", {color: "red"});
+                out ("...interrupted!", {class: "error"});
                 resetGo();
                 return;
             }
@@ -202,7 +202,7 @@
             if (next) {
                 setTimeout(() => tick(next), 0);
             } else {
-                out('&nbsp;&nbsp;', {bgcolor: 'black'});
+                out('&check;', {class: 'success'});
                 resetGo();
             }
         };

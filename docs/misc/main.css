@@ -93,3 +93,11 @@ button input {
 .con-header {
     background-color: lightgray;
 }
+
+.error {
+    color: red;
+}
+
+.success {
+    color: green;
+}
