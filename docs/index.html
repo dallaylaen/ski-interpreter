@@ -158,11 +158,13 @@
         const src = maybeAssign ? maybeAssign[2] : code.value;
         const saveAs = maybeAssign ? maybeAssign[1] : undefined;
 
-        out( ++count, {nobr: true, color: 'white', bgcolor: 'blue', padding: 1})
-        out( '<a href="'+permalink(code.value)+'" target="_blank">'+'code sample permalink</a>',
-            {padding: 1});
+        const head = out( '<a href="'+permalink(code.value)+'" target="_blank"><b>Expression #'+(++count)+'</b></a>',
+            {tag: 'div', nobr: true, padding: 1, bgcolor: 'lightgrey'});
+        append(head, 'span').innerHTML = '  steps: ';
+        const iterfield = append(head, 'span');
+        iterfield.innerHTML = '-';
 
-        const tick = getRunner(out);
+        const tick = getRunner(out, iterfield);
 
         try {
             let expr = ski.parse(src);
@@ -177,19 +179,25 @@
         }
     }
 
-    function getRunner(out) {
+    function getRunner(out, iterfield) {
         let step = 0;
         let line;
         const tick = expr => {
-            if (!line || step++ <= showlines)
-                line = out('');
-            line.rewrite('' + expr);
+            // check interrupt
             if (!running) {
                 out ("...interrupted!", {color: "red"});
                 resetGo();
                 return;
             }
 
+            // output state
+            step++;
+            if (!line || step <= showlines)
+                line = out('');
+            line.rewrite(expr);
+            iterfield.innerHTML = ''+step;
+
+            // calculate & setup next iteration
             const next = expr.step();
             if (next) {
                 setTimeout(() => tick(next), 0);
@@ -269,7 +277,7 @@
             if (opt.padding)
                 line.style.paddingLeft = line.style.paddingRight = opt.padding+"em";
             line.rewrite = function(str) {
-                this.innerHTML = str;
+                this.innerHTML = ''+str;
                 cons.scrollTop = line.offsetTop;
                 return this;
             }
