@@ -11,12 +11,18 @@
 <div class="all">
     <div class="layout" id="top"></div>
     <div class="layout main" id="main">
-        <div class="pane" id="cons" style="width: 59%">
+        <div class="pane" style="width: 69%">
+            <div>
+                [Console | Exercises ]
+            </div>
+            <div id="cons" class="scroll">
+
+            </div>
         </div>
 
-        <div id="info" class="pane" style="width: 39%;">
+        <div id="info" class="pane" style="width: 29%;">
             <div><b>Known terms that can be used in expressions:</b></div>
-            <ul id="known"></ul>
+            <ul id="known" class="scroll"></ul>
         </div>
     </div>
     <div class="layout" id="bottom">
@@ -42,7 +48,6 @@
     /**
      *   References to static page elements
      */
-    const cons = document.getElementById('cons');
     const code = document.getElementById('code');
     const href = window.location.href.replace( /\?.*$/, '' );
     const gostop = document.getElementById('gostop');
@@ -50,9 +55,8 @@
 
     // TODO move all of the above in here
     const elem = {};
-    for (const name of ['top', 'bottom', 'main', 'known'])
+    for (const name of ['top', 'bottom', 'main', 'known', 'cons'])
         elem[name] = document.getElementById(name);
-
 
     /**
      *   Global state of the interpreter
@@ -263,7 +267,7 @@
      * @return {(function(string, Object?): void)}
      */
     function teletype(opt={}) {
-        const sheet = append(cons, opt.tag ?? 'div');
+        const sheet = append(elem.cons, opt.tag ?? 'div');
         if (opt.color)
             sheet.style.color = opt.color;
         sheet.style.border = 'dotted 1px '+(opt.color ?? 'black');
@@ -279,7 +283,8 @@
                 line.classList.add(opt.class);
             line.rewrite = function(str) {
                 this.innerHTML = ''+str;
-                cons.scrollTop = line.offsetTop;
+                console.log(elem.cons, line);
+                elem.cons.scrollTop = line.offsetTop;
                 return this;
             }
             line.rewrite(text);

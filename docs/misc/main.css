@@ -15,6 +15,11 @@
     overflow-wrap: break-word;
 }
 
+.scroll {
+    overflow: scroll;
+    height: 100%;
+}
+
 .pane {
     display: inline-block;
     float: left;
