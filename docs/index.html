@@ -106,8 +106,7 @@
             code.value = 'S K I x';
 
         if (params.terms) {
-            const terms = decodeURIComponent(params.terms);
-            for (let pair of terms.split(',')) {
+            for (let pair of params.terms.split(',')) {
                 const [name, impl] = pair.split(':');
                 ski.add(name, impl);
             }
@@ -313,7 +312,7 @@
         raw.split('&').forEach( pair => {
             const [ name, value ] = pair.split('=');
             if (value === undefined) return; // TODO die
-            out[name] = decodeURIComponent(value);
+            out[name] = decode(value);
         })
         return out;
     }
@@ -326,6 +325,9 @@
             ')': '%29',
         }
         return encodeURIComponent(s).replace(/[()]/g, c => parens[c]);
+    }
+    function decode (s) {
+        return decodeURIComponent((''+s).replace(/\+/g, ' '));
     }
 
 </script>
