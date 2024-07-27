@@ -17,5 +17,34 @@ describe('Quest', () => {
         done();
     });
 
+    it ('works for if', done => {
+        const quest = new Quest(
+            {title:"if (then) (else) (true|false)"},
+            [ 'x', 'x', 'y', 'K'],
+            [ 'y', 'x', 'y', 'KI'],
+        );
 
+        const ski = new SKI();
+
+        const rot = ski.parse('S(S(K(S))(S(K(K))(S(K(S))(S(K(S(I)))(K)))))(K(K))');
+        const pass = quest.check(rot);
+
+        expect(pass.pass).to.equal(true);
+        expect(pass.details.length).to.equal(2);
+
+        const bad = ski.parse('KK');
+        const fail = quest.check(bad);
+
+        expect(fail.pass).to.equal(false);
+        expect(fail.details.length).to.equal(2);
+
+        expect(fail.details[0].pass).to.equal(false);
+        expect(fail.details[1].pass).to.equal(true);
+
+        expect(''+fail.details[0].found).to.equal('y');
+        expect(''+fail.details[0].expected).to.equal('x');
+
+
+        done();
+    });
 })
