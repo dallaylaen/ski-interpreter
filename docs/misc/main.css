@@ -57,6 +57,12 @@ ul {
     padding-left: 2em;
 }
 
+#known li {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
 .bigcontrol {
     width: 13%;
     background-color: lime;
