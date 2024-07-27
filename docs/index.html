@@ -46,12 +46,11 @@
     const code = document.getElementById('code');
     const href = window.location.href.replace( /\?.*$/, '' );
     const gostop = document.getElementById('gostop');
-    const listKnown = document.getElementById("known");
     const verbose = document.getElementById("verbose");
 
     // TODO move all of the above in here
     const elem = {};
-    for (const name of ['top', 'bottom', 'main'])
+    for (const name of ['top', 'bottom', 'main', 'known'])
         elem[name] = document.getElementById(name);
 
 
@@ -208,11 +207,11 @@
     }
 
     function showKnown() {
-        listKnown.innerHTML = '';
-        const list = ski.list();
+        elem.known.innerHTML = '';
+        const list = ski.getTerms();
         for (let name of Object.keys(list).sort()) {
             const entry = list[name];
-            const li = append(listKnown, 'li');
+            const li = append(elem.known, 'li');
             const out = append(li, 'a');
             out.classList.add('note', 'clickable');
             out.href = '#';
