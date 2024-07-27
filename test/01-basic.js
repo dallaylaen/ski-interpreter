@@ -39,7 +39,8 @@ describe( 'SKI', () => {
         const ski = new SKI;
         const expr = ski.parse("SKIx");
         const result = expr.run(10);
-        expect(''+result).to.equal('x');
+        expect(''+result.result).to.equal('x');
+        expect( result.final).to.equal(true);
         done();
     });
 
@@ -47,7 +48,8 @@ describe( 'SKI', () => {
         const ski = new SKI;
         const expr = ski.parse("S(K(S(S(KS)K)))K f g x");
         const result = expr.run(15);
-        expect(''+result).to.equal('g(f(x))');
+        expect(''+result.result).to.equal('g(f(x))');
+        expect(result.final).to.equal(true);
         done();
     });
 
@@ -57,5 +59,17 @@ describe( 'SKI', () => {
         expect(''+expr).to.equal("food(bard)");
         expect(expr.step()).to.equal(null);
         done();
-    })
+    });
+
+    it ('can perform unlimited calculations', done => {
+        const ski = new SKI;
+        const expr = ski.parse('SII(SII)');
+        const result = expr.run(42);
+
+        expect(''+result.result).to.equal('S(I)(I)(S(I)(I))');
+        expect(result.steps).to.equal(42);
+        expect(result.final).to.equal(false);
+
+        done();
+    });
 });
