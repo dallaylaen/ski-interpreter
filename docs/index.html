@@ -9,19 +9,12 @@
     <link rel="stylesheet" href="misc/main.css">
 </head>
 <body>
-<div class="all">
     <div class="layout" id="top">
-        <div>
-            <button id="mode-teletype" class="mode-pick" onclick="return modePick(this)">Workbook</button>
-            <button id="mode-quest" class="mode-pick" onclick="return modePick(this)">Quests</button>
-        </div>
+
     </div>
     <div class="layout main" id="main">
         <div class="pane" style="width: 69%">
             <div id="teletype" class="scroll">
-
-            </div>
-            <div id="quest" class="scroll hidden">
 
             </div>
         </div>
@@ -48,16 +41,12 @@
             &copy;2024 Konstantin Uvarin. <a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">source code</a>
         </div>
     </div>
-</div>
 
 <script>
     /**
      *   References to static page elements
      */
     const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'code', 'gostop', 'verbose');
-    const panels = {};
-    for (const name of ['teletype', 'quest'])
-        panels[name] = document.getElementById(name);
 
     /**
      *   Global state of the interpreter
@@ -101,8 +90,8 @@
         showKnown();
         view.verbose.checked = false;
         view.code.addEventListener('keydown', onKey);
-        window.addEventListener('resize', onResize);
-        onResize();
+
+        rubberDesign('main');
 
         const params = getParams();
         if (params.code) {
@@ -117,10 +106,6 @@
             }
             showKnown();
         }
-
-        let qnum = 1;
-        for (const spec of getQuests())
-            makeQuest(spec, qnum++);
     }
 
     function onKey (event) {
@@ -130,14 +115,6 @@
                 toggleRun();
             return false;
         }
-        return true;
-    }
-
-    function onResize() {
-        // FIXME should be done via css instead...
-        const height = window.innerHeight - view.top.offsetHeight - view.bottom.offsetHeight;
-
-        view.main.style.height = height + 'px';
         return true;
     }
 
@@ -157,66 +134,6 @@
             run();
         }
         return false;
-    }
-
-    function modePick (item) {
-        const [_, name] = item.id.match(/^mode-(\w+)$/);
-        for (const id in panels)
-            showhide(panels[id], name === id);
-    }
-
-    /**
-     *
-     * @param {Array} spec
-     * @param {number} [n]
-     */
-    function makeQuest (spec, n) {
-        const quest = new SKI.Quest(...spec);
-
-        const frame = append(panels.quest, 'div', {class: ['quest-box']});
-
-        const title = (n ? '#' + n + ': ' : '') + quest.title;
-
-        append(frame, 'div', {content: title, class: ['con-header']});
-        if (quest.descr)
-            append(frame, 'div', {content: quest.descr, class:['note']});
-
-        const box = append(frame, 'div', {class: ['quest-content']});
-        for (let test of quest.show()) {
-            const row = append(box, 'div');
-            append(row, 'span', {content: '? '});
-            append(row, 'span', {content: '&lt;your code&gt; '+test.args.join(' ')});
-        }
-
-        const form = append(frame, 'div', {class: ['quest-solve']});
-        const input = append(form, 'input');
-        const btn = append(form, 'button', {content: 'solve!'});
-        btn.onclick = () => checkQuest(box, quest, input.value);
-    }
-
-    /**
-     *
-     * @param {Element} output
-     * @param {Quest} quest
-     * @param {Ast} expr
-     */
-    function checkQuest (output, quest, expr) {
-        output.innerHTML = 'running...';
-        const report = quest.check(expr);
-        output.innerHTML = '';
-        for (const item of report.details) {
-            const line = append(output, 'div', {class: item.pass ? ['success'] : ['error']});
-            append(line, 'span', {content: item.pass ? '&check;' : '&cross;'});
-            append(line, 'span', {content: expr + ' ' + item.args.join(' ')});
-            if (item.pass) {
-                append(line, 'span', {content: ' == '+item.found+' in '+item.count+' iterations'});
-            } else {
-                append(line, 'br');
-                append(line, 'span', {content: 'found: '+item.found});
-                append(line, 'br');
-                append(line, 'span', {content: 'expected '+item.expected});
-            }
-        }
     }
 
     function run() {
@@ -323,7 +240,6 @@
             .map(name => name+':'+terms[name].expand()).join(',');
         return '?code=' + encode(sample) + '&terms=' + encode(saved);
     }
-
 
 </script>
 </body>
