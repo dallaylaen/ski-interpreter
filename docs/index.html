@@ -54,15 +54,9 @@
     /**
      *   References to static page elements
      */
-    const code = document.getElementById('code');
-    const href = window.location.href.replace( /\?.*$/, '' );
-    const gostop = document.getElementById('gostop');
-    const verbose = document.getElementById("verbose");
-
-    // TODO move all of the above in here
-    const elem = {};
-    for (const name of ['top', 'bottom', 'main', 'known', 'teletype'])
-        elem[name] = document.getElementById(name);
+    const view = {};
+    for (const name of ['top', 'bottom', 'main', 'known', 'teletype', 'code', 'gostop', 'verbose'])
+        view[name] = document.getElementById(name);
     const panels = {};
     for (const name of ['teletype', 'quest'])
         panels[name] = document.getElementById(name);
@@ -107,16 +101,16 @@
         );
         resetGo();
         showKnown();
-        verbose.checked = false;
-        code.addEventListener('keydown', onKey);
+        view.verbose.checked = false;
+        view.code.addEventListener('keydown', onKey);
         window.addEventListener('resize', onResize);
         onResize();
 
         const params = getParams();
         if (params.code) {
-            code.value = params.code;
-        } else if (!code.value.match(/\S/))
-            code.value = 'S K I x';
+            view.code.value = params.code;
+        } else if (!view.code.value.match(/\S/))
+            view.code.value = 'S K I x';
 
         if (params.terms) {
             for (let pair of params.terms.split(',')) {
@@ -142,15 +136,15 @@
 
     function onResize() {
         // FIXME should be done via css instead...
-        const height = window.innerHeight - elem.top.offsetHeight - elem.bottom.offsetHeight;
+        const height = window.innerHeight - view.top.offsetHeight - view.bottom.offsetHeight;
 
-        elem.main.style.height = height + 'px';
+        view.main.style.height = height + 'px';
         return true;
     }
 
     function toggleVerb () {
-        verbose.checked = !verbose.checked;
-        showlines = verbose.checked ? Infinity : 10;
+        view.verbose.checked = !view.verbose.checked;
+        showlines = view.verbose.checked ? Infinity : 10;
         return false;
     }
 
@@ -159,7 +153,7 @@
         if (running) {
             running = false;
         } else {
-            gostop.innerHTML = "Stop!";
+            view.gostop.innerHTML = "Stop!";
             running = true;
             run();
         }
@@ -192,7 +186,7 @@
         }
 
         const btn = append(frame, 'button', {content: 'verify'});
-        btn.onclick = () => checkQuest(box, quest, ski.parse(code.value));
+        btn.onclick = () => checkQuest(box, quest, ski.parse(view.code.value));
     }
 
     /**
@@ -223,11 +217,11 @@
     function run() {
         const out = teletype();
 
-        const maybeAssign = code.value.match(/^\s*([a-z][a-z_0-9]*)\s*=\s*(.*)$/i);
-        const src = maybeAssign ? maybeAssign[2] : code.value;
+        const maybeAssign = view.code.value.match(/^\s*([a-z][a-z_0-9]*)\s*=\s*(.*)$/i);
+        const src = maybeAssign ? maybeAssign[2] : view.code.value;
         const saveAs = maybeAssign ? maybeAssign[1] : undefined;
 
-        const head = out( '<a href="'+permalink(code.value)+'" target="_blank"><b>Expression #'+(++count)+'</b></a>',
+        const head = out( '<a href="'+permalink(view.code.value)+'" target="_blank"><b>Expression #'+(++count)+'</b></a>',
             {tag: 'div', nobr: true, class: 'con-header'});
         append(head, 'span').innerHTML = '  steps: ';
         const iterfield = append(head, 'span');
@@ -280,15 +274,15 @@
 
     function resetGo () {
         running = false;
-        gostop.innerHTML = "Run!";
+        view.gostop.innerHTML = "Run!";
     }
 
     function showKnown() {
-        elem.known.innerHTML = '';
+        view.known.innerHTML = '';
         const list = ski.getTerms();
         for (let name of Object.keys(list).sort()) {
             const entry = list[name];
-            const li = append(elem.known, 'li');
+            const li = append(view.known, 'li');
             const out = append(li, 'a', {class: ['note', 'clickable']});
             out.href = '#';
             out.onclick = event => insert(name);
@@ -302,17 +296,17 @@
     }
 
     function insert (text) {
-        const orig = code.value;
-        const prefix = orig.substring(0,  code.selectionStart);
-        const postfix = orig.substring(code.selectionEnd);
+        const orig = view.code.value;
+        const prefix = orig.substring(0,  view.code.selectionStart);
+        const postfix = orig.substring(view.code.selectionEnd);
 
         // add spaces around if we're not an elementary term
         if (!text.match(/^[()A-Z]$/))
             text = (prefix.match(/(?:^| )$/) ? '' : ' ') + text + (postfix.match(/^(?: |$)/) ? '' : ' ');
 
-        code.value = prefix + text + postfix;
-        code.selectionStart = prefix.length + text.length;
-        code.selectionEnd   = prefix.length + text.length;
+        view.code.value = prefix + text + postfix;
+        view.code.selectionStart = prefix.length + text.length;
+        view.code.selectionEnd   = prefix.length + text.length;
 
         return false;
     }
@@ -332,7 +326,7 @@
      * @return {(function(string, Object?): void)}
      */
     function teletype(opt={}) {
-        const sheet = append(elem.teletype, opt.tag ?? 'div');
+        const sheet = append(view.teletype, opt.tag ?? 'div');
         if (opt.color)
             sheet.style.color = opt.color;
         sheet.style.border = 'dotted 1px '+(opt.color ?? 'black');
@@ -348,7 +342,7 @@
                 line.classList.add(opt.class);
             line.rewrite = function(str) {
                 this.innerHTML = ''+str;
-                elem.teletype.scrollTop = line.offsetTop;
+                view.teletype.scrollTop = line.offsetTop;
                 return this;
             }
             line.rewrite(text);
