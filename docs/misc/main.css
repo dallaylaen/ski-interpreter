@@ -130,3 +130,8 @@ h1 {
     padding: 05.em;
     text-align: center;
 }
+
+.float-right {
+    display: inline-block;
+    float: right;
+}

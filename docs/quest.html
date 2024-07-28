@@ -49,7 +49,7 @@
         if (n)
             append (title, 'a').name = 'quest'+n;
         const expand = append(title, 'a', {content: n ? '#' + n + ' ' : 'Quest'});
-        append(title, 'span', {content: quest.title})
+        append(title, 'span', {content: quest.title});
         expand.href = '#';
         const body = append(frame, 'div');
         expand.onclick = () => showhide(body, true);
@@ -62,9 +62,36 @@
         const form = append(body, 'div', {class: ['quest-solve']});
         const input = append(form, 'input');
         const btn = append(form, 'button', {content: 'solve!'});
-        const close = append(form, 'button', {content: 'move on >>', class: ['hidden']});
-        close.onclick = () => showhide(body, false);
-        btn.onclick = () => checkQuest(box, quest, input.value, ()=>showhide(close, true));
+        const moveOn = append(form, 'button', {content: 'move on >>', class: ['hidden']});
+        moveOn.onclick = () => showhide(body, false);
+
+        const summary = append(append(title, 'span', {class: ['float-right']}), 'i');
+        let solved = false;
+        let count = 0;
+        let attempts = 0;
+        const sumUpdate = report => {
+            if (solved)
+                return;
+            if (report.pass)
+                solved = true;
+            attempts++;
+            for (const item of report.details)
+                count += item.count;
+
+            summary.innerHTML = 'Attempts: '+attempts+', total steps: '+count;
+            if (report.pass)
+                summary.classList.add('success');
+        }
+
+        btn.onclick = () => checkQuest(box, quest, input.value,
+            function (report) {
+                showhide(moveOn, true);
+                sumUpdate(report);
+            },
+            function (report) {
+                sumUpdate(report);
+            }
+        );
     }
 
     /**
@@ -72,9 +99,10 @@
      * @param {Element} output
      * @param {Quest} quest
      * @param {Ast} expr
-     * @param {function} onsuccess
+     * @param {function} [onpass]
+     * @param {function} [onfail]
      */
-    function checkQuest (output, quest, expr, onsuccess) {
+    function checkQuest (output, quest, expr, onpass, onfail) {
         output.innerHTML = 'running...';
         const report = quest.check(expr);
         output.innerHTML = '';
@@ -84,7 +112,6 @@
             append(line, 'span', {content: expr + ' ' + item.args.join(' ')});
             if (item.pass) {
                 append(line, 'span', {content: ' == '+item.found+' in '+item.count+' iterations'});
-                onsuccess();
             } else {
                 append(line, 'br');
                 append(line, 'span', {content: 'found: '+item.found});
@@ -92,6 +119,9 @@
                 append(line, 'span', {content: 'expected '+item.expected});
             }
         }
+        const action = report.pass ? onpass : onfail;
+        if (action)
+            action(report);
     }
 </script>
 </body>
