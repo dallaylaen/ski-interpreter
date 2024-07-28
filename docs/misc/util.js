@@ -3,9 +3,22 @@
  */
 
 /**
- *
+ * Locate static element with specific ids and return a hash of them.
+ * @param {String} ids
+ * @return {{}}
+ */
+function grabView (...ids) {
+    const view = {};
+    for (const name of ids)
+        view[name] = document.getElementById(name);
+    return view;
+}
+
+/**
+ * Attach a child element to the given parent and return the child.
  * @param parent
  * @param type
+ * @param {{class: string[]?, content: string?}} options
  * @return {HTMLElement}
  */
 function append(parent, type, options={}) {
