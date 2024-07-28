@@ -30,8 +30,7 @@
 .layout {
     display: block;
     float: none;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
+    margin: 0 0.5em;
 }
 .layout:after {
     display: block;
@@ -124,4 +123,10 @@ button input {
 .quest-box {
     margin: 0.5em;
     border: 5px solid dodgerblue;
+}
+
+h1 {
+    margin: 0;
+    padding: 05.em;
+    text-align: center;
 }
