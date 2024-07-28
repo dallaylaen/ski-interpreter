@@ -5,13 +5,14 @@
     <title>Simple Kombinator Interpreter</title>
     <link rel="shortcut icon" type="image/png" href="misc/ski-64.png">
     <script src="js/build/ski-interpreter.js"></script>
+    <script src="misc/quests.js"></script>
     <link rel="stylesheet" href="misc/main.css">
 </head>
 <body>
 <div class="all">
     <div class="layout" id="top">
         <div>
-            <button id="mode-free" class="mode-pick" onclick="return modePick(this)">Console</button>
+            <button id="mode-teletype" class="mode-pick" onclick="return modePick(this)">Workbook</button>
             <button id="mode-quest" class="mode-pick" onclick="return modePick(this)">Quests</button>
         </div>
     </div>
@@ -20,7 +21,7 @@
             <div id="teletype" class="scroll">
 
             </div>
-            <div id="quests" class="scroll hidden">
+            <div id="quest" class="scroll hidden">
 
             </div>
         </div>
@@ -62,6 +63,9 @@
     const elem = {};
     for (const name of ['top', 'bottom', 'main', 'known', 'teletype'])
         elem[name] = document.getElementById(name);
+    const panels = {};
+    for (const name of ['teletype', 'quest'])
+        panels[name] = document.getElementById(name);
 
     /**
      *   Global state of the interpreter
@@ -121,6 +125,9 @@
             }
             showKnown();
         }
+
+        for (const spec of getQuests())
+            makeQuest(spec);
     }
 
     function onKey (event) {
@@ -160,7 +167,57 @@
     }
 
     function modePick (item) {
-        console.log(item);
+        const [_, name] = item.id.match(/^mode-(\w+)$/);
+        for (const id in panels)
+            showhide(panels[id], name === id);
+    }
+
+    /**
+     *
+     * @param {Array} spec
+     */
+    function makeQuest (spec) {
+        const quest = new SKI.Quest(...spec);
+
+        const frame = append(panels.quest, 'div', {class: ['quest']});
+        append(frame, 'div', {content: quest.title, class: ['con-header']});
+        if (quest.descr)
+            append(frame, 'div', {content: quest.descr, class:['note']});
+
+        const box = append(frame, 'div', {class: ['quest-content']});
+        for (let test of quest.show()) {
+            const row = append(box, 'div');
+            append(row, 'span', {content: '? '});
+            append(row, 'span', {content: '&lt;your code&gt; '+test.args.join(' ')});
+        }
+
+        const btn = append(frame, 'button', {content: 'verify'});
+        btn.onclick = () => checkQuest(box, quest, ski.parse(code.value));
+    }
+
+    /**
+     *
+     * @param {Element} output
+     * @param {Quest} quest
+     * @param {Ast} expr
+     */
+    function checkQuest (output, quest, expr) {
+        output.innerHTML = 'running...';
+        const report = quest.check(expr);
+        output.innerHTML = '';
+        for (const item of report.details) {
+            const line = append(output, 'div', {class: item.pass ? ['success'] : ['error']});
+            append(line, 'span', {content: item.pass ? '&check;' : '&cross;'});
+            append(line, 'span', {content: expr + ' ' + item.args.join(' ')});
+            if (item.pass) {
+                append(line, 'span', {content: ' == '+item.found});
+            } else {
+                append(line, 'br');
+                append(line, 'span', {content: 'found: '+item.found});
+                append(line, 'br');
+                append(line, 'span', {content: 'expected '+item.expected});
+            }
+        }
     }
 
     function run() {
@@ -232,8 +289,7 @@
         for (let name of Object.keys(list).sort()) {
             const entry = list[name];
             const li = append(elem.known, 'li');
-            const out = append(li, 'a');
-            out.classList.add('note', 'clickable');
+            const out = append(li, 'a', {class: ['note', 'clickable']});
             out.href = '#';
             out.onclick = event => insert(name);
             append(out, 'b').innerHTML = name;
@@ -312,10 +368,26 @@
      * @param type
      * @return {HTMLElement}
      */
-    function append(parent, type) {
+    function append(parent, type, options={}) {
         const child = document.createElement(type);
+        if (options.class)
+            child.classList.add(...options.class);
+        if (options.content !== undefined)
+            child.innerHTML = '' + options.content;
         parent.appendChild(child);
         return child;
+    }
+
+    /**
+     *
+     * @param {Element} element
+     * @param {boolean} visible
+     */
+    function showhide(element, visible=false) {
+        if (visible)
+            element.classList.remove('hidden');
+        else
+            element.classList.add('hidden');
     }
 
     function getParams() {
