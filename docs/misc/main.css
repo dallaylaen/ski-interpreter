@@ -47,6 +47,7 @@ html, body {
 ul {
     margin: 0;
     padding: 0;
+    padding-left: 2em;
 }
 
 #info {
