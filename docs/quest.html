@@ -92,7 +92,7 @@
                 summary.classList.add('success');
         }
 
-        btn.onclick = () => checkQuest(box, quest, input.value,
+        const runme = () => checkQuest(box, quest, input.value,
             function (report) {
                 showhide(moveOn, true);
                 sumUpdate(report);
@@ -101,6 +101,9 @@
                 sumUpdate(report);
             }
         );
+        btn.onclick = runme;
+        input.onkeydown = (ev => ev.key === "Enter" ? runme() : true);
+
     }
 
     /**
@@ -131,6 +134,7 @@
         const action = report.pass ? onpass : onfail;
         if (action)
             action(report);
+        return false;
     }
 </script>
 </body>
