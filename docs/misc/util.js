@@ -46,7 +46,6 @@ function rubberDesign (mainId) {
 
     const resize = () => {
         const height = other.reduce( (acc, el) => acc+el.offsetHeight, 0);
-        console.log('combined height = '+height, "window = "+window.innerHeight);
         target.style.height = (window.innerHeight - height) + 'px';
         return true;
     }
@@ -97,7 +96,7 @@ function decode (s) {
  * create a function that takes text and appends it to specific region
  * in a specific <div>
  * @param {Element} attach
- * @param {Object} opt
+ * @param {{color: string?, bgcolor: string?, class: string?, padding: number?}} opt
  * @return {(function(string, Object?): void)}
  */
 function teletype(attach, opt={}) {
@@ -117,7 +116,7 @@ function teletype(attach, opt={}) {
             line.classList.add(opt.class);
         line.rewrite = function(str) {
             this.innerHTML = ''+str;
-            view.teletype.scrollTop = line.offsetTop;
+            attach.scrollTop = this.offsetTop;
             return this;
         }
         line.rewrite(text);
