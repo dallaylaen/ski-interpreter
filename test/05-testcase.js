@@ -50,4 +50,20 @@ describe('Quest', () => {
 
         done();
     });
+
+    it('can verify locked down solutions', done => {
+        const quest = new Quest(
+            {title: 'I from S & K', allow: 'SK'},
+            ['x', 'x']
+        );
+
+        const good = quest.check('SKK');
+        expect(good.pass).to.equal(true);
+
+        const bad = quest.check('I');
+        expect(bad.pass).to.equal(false);
+        expect(''+bad.details[0].found).to.equal('I(x)');
+
+        done();
+    });
 })
