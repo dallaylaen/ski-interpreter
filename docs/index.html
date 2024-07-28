@@ -120,8 +120,9 @@
             showKnown();
         }
 
+        let qnum = 1;
         for (const spec of getQuests())
-            makeQuest(spec);
+            makeQuest(spec, qnum++);
     }
 
     function onKey (event) {
@@ -169,12 +170,16 @@
     /**
      *
      * @param {Array} spec
+     * @param {number} [n]
      */
-    function makeQuest (spec) {
+    function makeQuest (spec, n) {
         const quest = new SKI.Quest(...spec);
 
-        const frame = append(panels.quest, 'div', {class: ['quest']});
-        append(frame, 'div', {content: quest.title, class: ['con-header']});
+        const frame = append(panels.quest, 'div', {class: ['quest-box']});
+
+        const title = (n ? '#' + n + ': ' : '') + quest.title;
+
+        append(frame, 'div', {content: title, class: ['con-header']});
         if (quest.descr)
             append(frame, 'div', {content: quest.descr, class:['note']});
 
@@ -185,8 +190,10 @@
             append(row, 'span', {content: '&lt;your code&gt; '+test.args.join(' ')});
         }
 
-        const btn = append(frame, 'button', {content: 'verify'});
-        btn.onclick = () => checkQuest(box, quest, ski.parse(view.code.value));
+        const form = append(frame, 'div', {class: ['quest-solve']});
+        const input = append(form, 'input');
+        const btn = append(form, 'button', {content: 'solve!'});
+        btn.onclick = () => checkQuest(box, quest, input.value);
     }
 
     /**
@@ -204,7 +211,7 @@
             append(line, 'span', {content: item.pass ? '&check;' : '&cross;'});
             append(line, 'span', {content: expr + ' ' + item.args.join(' ')});
             if (item.pass) {
-                append(line, 'span', {content: ' == '+item.found});
+                append(line, 'span', {content: ' == '+item.found+' in '+item.count+' iterations'});
             } else {
                 append(line, 'br');
                 append(line, 'span', {content: 'found: '+item.found});

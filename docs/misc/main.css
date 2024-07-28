@@ -120,3 +120,8 @@ button input {
 .mode-pick {
     color: dodgerblue;
 }
+
+.quest-box {
+    margin: 0.5em;
+    border: 5px solid dodgerblue;
+}
