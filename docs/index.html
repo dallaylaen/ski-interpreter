@@ -77,7 +77,7 @@
       */
 
     function init() {
-        const greet = teletype();
+        const greet = teletype(view.teletype);
         greet(
             'Welcome to the '+
             '<a href="https://en.wikipedia.org/wiki/SKI_combinator_calculus" target="_blank">' +
@@ -222,7 +222,7 @@
     }
 
     function run() {
-        const out = teletype();
+        const out = teletype(view.teletype);
 
         const maybeAssign = view.code.value.match(/^\s*([a-z][a-z_0-9]*)\s*=\s*(.*)$/i);
         const src = maybeAssign ? maybeAssign[2] : view.code.value;
@@ -329,11 +329,12 @@
     /**
      * create a function that takes test and appends it to specific region
      * in a specific <div>
+     * @param {Element} attach
      * @param {Object} opt
      * @return {(function(string, Object?): void)}
      */
-    function teletype(opt={}) {
-        const sheet = append(view.teletype, opt.tag ?? 'div');
+    function teletype(attach, opt={}) {
+        const sheet = append(attach, opt.tag ?? 'div');
         if (opt.color)
             sheet.style.color = opt.color;
         sheet.style.border = 'dotted 1px '+(opt.color ?? 'black');
