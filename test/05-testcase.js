@@ -32,6 +32,8 @@ describe('Quest', () => {
         expect(pass.pass).to.equal(true);
         expect(pass.details.length).to.equal(2);
 
+        expect(pass.details[0].args.join(' ')).to.equal('x y K');
+
         const bad = ski.parse('KK');
         const fail = quest.check(bad);
 
@@ -44,6 +46,7 @@ describe('Quest', () => {
         expect(''+fail.details[0].found).to.equal('y');
         expect(''+fail.details[0].expected).to.equal('x');
 
+        expect(pass.details[0].args.join(' ')).to.equal('x y K');
 
         done();
     });
