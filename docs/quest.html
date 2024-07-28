@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Quests - Simple Kombinator Interpreter</title>
+    <link rel="shortcut icon" type="image/png" href="misc/ski-64.png">
+    <script src="js/build/ski-interpreter.js"></script>
+    <script src="misc/util.js"></script>
+    <script src="misc/quests.js"></script>
+    <link rel="stylesheet" href="misc/main.css">
+</head>
+<body>
+<div class="layout" id="top">
+    <h1>Simple Kombinator Interpreter quest mode</h1>
+    <a href="index.html" target="_blank">free form SKI interpreter</a>
+</div>
+<div class="layout" id="main">
+    <div class="pane" id="quest"></div>
+</div>
+<div class="layout" id="bottom">
+    <div>
+        &copy;2024 Konstantin Uvarin. <a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">source code</a>
+    </div>
+</div>
+<script>
+    const view = grabView('quest');
+
+    init();
+
+    function init() {
+        let qnum = 1;
+        for (const spec of getQuests())
+            makeQuest(spec, qnum++);
+
+        rubberDesign('main');
+    }
+
+    /**
+     *
+     * @param {Array} spec
+     * @param {number} [n]
+     */
+    function makeQuest (spec, n) {
+        const quest = new SKI.Quest(...spec);
+
+        const frame = append(view.quest, 'div', {class: ['quest-box']});
+
+        const title = append(frame, 'div', {class: ['con-header']});
+        if (n)
+            append (title, 'a').name = 'quest'+n;
+        const expand = append(title, 'a', {content: n ? '#' + n + ' ' : 'Quest'});
+        append(title, 'span', {content: quest.title})
+        expand.href = '#';
+        const body = append(frame, 'div');
+        expand.onclick = () => showhide(body, true);
+
+        if (quest.descr)
+            append(body, 'div', {content: quest.descr, class:['note']});
+
+        const box = append(body, 'div', {class: ['quest-content'], content: '....'});
+
+        const form = append(body, 'div', {class: ['quest-solve']});
+        const input = append(form, 'input');
+        const btn = append(form, 'button', {content: 'solve!'});
+        const close = append(form, 'button', {content: 'move on >>', class: ['hidden']});
+        close.onclick = () => showhide(body, false);
+        btn.onclick = () => checkQuest(box, quest, input.value, ()=>showhide(close, true));
+    }
+
+    /**
+     *
+     * @param {Element} output
+     * @param {Quest} quest
+     * @param {Ast} expr
+     * @param {function} onsuccess
+     */
+    function checkQuest (output, quest, expr, onsuccess) {
+        output.innerHTML = 'running...';
+        const report = quest.check(expr);
+        output.innerHTML = '';
+        for (const item of report.details) {
+            const line = append(output, 'div', {class: item.pass ? ['success'] : ['error']});
+            append(line, 'span', {content: item.pass ? '&check;' : '&cross;'});
+            append(line, 'span', {content: expr + ' ' + item.args.join(' ')});
+            if (item.pass) {
+                append(line, 'span', {content: ' == '+item.found+' in '+item.count+' iterations'});
+                onsuccess();
+            } else {
+                append(line, 'br');
+                append(line, 'span', {content: 'found: '+item.found});
+                append(line, 'br');
+                append(line, 'span', {content: 'expected '+item.expected});
+            }
+        }
+    }
+</script>
+</body>
+</html>
