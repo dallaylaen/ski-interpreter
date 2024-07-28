@@ -31,6 +31,31 @@ function append(parent, type, options={}) {
     return child;
 }
 
+function rubberDesign (mainId) {
+    let target;
+    const other = [];
+    for (const child of document.body.children) {
+        if (child.id === mainId)
+            target = child;
+        else
+            other.push(child);
+    }
+
+    if (!target)
+        throw new Error("Failed to find main element with id "+mainId)
+
+    const resize = () => {
+        const height = other.reduce( (acc, el) => acc+el.offsetHeight, 0);
+        console.log('combined height = '+height, "window = "+window.innerHeight);
+        target.style.height = (window.innerHeight - height) + 'px';
+        return true;
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    return resize;
+}
+
 /**
  *
  * @param {Element} element
