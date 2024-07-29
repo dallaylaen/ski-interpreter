@@ -82,5 +82,20 @@ describe('Quest', () => {
         expect(''+bad.details[0].found).to.equal('x(x(x(x(y))))');
 
         done();
-    })
+    });
+
+    it ('does not die on incorrect inputs', done => {
+        const quest = new Quest(
+            {},
+            ['x', 'x'],
+        );
+
+        const result = quest.check('I)))');
+
+        expect(result.pass).to.equal(false);
+        expect(result.details).to.deep.equal([]);
+        expect(result.exception).to.match(/unbalanced input/i);
+
+        done();
+    });
 })
