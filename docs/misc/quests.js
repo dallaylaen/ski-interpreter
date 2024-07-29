@@ -71,8 +71,19 @@ function getQuests () {
             },
             [ 'x(x(y))', 'x', 'y'],
         ],
+        [
+            {
+                title: "Church of Numerals II",
+                descr: "Procure a term that increases given number by 1: inc N x y = x(...N+1 times(y)...). "+
+                    "Hint: inc N x y == x (N x y).",
+                numbers: true,
+            },
+            [ 'x y', 'KI', 'x', 'y' ],
+            [ 'x y', 'SK', 'x', 'y' ],
+            [ 'x (x y)', 'I', 'x', 'y'],
+            [ '9 x y', '8', 'x', 'y'],
+        ],
+    ];
 
-    ]
-    // TODO church numerals require engine update
-    // TODO quine requires specifal testing primitives
+    // TODO quine requires special testing primitives
 }
