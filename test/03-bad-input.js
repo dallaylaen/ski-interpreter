@@ -7,7 +7,8 @@ describe( 'SKI', () => {
         expect( () => { ski.parse( 'foo(' ) }).to.throw(/unbalanced/i);
         expect( () => { ski.parse( 'foo)' ) }).to.throw(/unbalanced/i);
 
-        expect( () => { ski.parse( 'S 1 2 3' )}).to.throw(/tokens.*1 2 3/);
+        expect( () => { ski.parse( 'S ~ **' )}).to.throw(/tokens.*~ \*\*/);
+        expect( () => { ski.parse( 'S 1 2 3' )}).to.throw(/numbers.*not supported/);
 
         done();
     })
