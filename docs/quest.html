@@ -47,19 +47,19 @@
     /**
      *
      * @param {Array} spec
-     * @param {number} [n]
+     * @param {number} n
      */
     function makeQuest (spec, n) {
         const quest = new SKI.Quest(...spec);
-
         const frame = append(view.quest, 'div', {class: ['quest-box']});
 
+        const name = 'quest-'+n;
         const title = append(frame, 'div', {class: ['con-header']});
-        if (n)
-            append (title, 'a').name = 'quest'+n;
+        append (title, 'a').name = name;
         const expand = append(title, 'a', {content: n ? '#' + n + ' ' : 'Quest'});
         append(title, 'span', {content: quest.title});
-        expand.href = '#';
+        expand.href = '#'+name;
+
         const body = append(frame, 'div');
         expand.onclick = () => showhide(body, true);
 
@@ -118,6 +118,9 @@
         output.innerHTML = 'running...';
         const report = quest.check(expr);
         output.innerHTML = '';
+        if (report.exception) {
+            append(output, 'div', {class: ['error'], content: 'Execution failed: '+report.exception});
+        }
         for (const item of report.details) {
             const line = append(output, 'div', {class: item.pass ? ['success'] : ['error']});
             append(line, 'span', {content: item.pass ? '&check;' : '&cross;'});
