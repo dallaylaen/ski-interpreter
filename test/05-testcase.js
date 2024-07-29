@@ -66,4 +66,21 @@ describe('Quest', () => {
 
         done();
     });
+
+    it( 'can verify terms that require calculations', done => {
+        const quest = new Quest(
+            { numbers: true, allow: 'SKIBCW' },
+            [ '5 x y', '4', 'x', 'y'],
+        );
+        const good = quest.check('SB');
+        expect( good.pass ).to.equal (true);
+
+        const bad = quest.check('I');
+
+        expect( bad.pass ).to.equal(false);
+        expect(''+bad.details[0].expected).to.equal('x(x(x(x(x(y)))))');
+        expect(''+bad.details[0].found).to.equal('x(x(x(x(y))))');
+
+        done();
+    })
 })
