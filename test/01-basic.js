@@ -72,4 +72,12 @@ describe( 'SKI', () => {
 
         done();
     });
+
+    it ('can throw on hung calculation if told so', done => {
+        const ski = new SKI;
+        const expr = ski.parse('SII(SII)');
+        expect( () => expr.run({max: 15, throw: true}) ).to.throw(/failed.*15.*steps/i);
+
+        done();
+    })
 });
