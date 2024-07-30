@@ -15,7 +15,19 @@
     <div class="layout main" id="main">
         <div class="pane" style="width: 69%">
             <div id="teletype" class="scroll">
-
+                <div style="border: 1px dotted black;">
+                    <p>Welcome to the
+                        <a href="https://en.wikipedia.org/wiki/SKI_combinator_calculus" target="_blank">combinatory logic</a>
+                        interpreter.
+                    </p>
+                    <p>Type an expression in the entry field and click "run!".
+                        A valid expression contains one or more terms and parenthesis around groups of terms.
+                        Unknown terms will be left as is.
+                    </p>
+                    <p>New terms can be declared by prepending <code>"name&nbsp;=&nbsp;"</code> to the expression.
+                        They will appear in the box on the right and can be clicked to add them to the expression.
+                    </p>
+               </div>
             </div>
         </div>
 
@@ -38,7 +50,8 @@
             </div>
         </form>
         <div>
-            &copy;2024 Konstantin Uvarin. <a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">source code</a>
+            &copy;2024 Konstantin Uvarin.
+            <a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">source code</a>
         </div>
     </div>
 
@@ -65,23 +78,6 @@
 
     function init() {
         const greet = teletype(view.teletype);
-        greet(
-            'Welcome to the '+
-            '<a href="https://en.wikipedia.org/wiki/SKI_combinator_calculus" target="_blank">' +
-            'combinatory logic<a> interpreter.',
-            {tag: 'p'}
-        );
-        greet(
-            'Type an expression in the entry field and click "run!". ' +
-            'A valid expression contains one or more terms and parenthesis around groups of terms. ' +
-            'Unknown terms will be left as is. ',
-            {tap: 'p'}
-        );
-        greet(
-            'New terms can be declared by prepending <code>"name&nbsp;=&nbsp;"</code> to the expression. ' +
-            'They will appear in the box on the right and can be clicked to add them to the expression',
-            {tag: 'p'}
-        );
         greet(
             "Your output goes here. ",
             {color: "green"}
