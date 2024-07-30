@@ -46,6 +46,14 @@ function getQuests () {
         ],
         [
             {
+                title: 'Quine',
+                descr: 'Write an expression that produces itself when given any argument. Hint: the above quest may help!',
+            },
+            [ {feedInput: true}, 'I', 'x'],
+            [ {feedInput: true}, 'I', 'x', 'y'],
+        ],
+        [
+            {
                 title: 'Boolean I',
                 descr: 'K and KI terms may be interpreted as true and false, respectively, '+
                     'as (x) (then) (else) will return <i>then</i> for <B>K</B> and <i>else</i> for <b>KI</b>. '+
