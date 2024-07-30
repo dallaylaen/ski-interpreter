@@ -98,4 +98,18 @@ describe('Quest', () => {
 
         done();
     });
+
+    it ('Can apply expect to input if needed', done => {
+        const quest = new Quest(
+            {},
+            [{feedInput: true}, 'K', 'x'],
+        );
+
+        const result = quest.check('y');
+        expect(''+result.details[0].expected).to.equal('K(y)');
+        expect(''+result.details[0].found).to.equal('y(x)');
+        expect(result.pass).to.equal(false);
+
+        done();
+    });
 })
