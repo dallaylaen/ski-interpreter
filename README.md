@@ -32,6 +32,11 @@ expr.run().result; // f(x)(g(x))
 
 All expressions are immutable and will return a brand new expression if anything changes, or just self.
 
+# Thanks
+
+* [@ivanaxe](https://github.com/ivanaxe) for luring me into [icfpc 2011](http://icfpc2011.blogspot.com/2011/06/task-description-contest-starts-now.html) where I was introduced to combinators.
+* [@akuklev](https://github.com/akuklev) for explaining functional programming to me so many times that I actually got some idea.
+
 # License and copyright
 
 GPL3+
