@@ -2,7 +2,7 @@
 
 set -ex
 
-AUTOFILES="docs/js/build docs/man"
+AUTOFILES="docs/build docs/man"
 
 modified() {
     LIST=$(git status --porcelain -- "$@" | grep '^ *[AM]' | awk '{print $2}')

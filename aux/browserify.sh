@@ -2,7 +2,7 @@
 
 set -ex
 
-DST=docs/js/build
+DST=docs/build/js
 
 compile() {
   webpack-cli "$1" --mode development -o "$DST"
