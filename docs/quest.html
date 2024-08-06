@@ -33,25 +33,50 @@
 </div>
 <script>
     const view = grabView('quest');
+    const questDir = 'js/quest/';
 
     init();
 
     function init() {
-        let qnum = 1;
-        for (const spec of getQuests())
-            makeQuest(spec, qnum++);
-
         rubberDesign('main');
+
+        fetch(questDir + 'index.json')
+            .then( resp => resp.json())
+            .then( list => {
+                console.log(list);
+                let chap = 1;
+                for (const item of list) {
+                    makeChapter(item, chap++);
+                }
+            });
+    }
+
+    function makeChapter (opt, n) {
+        console.log("creating chapter #"+n+": "+opt.name);
+        const container = append(view.quest, 'div', {class: ['chapter']});
+        append(container, 'div', {class: ['title'], content: opt.name});
+        append(container, 'div', {class: ['note'], content: cat(opt.intro)});
+        const inner = append(container, 'div', {});
+        fetch(questDir + opt.link)
+            .then( resp => resp.json() )
+            .then( list => {
+                console.log(list);
+                let k = 1;
+                for (const item of list) {
+                    makeQuest(inner, item, n+'.'+k++);
+                }
+            });
     }
 
     /**
      *
      * @param {Array} spec
-     * @param {number} n
+     * @param {string} n
      */
-    function makeQuest (spec, n) {
+    function makeQuest (container, spec, n) {
+        console.log("creating quest #"+n+": ", spec[0]);
         const quest = new SKI.Quest(...spec);
-        const frame = append(view.quest, 'div', {class: ['quest-box']});
+        const frame = append(container, 'div', {class: ['quest-box']});
 
         const name = 'quest-'+n;
         const title = append(frame, 'div', {class: ['con-header']});
@@ -64,7 +89,7 @@
         expand.onclick = () => showhide(body, true);
 
         if (quest.descr)
-            append(body, 'div', {content: quest.descr, class:['note']});
+            append(body, 'div', {content: cat(quest.descr), class:['note']});
 
         const box = append(body, 'div', {class: ['quest-content'], content: '....'});
 
@@ -138,6 +163,13 @@
         if (action)
             action(report);
         return false;
+    }
+
+    function cat(input) {
+        if (Array.isArray(input))
+            return input.join(' ');
+        else
+            return ''+input;
     }
 </script>
 </body>

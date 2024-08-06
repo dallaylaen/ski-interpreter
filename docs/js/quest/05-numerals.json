@@ -1,0 +1,50 @@
+[
+  [
+    {
+      "title": "Church of Numerals I",
+      "descr": [
+        "Church numeral N is a function that converts x, y to x(...x(y)...), repeated N times. ",
+        "0 is (x, y)->y (i.e. same as false), 1 is I (I x y = x(y)). What is 2?"
+      ]
+    },
+    [
+      "x(x(y))",
+      "x",
+      "y"
+    ]
+  ],
+  [
+    {
+      "title": "Church of Numerals II",
+      "descr": [
+        "Procure a term that increases given number by 1: inc N x y = x(...N+1 times(y)...). ",
+        "Hint: inc N x y == x (N x y)."
+      ],
+      "numbers": true
+    },
+    [
+      "x y",
+      "KI",
+      "x",
+      "y"
+    ],
+    [
+      "x y",
+      "SK",
+      "x",
+      "y"
+    ],
+    [
+      "x (x y)",
+      "I",
+      "x",
+      "y"
+    ],
+    [
+      "9 x y",
+      "8",
+      "x",
+      "y"
+    ]
+  ]
+]

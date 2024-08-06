@@ -1,0 +1,48 @@
+[
+  [
+    {
+      "title": "Boolean I",
+      "descr": [
+        "K and KI terms may be interpreted as true and false, respectively, ",
+        "as (x) (then) (else) will return <i>then</i> for <B>K</B> and <i>else</i> for <b>KI</b>. ",
+        "Implement not (x)"
+      ]
+    },
+    [
+      "x",
+      "KI",
+      "x",
+      "y"
+    ],
+    [
+      "y",
+      "K",
+      "x",
+      "y"
+    ]
+  ],
+  [
+    {
+      "title": "Boolean II",
+      "descr": "if (then) (else) (bool) = then/else, depending on bool."
+    },
+    [
+      "x",
+      "x",
+      "y",
+      "K"
+    ],
+    [
+      "y",
+      "x",
+      "y",
+      "KI"
+    ],
+    [
+      "y",
+      "x",
+      "y",
+      "SK"
+    ]
+  ]
+]

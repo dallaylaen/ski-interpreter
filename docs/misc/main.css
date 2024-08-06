@@ -123,7 +123,7 @@ button input {
 
 .quest-box {
     margin: 0.5em;
-    border: 5px solid dodgerblue;
+    border: 5px solid maroon;
 }
 
 h1 {
@@ -144,4 +144,25 @@ h1 {
 
 .help code {
     color: darkgoldenrod;
+}
+
+.chapter {
+    border: maroon solid 5px;
+}
+
+.chapter ~ .chapter {
+    margin-top: 1em;
+}
+
+.chapter .title {
+    background-color: maroon;
+    color: gold;
+    padding: 0.3em;
+    font-weight: bold;
+}
+
+.chapter .note {
+    font-size: small;
+    padding-left: 2em;
+    background-color: antiquewhite;
 }

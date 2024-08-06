@@ -1,0 +1,26 @@
+[
+  {
+    "name": "The basics",
+    "intro": "Welcome",
+    "link": "01-basics.json"
+  },
+  {
+    "name": "Moving arguments around",
+    "intro": "x y z -> x z y",
+    "link": "02-arguments.json"
+  },
+  {
+    "name": "Boolean logic",
+    "intro": [
+
+    ],
+    "link": "04-boolean.json"
+  },
+  {
+    "name": "The Church of Numerals",
+    "intro": [
+
+    ],
+    "link": "05-numerals.json"
+  }
+]

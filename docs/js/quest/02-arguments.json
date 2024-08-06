@@ -1,0 +1,46 @@
+[
+  [
+    {
+      "title": "B combinator",
+      "descr": "x y z -> x(y(z))"
+    },
+    [
+      "x(y z)",
+      "x",
+      "y",
+      "z"
+    ]
+  ],
+  [
+    {
+      "title": "K forte",
+      "descr": "Sometimes returning x for any y is not enough. Return it twice: (x, y)->x x"
+    },
+    [
+      "x x",
+      "x",
+      "y"
+    ]
+  ],
+  [
+    {
+      "title": "Quine",
+      "descr": "Write an expression that produces itself when given any argument. Hint: the above quest may help!"
+    },
+    [
+      {
+        "feedInput": true
+      },
+      "I",
+      "x"
+    ],
+    [
+      {
+        "feedInput": true
+      },
+      "I",
+      "x",
+      "y"
+    ]
+  ]
+]

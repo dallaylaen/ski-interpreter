@@ -1,0 +1,51 @@
+[
+  [
+    {
+      "title": "Ignore all previous instructions",
+      "descr": [
+        "The <b>K</b> combinator takes 2 arguments, <i>x</i> and <i>y</i>,",
+        "and returns the first of them. You need to return the second one instead."
+      ]
+    },
+    [
+      "y",
+      "x",
+      "y"
+    ]
+  ],
+  [
+    {
+      "title": "Look at yourself",
+      "descr": [
+        "In the realm of combinators, everything is a function.",
+        "So, how do you apply a function to itself? I.e. x -> x(x)"
+      ]
+    },
+    [
+      "x x",
+      "x"
+    ]
+  ],
+  [
+    {
+      "title": "Mirror image",
+      "descr": "Make a combinator that swaps its two arguments, that is, (x, y) -> y x"
+    },
+    [
+      "y x",
+      "x",
+      "y"
+    ]
+  ],
+  [
+    {
+      "title": "Lost identity",
+      "descr": "Someone stole the I combinator from your interpreter. You have to rebuild it from the remaining two!",
+      "allow": "SK"
+    },
+    [
+      "x",
+      "x"
+    ]
+  ]
+]
