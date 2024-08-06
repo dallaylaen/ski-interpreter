@@ -6,7 +6,7 @@ describe( 'SKI', () => {
         const ski = new SKI;
         ski.add('sub', 'S(K(SI))K');
 
-        const term = ski.parse('sub x y');
+        const term = ski.parseLine('sub x y');
 
         const result = term.run();
 
@@ -38,7 +38,7 @@ describe( 'SKI', () => {
         const ski = new SKI();
         ski.add('inc', 'S(S(K(S))(K))');
         ski.add('n2', 'inc I');
-        const expr = ski.parse('n2 n2 n2 x y');
+        const expr = ski.parseLine('n2 n2 n2 x y');
 
         const canonic = expr.expand();
         expect( ''+canonic ).to.match(/^[SKI()]+\(x\)\(y\)$/);
