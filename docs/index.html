@@ -134,10 +134,7 @@
 
     function run() {
         const out = teletype(view.teletype);
-
-        const maybeAssign = view.code.value.match(/^\s*([a-z][a-z_0-9]*)\s*=\s*(.*)$/i);
-        const src = maybeAssign ? maybeAssign[2] : view.code.value;
-        const saveAs = maybeAssign ? maybeAssign[1] : undefined;
+        const src = view.code.value;
 
         const head = out( '<a href="'+permalink(view.code.value)+'" target="_blank"><b>Expression #'+(++count)+'</b></a>',
             {tag: 'div', nobr: true, class: 'con-header'});
@@ -149,8 +146,8 @@
 
         try {
             let expr = ski.parse(src);
-            if (saveAs) {
-                ski.add(saveAs, expr);
+            if (expr instanceof SKI.classes.Alias) {
+                ski.add(expr.name, expr.impl);
                 showKnown();
             }
             tick(expr);
@@ -232,7 +229,7 @@
     function permalink(sample) {
         const terms = ski.getTerms();
         const saved = Object.keys(terms)
-            .filter(name => !terms[name].isNative())
+            .filter(name => !(terms[name] instanceof SKI.classes.Native))
             .map(name => name+':'+terms[name].expand()).join(',');
         return '?code=' + encode(sample) + '&terms=' + encode(saved);
     }
