@@ -1,1 +1,1 @@
-/docs/build/* -diff
+/docs/build/** -diff
