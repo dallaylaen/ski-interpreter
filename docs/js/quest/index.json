@@ -1,7 +1,13 @@
 [
   {
     "name": "The basics",
-    "intro": "Welcome",
+    "intro": [
+      "Welcome to the wonderful world of combinators. ",
+      "The only thing that exists here is functions. ",
+      "To be precise, functions of one argument that return functions of one argument.",
+      "And there are also not many of them at the start...",
+      "But they are <i>powerful enough</i>."
+      ],
     "link": "01-basics.json"
   },
   {
