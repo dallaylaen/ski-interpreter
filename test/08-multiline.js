@@ -18,4 +18,15 @@ describe( 'SKI.pasreMulti', () => {
 
         done();
     });
+
+    it ('makes last expr an alias if = given', done => {
+        const ski = new SKI();
+        const expr = ski.parseMulti('foo = SKK');
+        const x = SKI.free('x');
+
+        expect( expr.name ).to.equal ("foo");
+        expect( expr.run(x).result).to.equal(x);
+
+        done();
+    });
 });
