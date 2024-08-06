@@ -136,3 +136,12 @@ h1 {
     display: inline-block;
     float: right;
 }
+
+.help {
+    font-family: serif;
+
+}
+
+.help code {
+    color: darkgoldenrod;
+}

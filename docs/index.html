@@ -15,7 +15,7 @@
     <div class="layout main" id="main">
         <div class="pane" style="width: 69%">
             <div id="teletype" class="scroll">
-                <div style="border: 1px dotted black;">
+                <div style="border: 1px dotted black;" class="help">
                     <p>Welcome to the
                         <a href="https://en.wikipedia.org/wiki/SKI_combinator_calculus" target="_blank">combinatory logic</a>
                         interpreter.
@@ -26,6 +26,9 @@
                     </p>
                     <p>New terms can be declared by prepending <code>"name&nbsp;=&nbsp;"</code> to the expression.
                         They will appear in the box on the right and can be clicked to add them to the expression.
+                    </p>
+                    <p>
+                        Enter <code>?</code> to get detailed info on syntax.
                     </p>
                </div>
             </div>
@@ -55,11 +58,48 @@
         </div>
     </div>
 
+    <div hidden>
+        <div id="help">
+            <p>The interpreter honors the following rules:</p>
+            <ul>
+                <li>
+                    Terms are accepted in the form of upper-case latin letters, or lower case identifiers.
+                    Upper letter terms are assumed to be one letter and do not require spaces.
+                </li>
+                <li>
+                    A program consists of one or more statements, separated by semicolons (<code>;</code>).
+                    A statement may contain terms, parenthesis (<code>(</code> and <code>)</code>),
+                    and whitespace. Parenthesis may be omitted.
+                </li>
+                <li>
+                    Unknown terms are assumed to be free variables and will be left as is.
+                    Known terms and their reduction rules (or implementations) are listed in the right panel.
+                </li>
+                <li>
+                    If a statement is prepended with <code>identifier = </code>, it defines a new <i>temporary</i>
+                    term that can be used in further expressions.
+                </li>
+                <li>
+                    If that happens to the <i>last</i> statement in the group,
+                    it will be permanently added to list of available terms, overriding the existing
+                    term with the same name.
+                </li>
+            </ul>
+            <p>Examples: </p>
+            <ul>
+                <li><code>SIIx</code> evaluates to <code>x(x)</code> <i>// x is a free variable;</i></li>
+                <li><code>B = S(KS)K</code> declares the B combinator;</li>
+                <li><code>U = SII; Ux</code> evaluates to x(x), U will <b>not</b> be available afterwards.</li>
+            </ul>
+
+        </div>
+    </div>
+
 <script>
     /**
      *   References to static page elements
      */
-    const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'code', 'gostop', 'verbose');
+    const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'code', 'gostop', 'verbose', 'help');
 
     /**
      *   Global state of the interpreter
@@ -122,6 +162,7 @@
 
     // page functions
     function toggleRun() {
+        // FIXME this sucks, rewrite
         if (running) {
             running = false;
         } else {
@@ -135,6 +176,12 @@
     function run() {
         const out = teletype(view.teletype);
         const src = view.code.value;
+
+        if (src.match(/^\s*\?[\s?]*$/)) {
+            resetGo();
+            out(view.help.innerHTML, {tag: 'div', class: ['help']});
+            return;
+        }
 
         const head = out( '<a href="'+permalink(view.code.value)+'" target="_blank"><b>Expression #'+(++count)+'</b></a>',
             {tag: 'div', nobr: true, class: 'con-header'});
