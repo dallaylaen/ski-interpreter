@@ -27,9 +27,9 @@ describe( 'SKI', () => {
         expect (known.sub.note).to.equal('just an alias');
 
         let expr = known.sub;
-        expect( expr.isNative() ).to.equal(false);
+        expect( expr instanceof SKI.classes.Native ).to.equal(false);
         expr = expr.step();
-        expect( expr.isNative() ).to.equal(true);
+        expect( expr instanceof SKI.classes.Native ).to.equal(true);
 
         done();
     });
