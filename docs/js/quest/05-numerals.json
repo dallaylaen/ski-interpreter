@@ -1,10 +1,9 @@
 [
   [
     {
-      "title": "Church of Numerals I",
+      "title": "zero... one... two?!",
       "descr": [
-        "Church numeral N is a function that converts x, y to x(...x(y)...), repeated N times. ",
-        "0 is (x, y)->y (i.e. same as false), 1 is I (I x y = x(y)). What is 2?"
+        "Look at the definition above once more. What would number 2 look like?"
       ]
     },
     [
@@ -15,7 +14,7 @@
   ],
   [
     {
-      "title": "Church of Numerals II",
+      "title": "inc",
       "descr": [
         "Procure a term that increases given number by 1: inc N x y = x(...N+1 times(y)...). ",
         "Hint: inc N x y == x (N x y)."
@@ -46,5 +45,32 @@
       "x",
       "y"
     ]
+  ],
+  [
+    {
+      "title": "isZero",
+      "descr": [
+        "Make a term that returns K for 0 and KI for all other numbers. "
+      ],
+      "numbers": true
+    },
+    ["K", "KI"],
+    ["K", "SK"],
+    ["KI", "I"],
+    ["KI", "2"],
+    ["KI", "5"]
+  ],
+  [
+    {
+      "title": "dec",
+      "descr": [
+        "Return the previous number for positive integers, or zero for zero."
+      ],
+      "numbers": true
+    },
+    ["KI", "KI"],
+    ["KI", "I"],
+    ["x(y)", "2", "x", "y"],
+    ["5 x y", "6", "x", "y"]
   ]
 ]

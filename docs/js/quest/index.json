@@ -22,7 +22,12 @@
   {
     "name": "The Church of Numerals",
     "intro": [
-
+      "As everything in the world of combinators is a function, numbers are functions, too.",
+      "A Church numeral (named after ",
+      "<a href=\"https://en.wikipedia.org/wiki/Alonzo_Church\" target=\"_blank\">Alonzo Church</a>)",
+      "is a function N that takes 2 arguments, x and y, and returns x(...N times...(x(y))...).",
+      "By that definition, 0 is KI (just as false), as it repeats the first argument exactly 0 times,",
+      "and 1 is I (easy to confuse)."
     ],
     "link": "05-numerals.json"
   }
