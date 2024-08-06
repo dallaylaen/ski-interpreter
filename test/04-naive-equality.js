@@ -30,4 +30,22 @@ describe('SKI.equals', () => {
 
         done();
     });
+
+    it('can compare aliases to the same thing', done => {
+        const ski = new SKI;
+
+        ski.add('foo', 'SK');
+        ski.add('bar', 'SK');
+
+        const { foo, bar } = ski.getTerms();
+
+        expect(foo.equals(bar)).to.equal(true);
+
+        ski.add('foo', 'KI');
+        const foo2 = ski.getTerms().foo;
+
+        expect(foo.equals(foo2)).to.equal(false);
+
+        done();
+    });
 });
