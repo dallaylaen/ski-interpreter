@@ -12,7 +12,10 @@
   {
     "name": "Boolean logic",
     "intro": [
-
+      "<code>K</code> and <code>KI</code> terms may be interpreted as <b>true</b> and <b>false</b>",
+      ", respectively, as <code>K then else</code> will result in <code>then</code>",
+      "and <code>KI then else</code> will result in <code>else</code>.",
+      "The trick is almost always to feed a function to a boolean value, and not the other way around."
     ],
     "link": "04-boolean.json"
   },
