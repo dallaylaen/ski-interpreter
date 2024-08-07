@@ -51,25 +51,33 @@
 
     function makeChapter (opt, n) {
         const container = append(view.quest, 'div', {class: ['chapter']});
-        append(container, 'div', {class: ['title'], content: opt.name});
+        const title = append(container, 'div', {class: ['title'], content: opt.name});
+        const stats = append(title, 'span', {class: ['float-right']});
+        const counter = append( stats, 'span', {content: '0'});
+        let solved = 0;
+
         append(container, 'div', {class: ['note'], content: cat(opt.intro)});
         const inner = append(container, 'div', {});
         fetch(questDir + opt.link)
             .then( resp => resp.json() )
             .then( list => {
-                let k = 1;
+                let k = 0;
                 for (const item of list) {
-                    makeQuest(inner, item, n+'.'+k++);
+                    makeQuest(inner, item, n + '.' + ++k, () => { counter.innerHTML = '' + ++solved });
                 }
+                append(stats, 'span', {content: '/'+k});
             });
     }
 
     /**
-     *
+     * @param {Element} container
      * @param {Array} spec
      * @param {string} n
+     * @param {Function} onComplete
+     * @return {void}
      */
-    function makeQuest (container, spec, n) {
+
+    function makeQuest (container, spec, n, onComplete = x => x) {
         const quest = new SKI.Quest(...spec);
         const frame = append(container, 'div', {class: ['quest-box']});
 
@@ -102,15 +110,17 @@
         const sumUpdate = report => {
             if (solved)
                 return;
-            if (report.pass)
+            if (report.pass) {
                 solved = true;
+                summary.classList.add('success');
+                onComplete();
+            }
+
             attempts++;
             for (const item of report.details)
                 count += item.count;
 
             summary.innerHTML = 'Attempts: '+attempts+', total steps: '+count;
-            if (report.pass)
-                summary.classList.add('success');
         }
 
         const runme = () => checkQuest(box, quest, input.value,
@@ -124,7 +134,6 @@
         );
         btn.onclick = runme;
         input.onkeydown = (ev => ev.key === "Enter" ? runme() : true);
-
     }
 
     /**
