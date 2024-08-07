@@ -123,7 +123,9 @@ button input {
 
 .quest-box {
     margin: 0.5em;
-    border: 5px solid maroon;
+    border: 0.3em solid maroon;
+    padding: 0.2em;
+    border-radius: 0.5em;
 }
 
 h1 {
@@ -147,7 +149,9 @@ h1 {
 }
 
 .chapter {
-    border: maroon solid 5px;
+    border: maroon solid 0.3em;
+    border-radius: 0.5em;
+
 }
 
 .chapter ~ .chapter {
@@ -166,3 +170,4 @@ h1 {
     padding-left: 2em;
     background-color: antiquewhite;
 }
+
