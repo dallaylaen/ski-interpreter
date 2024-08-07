@@ -16,9 +16,9 @@
     {
       "title": "inc",
       "descr": [
-        "Procure a term that increases given number by 1: inc N x y = x(...N+1 times(y)...). ",
-        "Hint: inc N x y == x (N x y)."
+        "Procure a term that increases given number by 1: inc N x y = x(...N+1 times(y)...). "
       ],
+      "hint": "inc N x y == x (N x y).",
       "numbers": true
     },
     [

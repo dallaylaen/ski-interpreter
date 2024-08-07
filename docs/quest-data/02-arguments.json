@@ -25,7 +25,8 @@
   [
     {
       "title": "Quine",
-      "descr": "Write an expression that produces itself when given any argument. Hint: the above quest may help!"
+      "descr": "Write an expression that produces itself when given any argument.",
+      "hint": "The above quest may help!"
     },
     [
       {
