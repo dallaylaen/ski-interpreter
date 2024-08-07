@@ -83,8 +83,9 @@
         const body = append(frame, 'div');
         expand.onclick = () => showhide(body, true);
 
-        if (quest.descr)
-            append(body, 'div', {content: cat(quest.descr), class:['note']});
+        const descr = append(body, 'div', {content: cat(quest.descr), class:['note']});
+        if (quest.meta.hint)
+            hint(descr, ' Hint:...', ' Hint: '+quest.meta.hint);
 
         const box = append(body, 'div', {class: ['quest-content'], content: '....'});
 
@@ -165,6 +166,15 @@
             return input.join(' ');
         else
             return ''+input;
+    }
+
+    function hint (element, shown, hidden) {
+        const container = append(element, 'span', {});
+        const clickme = append(container, 'span', {content: shown, class: ['hint']});
+        clickme.onclick = () => {
+            clickme.remove();
+            append(container, 'span', { content: hidden });
+        };
     }
 </script>
 </body>

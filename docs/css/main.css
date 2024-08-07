@@ -171,3 +171,6 @@ h1 {
     background-color: antiquewhite;
 }
 
+.hint {
+    cursor: pointer;
+}
