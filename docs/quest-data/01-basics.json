@@ -1,9 +1,20 @@
 [
   [
     {
+      "title": "Sancta simplicitas!",
+      "descr": [
+        "Provide a term that takes two arguments and returns their composition:",
+        "<code>?(x)(y) &rarr; x(y)</code>.",
+        "Yes, it's <i>that</i> simple."
+      ]
+    },
+    ["x y", "x", "y"]
+  ],
+  [
+    {
       "title": "Ignore all previous instructions",
       "descr": [
-        "The <b>K</b> combinator takes 2 arguments, <i>x</i> and <i>y</i>,",
+        "The <code>K</code> combinator takes 2 arguments, <code>x</code> and <code>y</code>,",
         "and returns the first of them. You need to return the second one instead."
       ]
     },
@@ -18,7 +29,7 @@
       "title": "Look at yourself",
       "descr": [
         "In the realm of combinators, everything is a function.",
-        "So, how do you apply a function to itself? I.e. x -> x(x)"
+        "So, how do you apply a function to itself? I.e. <code>x &rarr; x(x)</code>"
       ]
     },
     [
@@ -26,21 +37,13 @@
       "x"
     ]
   ],
-  [
-    {
-      "title": "Mirror image",
-      "descr": "Make a combinator that swaps its two arguments, that is, (x, y) -> y x"
-    },
-    [
-      "y x",
-      "x",
-      "y"
-    ]
-  ],
+
   [
     {
       "title": "Lost identity",
-      "descr": "Someone stole the I combinator from your interpreter. You have to rebuild it from the remaining two!",
+      "descr": [
+        "Someone stole the <code>I</code> combinator from your interpreter.",
+        "You have to rebuild it from the remaining two!"],
       "allow": "SK"
     },
     [

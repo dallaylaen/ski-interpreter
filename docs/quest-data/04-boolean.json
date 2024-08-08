@@ -1,9 +1,9 @@
 [
   [
     {
-      "title": "warm up",
+      "title": "Warm up",
       "descr": [
-        "Provide a term that returns K for I and I for K."
+        "Provide a term that returns <code>K</code> for <code>I</code> and <code>I</code> for <code>K</code>."
       ]
     },
     ["K", "I"],
@@ -33,7 +33,10 @@
   [
     {
       "title": "and",
-      "descr": ["make a function of 2 arguments that only returns true (K) if both are true"]
+      "descr": [
+        "make a term that takes 2 arguments and returns true (<code>K</code>)",
+        " if and only if both are true"
+      ]
     },
     ["K", "K", "K"],
     ["KI", "KI", "K"],

@@ -1,18 +1,20 @@
 [
   {
-    "name": "The basics",
+    "name": "Baby steps",
     "intro": [
       "Welcome to the wonderful world of combinators. ",
       "The only thing that exists here is functions. ",
-      "To be precise, functions of one argument that return functions of one argument.",
+      "To be precise, a combinator is a function that takes a combinator and returns a combinator.",
       "And there are also not many of them at the start...",
-      "But they are <i>powerful enough</i>."
+      "But don't worry, they are <i>powerful enough</i>."
       ],
     "link": "01-basics.json"
   },
   {
-    "name": "Moving arguments around",
-    "intro": "x y z -> x z y",
+    "name": "Swing, swing!",
+    "intro": [
+      "Let's move some arguments around."
+    ],
     "link": "02-arguments.json"
   },
   {
@@ -31,9 +33,11 @@
       "As everything in the world of combinators is a function, numbers are functions, too.",
       "A Church numeral (named after ",
       "<a href=\"https://en.wikipedia.org/wiki/Alonzo_Church\" target=\"_blank\">Alonzo Church</a>)",
-      "is a function N that takes 2 arguments, x and y, and returns x(...N times...(x(y))...).",
-      "By that definition, 0 is KI (just as false), as it repeats the first argument exactly 0 times,",
-      "and 1 is I (easy to confuse)."
+      "is a function <code>N</code> that takes 2 arguments, <code>x</code> and <code>y</code>,",
+      "and returns <code>x(...N times...(x(y))...).</code>",
+      "By that definition, 0 is <code>KI</code> (just as false),",
+      "as it repeats the first argument exactly 0 times,",
+      "and 1 is <code>I</code> (easy to confuse)."
     ],
     "link": "05-numerals.json"
   }

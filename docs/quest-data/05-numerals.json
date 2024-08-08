@@ -16,9 +16,9 @@
     {
       "title": "inc",
       "descr": [
-        "Procure a term that increases given number by 1: inc N x y = x(...N+1 times(y)...). "
+        "Procure a term that increases given number by 1: <code>inc N x y &rarr; x(...N+1 times(y)...)</code>. "
       ],
-      "hint": "inc N x y == x (N x y).",
+      "hint": "<code>inc N x y &rarr; x (N x y)</code>.",
       "numbers": true
     },
     [
@@ -50,7 +50,7 @@
     {
       "title": "isZero",
       "descr": [
-        "Make a term that returns K for 0 and KI for all other numbers. "
+        "Make a term that returns <code>K</code> for 0 and <code>KI</code> for all other numbers. "
       ],
       "numbers": true
     },
@@ -68,8 +68,8 @@
       ],
       "numbers": true
     },
-    ["KI", "KI"],
-    ["KI", "I"],
+    ["y", "KI", "x", "y"],
+    ["y", "I", "x", "y"],
     ["x(y)", "2", "x", "y"],
     ["5 x y", "6", "x", "y"]
   ]

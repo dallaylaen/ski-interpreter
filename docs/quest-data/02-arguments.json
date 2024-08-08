@@ -1,8 +1,19 @@
 [
   [
     {
+      "title": "Mirror image",
+      "descr": "Make a combinator <code>T</code> that swaps its two arguments, that is, <code>(x, y) &rarr; y x</code>"
+    },
+    [
+      "y x",
+      "x",
+      "y"
+    ]
+  ],
+  [
+    {
       "title": "B combinator",
-      "descr": "x y z -> x(y(z))"
+      "descr": "<code>f g x &rarr; f(g(x))</code>"
     },
     [
       "x(y z)",
@@ -13,8 +24,21 @@
   ],
   [
     {
+      "title": "Lost at GoF, found at g&compfn;f",
+      "descr": [
+        "Somewhat similar to the previous one but you have to apply the functions in reverse order:",
+        "<code>(f g x)&rarr;g(f(x))</code>"
+      ]
+    },
+    ["g(f(x))", "f", "g", "x"]
+  ],
+  [
+    {
       "title": "K forte",
-      "descr": "Sometimes returning x for any y is not enough. Return it twice: (x, y)->x x"
+      "descr": [
+        "Sometimes returning <code>x</code> for any given <code>y</code> is not enough.",
+        "Return it twice: <code>(x, y)&rarr;x x</code>"
+      ]
     },
     [
       "x x",
