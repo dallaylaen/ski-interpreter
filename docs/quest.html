@@ -51,7 +51,7 @@
 
     function makeChapter (opt, n) {
         const container = append(view.quest, 'div', {class: ['chapter']});
-        const title = append(container, 'div', {class: ['title'], content: opt.name});
+        const title = append(container, 'div', {class: ['title'], content: 'Chapter '+n+': '+opt.name});
         const stats = append(title, 'span', {class: ['float-right']});
         const counter = append( stats, 'span', {content: '0'});
         let solved = 0;
@@ -82,7 +82,7 @@
         const frame = append(container, 'div', {class: ['quest-box']});
 
         const name = 'quest-'+n;
-        const title = append(frame, 'div', {class: ['con-header']});
+        const title = append(frame, 'div', {class: ['block-header']});
         append (title, 'a').name = name;
         const expand = append(title, 'a', {content: n ? '#' + n + ' ' : 'Quest'});
         append(title, 'span', {content: quest.title});

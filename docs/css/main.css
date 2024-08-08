@@ -151,7 +151,7 @@ h1 {
 .chapter {
     border: maroon solid 0.3em;
     border-radius: 0.5em;
-
+    background-color: antiquewhite;
 }
 
 .chapter ~ .chapter {
@@ -163,14 +163,27 @@ h1 {
     color: gold;
     padding: 0.3em;
     font-weight: bold;
+    font-size: large;
 }
 
 .chapter .note {
-    font-size: small;
     padding-left: 2em;
     background-color: antiquewhite;
 }
 
 .hint {
     cursor: pointer;
+}
+
+.block-header {
+    background-color: burlywood;
+    color: maroon;
+    padding: 0 0.5em;
+    border-radius: 0.5em;
+    font-weight: bold;
+}
+
+.block-header .success {
+    color: darkgreen;
+    font-stretch: condensed;
 }
