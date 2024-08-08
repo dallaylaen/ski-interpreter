@@ -187,3 +187,9 @@ h1 {
     color: darkgreen;
     font-stretch: condensed;
 }
+
+.chapter .note code {
+    font-family: inherit;
+    font-style: italic;
+    color: indigo;
+}
