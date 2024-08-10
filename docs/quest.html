@@ -87,7 +87,7 @@
      */
 
     function makeQuest (container, spec, n, onComplete = x => x) {
-        const quest = new SKI.Quest(...spec);
+        const quest = new SKI.Quest(spec);
         const frame = append(container, 'div', {class: ['quest-box']});
 
         const name = 'quest-'+n;
