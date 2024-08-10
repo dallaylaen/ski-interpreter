@@ -19,9 +19,10 @@ describe('Quest', () => {
 
     it ('works for if', done => {
         const quest = new Quest(
-            {title:"if (then) (else) (true|false)"},
-            [ 'x', 'x', 'y', 'K'],
-            [ 'y', 'x', 'y', 'KI'],
+            {title:"if (then) (else) (true|false)", cases: [
+                [ 'x', 'x', 'y', 'K'],
+                [ 'y', 'x', 'y', 'KI'],
+            ]}
         );
 
         const ski = new SKI();
@@ -53,8 +54,7 @@ describe('Quest', () => {
 
     it('can verify locked down solutions', done => {
         const quest = new Quest(
-            {title: 'I from S & K', allow: 'SK'},
-            ['x', 'x']
+            {title: 'I from S & K', allow: 'SK', cases: [['x', 'x']]}
         );
 
         const good = quest.check('SKK');
@@ -69,8 +69,12 @@ describe('Quest', () => {
 
     it( 'can verify terms that require calculations', done => {
         const quest = new Quest(
-            { numbers: true, allow: 'SKIBCW' },
-            [ '5 x y', '4', 'x', 'y'],
+            {
+                numbers: true, allow: 'SKIBCW',
+                cases: [
+                    ['5 x y', '4', 'x', 'y'],
+                ],
+            }
         );
         const good = quest.check('SB');
         expect( good.pass ).to.equal (true);
@@ -85,10 +89,7 @@ describe('Quest', () => {
     });
 
     it ('does not die on incorrect inputs', done => {
-        const quest = new Quest(
-            {},
-            ['x', 'x'],
-        );
+        const quest = new Quest({cases: [['x', 'x']],});
 
         const result = quest.check('I)))');
 
@@ -100,10 +101,7 @@ describe('Quest', () => {
     });
 
     it ('Can apply expect to input if needed', done => {
-        const quest = new Quest(
-            {},
-            [{feedInput: true}, 'K', 'x'],
-        );
+        const quest = new Quest({cases: [[{feedInput: true}, 'K', 'x']]});
 
         const result = quest.check('y');
         expect(''+result.details[0].expected).to.equal('K(y)');
