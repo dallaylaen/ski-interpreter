@@ -1,95 +1,151 @@
 [
-  [
-    {
-      "title": "Warm up",
-      "descr": [
-        "Provide a term that returns <code>K</code> for <code>I</code> and <code>I</code> for <code>K</code>."
-      ]
-    },
-    ["K", "I"],
-    ["I", "K"]
-  ],
-  [
-    {
-      "title": "not",
-      "descr": [
-        "Implement <code>not x</code>, that is,",
-        "return <code>K</code> for <code>KI</code> and <code>KI</code> for <code>K</code>"
-      ]
-    },
-    [
-      "x",
-      "KI",
-      "x",
-      "y"
+  {
+    "title": "Warm up",
+    "descr": [
+      "Provide a term that returns <code>K</code> for <code>I</code> and <code>I</code> for <code>K</code>."
     ],
-    [
-      "y",
-      "K",
-      "x",
-      "y"
+    "cases": [
+      [
+        "K",
+        "I"
+      ],
+      [
+        "I",
+        "K"
+      ]
     ]
-  ],
-  [
-    {
-      "title": "and",
-      "descr": [
-        "make a term that takes 2 arguments and returns true (<code>K</code>)",
-        " if and only if both are true"
-      ]
-    },
-    ["K", "K", "K"],
-    ["KI", "KI", "K"],
-    ["KI", "K", "KI"],
-    ["KI", "KI", "KI"]
-  ],
-  [
-    {
-      "title": "or",
-      "descr": ["the title says it"]
-    },
-    ["K", "K", "K"],
-    ["K", "KI", "K"],
-    ["K", "K", "KI"],
-    ["KI", "KI", "KI"]
-  ],
-  [
-    {
-      "title": "nand",
-      "descr": [
-        "NAND (not and) is true unless both ot its inputs are true."
-      ]
-    },
-    ["KI", "K", "K"],
-    ["K", "KI", "K"],
-    ["K", "K", "KI"],
-    ["K", "KI", "KI"]
-  ],
-  [
-    {
-      "title": "Postfix if statement",
-      "descr": [
-        "Often the then/else branches are known before the condition that picks one of them.",
-        "Provide a function that takes then/else terms and feeds them to its third argument."
-      ]
-    },
-    [
-      "x",
-      "x",
-      "y",
-      "K"
+  },
+  {
+    "title": "not",
+    "descr": [
+      "Implement <code>not x</code>, that is,",
+      "return <code>K</code> for <code>KI</code> and <code>KI</code> for <code>K</code>"
     ],
-    [
-      "y",
-      "x",
-      "y",
-      "KI"
-    ],
-    [
-      "y",
-      "x",
-      "y",
-      "SK"
+    "cases": [
+      [
+        "x",
+        "KI",
+        "x",
+        "y"
+      ],
+      [
+        "y",
+        "K",
+        "x",
+        "y"
+      ]
     ]
-  ]
+  },
+  {
+    "title": "and",
+    "descr": [
+      "make a term that takes 2 arguments and returns true (<code>K</code>)",
+      " if and only if both are true"
+    ],
+    "cases": [
+      [
+        "K",
+        "K",
+        "K"
+      ],
+      [
+        "KI",
+        "KI",
+        "K"
+      ],
+      [
+        "KI",
+        "K",
+        "KI"
+      ],
+      [
+        "KI",
+        "KI",
+        "KI"
+      ]
+    ]
+  },
+  {
+    "title": "or",
+    "descr": [
+      "the title says it"
+    ],
+    "cases": [
+      [
+        "K",
+        "K",
+        "K"
+      ],
+      [
+        "K",
+        "KI",
+        "K"
+      ],
+      [
+        "K",
+        "K",
+        "KI"
+      ],
+      [
+        "KI",
+        "KI",
+        "KI"
+      ]
+    ]
+  },
+  {
+    "title": "nand",
+    "descr": [
+      "NAND (not and) is true unless both ot its inputs are true."
+    ],
+    "cases": [
+      [
+        "KI",
+        "K",
+        "K"
+      ],
+      [
+        "K",
+        "KI",
+        "K"
+      ],
+      [
+        "K",
+        "K",
+        "KI"
+      ],
+      [
+        "K",
+        "KI",
+        "KI"
+      ]
+    ]
+  },
+  {
+    "title": "Postfix if statement",
+    "descr": [
+      "Often the then/else branches are known before the condition that picks one of them.",
+      "Provide a function that takes then/else terms and feeds them to its third argument."
+    ],
+    "cases": [
+      [
+        "x",
+        "x",
+        "y",
+        "K"
+      ],
+      [
+        "y",
+        "x",
+        "y",
+        "KI"
+      ],
+      [
+        "y",
+        "x",
+        "y",
+        "SK"
+      ]
+    ]
+  }
 ]

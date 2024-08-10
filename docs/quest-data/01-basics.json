@@ -1,55 +1,52 @@
 [
-  [
-    {
-      "title": "Sancta simplicitas!",
-      "descr": [
-        "Provide a term that takes two arguments and returns their composition:",
-        "<code>?(x)(y) &rarr; x(y)</code>.",
-        "Yes, it's <i>that</i> simple."
-      ]
-    },
-    ["x y", "x", "y"]
-  ],
-  [
+  {
+    "title": "Sancta simplicitas!",
+    "descr": [
+      "Provide a term that takes two arguments and returns their composition:",
+      "<code>?(x)(y) &rarr; x(y)</code>.",
+      "Yes, it's <i>that</i> simple."
+    ],
+    "cases": [
+      ["x y", "x", "y"]
+    ]
+  },
     {
       "title": "Ignore all previous instructions",
       "descr": [
         "The <code>K</code> combinator takes 2 arguments, <code>x</code> and <code>y</code>,",
         "and returns the first of them. You need to return the second one instead."
       ],
-      "solution": "SK"
+      "solution": "SK",
+      "cases": [
+        ["y", "x", "y"]
+      ]
     },
-    [
-      "y",
-      "x",
-      "y"
-    ]
-  ],
-  [
+
     {
       "title": "Look at yourself",
       "descr": [
         "In the realm of combinators, everything is a function.",
         "So, how do you apply a function to itself? I.e. <code>x &rarr; x(x)</code>"
+      ],
+      "cases": [
+        [
+          "x x",
+          "x"
+        ]
       ]
     },
-    [
-      "x x",
-      "x"
-    ]
-  ],
 
-  [
     {
       "title": "Lost identity",
       "descr": [
         "Someone stole the <code>I</code> combinator from your interpreter.",
         "You have to rebuild it from the remaining two!"],
-      "allow": "SK"
-    },
-    [
-      "x",
-      "x"
-    ]
-  ]
+      "allow": "SK",
+      "cases": [
+        [
+          "x",
+          "x"
+        ]
+      ]
+    }
 ]

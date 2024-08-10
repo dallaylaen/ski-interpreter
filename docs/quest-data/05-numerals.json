@@ -1,76 +1,79 @@
 [
-  [
     {
       "title": "zero... one... two?!",
       "descr": [
         "Look at the definition above once more. What would number 2 look like?"
+      ],
+      "cases": [
+        [
+          "x(x(y))",
+          "x",
+          "y"
+        ]
       ]
     },
-    [
-      "x(x(y))",
-      "x",
-      "y"
-    ]
-  ],
-  [
+
     {
       "title": "inc",
       "descr": [
         "Procure a term that increases given number by 1: <code>inc N x y &rarr; x(...N+1 times(y)...)</code>. "
       ],
       "hint": "<code>inc N x y &rarr; x (N x y)</code>.",
-      "numbers": true
+      "numbers": true,
+      "cases": [
+        [
+          "x y",
+          "KI",
+          "x",
+          "y"
+        ],
+        [
+          "x y",
+          "SK",
+          "x",
+          "y"
+        ],
+        [
+          "x (x y)",
+          "I",
+          "x",
+          "y"
+        ],
+        [
+          "9 x y",
+          "8",
+          "x",
+          "y"
+        ]
+      ]
     },
-    [
-      "x y",
-      "KI",
-      "x",
-      "y"
-    ],
-    [
-      "x y",
-      "SK",
-      "x",
-      "y"
-    ],
-    [
-      "x (x y)",
-      "I",
-      "x",
-      "y"
-    ],
-    [
-      "9 x y",
-      "8",
-      "x",
-      "y"
-    ]
-  ],
-  [
+
     {
       "title": "isZero",
       "descr": [
         "Make a term that returns <code>K</code> for 0 and <code>KI</code> for all other numbers. "
       ],
-      "numbers": true
+      "numbers": true,
+      "cases": [
+        ["K", "KI"],
+        ["K", "SK"],
+        ["KI", "I"],
+        ["KI", "2"],
+        ["KI", "5"]
+      ]
     },
-    ["K", "KI"],
-    ["K", "SK"],
-    ["KI", "I"],
-    ["KI", "2"],
-    ["KI", "5"]
-  ],
-  [
+
     {
       "title": "dec",
       "descr": [
         "Return the previous number for positive integers, or zero for zero."
       ],
-      "numbers": true
-    },
-    ["y", "KI", "x", "y"],
-    ["y", "I", "x", "y"],
-    ["x(y)", "2", "x", "y"],
-    ["5 x y", "6", "x", "y"]
-  ]
+      "numbers": true,
+      "cases": [
+        ["y", "KI", "x", "y"],
+        ["y", "I", "x", "y"],
+        ["x(y)", "2", "x", "y"],
+        ["5 x y", "6", "x", "y"]
+      ]
+    }
 ]
