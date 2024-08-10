@@ -9,33 +9,21 @@
       "x"
     ],
     "cases": [
-      [
-        "f(x)",
-        "f"
-      ]
+      [ "f(x)", "f" ]
     ]
   },
   {
     "title": "Mirror image",
     "descr": "Make a combinator <code>T</code> that swaps its two arguments, that is, <code>(x, y) &rarr; y x</code>",
     "cases": [
-      [
-        "y x",
-        "x",
-        "y"
-      ]
+      [ "y x", "x", "y" ]
     ]
   },
   {
     "title": "B combinator",
     "descr": "<code>f g x &rarr; f(g(x))</code>",
     "cases": [
-      [
-        "x(y z)",
-        "x",
-        "y",
-        "z"
-      ]
+      [ "x(y z)", "x", "y", "z" ]
     ]
   },
   {
@@ -45,12 +33,7 @@
       "<code>(f g x)&rarr;g(f(x))</code>"
     ],
     "cases": [
-      [
-        "g(f(x))",
-        "f",
-        "g",
-        "x"
-      ]
+      [ "g(f(x))", "f", "g", "x" ]
     ]
   },
   {
@@ -60,11 +43,7 @@
       "Return it twice: <code>(x, y)&rarr;x x</code>"
     ],
     "cases": [
-      [
-        "x x",
-        "x",
-        "y"
-      ]
+      [ "x x", "x", "y" ]
     ]
   },
   {
@@ -72,21 +51,8 @@
     "descr": "Write an expression that produces itself when given any argument.",
     "hint": "The above quest may help!",
     "cases": [
-      [
-        {
-          "feedInput": true
-        },
-        "I",
-        "x"
-      ],
-      [
-        {
-          "feedInput": true
-        },
-        "I",
-        "x",
-        "y"
-      ]
+      [ { "feedInput": true }, "I", "x" ],
+      [ { "feedInput": true }, "I", "x", "y" ]
     ]
   }
 ]

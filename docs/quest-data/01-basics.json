@@ -29,10 +29,7 @@
         "So, how do you apply a function to itself? I.e. <code>x &rarr; x(x)</code>"
       ],
       "cases": [
-        [
-          "x x",
-          "x"
-        ]
+        [ "x x", "x" ]
       ]
     },
 
@@ -43,10 +40,7 @@
         "You have to rebuild it from the remaining two!"],
       "allow": "SK",
       "cases": [
-        [
-          "x",
-          "x"
-        ]
+        [ "x", "x" ]
       ]
     }
 ]

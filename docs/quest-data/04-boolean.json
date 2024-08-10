@@ -5,14 +5,8 @@
       "Provide a term that returns <code>K</code> for <code>I</code> and <code>I</code> for <code>K</code>."
     ],
     "cases": [
-      [
-        "K",
-        "I"
-      ],
-      [
-        "I",
-        "K"
-      ]
+      [ "K", "I" ],
+      [ "I", "K" ]
     ]
   },
   {
@@ -22,18 +16,8 @@
       "return <code>K</code> for <code>KI</code> and <code>KI</code> for <code>K</code>"
     ],
     "cases": [
-      [
-        "x",
-        "KI",
-        "x",
-        "y"
-      ],
-      [
-        "y",
-        "K",
-        "x",
-        "y"
-      ]
+      [ "x", "KI", "x", "y" ],
+      [ "y", "K", "x", "y" ]
     ]
   },
   {
@@ -43,26 +27,10 @@
       " if and only if both are true"
     ],
     "cases": [
-      [
-        "K",
-        "K",
-        "K"
-      ],
-      [
-        "KI",
-        "KI",
-        "K"
-      ],
-      [
-        "KI",
-        "K",
-        "KI"
-      ],
-      [
-        "KI",
-        "KI",
-        "KI"
-      ]
+      [ "K", "K", "K" ],
+      [ "KI", "KI", "K" ],
+      [ "KI", "K", "KI" ],
+      [ "KI", "KI", "KI" ]
     ]
   },
   {
@@ -71,26 +39,10 @@
       "the title says it"
     ],
     "cases": [
-      [
-        "K",
-        "K",
-        "K"
-      ],
-      [
-        "K",
-        "KI",
-        "K"
-      ],
-      [
-        "K",
-        "K",
-        "KI"
-      ],
-      [
-        "KI",
-        "KI",
-        "KI"
-      ]
+      [ "K", "K", "K" ],
+      [ "K", "KI", "K" ],
+      [ "K", "K", "KI" ],
+      [ "KI", "KI", "KI" ]
     ]
   },
   {
@@ -99,26 +51,10 @@
       "NAND (not and) is true unless both ot its inputs are true."
     ],
     "cases": [
-      [
-        "KI",
-        "K",
-        "K"
-      ],
-      [
-        "K",
-        "KI",
-        "K"
-      ],
-      [
-        "K",
-        "K",
-        "KI"
-      ],
-      [
-        "K",
-        "KI",
-        "KI"
-      ]
+      [ "KI", "K", "K" ],
+      [ "K", "KI", "K" ],
+      [ "K", "K", "KI" ],
+      [ "K", "KI", "KI" ]
     ]
   },
   {
@@ -128,24 +64,9 @@
       "Provide a function that takes then/else terms and feeds them to its third argument."
     ],
     "cases": [
-      [
-        "x",
-        "x",
-        "y",
-        "K"
-      ],
-      [
-        "y",
-        "x",
-        "y",
-        "KI"
-      ],
-      [
-        "y",
-        "x",
-        "y",
-        "SK"
-      ]
+      [ "x", "x", "y", "K" ],
+      [ "y", "x", "y", "KI" ],
+      [ "y", "x", "y", "SK" ]
     ]
   }
 ]
