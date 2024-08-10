@@ -45,7 +45,7 @@ function checkChapter(entry, n) {
 function checkQuest(data, file, n) {
     describe('quest '+file+' ['+n+']', () => {
         it('can be used to create a quest', done => {
-            const quest = new Quest(...data);
+            const quest = new Quest(data);
             expect(quest instanceof Quest).to.equal(true, 'quest is a Quest');
             expect(typeof quest.title).to.equal('string');
             expect(typeof quest.descr).to.equal('string');
