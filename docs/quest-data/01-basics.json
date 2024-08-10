@@ -16,7 +16,8 @@
       "descr": [
         "The <code>K</code> combinator takes 2 arguments, <code>x</code> and <code>y</code>,",
         "and returns the first of them. You need to return the second one instead."
-      ]
+      ],
+      "solution": "SK"
     },
     [
       "y",
