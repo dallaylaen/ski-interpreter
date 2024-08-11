@@ -132,6 +132,11 @@ h1 {
     margin: 0;
     padding: 05.em;
     text-align: center;
+    color: maroon;
+}
+
+h1 img {
+    height: 1em;
 }
 
 .float-right {
