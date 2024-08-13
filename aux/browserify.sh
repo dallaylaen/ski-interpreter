@@ -2,16 +2,20 @@
 
 set -ex
 
-DST=docs/build/js
+DST=docs
 
 compile() {
-  webpack-cli "$1" --mode development -o "$DST"
-  mv -f "$DST"/main.js "$DST/$2".js
+  src=$1
+  dir=$(dirname "$DST/$2")
+  base=$(basename "$DST/$2")
+  mkdir -p "$dir"
 
-  webpack-cli "$1" --mode production -o "$DST"
-  mv -f "$DST"/main.js "$DST/$2".min.js
+  webpack-cli "$src" --mode development -o "$dir"
+  mv -f "$dir"/main.js "$dir/$base".js
+
+  webpack-cli "$1" --mode production -o "$dir"
+  mv -f "$dir"/main.js "$dir/$base".min.js
 }
 
-compile ./index.js ski-interpreter
-
+compile ./index.js build/js/ski-interpreter
 
