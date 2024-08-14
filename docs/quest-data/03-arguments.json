@@ -1,17 +1,5 @@
 [
-  {
-    "title": "Feeding a birdie",
-    "descr": [
-      "You are given a <i>known</i> value <code>x</code>.",
-      "You goal is to make a term that feeds this value to unknow function <code>f</code>"
-    ],
-    "vars": [
-      "x"
-    ],
-    "cases": [
-      [ "f(x)", "f" ]
-    ]
-  },
+
   {
     "title": "Mirror image",
     "descr": "Make a combinator <code>T</code> that swaps its two arguments, that is, <code>(x, y) &rarr; y x</code>",

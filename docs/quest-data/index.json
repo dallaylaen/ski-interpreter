@@ -11,6 +11,21 @@
     "link": "00-basics.json"
   },
   {
+    "name": "Dull tales",
+    "intro": [
+      "An arbitrary lambda expression can be converted to SKI via the following rules:",
+      "<ul>",
+      "<li><code>&lambda; x . x &rArr; I</code>;</li>",
+      "<li><code>&lambda; x . f(x)</code> (where f is independent of x) <code>&rArr; f</code>;</li>",
+      "<li><code>&lambda; x . y</code> (where y does not depend on x) <code>&rArr; K y</code>;</li>",
+      "<li><code>&lambda; x . y(z) &rArr; S(&lambda; x . y)(&lambda; x . z)</code>,",
+      "where <code>y</code> &amp; <code>z</code> may or may not depend on <code>x</code>.</li>",
+      "</ul><br>",
+      "Let's grind a bit to gain some XP before we can get to interesting stuff!"
+    ],
+    "link": "01-lambda.json"
+  },
+  {
     "name": "Swing, swing!",
     "intro": [
       "Let's move some arguments around."

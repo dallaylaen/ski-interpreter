@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Join em!",
+    "descr": [
+      "You are given 2 functions, <code>f</code> and <code>g</code>.",
+      "Make a term that returns <code>f(g(x))</code> for any given <code>x</code>."
+    ],
+    "vars": [
+      "f", "g"
+    ],
+    "cases": [
+      [ "f (g x)", "x" ]
+    ]
+  },
+  {
+    "title": "Feeding a birdie",
+    "descr": [
+      "You are given a <i>known</i> value <code>x</code>.",
+      "You goal is to make a term that feeds this value to unknown function <code>f</code>"
+    ],
+    "vars": [ "x" ],
+    "cases": [
+      [ "f(x)", "f" ]
+    ]
+  }
+]
