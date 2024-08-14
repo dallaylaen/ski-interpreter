@@ -11,18 +11,23 @@
 <body>
 <div class="layout" id="top">
     <h1><img src="img/mock1.png">Simple Kombinator Interpreter Quests<img src="img/mock2.png"></h1>
-    <a href="index.html" target="_blank">free form SKI interpreter</a>
 </div>
 <div class="layout" id="main">
+    <div class="side pane" style="width: 14%">
+        <div class="quest-box">
+            <a href="index.html" target="_blank">free form SKI interpreter</a>
+        </div>
+    </div>
     <div class="pane" id="quest" style="width: 69%"></div>
-    <div class="pane">
-        <p>The combinators: </p>
-        <ul>
-            <li><b>I</b>, the identity: <code>x -> x</code></li>
-            <li><b>K</b>, the constant: <code>x y -> x</code></li>
-            <li><b>S</b>, the substitution: <code>x y z -> x z (y z)</code></li>
-
-        </ul>
+    <div class="side pane" style="width: 14%">
+        <div class="quest-box">
+            <p>The combinators: </p>
+            <ul>
+                <li><b>I</b>, the identity: <code>x -> x</code></li>
+                <li><b>K</b>, the constant: <code>x y -> x</code></li>
+                <li><b>S</b>, the substitution: <code>x y z -> x z (y z)</code></li>
+            </ul>
+        </div>
     </div>
 </div>
 <div class="layout" id="bottom">
