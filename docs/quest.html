@@ -167,15 +167,14 @@
         if (report.exception) {
             append(output, 'div', {class: ['error'], content: 'Execution failed: '+report.exception});
         }
+        append(output, 'div', {content: 'Your solution: &phi; = '+report.expr.expand()});
         for (const item of report.details) {
             const line = append(output, 'div', {class: item.pass ? ['success'] : ['error']});
             append(line, 'span', {content: item.pass ? '&check;' : '&cross;'});
-            append(line, 'span', {content: expr + ' ' + item.args.join(' ')});
-            if (item.pass) {
-                append(line, 'span', {content: ' == '+item.found+' in '+item.count+' iterations'});
-            } else {
-                append(line, 'br');
-                append(line, 'span', {content: 'found: '+item.found});
+            append(line, 'span', {
+                content: '&phi; ' + item.args.join(' ') + ' &rarr; '+item.found+' in '+item.count+' iterations'
+            });
+            if (!item.pass) {
                 append(line, 'br');
                 append(line, 'span', {content: 'expected '+item.expected});
             }
