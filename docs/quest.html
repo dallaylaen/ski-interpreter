@@ -98,8 +98,8 @@
         const name = 'quest-'+n;
         const title = append(frame, 'div', {class: ['block-header']});
         append (title, 'a').name = name;
-        const expand = append(title, 'a', {content: n ? '#' + n + ' ' : 'Quest'});
-        append(title, 'span', {content: quest.title});
+        const expand = append(title, 'a', {content: n ? '#' + n + '' : 'Quest'});
+        append(title, 'span', {content: ' '+quest.title});
         expand.href = '#'+name;
         if (name === linkedTo)
             focusLater = frame;
@@ -170,13 +170,13 @@
         append(output, 'div', {content: 'Your solution: &phi; = '+report.expr.expand()});
         for (const item of report.details) {
             const line = append(output, 'div', {class: item.pass ? ['success'] : ['error']});
-            append(line, 'span', {content: item.pass ? '&check;' : '&cross;'});
+            append(line, 'span', {content: item.pass ? '&check; ' : '&cross; '});
             append(line, 'span', {
-                content: '&phi; ' + item.args.join(' ') + ' &rarr; '+item.found+' in '+item.count+' iterations'
+                content: `&phi; ${item.args.join(' ')} &rarr; ${item.found} in ${item.count} iterations`
             });
             if (!item.pass) {
                 append(line, 'br');
-                append(line, 'span', {content: 'expected '+item.expected});
+                append(line, 'span', {content: '&nbsp;&nbsp;expected '+item.expected});
             }
         }
         const action = report.pass ? onpass : onfail;

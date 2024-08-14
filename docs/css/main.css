@@ -177,9 +177,14 @@ h1 img {
 }
 
 .chapter .note {
-    padding-left: 2em;
-    background-color: antiquewhite;
+    margin: 1ex 0;
 }
+
+.quest-box .note {
+    border: 1px solid goldenrod;
+    border-radius: 0.5em;
+    padding: 0 0.5em;
+};
 
 .hint {
     cursor: pointer;
