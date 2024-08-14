@@ -141,6 +141,7 @@ h1 {
 
 h1 img {
     height: 1em;
+    margin-bottom: -0.3em;
 }
 
 .float-right {
