@@ -16,11 +16,53 @@
     "title": "Feeding a birdie",
     "descr": [
       "You are given a <i>known</i> value <code>x</code>.",
-      "You goal is to make a term that feeds this value to unknown function <code>f</code>"
+      "You goal is to make a term that feeds this value to an <i>unknown</i> function <code>f</code>"
     ],
     "vars": [ "x" ],
     "cases": [
       [ "f(x)", "f" ]
+    ]
+  },
+  {
+    "title": "Feeding a hungry birdie",
+    "descr": [
+      "You are given two known values, <code>x</code> and <code>y</code>.",
+      "Feed both of them, sequentially to function <code>f</code>."
+    ],
+    "vars": ["x", "y"],
+    "cases": [
+      ["f x y", "f"]
+    ]
+  },
+  {
+    "title": "Sandwich",
+    "descr": [
+      "You are given a term <code>y</code>.",
+      "Implement <code>x &rarr; y(x(y))</code>."
+    ],
+    "vars": ["y"],
+    "cases": [
+      ["y (x y)", "x"]
+    ]
+  },
+  {
+    "title": "Sandwich II",
+    "descr": [
+      "You are given a term <code>x</code> this time.",
+      "Implement <code>y &rarr; y(x(y))</code>."
+    ],
+    "vars": ["x"],
+    "cases": [
+      ["y (x y)", "y"]
+    ]
+  },
+  {
+    "title": "Sandwich III",
+    "descr": [
+      "Implement <code>x &rarr; y &rarr; y(x(y))</code>."
+    ],
+    "cases": [
+      ["y (x y)", "x", "y"]
     ]
   }
 ]
