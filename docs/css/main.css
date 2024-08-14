@@ -177,13 +177,14 @@ h1 img {
 }
 
 .chapter .note {
-    margin: 1ex 0;
+    margin: 1ex;
 }
 
 .quest-box .note {
     border: 1px solid goldenrod;
     border-radius: 0.5em;
     padding: 0 0.5em;
+    margin: 1ex 0;
 };
 
 .hint {

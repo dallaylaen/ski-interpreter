@@ -70,8 +70,9 @@
         const counter = append( stats, 'span', {content: '0'});
         let solved = 0;
 
-        append(container, 'div', {class: ['note'], content: cat(opt.intro)});
-        const inner = append(container, 'div', {});
+        const inner = append(container, 'div', {class: ['chapter-content']});
+
+        append(inner, 'div', {class: ['note'], content: cat(opt.intro)});
         return fetch(questDir + opt.link)
             .then( resp => resp.json() )
             .then( list => {
