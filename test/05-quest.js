@@ -8,6 +8,8 @@ describe('Quest', () => {
         const ski = new SKI;
         const result = quest.check(ski.parse('SKK'));
 
+        expect( result.expr instanceof SKI.classes.Ast ).to.equal(true,
+            'result.expr must be present & instanceof AST');
         expect( result.pass ).to.equal(true);
 
         // try to fool the parser with eponymous free var
