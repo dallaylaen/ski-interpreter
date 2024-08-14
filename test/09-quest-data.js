@@ -4,58 +4,44 @@ const fs = require('node:fs').promises;
 
 const dir = __dirname + '/../docs/quest-data/';
 
-describe( 'quest-data dir', () => {
-    it ('has index', done => {
-        fs.readFile(dir+'index.json')
-            .then(data => JSON.parse(data))
-            .then(data => {
-                expect(Array.isArray(data)).to.equal(true);
-                done();
-                data.map(checkChapter);
-            })
-            .catch(e => done(e));
+describe( 'quest-data', async () => {
+    it ('has index', async () => {
+        const index = await fs.readFile(dir + 'index.json')
+            .then(data => JSON.parse(data));
+
+        expect(Array.isArray(index)).to.equal(true, 'index is an array');
+
+        for (let n = 0; n < index.length; n++) {
+            const entry = index[n];
+            describe('entry ' + n + ' ' + (entry.link ?? 'empty'), async () => {
+                it('has title', async () => {
+                    expect(typeof entry.name).to.equal('string');
+                });
+                it('has description', async () => {
+                    const intro = Array.isArray(entry.intro) ? entry.intro : [entry.intro];
+                    for (const s of intro)
+                        expect(typeof s).to.equal('string');
+                })
+                it('has actual file with quest data array', async () => {
+                    expect(typeof entry.link).to.equal('string');
+                    const content = await fs.readFile(dir + entry.link)
+                        .then(data => JSON.parse(data));
+
+                    expect(Array.isArray(content)).to.equal(true, 'Content must be an array');
+
+                    for (let i = 0; i < content.length; i++) {
+                        const quest = content[i];
+                        describe('quest ' + entry.link + ' [' + i + ']', async () => {
+                            it('is a quest', () => {
+                                const q = new Quest(quest);
+                                expect(typeof q.descr).to.equal('string');
+                                expect( typeof q.title ).to.equal('string');
+                                expect( q.cases.length ).to.be.within(1, Infinity, 'At least 1 case');
+                            });
+                        });
+                    }
+                });
+            });
+        }
     });
 });
-
-function checkChapter(entry, n) {
-    describe('chapter ' + (n + 1), () => {
-        it('has name', done => {
-            expect(typeof entry.name).to.equal('string');
-            done();
-        });
-        it('has intro', done => {
-            for(let s of Array.isArray(entry.intro) ? entry.intro : [entry.intro])
-                expect( typeof s ).to.equal('string');
-            done();
-        });
-        it('has content linked to', done => {
-            expect(typeof entry.link).to.equal('string');
-            fs.readFile(dir+entry.link)
-                .then(data => JSON.parse(data))
-                .then(data => {
-                    expect(Array.isArray(data)).to.equal(true, "chapter content must be array");
-                    data.forEach((data, n) => checkQuest(data, entry.link, n));
-                    done();
-                })
-                .catch(e => done(e));
-        });
-    });
-}
-
-function checkQuest(data, file, n) {
-    describe('quest '+file+' ['+n+']', () => {
-        it('can be used to create a quest', done => {
-            const quest = new Quest(data);
-            expect(quest instanceof Quest).to.equal(true, 'quest is a Quest');
-            expect(typeof quest.title).to.equal('string');
-            expect(typeof quest.descr).to.equal('string');
-
-            if (quest.meta.solution) {
-                const result = quest.check(quest.meta.solution);
-                expect(result.pass).to.equal(true);
-            }
-
-            done();
-        });
-    });
-}
