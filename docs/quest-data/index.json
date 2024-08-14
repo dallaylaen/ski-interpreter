@@ -8,14 +8,14 @@
       "And there are also not many of them at the start...",
       "But don't worry, they are <i>powerful enough</i>."
       ],
-    "link": "01-basics.json"
+    "link": "00-basics.json"
   },
   {
     "name": "Swing, swing!",
     "intro": [
       "Let's move some arguments around."
     ],
-    "link": "02-arguments.json"
+    "link": "03-arguments.json"
   },
   {
     "name": "Boolean logic",
