@@ -1,0 +1,24 @@
+[
+  {
+    "title": "Quine",
+    "descr": [
+      "Technically, every irreducible combinator is a quine, for it returns itself. ",
+      "Write a combinator that returns itself when given <i>any</i> argument."
+    ],
+    "cases": [
+      [ { "feedInput": true }, "I", "x" ],
+      [ { "feedInput": true }, "I", "x", "y" ]
+    ]
+  },
+  {
+    "title": "Literal foo",
+    "descr": [
+      "You are given a term <code>foo</code>.",
+      "Construct f such that <code>f x = foo(f, x)</code> for any given <code>x</code>."
+    ],
+    "vars": ["foo"],
+    "cases": [
+      [ { "feedInput": true }, "S foo (K x)", "x"]
+    ]
+  }
+]

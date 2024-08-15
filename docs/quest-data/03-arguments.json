@@ -25,6 +25,13 @@
     ]
   },
   {
+    "title": "What you like, do once more!",
+    "descr": "The <code>W</code> combinator is defined as x &rArr; y &rArr; x(y)(y). Implement it.",
+    "cases": [
+      ["x y y", "x", "y"]
+    ]
+  },
+  {
     "title": "K forte",
     "descr": [
       "Sometimes returning <code>x</code> for any given <code>y</code> is not enough.",
@@ -32,15 +39,6 @@
     ],
     "cases": [
       [ "x x", "x", "y" ]
-    ]
-  },
-  {
-    "title": "Quine",
-    "descr": "Write an expression that produces itself when given any argument.",
-    "hint": "The above quest may help!",
-    "cases": [
-      [ { "feedInput": true }, "I", "x" ],
-      [ { "feedInput": true }, "I", "x", "y" ]
     ]
   }
 ]
