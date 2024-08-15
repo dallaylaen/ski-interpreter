@@ -208,4 +208,5 @@ h1 img {
     font-family: inherit;
     font-style: italic;
     color: indigo;
+    white-space: nowrap;
 }
