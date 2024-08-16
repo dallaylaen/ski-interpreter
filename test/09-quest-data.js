@@ -32,12 +32,28 @@ describe( 'quest-data', async () => {
                     for (let i = 0; i < content.length; i++) {
                         const quest = content[i];
                         describe('quest ' + entry.link + ' [' + i + ']', async () => {
+                            let q;
+                            try {
+                                q = new Quest(quest)
+                            } catch (e) {
+                                // do nothing, will be rejected later
+                            }
                             it('is a quest', () => {
-                                const q = new Quest(quest);
-                                expect(typeof q.descr).to.equal('string');
-                                expect( typeof q.title ).to.equal('string');
+                                expect( q instanceof Quest).to.equal(true, 'A quest was generated');
                                 expect( q.cases.length ).to.be.within(1, Infinity, 'At least 1 case');
                             });
+                            if (!(q instanceof Quest))
+                                return;
+                            it('has title & description', () => {
+                                expect(typeof q.descr).to.equal('string');
+                                expect( typeof q.title ).to.equal('string');
+                            });
+                            if (quest.solution) {
+                                it ('passes included example solution', () => {
+                                    const result = q.check(quest.solution);
+                                    expect( result.pass ).to.equal(true);
+                                });
+                            }
                         });
                     }
                 });
