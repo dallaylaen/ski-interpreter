@@ -62,4 +62,21 @@ describe( 'SKI.parse', () => {
 
         done();
     });
+
+    it('does not display intermediate terms unless added', done => {
+        const ski = new SKI;
+
+        // use small letters as we'll make BCKW available by default
+        const expr = ski.parse('b = S(KS)K; w = SS(KI); bw = b w');
+
+        expect( expr instanceof SKI.classes.Alias).to.equal(true, 'returns an alias');
+
+        expect(''+expr.impl).to.match(/^[SKI()]*$/, "no traces of b() and w()");
+
+        // just check the expr to work
+        expect(expr.run(SKI.free('x'), SKI.free('y'), SKI.free('z')).result.toString()
+            ).to.equal('x(y)(z)(z)');
+
+        done();
+    });
 });
