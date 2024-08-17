@@ -12,6 +12,9 @@ describe( 'SKI', () => {
 
         expect( () => { ski.parseLine('\\%')}).to.throw(/tokens.*starting with [\\]*%/);
 
+        expect (() => { ski.parseLine('')}).to.throw(/ttempt to return ()/);
+        expect (() => { ski.parseLine('SK()')}).to.throw(/ttempt to return ()/);
+
         done();
     })
 });
