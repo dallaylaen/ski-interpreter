@@ -14,5 +14,10 @@ describe( 'Church numbers', () => {
         }
 
         done();
-    })
+    });
+
+    it ('sanitizes input', () => {
+        expect(() => SKI.church(-2)).to.throw(/integer/);
+
+    });
 });
