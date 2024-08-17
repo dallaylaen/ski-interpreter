@@ -210,3 +210,7 @@ h1 img {
     color: indigo;
     white-space: nowrap;
 }
+
+.remove {
+    color: red;
+}

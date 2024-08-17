@@ -245,7 +245,7 @@
         for (let name of Object.keys(list).sort()) {
             const entry = list[name];
             const li = append(view.known, 'li');
-            const out = append(li, 'a', {class: ['note', 'clickable']});
+            const out = append(li, 'a', {class: ['note', 'clickable', 'ellipsis']});
             out.href = '#';
             out.onclick = event => insert(name);
             append(out, 'b').innerHTML = name;
@@ -254,7 +254,15 @@
                 append(out, 'i').innerHTML = entry.note;
             else
                 append(out, 'tt').innerHTML = '= '+entry.impl;
+            const harakiri = append(li, 'a', {content: '[&cross;]', class: ['remove', 'float-right']});
+            harakiri.href='#';
+            harakiri.onclick = () => removeKnown(name);
         }
+    }
+
+    function removeKnown(name) {
+        ski.remove(name);
+        showKnown();
     }
 
     function insert (text) {
