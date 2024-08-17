@@ -10,6 +10,8 @@ describe( 'SKI', () => {
         expect( () => { ski.parseLine( 'S ~ **' )}).to.throw(/tokens.*~ \*\*/);
         expect( () => { ski.parseLine( 'S 1 2 3' )}).to.throw(/numbers.*not supported/);
 
+        expect( () => { ski.parseLine('\\%')}).to.throw(/tokens.*starting with [\\]*%/);
+
         done();
     })
 });
