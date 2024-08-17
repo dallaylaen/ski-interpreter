@@ -21,7 +21,7 @@ describe( 'SKI.parse', () => {
     it ('makes last expr an alias if = given', done => {
         const ski = new SKI();
         const expr = ski.parse('foo = SKK');
-        const x = SKI.free('x');
+        const [x] = SKI.free('x');
 
         expect( expr.name ).to.equal ("foo");
         expect( expr.run(x).result).to.equal(x);
@@ -31,7 +31,7 @@ describe( 'SKI.parse', () => {
 
     it ('does not leak intermediate terms', done => {
         const ski = new SKI;
-        const x = SKI.free('x');
+        const [x] = SKI.free('x');
         const jar = { x };
         const intact = { ... jar };
         // console.log(jar);
@@ -74,7 +74,7 @@ describe( 'SKI.parse', () => {
         expect(''+expr.impl).to.match(/^[SKI()]*$/, "no traces of b() and w()");
 
         // just check the expr to work
-        expect(expr.run(SKI.free('x'), SKI.free('y'), SKI.free('z')).result.toString()
+        expect(expr.run(...SKI.free('x', 'y', 'z')).result.toString()
             ).to.equal('x(y)(z)(z)');
 
         done();
