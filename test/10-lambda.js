@@ -62,7 +62,47 @@ describe('Lambda', function () {
 
     it('stringifies', () => {
         const expr = new Lambda([x, y], z);
-        expect(''+expr).to.match(/^\{.*\}$/, 'in braces');
+        expect(''+expr).to.match(/^\(.*\)$/, 'in braces');
         expect(''+expr).to.match(/^[^a-z]+x[^a-z]+y[^a-z]+z/);
     });
+
+
+});
+
+describe ('Lambda parsing', () => {
+    const ski = new SKI({lambdas: true});
+    const [x, y, z, t1, t2] = SKI.free('x', 'y', 'z', 't1', 't2');
+
+    it('can parse simple expressions', () => {
+        const expr = ski.parseLine('x->y->x');
+        expect( expr.run(t1, t2).result ).to.equal(t1);
+    });
+
+    it('can parse compound terms', ()=>{
+        const expr = ski.parse('x->xSK');
+        expect( expr.run(expr, t1).result ).to.equal(t1);
+    });
+
+    it ('handles complicated expressions', () => {
+        const expr = ski.parse('x->K(y->y(x))');
+        expect(expr.run(x, y, z).result + '').to.equal('z(x)');
+    });
+
+    // TODO proper error handling, not this mess
+    it ('forbids naughty syntax', () => {
+        expect(()=>console.log(ski.parseLine('x->->y'))).to.throw();
+    });
+
+    it ('forbids naughty syntax II', () => {
+        expect(()=>ski.parseLine('x->x->y')).to.throw();
+    });
+
+    it ('forbids naughty syntax III', () => {
+        expect(()=>ski.parseLine('x(S)->y')).to.throw();
+    });
+
+    it ('forbids naughty syntax III', () => {
+        expect(()=>ski.parseLine('x->y->y(x)->S')).to.throw();
+    });
+
 });
