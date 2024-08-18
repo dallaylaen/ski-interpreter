@@ -30,7 +30,7 @@
                     <p>
                         Enter <code>?</code> to get detailed info on syntax.
                     </p>
-               </div>
+                </div>
             </div>
         </div>
 
@@ -84,12 +84,23 @@
                     it will be permanently added to list of available terms, overriding the existing
                     term with the same name.
                 </li>
+                <li>
+                    A nonnegative integer is assumed to be a church number, i.e. a term with two arguments
+                    returning x(...{N times}...(x(y)...).
+                </li>
+                <li>
+                    A x->y->z->(some expression) is parsed into a raw lambda expression.
+                    This is still beta, both hastily written, buggy, and inefficient.
+                    <s>Please use Haskell instead</s>.
+                </li>
             </ul>
             <p>Examples: </p>
             <ul>
                 <li><code>SIIx</code> evaluates to <code>x(x)</code> <i>// x is a free variable;</i></li>
                 <li><code>B = S(KS)K</code> declares the B combinator;</li>
-                <li><code>U = SII; Ux</code> evaluates to x(x), U will <b>not</b> be available afterwards.</li>
+                <li><code>U = SII; Ux</code> evaluates to x(x), U will <b>not</b> be available afterwards;</li>
+                <li><code>5 x y</code>evaluates to <code>x(x(x(x(x(y)))))</code>;</li>
+                <li><code>x-&gt;y-&gt;x</code> creates a K via plain lambdas.</li>
             </ul>
 
         </div>
@@ -106,7 +117,7 @@
      */
 
     let showlines = 10;
-    let ski = new SKI({numbers: true, allow: 'SKIBCKW'});
+    let ski = new SKI({numbers: true, allow: 'SKIBCKW', lambdas: true});
     let count = 0;
     let running = false;
 
