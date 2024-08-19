@@ -64,7 +64,8 @@ describe('Quest', () => {
 
         const bad = quest.check('I');
         expect(bad.pass).to.equal(false);
-        expect(''+bad.details[0].found).to.equal('I(x)');
+        expect(bad.exception).to.match(/ative.* I .*restricted.* KS/)
+        // expect(''+bad.details[0].found).to.equal('I(x)');
 
         done();
     });

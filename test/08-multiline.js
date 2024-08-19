@@ -11,7 +11,10 @@ describe( 'SKI.parse', () => {
             dbl dbl dbl
         `, vars);
         expect( expr.run(SKI.S).result.toString() ).to.equal(expr.run().result.toString());
-        expect(Object.keys(ski.getTerms()).sort()).to.deep.equal(['I', 'K', 'S']);
+
+        // verify that no aliased terms were created within ski itself
+        for (const x of Object.values(ski.getTerms()))
+            expect (x).to.be.instanceof(SKI.classes.Native);
 
         expect(vars).to.deep.equal({});
 
