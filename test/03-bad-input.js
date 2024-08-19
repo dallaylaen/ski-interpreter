@@ -3,7 +3,7 @@ const { SKI } = require('../index');
 
 describe( 'SKI', () => {
     it( 'catches bad input', done => {
-        const ski = new SKI();
+        const ski = new SKI({numbers: false, lambdas: false, allow: 'SKI'});
         expect( () => { ski.parseLine( 'foo(' ) }).to.throw(/unbalanced/i);
         expect( () => { ski.parseLine( 'foo)' ) }).to.throw(/unbalanced/i);
 

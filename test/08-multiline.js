@@ -3,7 +3,7 @@ const {SKI} = require('../index');
 
 describe( 'SKI.parse', () => {
     it ('handles comments, definitions, and stuff', done => {
-        const ski = new SKI;
+        const ski = new SKI ({allow: 'SKI'});
         const vars = {};
         const expr = ski.parse(`
             // this is a comment
