@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8"/>
-    <title>Simple Kombinator Interpreter - online combinatory logic playground</title>
+    <title>Simple Kombinator Interpreter - online combinatory logic and lambda calculus playground</title>
     <link rel="shortcut icon" type="image/png" href="img/ski-64.png">
     <script src="build/js/ski-interpreter.js"></script>
     <script src="js/util.js"></script>
@@ -31,6 +31,53 @@
                         Enter <code>?</code> to get detailed info on syntax.
                     </p>
                 </div>
+                <div id="help" class="help">
+                    <img src="img/mock2.png" style="height: 5em; float: right;">
+                    <p>The interpreter honors the following rules:</p>
+                    <ul>
+                        <li>
+                            Terms are accepted in the form of upper-case latin letters, or lower case identifiers.
+                            Uppercase letter terms are assumed to always be one letter and do not require spaces
+                            between them.
+                        </li>
+                        <li>
+                            A program consists of one or more statements, separated by semicolons (<code>;</code>).
+                            A statement may contain terms, parentheses (<code>(</code> and <code>)</code>),
+                            and whitespace. Parentheses may be omitted.
+                        </li>
+                        <li>
+                            Unknown terms are assumed to be free variables and will be left as is.
+                            Known terms and their reduction rules (or implementations) are listed in the right panel.
+                        </li>
+                        <li>
+                            If a statement is prepended with <code>identifier = </code>, it defines a new <i>temporary</i>
+                            term that can be used in further expressions.
+                        </li>
+                        <li>
+                            If that happens to the <i>last</i> statement in the group,
+                            it will be permanently added to list of available terms, overriding the existing
+                            term with the same name.
+                        </li>
+                        <li>
+                            A non-negative integer is assumed to be a church number, i.e. a term with two arguments
+                            returning x(...{N times}...(x(y)...).
+                        </li>
+                        <li>
+                            A x->y->z->(some expression) is parsed into a raw lambda expression.
+                            This part is still in beta and needs more work.
+                            <s>Please use Haskell instead</s>.
+                        </li>
+                    </ul>
+                    <p>Examples: </p>
+                    <ul>
+                        <li><code>SIIx</code> evaluates to <code>x(x)</code> <i>// x is a free variable;</i></li>
+                        <li><code>B = S(KS)K</code> declares the B combinator;</li>
+                        <li><code>U = SII; Ux</code> evaluates to x(x), U will <b>not</b> be available afterwards;</li>
+                        <li><code>5 x y</code>evaluates to <code>x(x(x(x(x(y)))))</code>;</li>
+                        <li><code>x-&gt;y-&gt;x</code> creates a K via plain lambdas.</li>
+                    </ul>
+                    <p>Enter '?' to get this message again.</p>
+                </div>
             </div>
         </div>
 
@@ -58,54 +105,6 @@
         </div>
     </div>
 
-    <div hidden>
-        <div id="help">
-            <p>The interpreter honors the following rules:</p>
-            <ul>
-                <li>
-                    Terms are accepted in the form of upper-case latin letters, or lower case identifiers.
-                    Upper letter terms are assumed to be one letter and do not require spaces.
-                </li>
-                <li>
-                    A program consists of one or more statements, separated by semicolons (<code>;</code>).
-                    A statement may contain terms, parenthesis (<code>(</code> and <code>)</code>),
-                    and whitespace. Parenthesis may be omitted.
-                </li>
-                <li>
-                    Unknown terms are assumed to be free variables and will be left as is.
-                    Known terms and their reduction rules (or implementations) are listed in the right panel.
-                </li>
-                <li>
-                    If a statement is prepended with <code>identifier = </code>, it defines a new <i>temporary</i>
-                    term that can be used in further expressions.
-                </li>
-                <li>
-                    If that happens to the <i>last</i> statement in the group,
-                    it will be permanently added to list of available terms, overriding the existing
-                    term with the same name.
-                </li>
-                <li>
-                    A nonnegative integer is assumed to be a church number, i.e. a term with two arguments
-                    returning x(...{N times}...(x(y)...).
-                </li>
-                <li>
-                    A x->y->z->(some expression) is parsed into a raw lambda expression.
-                    This is still beta, both hastily written, buggy, and inefficient.
-                    <s>Please use Haskell instead</s>.
-                </li>
-            </ul>
-            <p>Examples: </p>
-            <ul>
-                <li><code>SIIx</code> evaluates to <code>x(x)</code> <i>// x is a free variable;</i></li>
-                <li><code>B = S(KS)K</code> declares the B combinator;</li>
-                <li><code>U = SII; Ux</code> evaluates to x(x), U will <b>not</b> be available afterwards;</li>
-                <li><code>5 x y</code>evaluates to <code>x(x(x(x(x(y)))))</code>;</li>
-                <li><code>x-&gt;y-&gt;x</code> creates a K via plain lambdas.</li>
-            </ul>
-
-        </div>
-    </div>
-
 <script>
     /**
      *   References to static page elements
@@ -128,6 +127,8 @@
       */
 
     function init() {
+        view.help.hidden = true;
+
         const greet = teletype(view.teletype);
         greet(
             "Your output goes here. ",
