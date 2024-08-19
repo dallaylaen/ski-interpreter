@@ -83,7 +83,7 @@
 
         <div id="info" class="pane" style="width: 29%;">
             <div><b>Known terms that can be used in expressions:</b></div>
-            <ul id="known" class="scroll"></ul>
+            <ul id="known"></ul>
         </div>
     </div>
     <div class="layout" id="bottom">
@@ -269,6 +269,14 @@
             const harakiri = append(li, 'a', {content: '[&cross;]', class: ['remove', 'float-right']});
             harakiri.href='#';
             harakiri.onclick = () => removeKnown(name);
+        }
+        if (ski.hasNumbers) {
+            append(view.known, 'li', {
+                content: '<b>&lt;n&gt;</b> - <code>x(...(x(y))...)</code>;'
+            });
+        }
+        if (ski.hasLambdas) {
+            append(view.known, 'li', {content: '<b>x-&gt;y-&gt;y(x)</b> - a generic lambda term;'});
         }
     }
 
