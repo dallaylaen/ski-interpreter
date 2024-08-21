@@ -36,6 +36,8 @@
     </div>
 </div>
 <script>
+    const { Expr, FreeVar } = SKI.classes; // just for type annotations
+
     const view = grabView('quest');
     const questDir = 'quest-data/';
 
@@ -157,7 +159,7 @@
      *
      * @param {Element} output
      * @param {Quest} quest
-     * @param {Ast} expr
+     * @param {Expr} expr
      * @param {function} [onpass]
      * @param {function} [onfail]
      */
