@@ -38,8 +38,8 @@ const [x, y, z] = SKI.free('x', 'y', 'z');
 const si = SKI.S.apply(SKI.I);
 
 // check type
-if (si instanceof SKI.classes.Ast) {
-    console.log('expression: '+si );
+if (si instanceof SKI.classes.Expr) {
+    console.log('expression: ' + si);
 }
 
 // compare expressions
@@ -55,7 +55,7 @@ ski.parse('x->y->z->x(z)(y(z))'); // same as S
 
 // run with argumens
 const U = ski.parse('SII');
-U.run({max: 100, throw: true}, U); 
+U.run({max: 100, throw: true}, U);
 // throws an exception because U(U) is an infinite loop
 ```
 
