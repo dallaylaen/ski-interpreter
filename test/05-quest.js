@@ -8,7 +8,7 @@ describe('Quest', () => {
         const ski = new SKI;
         const result = quest.check(ski.parse('SKK'));
 
-        expect( result.expr instanceof SKI.classes.Ast ).to.equal(true,
+        expect( result.expr instanceof SKI.classes.Expr ).to.equal(true,
             'result.expr must be present & instanceof AST');
         expect( result.pass ).to.equal(true);
 

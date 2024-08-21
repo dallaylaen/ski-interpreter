@@ -1,10 +1,12 @@
 const { expect } = require('chai');
 const { SKI } = require('../index');
+const { Expr } = SKI.classes;
 
 describe( 'SKI', () => {
     it ('can parseLine basic expr: I', done => {
        const ski = new SKI;
        let expr = ski.parseLine('I x');
+       expect( expr ).to.be.instanceof(Expr);
        expect(''+expr).to.equal('I(x)');
        expr = expr.step();
        expect(''+expr).to.equal('x');
