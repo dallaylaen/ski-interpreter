@@ -167,10 +167,13 @@
         output.innerHTML = 'running...';
         const report = quest.check(expr);
         output.innerHTML = '';
+
         if (report.exception) {
             append(output, 'div', {class: ['error'], content: 'Execution failed: '+report.exception});
+        } else {
+            append(output, 'div', {content: 'Your solution: &phi; = ' + report.expr.expand()});
         }
-        append(output, 'div', {content: 'Your solution: &phi; = '+report.expr.expand()});
+
         for (const item of report.details) {
             const line = append(output, 'div', {class: item.pass ? ['success'] : ['error']});
             append(line, 'span', {content: item.pass ? '&check; ' : '&cross; '});
