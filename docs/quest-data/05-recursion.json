@@ -5,9 +5,10 @@
       "Technically, every irreducible combinator is a quine, for it returns itself. ",
       "Write a combinator that returns itself when given <i>any</i> argument."
     ],
+    "subst": "&phi;",
     "cases": [
-      [ { "feedInput": true }, "I", "x" ],
-      [ { "feedInput": true }, "I", "x", "y" ]
+      [ "phi", "phi x", "phi" ],
+      [ "phi", "phi x y z", "phi" ]
     ]
   },
   {
@@ -17,8 +18,9 @@
       "Construct f such that <code>f x = foo(f, x)</code> for any given <code>x</code>."
     ],
     "vars": ["foo"],
+    "subst": "&phi;",
     "cases": [
-      [ { "feedInput": true }, "S foo (K x)", "x"]
+      [ "phi", "phi x", "foo phi x"]
     ]
   }
 ]
