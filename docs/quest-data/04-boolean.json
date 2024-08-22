@@ -4,9 +4,10 @@
     "descr": [
       "Provide a term that returns <code>K</code> for <code>I</code> and <code>I</code> for <code>K</code>."
     ],
+    "subst": "&phi;",
     "cases": [
-      [ "K", "I" ],
-      [ "I", "K" ]
+      ["phi", "phi I", "K"],
+      ["phi", "phi K", "I"]
     ]
   },
   {
@@ -15,9 +16,10 @@
       "Implement <code>not x</code>, that is,",
       "return <code>K</code> for <code>KI</code> and <code>KI</code> for <code>K</code>"
     ],
+    "subst": "&phi;",
     "cases": [
-      [ "x", "KI", "x", "y" ],
-      [ "y", "K", "x", "y" ]
+      ["phi", "phi (KI) x y", "x"],
+      ["phi", "phi K x y", "y"]
     ]
   },
   {
@@ -26,11 +28,12 @@
       "make a term that takes 2 arguments and returns true (<code>K</code>)",
       " if and only if both are true"
     ],
+    "subst": "&phi;",
     "cases": [
-      [ "K", "K", "K" ],
-      [ "KI", "KI", "K" ],
-      [ "KI", "K", "KI" ],
-      [ "KI", "KI", "KI" ]
+      ["phi", "phi K K", "K"],
+      ["phi", "phi (KI) K", "KI"],
+      ["phi", "phi K (KI)", "KI"],
+      ["phi", "phi (KI) (KI)", "KI"]
     ]
   },
   {
@@ -38,11 +41,12 @@
     "descr": [
       "the title says it"
     ],
+    "subst": "&phi;",
     "cases": [
-      [ "K", "K", "K" ],
-      [ "K", "KI", "K" ],
-      [ "K", "K", "KI" ],
-      [ "KI", "KI", "KI" ]
+      ["phi", "phi K K", "K"],
+      ["phi", "phi (KI) K", "K"],
+      ["phi", "phi K (KI)", "K"],
+      ["phi", "phi (KI) (KI)", "KI"]
     ]
   },
   {
@@ -50,11 +54,12 @@
     "descr": [
       "NAND (not and) is true unless both ot its inputs are true."
     ],
+    "subst": "&phi;",
     "cases": [
-      [ "KI", "K", "K" ],
-      [ "K", "KI", "K" ],
-      [ "K", "K", "KI" ],
-      [ "K", "KI", "KI" ]
+      ["phi", "phi K K", "KI"],
+      ["phi", "phi (KI) K", "K"],
+      ["phi", "phi K (KI)", "K"],
+      ["phi", "phi (KI) (KI)", "K"]
     ]
   },
   {
@@ -63,10 +68,11 @@
       "Often the then/else branches are known before the condition that picks one of them.",
       "Provide a function that takes then/else terms and feeds them to its third argument."
     ],
+    "subst": "&phi;",
     "cases": [
-      [ "x", "x", "y", "K" ],
-      [ "y", "x", "y", "KI" ],
-      [ "y", "x", "y", "SK" ]
+      ["phi", "phi x y K", "x"],
+      ["phi", "phi x y (KI)", "y"],
+      ["phi", "phi x y (SK)", "y"]
     ]
   }
 ]

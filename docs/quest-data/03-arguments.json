@@ -3,15 +3,17 @@
   {
     "title": "Mirror image",
     "descr": "Make a combinator <code>T</code> that swaps its two arguments, that is, <code>(x, y) &rarr; y x</code>",
+    "subst": "&phi;",
     "cases": [
-      [ "y x", "x", "y" ]
+      ["phi", "phi x y", "y x"]
     ]
   },
   {
     "title": "B combinator",
     "descr": "<code>f g x &rarr; f(g(x))</code>",
+    "subst": "&phi;",
     "cases": [
-      [ "x(y z)", "x", "y", "z" ]
+      ["phi", "phi x y z", "x(y z)"]
     ]
   },
   {
@@ -20,15 +22,17 @@
       "Somewhat similar to the previous one but you have to apply the functions in reverse order:",
       "<code>(f g x)&rarr;g(f(x))</code>"
     ],
+    "subst": "&phi;",
     "cases": [
-      [ "g(f(x))", "f", "g", "x" ]
+      ["phi", "phi f g x", "g(f(x))"]
     ]
   },
   {
     "title": "What you like, do once more!",
     "descr": "The <code>W</code> combinator is defined as x &rArr; y &rArr; x(y)(y). Implement it.",
+    "subst": "&phi;",
     "cases": [
-      ["x y y", "x", "y"]
+      ["phi", "phi x y", "x y y"]
     ]
   },
   {
@@ -37,8 +41,9 @@
       "Sometimes returning <code>x</code> for any given <code>y</code> is not enough.",
       "Return it twice: <code>(x, y)&rarr;x x</code>"
     ],
+    "subst": "&phi;",
     "cases": [
-      [ "x x", "x", "y" ]
+      ["phi", "phi x y", "x x"]
     ]
   }
 ]

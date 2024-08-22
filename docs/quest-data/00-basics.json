@@ -6,8 +6,9 @@
       "<code>?(x)(y) &rarr; x(y)</code>.",
       "Yes, it's <i>that</i> simple."
     ],
+    "subst": "&phi;",
     "cases": [
-      ["x y", "x", "y"]
+      ["phi", "phi x y", "x y"]
     ]
   },
     {
@@ -17,8 +18,9 @@
         "and returns the first of them. You need to return the second one instead."
       ],
       "solution": "SK",
+      "subst": "&phi;",
       "cases": [
-        ["y", "x", "y"]
+        ["phi", "phi x y", "y"]
       ]
     },
 
@@ -28,8 +30,9 @@
         "In the realm of combinators, everything is a function.",
         "So, how do you apply a function to itself? I.e. <code>x &rarr; x(x)</code>"
       ],
+      "subst": "&phi;",
       "cases": [
-        [ "x x", "x" ]
+        ["phi", "phi x", "x x"]
       ]
     },
 
@@ -39,8 +42,9 @@
         "Someone stole the <code>I</code> combinator from your interpreter.",
         "You have to rebuild it from the remaining two!"],
       "allow": "SK",
+      "subst": "&phi;",
       "cases": [
-        [ "x", "x" ]
+        ["phi", "phi x", "x"]
       ]
     }
 ]

@@ -4,8 +4,9 @@
       "descr": [
         "Look at the definition above once more. What would number 2 look like?"
       ],
+      "subst": "&phi;",
       "cases": [
-        [ "x(x(y))", "x", "y" ]
+        ["phi", "phi x y", "x(x(y))"]
       ]
     },
     {
@@ -15,11 +16,12 @@
       ],
       "hint": "<code>inc N x y &rarr; x (N x y)</code>.",
       "numbers": true,
+      "subst": "&phi;",
       "cases": [
-        [ "x y", "KI", "x", "y" ],
-        [ "x y", "SK", "x", "y" ],
-        [ "x (x y)", "I", "x", "y" ],
-        [ "9 x y", "8", "x", "y" ]
+        ["phi", "phi (KI) x y", "x y"],
+        ["phi", "phi (SK) x y", "x y"],
+        ["phi", "phi I x y", "x (x y)"],
+        ["phi", "phi 8 x y", "9 x y"]
       ]
     },
     {
@@ -28,12 +30,13 @@
         "Make a term that returns <code>K</code> for 0 and <code>KI</code> for all other numbers. "
       ],
       "numbers": true,
+      "subst": "&phi;",
       "cases": [
-        ["K", "KI"],
-        ["K", "SK"],
-        ["KI", "I"],
-        ["KI", "2"],
-        ["KI", "5"]
+        ["phi", "phi (KI)", "K"],
+        ["phi", "phi (SK)", "K"],
+        ["phi", "phi I", "KI"],
+        ["phi", "phi 2", "KI"],
+        ["phi", "phi 5", "KI"]
       ]
     },
     {
@@ -42,11 +45,12 @@
         "Return the previous number for positive integers, or zero for zero."
       ],
       "numbers": true,
+      "subst": "&phi;",
       "cases": [
-        ["y", "KI", "x", "y"],
-        ["y", "I", "x", "y"],
-        ["x(y)", "2", "x", "y"],
-        ["5 x y", "6", "x", "y"]
+        ["phi", "phi (KI) x y", "y"],
+        ["phi", "phi I x y", "y"],
+        ["phi", "phi 2 x y", "x(y)"],
+        ["phi", "phi 6 x y", "5 x y"]
       ]
     }
 ]
