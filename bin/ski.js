@@ -1,35 +1,43 @@
 #!/usr/bin/env node
 
+const fs = require('node:fs/promises');
 const {SKI} = require('../index');
 
-const [_, script, ...args] = process.argv;
-
-const [options, positional] = parseArgs(args);
+const [myname, options, positional] = parseArgs(process.argv);
 
 if (options.help) {
-    console.log('Usage: ' + script + '[-q | -v ] -e <expression>');
+    console.error(myname + ': usage: ' + myname + '[-q | -v ] -e <expression>');
     process.exit(1);
 }
 
-if (!options.e) {
-    throw new Error('only -e option supported so far');
+if (!((typeof options.e === 'string') ^ (positional.length === 1))) {
+    console.error(myname + ': either -e <expr> or exactly one filename must be given');
+    process.exit(1);
 }
 
-// TODO should also be able to read file
-const source = options.e;
+const prom = positional.length > 0
+    ? fs.readFile(positional[0], 'utf8')
+    : Promise.resolve(options.e);
 
-const ski = new SKI();
-const expr = ski.parse(source);
+prom.then(source => {
+    const ski = new SKI();
+    const expr = ski.parse(source);
 
-const t0 = new Date();
-for (let state of expr.walk()) {
-    if (state.final && !options.q)
-      console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms` );
-    if (options.v || state.final)
-    console.log(''+state.expr);
-}
+    const t0 = new Date();
+    for (let state of expr.walk()) {
+        if (state.final && !options.q)
+            console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
+        if (options.v || state.final)
+            console.log('' + state.expr);
+    }
+}).catch(err => {
+    console.error(myname + ': '+err);
+    process.exit(2);
+});
 
-function parseArgs(list) {
+function parseArgs(argv) {
+    const [_, script, ...list] = argv;
+
     // TODO replace with a relevant dependency
     const pos = [];
     const opt = {};
@@ -60,6 +68,6 @@ function parseArgs(list) {
         }
     }
 
-    return [opt, pos];
+    return [script, opt, pos];
 }
 
