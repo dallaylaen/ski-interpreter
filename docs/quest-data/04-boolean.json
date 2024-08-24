@@ -6,8 +6,8 @@
     ],
     "subst": "&phi;",
     "cases": [
-      ["phi", "phi I", "K"],
-      ["phi", "phi K", "I"]
+      [ "phi->phi I", "phi->K" ],
+      [ "phi->phi K", "phi->I" ]
     ]
   },
   {
@@ -18,8 +18,8 @@
     ],
     "subst": "&phi;",
     "cases": [
-      ["phi", "phi (KI) x y", "x"],
-      ["phi", "phi K x y", "y"]
+      [ "phi->phi (KI) x y", "phi->x" ],
+      [ "phi->phi K x y", "phi->y" ]
     ]
   },
   {
@@ -30,10 +30,10 @@
     ],
     "subst": "&phi;",
     "cases": [
-      ["phi", "phi K K", "K"],
-      ["phi", "phi (KI) K", "KI"],
-      ["phi", "phi K (KI)", "KI"],
-      ["phi", "phi (KI) (KI)", "KI"]
+      [ "phi->phi K K", "phi->K" ],
+      [ "phi->phi (KI) K", "phi->KI" ],
+      [ "phi->phi K (KI)", "phi->KI" ],
+      [ "phi->phi (KI) (KI)", "phi->KI" ]
     ]
   },
   {
@@ -43,10 +43,10 @@
     ],
     "subst": "&phi;",
     "cases": [
-      ["phi", "phi K K", "K"],
-      ["phi", "phi (KI) K", "K"],
-      ["phi", "phi K (KI)", "K"],
-      ["phi", "phi (KI) (KI)", "KI"]
+      [ "phi->phi K K", "phi->K" ],
+      [ "phi->phi (KI) K", "phi->K" ],
+      [ "phi->phi K (KI)", "phi->K" ],
+      [ "phi->phi (KI) (KI)", "phi->KI" ]
     ]
   },
   {
@@ -56,10 +56,10 @@
     ],
     "subst": "&phi;",
     "cases": [
-      ["phi", "phi K K", "KI"],
-      ["phi", "phi (KI) K", "K"],
-      ["phi", "phi K (KI)", "K"],
-      ["phi", "phi (KI) (KI)", "K"]
+      [ "phi->phi K K", "phi->KI" ],
+      [ "phi->phi (KI) K", "phi->K" ],
+      [ "phi->phi K (KI)", "phi->K" ],
+      [ "phi->phi (KI) (KI)", "phi->K" ]
     ]
   },
   {
@@ -70,9 +70,9 @@
     ],
     "subst": "&phi;",
     "cases": [
-      ["phi", "phi x y K", "x"],
-      ["phi", "phi x y (KI)", "y"],
-      ["phi", "phi x y (SK)", "y"]
+      [ "phi->phi x y K", "phi->x" ],
+      [ "phi->phi x y (KI)", "phi->y" ],
+      [ "phi->phi x y (SK)", "phi->y" ]
     ]
   }
 ]

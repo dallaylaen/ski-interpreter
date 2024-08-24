@@ -8,7 +8,7 @@
     ],
     "subst": "&phi;",
     "cases": [
-      ["phi", "phi x y", "x y"]
+      [ "phi->phi x y", "phi->x y" ]
     ]
   },
     {
@@ -20,7 +20,7 @@
       "solution": "SK",
       "subst": "&phi;",
       "cases": [
-        ["phi", "phi x y", "y"]
+        [ "phi->phi x y", "phi->y" ]
       ]
     },
 
@@ -32,7 +32,7 @@
       ],
       "subst": "&phi;",
       "cases": [
-        ["phi", "phi x", "x x"]
+        [ "phi->phi x", "phi->x x" ]
       ]
     },
 
@@ -44,7 +44,7 @@
       "allow": "SK",
       "subst": "&phi;",
       "cases": [
-        ["phi", "phi x", "x"]
+        [ "phi->phi x", "phi->x" ]
       ]
     }
 ]

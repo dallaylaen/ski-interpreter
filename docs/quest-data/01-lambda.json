@@ -10,7 +10,7 @@
     ],
     "subst": "&phi;",
     "cases": [
-      ["phi", "phi x", "f (g x)"]
+      [ "phi->phi x", "phi->f (g x)" ]
     ]
   },
   {
@@ -19,10 +19,10 @@
       "You are given a <i>known</i> value <code>x</code>.",
       "You goal is to make a term that feeds this value to an <i>unknown</i> function <code>f</code>"
     ],
-    "vars": ["phi", "phi ", "x"],
+    "vars": [ "phi->phi ", "phi->x" ],
     "subst": "&phi;",
     "cases": [
-      ["phi", "phi f", "f(x)"]
+      [ "phi->phi f", "phi->f(x)" ]
     ]
   },
   {
@@ -31,10 +31,10 @@
       "You are given two known values, <code>x</code> and <code>y</code>.",
       "Feed both of them, sequentially to function <code>f</code>."
     ],
-    "vars": ["phi", "phi y", "x"],
+    "vars": [ "phi->phi y", "phi->x" ],
     "subst": "&phi;",
     "cases": [
-      ["phi", "phi f", "f x y"]
+      [ "phi->phi f", "phi->f x y" ]
     ]
   },
   {
@@ -43,10 +43,10 @@
       "You are given a term <code>y</code>.",
       "Implement <code>x &rarr; y(x(y))</code>."
     ],
-    "vars": ["phi", "phi ", "y"],
+    "vars": [ "phi->phi ", "phi->y" ],
     "subst": "&phi;",
     "cases": [
-      ["phi", "phi x", "y (x y)"]
+      [ "phi->phi x", "phi->y (x y)" ]
     ]
   },
   {
@@ -55,10 +55,10 @@
       "You are given a term <code>x</code> this time.",
       "Implement <code>y &rarr; y(x(y))</code>."
     ],
-    "vars": ["phi", "phi ", "x"],
+    "vars": [ "phi->phi ", "phi->x" ],
     "subst": "&phi;",
     "cases": [
-      ["phi", "phi y", "y (x y)"]
+      [ "phi->phi y", "phi->y (x y)" ]
     ]
   },
   {
@@ -68,7 +68,7 @@
     ],
     "subst": "&phi;",
     "cases": [
-      ["phi", "phi x y", "y (x y)"]
+      [ "phi->phi x y", "phi->y (x y)" ]
     ]
   }
 ]

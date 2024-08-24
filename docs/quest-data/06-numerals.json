@@ -6,7 +6,7 @@
       ],
       "subst": "&phi;",
       "cases": [
-        ["phi", "phi x y", "x(x(y))"]
+        [ "phi->phi x y", "phi->x(x(y))" ]
       ]
     },
     {
@@ -18,10 +18,10 @@
       "numbers": true,
       "subst": "&phi;",
       "cases": [
-        ["phi", "phi (KI) x y", "x y"],
-        ["phi", "phi (SK) x y", "x y"],
-        ["phi", "phi I x y", "x (x y)"],
-        ["phi", "phi 8 x y", "9 x y"]
+        [ "phi->phi (KI) x y", "phi->x y" ],
+        [ "phi->phi (SK) x y", "phi->x y" ],
+        [ "phi->phi I x y", "phi->x (x y)" ],
+        [ "phi->phi 8 x y", "phi->9 x y" ]
       ]
     },
     {
@@ -32,11 +32,11 @@
       "numbers": true,
       "subst": "&phi;",
       "cases": [
-        ["phi", "phi (KI)", "K"],
-        ["phi", "phi (SK)", "K"],
-        ["phi", "phi I", "KI"],
-        ["phi", "phi 2", "KI"],
-        ["phi", "phi 5", "KI"]
+        [ "phi->phi (KI)", "phi->K" ],
+        [ "phi->phi (SK)", "phi->K" ],
+        [ "phi->phi I", "phi->KI" ],
+        [ "phi->phi 2", "phi->KI" ],
+        [ "phi->phi 5", "phi->KI" ]
       ]
     },
     {
@@ -47,10 +47,10 @@
       "numbers": true,
       "subst": "&phi;",
       "cases": [
-        ["phi", "phi (KI) x y", "y"],
-        ["phi", "phi I x y", "y"],
-        ["phi", "phi 2 x y", "x(y)"],
-        ["phi", "phi 6 x y", "5 x y"]
+        [ "phi->phi (KI) x y", "phi->y" ],
+        [ "phi->phi I x y", "phi->y" ],
+        [ "phi->phi 2 x y", "phi->x(y)" ],
+        [ "phi->phi 6 x y", "phi->5 x y" ]
       ]
     }
 ]
