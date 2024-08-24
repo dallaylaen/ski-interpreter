@@ -48,4 +48,15 @@ describe('SKI.equals', () => {
 
         done();
     });
+
+    it('handles other tricky cases', () => {
+        const ski = new SKI();
+        expect(ski.parse('SI').equals(ski.parse('SII'))).to.equal(false);
+    });
+
+    it ('can compare Church numbers', () => {
+        expect(SKI.church(5).equals(SKI.church(5))).to.equal(true);
+        expect(SKI.church(5).equals(SKI.church(4))).to.equal(false);
+        expect(SKI.church(1).equals(SKI.I)).to.equal(false);
+    });
 });

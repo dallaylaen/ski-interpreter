@@ -36,7 +36,7 @@ describe( 'SKI', () => {
 
     it('can perform some complex computations, correctly', done => {
         const ski = new SKI();
-        ski.add('inc', 'S(S(K(S))(K))');
+        ski.add('inc', ski.parse('S(S(K(S))(K))'));
         ski.add('n2', 'inc I');
         const expr = ski.parseLine('n2 n2 n2 x y');
 
