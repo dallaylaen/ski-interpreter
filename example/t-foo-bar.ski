@@ -1,0 +1,5 @@
+// This is an example file written in SKI
+// usage: ./bin/ski.js <this file>
+// The expression below evaluates to bar(foo)
+
+S(K(SI))K foo bar
