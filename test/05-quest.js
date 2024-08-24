@@ -9,10 +9,11 @@ describe('Quest', () => {
             subst: '&phi;',
             allow: 'SK',
             cases: [
-                ['sol', 'sol x', 'x']
+                [ 'f->f x', 'f->x']
             ]
         });
         const pass = quest.check('SKK');
+        expect(pass.exception).to.equal(undefined);
         expect(pass.pass).to.equal(true);
 
         const details = pass.details[0];
@@ -54,9 +55,5 @@ describe('Quest', () => {
 
         expect(never.pass).to.equal(false);
         expect(never.details.map(i => i.pass ? 1 : 0).join('')).to.equal('1110');
-    });
-
-    it ('requires exactly 3 strings for each condition', () => {
-        expect(() => new Quest({subst: '&phi;', cases: [['Ix', 'x']]})).to.throw(/Exactly 3/i);
     });
 });
