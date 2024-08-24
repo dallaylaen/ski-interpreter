@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S node --stack-size=20600
 
 const fs = require('node:fs/promises');
 const readline = require('readline');
