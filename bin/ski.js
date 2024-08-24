@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 const fs = require('node:fs/promises');
+const readline = require('readline');
+
 const {SKI} = require('../index');
 
 const [myname, options, positional] = parseArgs(process.argv);
@@ -10,30 +12,61 @@ if (options.help) {
     process.exit(1);
 }
 
-if (!((typeof options.e === 'string') ^ (positional.length === 1))) {
+if (typeof options.e === 'string' && positional.length > 0 || positional.length > 1) {
     console.error(myname + ': either -e <expr> or exactly one filename must be given');
     process.exit(1);
+}
+
+const ski = new SKI();
+
+if (options.e === undefined && !positional.length) {
+    // interactive console
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+        terminal: true,
+    });
+    rl.on('line', runLine);
+    rl.once('close', () => {
+        if (!options.q)
+            console.log('Bye, and may your bird fly high!');
+        process.exit(0)
+    });
 }
 
 const prom = positional.length > 0
     ? fs.readFile(positional[0], 'utf8')
     : Promise.resolve(options.e);
 
-prom.then(source => {
-    const ski = new SKI();
-    const expr = ski.parse(source);
-
-    const t0 = new Date();
-    for (let state of expr.walk()) {
-        if (state.final && !options.q)
-            console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
-        if (options.v || state.final)
-            console.log('' + state.expr);
-    }
-}).catch(err => {
-    console.error(myname + ': '+err);
+prom.then(runLine).catch(err => {
+    console.error(myname + ': ' + err);
     process.exit(2);
 });
+
+function runLine(source) {
+    if (source === undefined) {
+        // 1st line of readline
+        if (!options.q)
+            console.log('Welcome to SKI interactive shell. Known combinators: '+ski.allow);
+        return;
+    }
+
+    try {
+        const expr = ski.parse(source);
+
+        const t0 = new Date();
+        for (let state of expr.walk()) {
+            if (state.final && !options.q)
+                console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
+            if (options.v || state.final)
+                console.log('' + state.expr);
+        }
+        return 0;
+    } catch (err) {
+        console.error(''+err);
+        return 3;
+    }
+}
 
 function parseArgs(argv) {
     const [_, script, ...list] = argv;
