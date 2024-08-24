@@ -32,7 +32,7 @@ describe('Quest', () => {
     it ('can validate quine', () => {
         const quest = new Quest({
             subst: '&phi;',
-            cases: [['sol', 'sol x', 'sol']],
+            cases: [['f->f x', 'I']],
         });
 
         const pass = quest.check('SII (S(S(KS)K)K)');
@@ -44,10 +44,10 @@ describe('Quest', () => {
         const quest = new Quest({
             subst: '&phi;',
             cases: [
-                [ 'f', 'f (KI) (KI)', 'KI' ],
-                [ {max: 10}, 'f', 'f (KI) (K )', 'KI' ],
-                [ 'f', 'f (K ) (KI)', 'KI' ],
-                [ 'f', 'f (K ) (K )', 'K ' ],
+                [ 'f->f (KI) (KI)', 'f->KI' ],
+                [ {max: 10}, 'f->f (KI) (K )', 'f->KI' ],
+                [ 'f->f (K ) (KI)', 'f->KI' ],
+                [ 'f->f (K ) (K )', 'f->K ' ],
             ],
         });
 
@@ -55,5 +55,10 @@ describe('Quest', () => {
 
         expect(never.pass).to.equal(false);
         expect(never.details.map(i => i.pass ? 1 : 0).join('')).to.equal('1110');
+    });
+
+    it ('rejects bad specs', () => {
+        expect(() => new Quest({cases: [['f->f']]})).to.throw(/exactly 2/);
+        expect(() => new Quest({cases: [['f', 'I', 'I']]})).to.throw(/exactly 2/);
     });
 });
