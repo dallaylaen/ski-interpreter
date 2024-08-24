@@ -1,7 +1,6 @@
 #!/usr/bin/env -S node --stack-size=20600
 
 const fs = require('node:fs/promises');
-const readline = require('readline');
 
 const {SKI} = require('../index');
 
@@ -21,6 +20,7 @@ const ski = new SKI();
 
 if (options.e === undefined && !positional.length) {
     // interactive console
+    const readline = require('readline');
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
@@ -56,6 +56,8 @@ function runLine(onErr) {
                     console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
                 if (options.v || state.final)
                     console.log('' + state.expr);
+                if (state.final && expr instanceof SKI.classes.Alias)
+                    ski.add(expr.name, state.expr);
             }
             return 0;
         } catch (err) {
