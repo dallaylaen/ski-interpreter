@@ -62,11 +62,8 @@ describe('Lambda', function () {
 
     it('stringifies', () => {
         const expr = new Lambda([x, y], z);
-        expect(''+expr).to.match(/^\(.*\)$/, 'in braces');
-        expect(''+expr).to.match(/^[^a-z]+x[^a-z]+y[^a-z]+z/);
+        expect(''+expr).to.equal('x->y->z');
     });
-
-
 });
 
 describe ('Lambda parsing', () => {
