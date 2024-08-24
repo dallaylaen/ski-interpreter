@@ -26,45 +26,41 @@ if (options.e === undefined && !positional.length) {
         output: process.stdout,
         terminal: true,
     });
-    rl.on('line', runLine);
+    if (!options.q)
+        console.log('Welcome to SKI interactive shell. Known combinators: '+ski.allow);
+    rl.on('line', runLine(err => {console.log('' + err)}));
     rl.once('close', () => {
         if (!options.q)
             console.log('Bye, and may your bird fly high!');
         process.exit(0)
     });
+} else {
+    const prom = positional.length > 0
+        ? fs.readFile(positional[0], 'utf8')
+        : Promise.resolve(options.e);
+
+    prom.then(runLine(err => { console.error(''+err); process.exit(3)})).catch(err => {
+        console.error(myname + ': ' + err);
+        process.exit(2);
+    });
 }
 
-const prom = positional.length > 0
-    ? fs.readFile(positional[0], 'utf8')
-    : Promise.resolve(options.e);
+function runLine(onErr) {
+    return function(source) {
+        try {
+            const expr = ski.parse(source);
 
-prom.then(runLine).catch(err => {
-    console.error(myname + ': ' + err);
-    process.exit(2);
-});
-
-function runLine(source) {
-    if (source === undefined) {
-        // 1st line of readline
-        if (!options.q)
-            console.log('Welcome to SKI interactive shell. Known combinators: '+ski.allow);
-        return;
-    }
-
-    try {
-        const expr = ski.parse(source);
-
-        const t0 = new Date();
-        for (let state of expr.walk()) {
-            if (state.final && !options.q)
-                console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
-            if (options.v || state.final)
-                console.log('' + state.expr);
+            const t0 = new Date();
+            for (let state of expr.walk()) {
+                if (state.final && !options.q)
+                    console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
+                if (options.v || state.final)
+                    console.log('' + state.expr);
+            }
+            return 0;
+        } catch (err) {
+            onErr(err);
         }
-        return 0;
-    } catch (err) {
-        console.error(''+err);
-        return 3;
     }
 }
 
