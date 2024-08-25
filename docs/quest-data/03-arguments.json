@@ -3,13 +3,18 @@
   {
     "title": "Mirror image",
     "descr": "Make a combinator <code>T</code> that swaps its two arguments, that is, <code>(x, y) &rarr; y x</code>",
+    "unlock": "T",
     "cases": [
       [ "phi->phi x y", "phi->y x" ]
     ]
   },
   {
-    "title": "B combinator",
-    "descr": "<code>f g x &rarr; f(g(x))</code>",
+    "title": "But just you wait...",
+    "descr": [
+      "Don't take the argument just yet, let it take what comes after it first.",
+      "A.K.A. the <code>B</code> combinator: <code>f g x &rarr; f(g(x))</code>"
+    ],
+    "unlock": "B",
     "cases": [
       [ "phi->phi x y z", "phi->x(y z)" ]
     ]
@@ -27,6 +32,7 @@
   {
     "title": "What you like, do once more!",
     "descr": "The <code>W</code> combinator is defined as x &rArr; y &rArr; x(y)(y). Implement it.",
+    "unlock": "W",
     "cases": [
       [ "phi->phi x y", "phi->x y y" ]
     ]
@@ -39,6 +45,16 @@
     ],
     "cases": [
       [ "phi->phi x y", "phi->x x" ]
+    ]
+  },
+  {
+    "title": "Juggle juggle",
+    "descr": [
+      "The <code>C</code> combinator: <code>x &rarr; y &rarr; z &rarr; x z y</code>."
+    ],
+    "unlock": "C",
+    "cases": [
+      [ "f->f x y z", "f->x z y" ]
     ]
   }
 ]
