@@ -25,7 +25,7 @@ describe('Quest', () => {
 
         const violate = quest.check('I');
         expect(violate.pass).to.equal(false);
-        expect( violate.exception + '' ).to.match(/\bI\b.* restricted .*\bKS\b/);
+        expect( violate.exception + '' ).to.match(/\bI\b.* restricted .*\bK\s*S\b/);
         expect(violate.details).to.deep.equal([]);
     });
 
@@ -61,4 +61,17 @@ describe('Quest', () => {
         expect(() => new Quest({cases: [['f->f']]})).to.throw(/exactly 2/);
         expect(() => new Quest({cases: [['f', 'I', 'I']]})).to.throw(/exactly 2/);
     });
+
+    it ('handles global unlockable engine', () => {
+        const ski = new SKI({allow: 'SK'});
+        const quest = new Quest({engine: ski, cases: [['f->f x', 'f->I x']]});
+        const fail = quest.check('I');
+        expect(fail.exception + '').to.match(/restricted/);
+
+        ski.restrict('+I'); // oh noes! spooky action at a distance
+        const pass = quest.check('I');
+        expect (pass.exception).to.equal(undefined);
+
+    });
+
 });
