@@ -22,11 +22,8 @@
     <div class="side pane" style="width: 15%">
         <div class="quest-box">
             <p>The combinators: </p>
-            <ul>
-                <li><b>I</b>, the identity: <code>x -> x</code></li>
-                <li><b>K</b>, the constant: <code>x y -> x</code></li>
-                <li><b>S</b>, the substitution: <code>x y z -> x z (y z)</code></li>
-            </ul>
+            <div id="known">
+            </div>
         </div>
     </div>
 </div>
@@ -37,8 +34,9 @@
 </div>
 <script>
     const { Expr, FreeVar } = SKI.classes; // just for type annotations
+    const ski = new SKI({allow: 'SKI'}); // global interpreter
 
-    const view = grabView('quest');
+    const view = grabView('quest', 'known');
     const questDir = 'quest-data/';
 
     const linkedTo = window.location.hash.slice(1);
@@ -53,6 +51,7 @@
     function init() {
         rubberDesign('main');
 
+        showKnown();
         fetch(questDir + 'index.json')
             .then( resp => resp.json())
             .then( list => {
@@ -95,7 +94,7 @@
      */
 
     function makeQuest (container, spec, n, onComplete = x => x) {
-        const quest = new SKI.Quest({subst: '&phi;', ...spec});
+        const quest = new SKI.Quest({subst: '&phi;', ...spec}, ski);
         const frame = append(container, 'div', {class: ['quest-box']});
 
         const name = 'quest-'+n;
@@ -146,6 +145,10 @@
             function (report) {
                 showhide(moveOn, true);
                 sumUpdate(report);
+                if (quest.meta.unlock) {
+                    ski.add(quest.meta.unlock, report.expr.expand());
+                    showKnown();
+                }
             },
             function (report) {
                 sumUpdate(report);
@@ -211,6 +214,13 @@
             clickme.remove();
             append(container, 'span', { content: hidden });
         };
+    }
+
+    function showKnown() {
+        view.known.innerHTML = '';
+        const terms = ski.getTerms();
+        for (const entry of Object.keys(terms).sort().map(x => [x, terms[x]]))
+            append(view.known, 'div', {content: `<b>${entry[0]}</b> = ${entry[1].note ?? entry[1].impl}`});
     }
 </script>
 </body>
