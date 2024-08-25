@@ -95,7 +95,7 @@
      */
 
     function makeQuest (container, spec, n, onComplete = x => x) {
-        const quest = new SKI.Quest({subst: '&phi;', ...spec}, ski);
+        const quest = new SKI.Quest({subst: '&phi;', ...spec, engine: ski});
         const frame = append(container, 'div', {class: ['quest-box']});
 
         const name = 'quest-'+n;
@@ -147,7 +147,7 @@
                 showhide(moveOn, true);
                 sumUpdate(report);
                 if (quest.meta.unlock) {
-                    ski.add(quest.meta.unlock, report.expr.expand());
+                    ski.maybeAdd(quest.meta.unlock, report.expr.expand());
                     showKnown();
                 }
             },
