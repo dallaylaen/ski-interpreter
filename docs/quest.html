@@ -95,7 +95,7 @@
      */
 
     function makeQuest (container, spec, n, onComplete = x => x) {
-        const quest = new SKI.Quest(spec);
+        const quest = new SKI.Quest({subst: '&phi;', ...spec});
         const frame = append(container, 'div', {class: ['quest-box']});
 
         const name = 'quest-'+n;
@@ -168,10 +168,14 @@
         const report = quest.check(expr);
         output.innerHTML = '';
 
+        const expand = expr => expr instanceof SKI.classes.Alias
+            ? expr.name + ' = ' + expr.expand()
+            : '' + expr.expand();
+
         if (report.exception) {
             append(output, 'div', {class: ['error'], content: 'Execution failed: '+report.exception});
         } else {
-            append(output, 'div', {content: 'Your solution: &phi; = ' + report.expr.expand()});
+            append(output, 'div', {content: 'Your solution: ' + expand(report.expr)});
         }
 
         for (const item of report.details) {
