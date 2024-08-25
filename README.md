@@ -18,7 +18,7 @@ This page contains small tasks of increasing complexity. Each task requires the 
 
 # CLI
 
-The file [bin/ski.js](bin/ski.js) can be used to calculate SKI expressions, albeit lacking REPL and ability to define more terms. Use the playground instead. `¯\_(ツ)_/¯`
+[bin/ski.js](bin/ski.js) is a REPL supporting SKI and BCKW combinators, lambdas, and Church numerals, as well as defining new terms and running in batch mode.
 
 # The library
 
@@ -68,6 +68,6 @@ All expressions are immutable and will return a brand new expression if anything
 
 # License and copyright
 
-MIT
+This software is free and available under the MIT license.
 
 &copy; Konstantin Uvarin 2024
