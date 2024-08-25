@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8"/>
     <title>Simple Kombinator Interpreter - online combinatory logic and lambda calculus playground</title>
     <link rel="shortcut icon" type="image/png" href="img/ski-64.png">
     <script src="build/js/ski-interpreter.js"></script>
     <script src="js/util.js"></script>
+    <script src="js/common.js"></script>
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
@@ -195,7 +196,7 @@
             return;
         }
 
-        const head = out( '<a href="'+permalink(view.code.value)+'" target="_blank"><b>Expression #'+(++count)+'</b></a>',
+        const head = out( '<a href="'+permalink(ski, view.code.value)+'" target="_blank"><b>Expression #'+(++count)+'</b></a>',
             {tag: 'div', nobr: true, class: 'con-header'});
         append(head, 'span').innerHTML = '  steps: ';
         const iterfield = append(head, 'span');
@@ -301,13 +302,7 @@
         return false;
     }
 
-    function permalink(sample) {
-        const terms = ski.getTerms();
-        const saved = Object.keys(terms)
-            .filter(name => !(terms[name] instanceof SKI.classes.Native))
-            .map(name => name+':'+terms[name].expand()).join(',');
-        return '?code=' + encode(sample) + '&terms=' + encode(saved);
-    }
+
 
 </script>
 </body>
