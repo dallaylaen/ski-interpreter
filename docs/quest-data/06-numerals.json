@@ -4,7 +4,6 @@
       "descr": [
         "Look at the definition above once more. What would number 2 look like?"
       ],
-      "subst": "&phi;",
       "cases": [
         [ "phi->phi x y", "phi->x(x(y))" ]
       ]
@@ -16,7 +15,6 @@
       ],
       "hint": "<code>inc N x y &rarr; x (N x y)</code>.",
       "numbers": true,
-      "subst": "&phi;",
       "cases": [
         [ "phi->phi (KI) x y", "phi->x y" ],
         [ "phi->phi (SK) x y", "phi->x y" ],
@@ -30,7 +28,6 @@
         "Make a term that returns <code>K</code> for 0 and <code>KI</code> for all other numbers. "
       ],
       "numbers": true,
-      "subst": "&phi;",
       "cases": [
         [ "phi->phi (KI)", "phi->K" ],
         [ "phi->phi (SK)", "phi->K" ],
@@ -45,7 +42,6 @@
         "Return the previous number for positive integers, or zero for zero."
       ],
       "numbers": true,
-      "subst": "&phi;",
       "cases": [
         [ "phi->phi (KI) x y", "phi->y" ],
         [ "phi->phi I x y", "phi->y" ],

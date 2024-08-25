@@ -8,7 +8,6 @@
     "vars": [
       "f", "g"
     ],
-    "subst": "&phi;",
     "cases": [
       [ "phi->phi x", "phi->f (g x)" ]
     ]
@@ -20,7 +19,6 @@
       "You goal is to make a term that feeds this value to an <i>unknown</i> function <code>f</code>"
     ],
     "vars": [ "phi->phi ", "phi->x" ],
-    "subst": "&phi;",
     "cases": [
       [ "phi->phi f", "phi->f(x)" ]
     ]
@@ -32,7 +30,6 @@
       "Feed both of them, sequentially to function <code>f</code>."
     ],
     "vars": [ "phi->phi y", "phi->x" ],
-    "subst": "&phi;",
     "cases": [
       [ "phi->phi f", "phi->f x y" ]
     ]
@@ -44,7 +41,6 @@
       "Implement <code>x &rarr; y(x(y))</code>."
     ],
     "vars": [ "phi->phi ", "phi->y" ],
-    "subst": "&phi;",
     "cases": [
       [ "phi->phi x", "phi->y (x y)" ]
     ]
@@ -56,7 +52,6 @@
       "Implement <code>y &rarr; y(x(y))</code>."
     ],
     "vars": [ "phi->phi ", "phi->x" ],
-    "subst": "&phi;",
     "cases": [
       [ "phi->phi y", "phi->y (x y)" ]
     ]
@@ -66,7 +61,6 @@
     "descr": [
       "Implement <code>x &rarr; y &rarr; y(x(y))</code>."
     ],
-    "subst": "&phi;",
     "cases": [
       [ "phi->phi x y", "phi->y (x y)" ]
     ]
