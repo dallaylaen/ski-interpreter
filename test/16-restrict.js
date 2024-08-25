@@ -10,4 +10,9 @@ describe( 'SKI.restrict', () => {
         expect(ski.restrict('+I')).to.equal(ski);
         expect(ski.parseLine('Ix').run().result+'').to.equal('x');
     });
+
+    it ('honors restrictions in getTerms', () => {
+        const ski = new SKI({allow: 'SKI'});
+        expect(Object.keys(ski.getTerms()).sort()).to.deep.equal(['I', 'K', 'S']);
+    });
 });
