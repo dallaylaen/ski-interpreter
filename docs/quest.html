@@ -6,6 +6,7 @@
     <link rel="shortcut icon" type="image/png" href="img/ski-64.png">
     <script src="build/js/ski-interpreter.js"></script>
     <script src="js/util.js"></script>
+    <script src="js/common.js"></script>
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
@@ -162,24 +163,23 @@
      *
      * @param {Element} output
      * @param {Quest} quest
-     * @param {Expr} expr
+     * @param {Expr} input
      * @param {function} [onpass]
      * @param {function} [onfail]
      */
-    function checkQuest (output, quest, expr, onpass, onfail) {
+    function checkQuest (output, quest, input, onpass, onfail) {
         output.innerHTML = 'running...';
-        const report = quest.check(expr);
+        const report = quest.check(input);
         output.innerHTML = '';
 
-        const expand = expr => expr instanceof SKI.classes.Alias
-            ? expr.name + ' = ' + expr.expand()
-            : '' + expr.expand();
+        const echo = append(output, 'div');
+        append(echo, 'span', {content: 'Your solution: ' + expand(report.expr ?? input) + ' '});
+        const linque = append(echo, 'a', {content: 'playground'});
+        linque.href='index.html'+permalink(ski, input);
+        linque.target = '_blank';
 
-        if (report.exception) {
+        if (report.exception)
             append(output, 'div', {class: ['error'], content: 'Execution failed: '+report.exception});
-        } else {
-            append(output, 'div', {content: 'Your solution: ' + expand(report.expr)});
-        }
 
         for (const item of report.details) {
             const line = append(output, 'div', {class: item.pass ? ['success'] : ['error']});
@@ -194,6 +194,7 @@
                 append(line, 'span', {content: '&nbsp;&nbsp;expected '+item.expected});
             }
         }
+
         const action = report.pass ? onpass : onfail;
         if (action)
             action(report);
@@ -214,6 +215,14 @@
             clickme.remove();
             append(container, 'span', { content: hidden });
         };
+    }
+
+    function expand(expr) {
+        return expr instanceof SKI.classes.Expr ? (
+            expr instanceof SKI.classes.Alias
+                ? expr.name + ' = ' + expr.expand()
+                : '' + expr.expand()
+        ) : ''+expr;
     }
 
     function showKnown() {
