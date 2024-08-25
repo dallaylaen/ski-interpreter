@@ -62,14 +62,13 @@ ul {
     color: darkgray;
 }
 
-#known {
+ul#known {
     padding-left: 2em;
 }
 
-#known li {
+ul#known li {
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
 }
 
 .bigcontrol {
