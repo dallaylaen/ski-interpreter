@@ -39,7 +39,12 @@
   {
     "name": "The BCKW forest",
     "intro": [
-
+      "As you progress discovering more and more combinators,",
+      "you find out that some of them can thrive on their own.",
+      "In fact, as you wander further, you find yourself surrounded by a think forest",
+      "built entirely of four combinators:",
+      "<code>B</code>, <code>C</code>, <code>K</code>, and <code>W</code>.",
+      "Can you find the way back?"
     ],
     "link": "40-bckw.json"
   },

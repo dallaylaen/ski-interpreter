@@ -1,3 +1,10 @@
 [
-
+  {
+    "title": "Where am I?",
+    "descr": "Build the I combinator (yes, again) from B, C, K, and W.",
+    "allow": "BCKW",
+    "cases": [
+      [ "f->f x", "Kx" ]
+    ]
+  }
 ]
