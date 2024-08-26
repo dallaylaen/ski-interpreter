@@ -37,6 +37,21 @@
     "link": "30-arguments.json"
   },
   {
+    "name": "The BCKW forest",
+    "intro": [
+
+    ],
+    "link": "40-bckw.json"
+  },
+  {
+    "name": "The island of Iota",
+    "intro": [
+      "Now you know two bases: the SK(I) and the BCKW.",
+      "Apparently, there is a one element base: <code>X = x &rarr; xSK</code>. Try it!"
+    ],
+    "link": "50-iota.json"
+  },
+  {
     "name": "Boolean logic",
     "intro": [
       "<code>K</code> and <code>KI</code> terms may be interpreted as <b>true</b> and <b>false</b>",

@@ -1,0 +1,56 @@
+[
+  {
+    "title": "All you need is",
+    "descr": "Build <code>x &rarr; x(S)(K)</code>",
+    "unlock": "X",
+    "solution": "BC(CI)SK",
+    "cases": [
+      [ "f->f K x y z", "f->x z (y z)" ],
+      [ "f->f (KI) x y z", "f->x z" ]
+    ]
+  },
+  {
+    "title": "Easy peasy",
+    "descr": [
+      "Now build <code>I</code> from <code>X</code>. ",
+      "No other combinators are (hopefully temporarily) available."
+    ],
+    "allow": "X",
+    "hint": "You might want to go back to the very first chapter...",
+    "cases": [
+      [ "f->f x", "f->x" ]
+    ]
+  },
+  {
+    "title": "Ignore all previous instructions II",
+    "descr": [
+      "Build a combinator that omits its first argument and returns the second one"
+    ],
+    "allow": "X",
+    "hint": "XXX... would alternate between I and X. Try parenthesis...",
+    "cases": [
+      [ "f->f x y", "f->y"]
+    ]
+  },
+  {
+    "title": "Stay constant, whatever you receive",
+    "descr": [
+      "Build a combinator that omits its second argument and returns the first one",
+      "(i.e. <code>K</code>)"
+    ],
+    "allow": "X",
+    "cases": [
+      [ "f->f x y", "f->x"]
+    ]
+  },
+  {
+    "title": "Last but not least",
+    "descr": [
+      "How about <code>S</code>?"
+    ],
+    "allow": "X",
+    "cases": [
+      [ "f->f x y z", "f->x z (y z)"]
+    ]
+  }
+]
