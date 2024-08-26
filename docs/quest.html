@@ -95,17 +95,20 @@
      */
 
     function makeQuest (container, spec, n, onComplete = x => x) {
-        const quest = new SKI.Quest({subst: '&phi;', ...spec, engine: ski});
-        const frame = append(container, 'div', {class: ['quest-box']});
-
         const name = 'quest-'+n;
-        const title = append(frame, 'div', {class: ['block-header']});
-        append (title, 'a').name = name;
-        const expand = append(title, 'a', {content: n ? '#' + n + '' : 'Quest'});
-        append(title, 'span', {content: ' '+quest.title});
-        expand.href = '#'+name;
+        const quest = new SKI.Quest({subst: '&phi;', ...spec, engine: ski});
+
+        const frame = append(container, 'div', {class: ['quest-box']});
+        frame.id = name;
         if (name === linkedTo)
             focusLater = frame;
+
+        const title = append(frame, 'div', {class: ['block-header']});
+        const expand = append(title, 'a', {content: n ? '#' + n + '' : 'Quest'});
+        expand.href = '#'+name;
+        append(title, 'span', {content: ' '+quest.title});
+        if (quest.restrict.allow)
+            append(title, 'span', {content: ' ['+quest.restrict.allow+']'})
 
         const body = append(frame, 'div');
         expand.onclick = () => showhide(body, true);
