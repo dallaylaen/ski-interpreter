@@ -8,7 +8,7 @@
       "And there are also not many of them at the start...",
       "But don't worry, they are <i>powerful enough</i>."
       ],
-    "link": "00-basics.json"
+    "link": "10-basics.json"
   },
   {
     "name": "Dull tales",
@@ -23,7 +23,7 @@
       "</ul><br>",
       "Let's grind a bit to gain some XP before we can get to interesting stuff!"
     ],
-    "link": "01-lambda.json"
+    "link": "20-lambda.json"
   },
   {
     "name": "Swing, swing!",
@@ -34,7 +34,7 @@
       "Then construct it via the above technique and go one argument back,",
       "until you run out of them."
     ],
-    "link": "03-arguments.json"
+    "link": "30-arguments.json"
   },
   {
     "name": "Boolean logic",
@@ -44,7 +44,7 @@
       "and <code>KI then else</code> will result in <code>else</code>.",
       "The trick is almost always to feed a function to a boolean value, and not the other way around."
     ],
-    "link": "04-boolean.json"
+    "link": "60-boolean.json"
   },
   {
     "name": "Recursion",
@@ -62,7 +62,7 @@
       "You might want to use <code>x &rArr; y &rArr; x(x)</code> combinator from one of the above quests,",
       "or invent your own!"
     ],
-    "link": "05-recursion.json"
+    "link": "70-recursion.json"
   },
   {
     "name": "The Church of Numerals",
@@ -76,6 +76,6 @@
       "as it repeats the first argument exactly 0 times,",
       "and 1 is <code>I</code> (easy to confuse)."
     ],
-    "link": "06-numerals.json"
+    "link": "80-numerals.json"
   }
 ]
