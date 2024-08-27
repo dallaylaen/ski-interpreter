@@ -18,6 +18,7 @@ describe('Quest', () => {
 
         const details = pass.details[0];
         expect(details.start + ' -> ' + details.found).to.equal('&phi;(x) -> x');
+        expect(details.steps).to.equal(2, "SKK=I takes 2 steps to validate");
 
         const fail = quest.check('S(SKK)(SKK)');
         expect(fail.pass).to.equal(false);
