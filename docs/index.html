@@ -202,25 +202,23 @@
         const iterfield = append(head, 'span');
         iterfield.innerHTML = '-';
 
-        const tick = getRunner(out, iterfield);
-
         try {
-            let expr = ski.parse(src);
+            const expr = ski.parse(src);
             if (expr instanceof SKI.classes.Alias) {
                 ski.add(expr.name, expr.impl);
                 showKnown();
             }
-            tick(expr);
+            getRunner(out, iterfield, expr.walk());
         } catch (err) {
             out(err, {class: 'error'});
             resetGo();
         }
     }
 
-    function getRunner(out, iterfield) {
-        let step = 0;
-        let line;
-        const tick = expr => {
+    function getRunner(out, iterfield, gen) {
+        let lcount = 0; // lines output may differ from step count
+        let line; // element to write to
+        const tick = () => {
             // check interrupt
             if (!running) {
                 out ("...interrupted!", {class: "error"});
@@ -228,23 +226,22 @@
                 return;
             }
 
+            const next = gen.next().value;
             // output state
-            step++;
-            if (!line || step <= showlines)
+            if (!line || lcount <= showlines)
                 line = out('');
-            line.rewrite(expr);
-            iterfield.innerHTML = ''+step;
+            line.rewrite(next.expr);
+            iterfield.innerHTML = ''+next.steps;
 
-            // calculate & setup next iteration
-            const next = expr.step();
-            if (next) {
-                setTimeout(() => tick(next), 0);
+            if (!next.final) {
+                lcount++;
+                setTimeout(tick, 0);
             } else {
                 out('&check;', {class: 'success'});
                 resetGo();
             }
         };
-        return tick;
+        tick();
     }
 
     function resetGo () {
