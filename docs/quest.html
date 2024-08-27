@@ -127,7 +127,7 @@
 
         const summary = append(append(title, 'span', {class: ['float-right']}), 'i');
         let solved = false;
-        let count = 0;
+        let steps = 0;
         let attempts = 0;
         const sumUpdate = report => {
             if (solved)
@@ -140,9 +140,9 @@
 
             attempts++;
             for (const item of report.details)
-                count += item.count;
+                steps += item.steps;
 
-            summary.innerHTML = 'Attempts: '+attempts+', total steps: '+count;
+            summary.innerHTML = 'Attempts: '+attempts+', total steps: '+steps;
         }
 
         const runme = () => checkQuest(box, quest, input.value,
