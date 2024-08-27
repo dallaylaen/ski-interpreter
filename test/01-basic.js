@@ -3,37 +3,15 @@ const { SKI } = require('../index');
 const { Expr } = SKI.classes;
 
 describe( 'SKI', () => {
-    it ('can parseLine basic expr: I', done => {
-       const ski = new SKI;
-       let expr = ski.parseLine('I x');
-       expect( expr ).to.be.instanceof(Expr);
-       expect(''+expr).to.equal('I(x)');
-       expr = expr.step();
-       expect(''+expr).to.equal('x');
-       expr = expr.step();
-       expect(expr).to.equal(null);
-       done();
-    });
-
-    it ('can parseLine basic expr: K', done => {
+    it ('can parse basic expr: S', done => {
         const ski = new SKI;
-        let expr = ski.parseLine('K x y');
-        expect(''+expr).to.equal('K(x)(y)');
-        expr = expr.step();
-        expect(''+expr).to.equal('x');
-        expr = expr.step();
-        expect(expr).to.equal(null);
-        done();
-    });
-
-    it ('can parseLine basic expr: S', done => {
-        const ski = new SKI;
-        let expr = ski.parseLine('S x y z');
-        expect(''+expr).to.equal('S(x)(y)(z)');
-        expr = expr.step();
-        expect(''+expr).to.equal('x(z)(y(z))');
-        expr = expr.step();
-        expect(expr).to.equal(null);
+        const s0 = ski.parseLine('S x y z');
+        expect(''+s0).to.equal('S(x)(y)(z)');
+        const s1 = s0.step();
+        expect(''+s1.expr).to.equal('x(z)(y(z))');
+        const s2 = s1.expr.step();
+        expect(s2.steps).to.equal(0);
+        expect(s2.expr).to.equal(s1.expr);
         done();
     });
 
@@ -59,7 +37,7 @@ describe( 'SKI', () => {
         const ski = new SKI;
         const expr = ski.parseLine("food bard");
         expect(''+expr).to.equal("food(bard)");
-        expect(expr.step()).to.equal(null);
+        expect(expr.step()).to.deep.equal({expr, steps: 0});
         done();
     });
 

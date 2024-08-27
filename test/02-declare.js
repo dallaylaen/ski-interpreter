@@ -28,7 +28,7 @@ describe( 'SKI', () => {
 
         let expr = known.sub;
         expect( expr instanceof SKI.classes.Native ).to.equal(false);
-        expr = expr.step();
+        expr = expr.step().expr;
         expect( expr instanceof SKI.classes.Native ).to.equal(true);
 
         done();
