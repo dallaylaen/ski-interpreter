@@ -27,7 +27,7 @@ const {SKI} = require('./index.js');
 
 const ski = new SKI();
 const expr = ski.parse('S f g x');
-expr.run().result; // f(x)(g(x))
+expr.run().expr; // f(x)(g(x))
 
 // declare free variables. 
 // note that free variables with the same name are
@@ -43,12 +43,12 @@ if (si instanceof SKI.classes.Expr) {
 }
 
 // compare expressions
-if (ski.parse('SKK').run(x).result.equals(x)) {
+if (ski.parse('SKK').run(x).expr.equals(x)) {
     console.log('created I from S and K')
 }
 
 // Church numerals
-console.log(ski.parse('15 man chest').run().result + ' and a bottle of rum');
+console.log(ski.parse('15 man chest').run().expr + ' and a bottle of rum');
 
 // generic lambda expressions
 ski.parse('x->y->z->x(z)(y(z))'); // same as S
