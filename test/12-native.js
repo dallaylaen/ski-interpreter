@@ -16,7 +16,7 @@ describe('native combinators', () => {
     for (const comb in list) {
         it ('contains combinator '+comb, () => {
             expect(SKI[comb]).to.be.instanceOf(SKI.classes.Native);
-            expect(SKI[comb].run(x, y, z).result + '').to.equal(list[comb]);
+            expect(SKI[comb].run(x, y, z).expr + '').to.equal(list[comb]);
         });
     }
 });

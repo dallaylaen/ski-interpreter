@@ -6,9 +6,9 @@ describe( 'SKI.restrict', () => {
         const ski = new SKI();
         expect(ski.restrict('-IBCW')).to.equal(ski);
         expect(()=>ski.parseLine('Ix')).to.throw(/I.*restricted/);
-        expect(ski.parse('SKKx').run().result+'').to.equal('x');
+        expect(ski.parse('SKKx').run().expr+'').to.equal('x');
         expect(ski.restrict('+I')).to.equal(ski);
-        expect(ski.parseLine('Ix').run().result+'').to.equal('x');
+        expect(ski.parseLine('Ix').run().expr+'').to.equal('x');
     });
 
     it ('honors restrictions in getTerms', () => {

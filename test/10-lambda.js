@@ -9,7 +9,7 @@ describe('Lambda', function () {
     it ('is indeed a lambda expression', () => {
         const expr = new Lambda([x, y], y.apply(x));
 
-        const got = expr.run(t1, t2).result;
+        const got = expr.run(t1, t2).expr;
 
         expect(''+got).to.equal('t2(t1)');
     });
@@ -29,7 +29,7 @@ describe('Lambda', function () {
 
     it ('successfully emulates K', () => {
         const k = new Lambda([x], new Lambda([y], x));
-        expect(k.run(y, x).result).to.equal(y);
+        expect(k.run(y, x).expr).to.equal(y);
     });
 
     it ('works with aliases', () => {
@@ -37,7 +37,7 @@ describe('Lambda', function () {
         ski.add('T', 'S(K(SI))K');
         const expr = new Lambda( [x], ski.parse('T', {x}));
 
-        expect(''+expr.run(y, z, t1).result).to.equal('t1(z)');
+        expect(''+expr.run(y, z, t1).expr).to.equal('t1(z)');
         expect(expr.impl).to.be.instanceOf(SKI.classes.Alias);
     });
 
@@ -50,13 +50,13 @@ describe('Lambda', function () {
 
     it ('another stupid use case', () => {
         const kk = new Lambda([x], new Lambda([y], z));
-        expect(kk.run(t1, t2).result).to.equal(z);
+        expect(kk.run(t1, t2).expr).to.equal(z);
     });
 
     it ('handles partial application', () => {
         const expr = new Lambda( [x, y], y.apply(x));
-        const partial = expr.run(z).result;
-        const complete = partial.run(t1).result;
+        const partial = expr.run(z).expr;
+        const complete = partial.run(t1).expr;
         expect( ''+complete ).to.equal('t1(z)');
     });
 
@@ -72,17 +72,17 @@ describe ('Lambda parsing', () => {
 
     it('can parse simple expressions', () => {
         const expr = ski.parseLine('x->y->x');
-        expect( expr.run(t1, t2).result ).to.equal(t1);
+        expect( expr.run(t1, t2).expr ).to.equal(t1);
     });
 
     it('can parse compound terms', ()=>{
         const expr = ski.parse('x->xSK');
-        expect( expr.run(expr, t1).result ).to.equal(t1);
+        expect( expr.run(expr, t1).expr ).to.equal(t1);
     });
 
     it ('handles complicated expressions', () => {
         const expr = ski.parse('x->K(y->y(x))');
-        expect(expr.run(x, y, z).result + '').to.equal('z(x)');
+        expect(expr.run(x, y, z).expr + '').to.equal('z(x)');
     });
 
     // TODO proper error handling, not this mess

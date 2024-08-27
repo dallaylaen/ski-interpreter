@@ -10,7 +10,7 @@ describe( 'SKI.parse', () => {
             dbl = S (S(KS)K) K;;;;
             dbl dbl dbl
         `, vars);
-        expect( expr.run(SKI.S).result.toString() ).to.equal(expr.run().result.toString());
+        expect( expr.run(SKI.S).expr.toString() ).to.equal(expr.run().expr.toString());
 
         // verify that no aliased terms were created within ski itself
         for (const x of Object.values(ski.getTerms()))
@@ -27,7 +27,7 @@ describe( 'SKI.parse', () => {
         const [x] = SKI.free('x');
 
         expect( expr.name ).to.equal ("foo");
-        expect( expr.run(x).result).to.equal(x);
+        expect( expr.run(x).expr).to.equal(x);
 
         done();
     });
@@ -77,7 +77,7 @@ describe( 'SKI.parse', () => {
         expect(''+expr.impl).to.match(/^[SKI()]*$/, "no traces of b() and w()");
 
         // just check the expr to work
-        expect(expr.run(...SKI.free('x', 'y', 'z')).result.toString()
+        expect(expr.run(...SKI.free('x', 'y', 'z')).expr.toString()
             ).to.equal('x(y)(z)(z)');
 
         done();

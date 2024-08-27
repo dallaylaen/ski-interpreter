@@ -24,9 +24,9 @@ describe('SKI.equals', () => {
         const x = ski.parse('x');
         const y = ski.parse('y');
 
-        expect( e1.run(x).result.equals(e2.run(x).result) ).to.equal(false);
-        expect( e1.run(x, y).result.equals(e2.run(x, y).result) ).to.equal(true);
-        expect( e1.run(x, y).result.equals(e2.run(y, x).result) ).to.equal(false);
+        expect( e1.run(x).expr.equals(e2.run(x).expr) ).to.equal(false);
+        expect( e1.run(x, y).expr.equals(e2.run(x, y).expr) ).to.equal(true);
+        expect( e1.run(x, y).expr.equals(e2.run(y, x).expr) ).to.equal(false);
 
         done();
     });
