@@ -47,6 +47,8 @@ if (options.e === undefined && !positional.length) {
 
 function runLine(onErr) {
     return function(source) {
+        if (!source.match(/\S/))
+            return 0; // nothing to see here
         try {
             const expr = ski.parse(source);
 
