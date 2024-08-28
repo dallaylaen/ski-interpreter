@@ -2,11 +2,11 @@
   {
     "name": "Baby steps",
     "intro": [
-      "Welcome to the wonderful world of combinators. ",
+      "<p>Welcome to the wonderful world of combinators. ",
       "The only thing that exists here is functions. ",
       "To be precise, a combinator is a function that takes a combinator and returns a combinator.",
       "And there are also not many of them at the start...",
-      "But don't worry, they are <i>powerful enough</i>."
+      "But don't worry, they are <i>powerful enough</i>.<p>"
       ],
     "link": "10-basics.json"
   },
@@ -39,12 +39,14 @@
   {
     "name": "The BCKW forest",
     "intro": [
-      "As you progress discovering more and more combinators,",
+      "<p>As you progress discovering more and more combinators,",
       "you find out that some of them can thrive on their own.",
       "In fact, as you wander further, you find yourself surrounded by a think forest",
       "built entirely of four combinators:",
       "<code>B</code>, <code>C</code>, <code>K</code>, and <code>W</code>.",
-      "Can you find the way back?"
+      "Can you find the way back?</p>",
+      "<p>See also: <a href=\"https://en.wikipedia.org/wiki/B,_C,_K,_W_system\">BCKW system</a>",
+      "on wikipedia.</p>"
     ],
     "link": "40-bckw.json"
   },
