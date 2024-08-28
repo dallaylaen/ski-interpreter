@@ -107,8 +107,8 @@
         const expand = append(title, 'a', {content: n ? '#' + n + '' : 'Quest'});
         expand.href = '#'+name;
         append(title, 'span', {content: ' '+quest.title});
-        if (quest.restrict.allow)
-            append(title, 'span', {content: ' ['+quest.restrict.allow+']'})
+        if (quest.restrict.allow !== undefined)
+            append(title, 'span', {content: ' ['+(ski.showRestrict(quest.restrict.allow) || '-')+']'})
 
         const body = append(frame, 'div');
         expand.onclick = () => showhide(body, true);
