@@ -187,11 +187,7 @@
         for (const item of report.details) {
             const line = append(output, 'div', {class: item.pass ? ['success'] : ['error']});
             append(line, 'span', {content: item.pass ? '&check; ' : '&cross; '});
-            append(line, 'span', {
-                content: item.start
-                    ? `${item.start} &rarr; ${item.found} in ${item.count} steps`
-                    : `&phi; ${item.args.join(' ')} &rarr; ${item.found} in ${item.count} steps`
-            });
+            append(line, 'span', {content: `${item.start} &rarr; ${item.found} in ${item.steps} steps`});
             if (!item.pass) {
                 append(line, 'br');
                 append(line, 'span', {content: '&nbsp;&nbsp;expected '+item.expected});
