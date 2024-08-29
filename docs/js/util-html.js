@@ -125,3 +125,22 @@ function teletype(attach, opt={}) {
         return line;
     }
 }
+
+class Store {
+    constructor(namespace) {
+        this.ns = namespace + ':';
+    }
+
+    save(key, value) {
+        return new Promise( resolve => {
+            window.localStorage.setItem(this.ns + key, JSON.stringify(value));
+            resolve(); // nothing to boast about here
+        });
+    }
+
+    load(key) {
+        return new Promise( resolve => {
+            resolve( JSON.parse(window.localStorage.getItem(this.ns + key)) );
+        });
+    }
+}
