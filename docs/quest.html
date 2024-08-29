@@ -35,7 +35,9 @@
 </div>
 <script>
     const { Expr, FreeVar } = SKI.classes; // just for type annotations
-    const ski = new SKI({allow: 'SKI'}); // global interpreter
+
+    const store = new Store('quest-page');
+    let ski; // global interpreter
 
     const view = grabView('quest', 'known');
     const questDir = 'quest-data/';
@@ -52,7 +54,11 @@
     function init() {
         rubberDesign('main');
 
-        showKnown();
+        store.load('engine').then(spec => {
+            ski = new SKI(spec || {allow: 'SKI'});
+            showKnown();
+        });
+
         fetch(questDir + 'index.json')
             .then( resp => resp.json())
             .then( list => {
@@ -70,7 +76,7 @@
         const title = append(container, 'div', {class: ['title'], content: 'Chapter '+n+': '+opt.name});
         const stats = append(title, 'span', {class: ['float-right']});
         const counter = append( stats, 'span', {content: '0'});
-        let solved = 0;
+        const done = new Set();
 
         const inner = append(container, 'div', {class: ['chapter-content']});
 
@@ -80,7 +86,7 @@
             .then( list => {
                 let k = 0;
                 for (const item of list) {
-                    makeQuest(inner, item, n + '.' + ++k, () => { counter.innerHTML = '' + ++solved });
+                    makeQuest(inner, item, n + '.' + ++k, id => { done.add(id); counter.innerHTML = '' + done.size });
                 }
                 append(stats, 'span', {content: '/'+k});
             });
@@ -94,9 +100,10 @@
      * @return {void}
      */
 
-    function makeQuest (container, spec, n, onComplete = x => x) {
-        const name = 'quest-'+n;
+    function makeQuest (container, spec, n, onComplete = ()=>{}) {
         const quest = new SKI.Quest({subst: '&phi;', ...spec, engine: ski});
+        const name = 'quest-' + quest.meta.id;
+        quest.meta.status = { solved: false, steps: 0, attempts: 0};
 
         const frame = append(container, 'div', {class: ['quest-box']});
         frame.id = name;
@@ -126,38 +133,49 @@
         moveOn.onclick = () => showhide(body, false);
 
         const summary = append(append(title, 'span', {class: ['float-right']}), 'i');
-        let solved = false;
-        let steps = 0;
-        let attempts = 0;
-        const sumUpdate = report => {
-            if (solved)
-                return;
-            if (report.pass) {
-                solved = true;
+        const showStatus = () => {
+            const st = quest.meta.status;
+            if (st.solved)
                 summary.classList.add('success');
+            summary.innerHTML = 'Attempts: '+st.attempts+', total steps: '+st.steps;
+        };
+
+        store.load('quest:' + quest.meta.id).then(data => {
+            if (data) {
+                const st = quest.meta.status;
+                st.solved   = data.solved ?? false;
+                st.steps    = data.steps ?? 0;
+                st.attempts = data.attempts ?? 0;
+                if (st.solved)
+                    onComplete(quest.meta.id);
+            }
+            showStatus();
+        })
+
+        const appendStatus = report => {
+            const st = quest.meta.status;
+            if (st.solved)
+                return;
+            st.attempts++;
+            for (const item of report.details)
+                st.steps += item.steps;
+
+            if (report.pass) {
+                st.solved = true;
+                if (quest.meta.unlock) {
+                    ski.maybeAdd(quest.meta.unlock, report.expr.expand());
+                    store.save('engine', ski);
+                    showKnown();
+                }
+                showhide(moveOn, true);
                 onComplete();
             }
 
-            attempts++;
-            for (const item of report.details)
-                steps += item.steps;
-
-            summary.innerHTML = 'Attempts: '+attempts+', total steps: '+steps;
+            store.save('quest:'+quest.meta.id, st);
+            showStatus();
         }
 
-        const runme = () => checkQuest(box, quest, input.value,
-            function (report) {
-                showhide(moveOn, true);
-                sumUpdate(report);
-                if (quest.meta.unlock) {
-                    ski.maybeAdd(quest.meta.unlock, report.expr.expand());
-                    showKnown();
-                }
-            },
-            function (report) {
-                sumUpdate(report);
-            }
-        );
+        const runme = () => checkQuest(box, quest, input.value, appendStatus);
         btn.onclick = runme;
         input.onkeydown = (ev => ev.key === "Enter" ? runme() : true);
     }
@@ -167,10 +185,9 @@
      * @param {Element} output
      * @param {Quest} quest
      * @param {Expr} input
-     * @param {function} [onpass]
-     * @param {function} [onfail]
+     * @param {function} [callback]
      */
-    function checkQuest (output, quest, input, onpass, onfail) {
+    function checkQuest (output, quest, input, callback) {
         output.innerHTML = 'running...';
         const report = quest.check(input);
         output.innerHTML = '';
@@ -194,9 +211,8 @@
             }
         }
 
-        const action = report.pass ? onpass : onfail;
-        if (action)
-            action(report);
+        if (callback)
+            callback(report);
         return false;
     }
 
