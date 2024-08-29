@@ -5,6 +5,8 @@ const fs = require('node:fs').promises;
 const dir = __dirname + '/../docs/quest-data/';
 
 describe( 'quest-data', async () => {
+    const uniq = new Set();
+
     it ('has index', async () => {
         const index = await fs.readFile(dir + 'index.json')
             .then(data => JSON.parse(data));
@@ -54,6 +56,13 @@ describe( 'quest-data', async () => {
                                     expect( result.pass ).to.equal(true);
                                 });
                             }
+                            it ('has unique id', () => {
+                                const id = q.meta.id;
+                                expect(typeof id).to.equal('string');
+                                expect(id).to.match(/\S/);
+                                expect(uniq.has(id)).to.equal(false, 'quest id is unique: '+id);
+                                uniq.add(id);
+                            });
                         });
                     }
                 });
