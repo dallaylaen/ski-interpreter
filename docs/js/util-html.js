@@ -143,4 +143,17 @@ class Store {
             resolve( JSON.parse(window.localStorage.getItem(this.ns + key)) );
         });
     }
+
+    * scan() {
+        const st = window.localStorage;
+        for (let i = 0; i < st.length; i++) {
+            const key = st.key(i);
+            if (key.startsWith(this.ns))
+                yield key.substring(this.ns.length);
+        }
+    }
+
+    delete(key) {
+        window.localStorage.removeItem(this.ns + key);
+    }
 }
