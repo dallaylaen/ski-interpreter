@@ -18,6 +18,11 @@
         <div class="quest-box">
             <a href="index.html" target="_blank">playground</a>
         </div>
+        <div class="quest-box" id="chapterlist">
+        </div>
+        <div class="quest-box" id="left-footer">
+            <button onclick="demolish()">Erase progress</button>
+        </div>
     </div>
     <div class="pane" id="quest" style="width: 70%;"></div>
     <div class="side pane" style="width: 15%">
@@ -39,7 +44,7 @@
     const store = new Store('quest-page');
     let ski; // global interpreter
 
-    const view = grabView('quest', 'known');
+    const view = grabView('quest', 'known', 'chapterlist');
     const questDir = 'quest-data/';
 
     const linkedTo = window.location.hash.slice(1);
@@ -79,6 +84,11 @@
         const done = new Set();
 
         const inner = append(container, 'div', {class: ['chapter-content']});
+
+        const linkDiv = append(view.chapterlist, 'div', {});
+        const linkTo = append(linkDiv, 'a', {content: n + '. ' + opt.name});
+        linkTo.href = '#';
+        linkTo.onclick = () => {container.scrollIntoView()};
 
         append(inner, 'div', {class: ['note'], content: cat(opt.intro)});
         return fetch(questDir + opt.link)
@@ -171,8 +181,7 @@
                 onComplete();
             }
 
-            store.save('quest:'+quest.meta.id, st);
-            showStatus();
+            store.save('quest:'+quest.meta.id, st).then( () => showStatus() );
         }
 
         const runme = () => checkQuest(box, quest, input.value, appendStatus);
@@ -245,6 +254,13 @@
         const terms = ski.getTerms();
         for (const entry of Object.keys(terms).sort().map(x => [x, terms[x]]))
             append(view.known, 'div', {content: `<b>${entry[0]}</b> = ${entry[1].note ?? entry[1].impl}`});
+    }
+
+    function demolish() {
+        for (const key of store.scan()) {
+            store.delete(key);
+        };
+        window.location.reload();
     }
 </script>
 </body>
