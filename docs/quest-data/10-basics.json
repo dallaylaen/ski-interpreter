@@ -1,5 +1,6 @@
 [
   {
+    "id": "3a9d526d-ee4c-453d-9930-a6bbfbb95d9f",
     "title": "First principles I",
     "descr": [
       "You are given values <code>x</code>, <code>y</code>, and <code>z</code>.",
@@ -12,6 +13,7 @@
     ]
   },
   {
+    "id": "8e95602a-9cbf-4e7e-a349-488f9f40d86a",
     "title": "First principles II",
     "descr": [
       "You are given values <code>x</code>, <code>y</code>, and <code>z</code>.",
@@ -24,6 +26,7 @@
     ]
   },
   {
+    "id": "8a409fb3-3a86-4100-a91f-f7f6f693ea2f",
     "title": "First principles III",
     "descr": [
       "You are given values <code>x</code>, <code>y</code>, and <code>z</code>.",
@@ -36,6 +39,7 @@
     ]
   },
   {
+    "id": "432a6dd2-1f56-4002-90e3-c317f0beca81",
     "title": "Ignore all previous instructions",
     "descr": [
       "The <code>K</code> combinator takes 2 arguments, <code>x</code> and <code>y</code>,",
@@ -47,6 +51,7 @@
     ]
   },
   {
+    "id": "36fc11e3-b017-402d-bfe7-50ad0881baa9",
     "title": "Look at yourself",
     "descr": [
       "In the realm of combinators, everything is a function.",
@@ -57,6 +62,7 @@
     ]
   },
   {
+    "id": "024f0dca-0b75-457c-aa50-1f2a23651cba",
     "title": "Lost identity",
     "descr": [
       "Someone stole the <code>I</code> combinator from your interpreter.",

@@ -1,5 +1,6 @@
 [
   {
+    "id": "9ea93c63-362f-4a67-ae36-17357fc5e5a5",
     "title": "Warm up",
     "descr": [
       "Provide a term that returns <code>K</code> for <code>I</code> and <code>I</code> for <code>K</code>."
@@ -10,6 +11,7 @@
     ]
   },
   {
+    "id": "d05bb5f9-51e9-4db7-8a70-7566572236bb",
     "title": "not",
     "descr": [
       "Implement <code>not x</code>, that is,",
@@ -21,6 +23,7 @@
     ]
   },
   {
+    "id": "148d86b1-10f7-49ee-b98e-c99d9e376e0f",
     "title": "and",
     "descr": [
       "make a term that takes 2 arguments and returns true (<code>K</code>)",
@@ -34,6 +37,7 @@
     ]
   },
   {
+    "id": "b32924cb-dc89-496f-a95a-1acb35be28df",
     "title": "or",
     "descr": [
       "the title says it"
@@ -46,6 +50,7 @@
     ]
   },
   {
+    "id": "68d4bff5-9e44-4ca7-837a-eb66e647829a",
     "title": "nand",
     "descr": [
       "NAND (not and) is true unless both ot its inputs are true."
@@ -58,6 +63,7 @@
     ]
   },
   {
+    "id": "c4770a7e-9b22-4d3e-9a41-f9aa85f2128a",
     "title": "Postfix if statement",
     "descr": [
       "Often the then/else branches are known before the condition that picks one of them.",

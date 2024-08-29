@@ -1,5 +1,6 @@
 [
     {
+      "id": "08e7fa65-1a48-45f3-b115-20aa67520a3e",
       "title": "zero... one... two?!",
       "descr": [
         "Look at the definition above once more. What would number 2 look like?"
@@ -9,6 +10,7 @@
       ]
     },
     {
+      "id": "815847b2-5aec-4496-bc94-07316bd2278b",
       "title": "inc",
       "descr": [
         "Procure a term that increases given number by 1: <code>inc N x y &rarr; x(...N+1 times(y)...)</code>. "
@@ -23,6 +25,7 @@
       ]
     },
     {
+      "id": "e61e545e-42b6-4ab0-b311-0372841e87f5",
       "title": "isZero",
       "descr": [
         "Make a term that returns <code>K</code> for 0 and <code>KI</code> for all other numbers. "
@@ -37,6 +40,7 @@
       ]
     },
     {
+      "id": "92d3e3f7-cb26-4294-955b-ba526a61bb42",
       "title": "dec",
       "descr": [
         "Return the previous number for positive integers, or zero for zero."

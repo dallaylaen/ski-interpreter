@@ -1,5 +1,6 @@
 [
   {
+    "id": "e78cbce3-11f4-4a85-943c-d96dd4120315",
     "title": "Join em!",
     "descr": [
       "You are given 2 functions, <code>f</code> and <code>g</code>.",
@@ -13,6 +14,7 @@
     ]
   },
   {
+    "id": "fb59a599-97a8-44bd-942f-560b44492d6a",
     "title": "Feeding a birdie",
     "descr": [
       "You are given a <i>known</i> value <code>x</code>.",
@@ -24,6 +26,7 @@
     ]
   },
   {
+    "id": "21220fcf-0548-49f2-93c1-7dbad38851dc",
     "title": "Feeding a hungry birdie",
     "descr": [
       "You are given two known values, <code>x</code> and <code>y</code>.",
@@ -35,6 +38,7 @@
     ]
   },
   {
+    "id": "044076eb-ce4e-495b-89c7-be1914a1b52a",
     "title": "Sandwich",
     "descr": [
       "You are given a term <code>y</code>.",
@@ -46,6 +50,7 @@
     ]
   },
   {
+    "id": "6483a2d1-ee56-4c16-ad04-fdb35b90ff63",
     "title": "Sandwich II",
     "descr": [
       "You are given a term <code>x</code> this time.",
@@ -57,6 +62,7 @@
     ]
   },
   {
+    "id": "b1bf882f-93d6-44bf-bf2e-039f1d701656",
     "title": "Sandwich III",
     "descr": [
       "Implement <code>x &rarr; y &rarr; y(x(y))</code>."

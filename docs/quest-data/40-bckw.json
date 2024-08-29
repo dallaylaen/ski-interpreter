@@ -1,5 +1,6 @@
 [
   {
+    "id": "164aa3bd-5bad-4f1c-baf2-8702b5f438a3",
     "title": "Where am I?",
     "descr": "Build the I combinator (yes, again) from B, C, K, and W.",
     "allow": "BCKW",
@@ -8,6 +9,7 @@
     ]
   },
   {
+    "id": "6684db92-9f1c-465d-ab62-b5cb62d069e4",
     "title": "The way back home",
     "descr": "Build <code>S</code> from B, C, K, and W.",
     "allow": "BCIKW",

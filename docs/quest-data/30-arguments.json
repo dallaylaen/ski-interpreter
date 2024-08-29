@@ -1,6 +1,7 @@
 [
 
   {
+    "id": "a678a5bc-ce73-466d-b4e1-251e698885be",
     "title": "Mirror image",
     "descr": "Make a combinator <code>T</code> that swaps its two arguments, that is, <code>(x, y) &rarr; y x</code>",
     "unlock": "T",
@@ -9,6 +10,7 @@
     ]
   },
   {
+    "id": "b695072d-1077-4cb8-963b-7207c2ab2c9f",
     "title": "But just you wait...",
     "descr": [
       "Don't take the argument just yet, let it take what comes after it first.",
@@ -20,6 +22,7 @@
     ]
   },
   {
+    "id": "1c95d614-1977-4469-b40b-5f82bc52166d",
     "title": "Lost at GoF, found at g&compfn;f",
     "descr": [
       "Somewhat similar to the previous one but you have to apply the functions in reverse order:",
@@ -30,6 +33,7 @@
     ]
   },
   {
+    "id": "bf61646f-dc6b-4e69-9b5f-6d931928eb62",
     "title": "What you like, do once more!",
     "descr": "The <code>W</code> combinator is defined as x &rArr; y &rArr; x(y)(y). Implement it.",
     "unlock": "W",
@@ -38,6 +42,7 @@
     ]
   },
   {
+    "id": "31447c3a-90a0-40ed-8359-09112631474d",
     "title": "K forte",
     "descr": [
       "Sometimes returning <code>x</code> for any given <code>y</code> is not enough.",
@@ -48,6 +53,7 @@
     ]
   },
   {
+    "id": "da0bfbf1-7bc0-4865-9fec-64da89aecd99",
     "title": "Juggle juggle",
     "descr": [
       "The <code>C</code> combinator: <code>x &rarr; y &rarr; z &rarr; x z y</code>."
