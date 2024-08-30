@@ -103,3 +103,12 @@ describe ('Lambda parsing', () => {
     });
 
 });
+
+describe ('more lambdas', () =>{
+    it ('allows partial evaluation', () => {
+        const ski = new SKI();
+        const expr = ski.parse('(x->y->x) S');
+
+        expect(expr.run().expr.toString()).to.equal('y->S');
+    });
+});
