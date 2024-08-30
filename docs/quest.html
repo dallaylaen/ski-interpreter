@@ -178,7 +178,7 @@
                     showKnown();
                 }
                 showhide(moveOn, true);
-                onComplete();
+                onComplete(quest.meta.id);
             }
 
             store.save('quest:'+quest.meta.id, st).then( () => showStatus() );
