@@ -1,4 +1,4 @@
-const ski = require('./lib/ski');
+const ski = require('./lib/parser');
 const quest = require('./lib/quest');
 
 module.exports = { ...ski, ...quest };
