@@ -15,4 +15,13 @@ describe( 'SKI.restrict', () => {
         const ski = new SKI({allow: 'SKI'});
         expect(Object.keys(ski.getTerms()).sort()).to.deep.equal(['I', 'K', 'S']);
     });
+
+    it ('can display restrictions', () => {
+        const ski = new SKI();
+        ski.restrict('SKI');
+        expect(ski.showRestrict()).to.equal('IKS');
+        expect(ski.showRestrict('-I')).to.equal('KS');
+        expect(ski.showRestrict('+foo')).to.equal('IKS foo');
+        expect(ski.showRestrict('foo bar')).to.equal( 'bar foo');
+    });
 });
