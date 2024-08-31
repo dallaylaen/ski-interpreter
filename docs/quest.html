@@ -124,8 +124,10 @@
         const expand = append(title, 'a', {content: n ? '#' + n + '' : 'Quest'});
         expand.href = '#'+name;
         append(title, 'span', {content: ' '+quest.title});
-        if (quest.restrict.allow !== undefined)
-            append(title, 'span', {content: ' ['+(ski.showRestrict(quest.restrict.allow) || '-')+']'})
+        if (quest.restrict.allow !== undefined || Object.keys(quest.vars).length !== 0) {
+            const terms = (quest.restrict.allow ?? '') + ' + ' + Object.keys(quest.vars).join(' ');
+            append(title, 'span', {content: ' [' + (ski.showRestrict(terms) || '-') + ']'});
+        }
 
         const body = append(frame, 'div');
         expand.onclick = () => showhide(body, true);
