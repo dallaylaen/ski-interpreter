@@ -20,7 +20,7 @@
       "You are given a <i>known</i> value <code>x</code>.",
       "You goal is to make a term that feeds this value to an <i>unknown</i> function <code>f</code>"
     ],
-    "vars": [ "phi->phi ", "phi->x" ],
+    "vars": [ "x" ],
     "cases": [
       [ "phi->phi f", "phi->f(x)" ]
     ]
@@ -30,9 +30,9 @@
     "title": "Feeding a hungry birdie",
     "descr": [
       "You are given two known values, <code>x</code> and <code>y</code>.",
-      "Feed both of them, sequentially to function <code>f</code>."
+      "Feed both of them, sequentially, to unknown function <code>f</code>."
     ],
-    "vars": [ "phi->phi y", "phi->x" ],
+    "vars": [ "y", "x" ],
     "cases": [
       [ "phi->phi f", "phi->f x y" ]
     ]
@@ -44,7 +44,7 @@
       "You are given a term <code>y</code>.",
       "Implement <code>x &rarr; y(x(y))</code>."
     ],
-    "vars": [ "phi->phi ", "phi->y" ],
+    "vars": [ "y" ],
     "cases": [
       [ "phi->phi x", "phi->y (x y)" ]
     ]
@@ -56,7 +56,7 @@
       "You are given a term <code>x</code> this time.",
       "Implement <code>y &rarr; y(x(y))</code>."
     ],
-    "vars": [ "phi->phi ", "phi->x" ],
+    "vars": [ "x" ],
     "cases": [
       [ "phi->phi y", "phi->y (x y)" ]
     ]
@@ -65,7 +65,8 @@
     "id": "b1bf882f-93d6-44bf-bf2e-039f1d701656",
     "title": "Sandwich III",
     "descr": [
-      "Implement <code>x &rarr; y &rarr; y(x(y))</code>."
+      "Implement <code>x &rarr; y &rarr; y(x(y))</code>",
+      "(without knowing either <code>x</code> or <code>y</code>)."
     ],
     "cases": [
       [ "phi->phi x y", "phi->y (x y)" ]
