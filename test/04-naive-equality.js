@@ -59,4 +59,9 @@ describe('SKI.equals', () => {
         expect(SKI.church(5).equals(SKI.church(4))).to.equal(false);
         expect(SKI.church(1).equals(SKI.I)).to.equal(false);
     });
+
+    it('can throw on term mismatch if needed', () => {
+        expect( () => SKI.S.expect(SKI.I) ).to.throw( /ound.*\bS\b.*expected.*\bI\b/ );
+        // TODO add test for expected/actual being present
+    });
 });
