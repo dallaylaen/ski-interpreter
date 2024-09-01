@@ -28,7 +28,14 @@ if (options.e === undefined && !positional.length) {
     });
     if (!options.q)
         console.log('Welcome to SKI interactive shell. Known combinators: '+ski.allow);
-    rl.on('line', runLine(err => {console.log('' + err)}));
+    rl.on('line', str => {
+        const flag = str.match(/^\s*([-+])([qvt])\s*$/);
+        if (flag) {
+            options[flag[2]] = flag[1] === '+';
+            return 0;
+        }
+        return runLine(err => {console.log('' + err)})(str);
+    });
     rl.once('close', () => {
         if (!options.q)
             console.log('Bye, and may your bird fly high!');
@@ -57,7 +64,7 @@ function runLine(onErr) {
                 if (state.final && !options.q)
                     console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
                 if (options.v || state.final)
-                    console.log('' + state.expr);
+                    console.log('' + state.expr.toString({terse: options.t}));
                 if (state.final && expr instanceof SKI.classes.Alias)
                     ski.add(expr.name, state.expr);
             }
@@ -71,6 +78,20 @@ function runLine(onErr) {
 function parseArgs(argv) {
     const [_, script, ...list] = argv;
 
+    const todo = {
+        '--':     () => { pos.push(...list) },
+        '--help': () => { opt.help = true },
+        '-q':     () => { opt.q = true },
+        '-v':     () => { opt.v = true },
+        '-c':     () => { opt.t = false },
+        '-t':     () => { opt.t = true },
+        '-e':     () => {
+            if (list.length < 1)
+                throw new Error('option ' + next + 'requires and argument');
+            opt.e = list.shift();
+        },
+    };
+
     // TODO replace with a relevant dependency
     const pos = [];
     const opt = {};
@@ -83,22 +104,11 @@ function parseArgs(argv) {
             continue;
         }
 
-        if (next === '--') {
-            pos.push(...list);
-        } else if (next === '--help') {
-            opt.help = true;
-            break;
-        } else if (next === '-q') {
-            opt.q = true;
-        } else if (next === '-v') {
-            opt.v = true;
-        } else if (next === '-e') {
-            if (list.length < 1)
-                throw new Error('option ' + next + 'requires and argument');
-            opt.e = list.shift();
-        } else {
+        const action = todo[next];
+        if (typeof action !== "function")
             throw new Error('Unknown option ' + next + '; see ski.js --help');
-        }
+
+        action();
     }
 
     return [script, opt, pos];
