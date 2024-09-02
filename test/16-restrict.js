@@ -24,4 +24,14 @@ describe( 'SKI.restrict', () => {
         expect(ski.showRestrict('+foo')).to.equal('IKS foo');
         expect(ski.showRestrict('foo bar')).to.equal( 'bar foo');
     });
+
+    it ('can reenable restricted terms', () => {
+        const ski = new SKI();
+        ski.restrict('-B');
+        ski.maybeAdd('B', 'S(KS)K');
+        ski.maybeAdd('T', 'CI');
+
+        ski.parse('B').expand().expect(SKI.B);
+        ski.parse('T').expand().expect(SKI.C.apply(SKI.I));
+    });
 });
