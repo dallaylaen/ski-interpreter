@@ -8,7 +8,7 @@ describe( 'interventions', () => {
         const coerce = ski.parse('x -> !nat x');
 
         expect(coerce.run(ski.parse('4 5')).expr.toString()).to.equal('' + 625);
-        expect( () => coerce.run(ski.parse('S'))).to.throw(/non-numeric/);
+        expect( () => coerce.run(ski.parse('S'))).to.throw(/coerce.*Church/);
 
     });
     it ('rejects unknown terms', () => {
