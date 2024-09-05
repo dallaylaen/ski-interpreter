@@ -22,25 +22,30 @@ if (options.e === undefined && !positional.length) {
     // interactive console
     const readline = require('readline');
     const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
+        input:    process.stdin,
+        output:   process.stdout,
+        prompt:   '> ',
         terminal: true,
     });
     if (!options.q)
-        console.log('Welcome to SKI interactive shell. Known combinators: '+ski.allow);
+        console.log('Welcome to SKI interactive shell. Known combinators: '+ski.showRestrict());
     rl.on('line', str => {
         const flag = str.match(/^\s*([-+])([qvt])\s*$/);
         if (flag) {
             options[flag[2]] = flag[1] === '+';
-            return 0;
+        } else {
+            runLine(err => {
+                console.log('' + err)
+            })(str);
         }
-        return runLine(err => {console.log('' + err)})(str);
+        rl.prompt();
     });
     rl.once('close', () => {
         if (!options.q)
             console.log('Bye, and may your bird fly high!');
         process.exit(0)
     });
+    rl.prompt();
 } else {
     const prom = positional.length > 0
         ? fs.readFile(positional[0], 'utf8')
@@ -71,6 +76,7 @@ function runLine(onErr) {
             return 0;
         } catch (err) {
             onErr(err);
+            return 1;
         }
     }
 }
