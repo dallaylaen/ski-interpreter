@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const { SKI } = require('../index');
+const {Church} = require("../lib/expr");
 
 describe( 'interventions', () => {
     const ski = new SKI();
@@ -7,8 +8,8 @@ describe( 'interventions', () => {
     it ('can detect and coerce numbers', () => {
         const coerce = ski.parse('x -> !nat x');
 
-        expect(coerce.run(ski.parse('4 5')).expr.toString()).to.equal('' + 625);
-        expect( () => coerce.run(ski.parse('S'))).to.throw(/coerce.*Church/);
+        coerce.run(ski.parse('4 5')).expr.expect(new Church(625));
+        expect( () => coerce.run(ski.parse('S'))).to.throw(/Church .*coercion .*not a number/);
 
     });
 
@@ -25,7 +26,8 @@ describe( 'interventions', () => {
     });
 
     it ('catches infinite loops', () => {
-        expect( () => console.log(ski.parse('!nat( S(K(SII))(K(SII)) )').run()) ).to.throw(/Church.*completed.*steps/);
+        expect( () => console.log(ski.parse('!nat( S(K(SII))(K(SII)) )').run()) )
+            .to.throw(/Church.*coercion.*terminate/);
     });
 
 })
