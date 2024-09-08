@@ -40,7 +40,7 @@
                         <li>
                             Terms are accepted in the form of upper-case latin letters, or lower case identifiers.
                             Uppercase letter terms are assumed to always be one letter and do not require spaces
-                            between them.
+                            around them.
                         </li>
                         <li>
                             A program consists of one or more statements, separated by semicolons (<code>;</code>).
@@ -61,22 +61,23 @@
                             term with the same name.
                         </li>
                         <li>
-                            A non-negative integer is assumed to be a church number, i.e. a term with two arguments
-                            returning x(...{N times}...(x(y)...).
+                            An <code>x->y->z->&lt;some expression&gt;</code> is a lambda expression.
+                            Lambdas may be mixed with ordinary combinators.
+                            <s>Please use Haskell instead</s>.
                         </li>
                         <li>
-                            A x->y->z->(some expression) is parsed into a raw lambda expression.
-                            This part is still in beta and needs more work.
-                            <s>Please use Haskell instead</s>.
+                            A non-negative integer is assumed to be a church number, i.e. a term with
+                            two arguments <code>x</code> and <code>y</code>
+                            returning <code>x(...{n times}...(x(y)...)</code>.
                         </li>
                     </ul>
                     <p>Examples: </p>
                     <ul>
-                        <li><code>SIIx</code> evaluates to <code>x(x)</code> <i>// x is a free variable;</i></li>
-                        <li><code>B = S(KS)K</code> declares the B combinator;</li>
-                        <li><code>U = SII; Ux</code> evaluates to x(x), U will <b>not</b> be available afterwards;</li>
-                        <li><code>5 x y</code>evaluates to <code>x(x(x(x(x(y)))))</code>;</li>
-                        <li><code>x-&gt;y-&gt;x</code> creates a K via plain lambdas.</li>
+                        <li><code>SIIx</code> evaluates to <code>x(x)</code> <i>// where x is a free variable;</i></li>
+                        <li><code>T = S(K(SI))K</code> declares the T combinator;</li>
+                        <li><code>M = SII; Mx</code> evaluates to x(x), M will <b>not</b> be available afterwards;</li>
+                        <li><code>5 x y</code> evaluates to <code>x(x(x(x(x(y)))))</code>;</li>
+                        <li><code>x-&gt;y-&gt;x</code> is an equivalent of <code>Kx</code>.</li>
                     </ul>
                     <p>Enter '?' to get this message again.</p>
                 </div>
