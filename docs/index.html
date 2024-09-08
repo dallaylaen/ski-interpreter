@@ -113,13 +113,15 @@
      *   References to static page elements
      */
     const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'code', 'gostop', 'verbose', 'help');
+    const store = new Store('playground');
 
     /**
      *   Global state of the interpreter
      */
 
-    let showlines = 10;
     let ski = new SKI({numbers: true, allow: 'SKIBCKW', lambdas: true});
+    let showlines = 10;
+    let autosave = false;
     let count = 0;
     let running = false;
 
@@ -129,22 +131,19 @@
      * Page-specific functions
       */
 
-    function init() {
+    async function init() {
         view.help.hidden = true;
 
         const greet = teletype(view.teletype);
-        greet(
-            "Your output goes here. ",
-            {color: "green"}
-        );
+
         resetGo();
-        showKnown();
         view.verbose.checked = false;
         view.code.addEventListener('keydown', onKey);
 
         rubberDesign('main');
 
         const params = getParams();
+
         if (params.code) {
             view.code.value = params.code;
         } else if (!view.code.value.match(/\S/))
@@ -155,8 +154,15 @@
                 const [name, impl] = pair.split(':');
                 ski.add(name, impl);
             }
-            showKnown();
+        } else {
+            ski = new SKI( await store.load('engine') || {} );
+            autosave = true;
         }
+        showKnown();
+        greet(
+            "Your output goes here. ",
+            {color: "green"}
+        );
     }
 
     function onKey (event) {
@@ -252,6 +258,12 @@
     }
 
     function showKnown() {
+        // TODO should not be here but still
+        if (autosave) {
+            console.log("saving engine:", ski);
+            store.save('engine', ski);
+        }
+
         view.known.innerHTML = '';
         const list = ski.getTerms();
         for (let name of Object.keys(list).sort()) {
@@ -278,7 +290,17 @@
         if (ski.hasLambdas) {
             append(view.known, 'li', {content: '<b>x-&gt;y-&gt;y(x)</b> - a generic lambda term;'});
         }
-    }
+
+        const controls = append(view.known, 'div', {class: ['controls']});
+        append(controls, 'button', {content: 'save'}).onclick = () => {
+            store.save('engine', ski);
+        };
+        append(controls, 'button', {content: 'reset terms'}).onclick = () => {
+            ski = new SKI();
+            store.save('engine', ski);
+            showKnown();
+        };
+    };
 
     function removeKnown(name) {
         ski.remove(name);
@@ -300,8 +322,6 @@
 
         return false;
     }
-
-
 
 </script>
 </body>
