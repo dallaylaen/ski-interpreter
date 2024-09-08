@@ -1,56 +1,56 @@
 [
-    {
-      "id": "08e7fa65-1a48-45f3-b115-20aa67520a3e",
-      "title": "zero... one... two?!",
-      "descr": [
-        "Look at the definition above once more. What would number 2 look like?"
-      ],
-      "cases": [
-        [ "phi->phi x y", "phi->x(x(y))" ]
-      ]
-    },
-    {
-      "id": "815847b2-5aec-4496-bc94-07316bd2278b",
-      "title": "inc",
-      "descr": [
-        "Procure a term that increases given number by 1: <code>inc N x y &rarr; x(...N+1 times(y)...)</code>. "
-      ],
-      "hint": "<code>inc N x y &rarr; x (N x y)</code>.",
-      "numbers": true,
-      "cases": [
-        [ "phi->phi (KI) x y", "phi->x y" ],
-        [ "phi->phi (SK) x y", "phi->x y" ],
-        [ "phi->phi I x y", "phi->x (x y)" ],
-        [ "phi->phi 8 x y", "phi->9 x y" ]
-      ]
-    },
-    {
-      "id": "e61e545e-42b6-4ab0-b311-0372841e87f5",
-      "title": "isZero",
-      "descr": [
-        "Make a term that returns <code>K</code> for 0 and <code>KI</code> for all other numbers. "
-      ],
-      "numbers": true,
-      "cases": [
-        [ "phi->phi (KI)", "phi->K" ],
-        [ "phi->phi (SK)", "phi->K" ],
-        [ "phi->phi I", "phi->KI" ],
-        [ "phi->phi 2", "phi->KI" ],
-        [ "phi->phi 5", "phi->KI" ]
-      ]
-    },
-    {
-      "id": "92d3e3f7-cb26-4294-955b-ba526a61bb42",
-      "title": "dec",
-      "descr": [
-        "Return the previous number for positive integers, or zero for zero."
-      ],
-      "numbers": true,
-      "cases": [
-        [ "phi->phi (KI) x y", "phi->y" ],
-        [ "phi->phi I x y", "phi->y" ],
-        [ "phi->phi 2 x y", "phi->x(y)" ],
-        [ "phi->phi 6 x y", "phi->5 x y" ]
-      ]
-    }
+  {
+    "id": "08e7fa65-1a48-45f3-b115-20aa67520a3e",
+    "title": "zero... one... two?!",
+    "descr": [
+      "Look at the definition above once more. What would number 2 look like?"
+    ],
+    "cases": [
+      [ "phi->phi x y", "phi->x(x(y))" ]
+    ]
+  },
+  {
+    "id": "815847b2-5aec-4496-bc94-07316bd2278b",
+    "title": "inc",
+    "descr": [
+      "Procure a term that increases given number by 1: <code>inc N x y &rarr; x(...N+1 times(y)...)</code>. "
+    ],
+    "hint": "<code>inc N x y &rarr; x (N x y)</code>.",
+    "numbers": true,
+    "cases": [
+      [ "phi->phi (KI) x y", "phi->x y" ],
+      [ "phi->phi (SK) x y", "phi->x y" ],
+      [ "phi->phi I x y", "phi->x (x y)" ],
+      [ "phi->phi 8 x y", "phi->9 x y" ]
+    ]
+  },
+  {
+    "id": "e61e545e-42b6-4ab0-b311-0372841e87f5",
+    "title": "isZero",
+    "descr": [
+      "Make a term that returns <code>K</code> for 0 and <code>KI</code> for all other numbers. "
+    ],
+    "numbers": true,
+    "cases": [
+      [ "phi->phi (KI)", "phi->K" ],
+      [ "phi->phi (SK)", "phi->K" ],
+      [ "phi->phi I", "phi->KI" ],
+      [ "phi->phi 2", "phi->KI" ],
+      [ "phi->phi 5", "phi->KI" ]
+    ]
+  },
+  {
+    "id": "92d3e3f7-cb26-4294-955b-ba526a61bb42",
+    "title": "dec",
+    "descr": [
+      "Return the previous number for positive integers, or zero for zero."
+    ],
+    "numbers": true,
+    "cases": [
+      [ "phi->phi (KI) x y", "phi->y" ],
+      [ "phi->phi I x y", "phi->y" ],
+      [ "phi->phi 2 x y", "phi->x(y)" ],
+      [ "phi->phi 6 x y", "phi->5 x y" ]
+    ]
+  }
 ]
