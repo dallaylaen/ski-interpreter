@@ -263,7 +263,7 @@
             append(out, 'b').innerHTML = name;
             append(out, 'span').innerHTML = " ";
             if (entry.note)
-                append(out, 'i').innerHTML = entry.note;
+                append(out, 'i').innerHTML = entry.note.replaceAll('->', '&rarr;');
             else
                 append(out, 'tt').innerHTML = '= '+entry.impl;
             const harakiri = append(li, 'a', {content: '[&cross;]', class: ['remove', 'float-right']});
@@ -272,7 +272,7 @@
         }
         if (ski.hasNumbers) {
             append(view.known, 'li', {
-                content: '<b>&lt;n&gt;</b> - <code>x(...(x(y))...)</code>;'
+                content: '<b>&lt;n&gt;</b>: <code>x(...(x(y))...)</code>;'
             });
         }
         if (ski.hasLambdas) {
