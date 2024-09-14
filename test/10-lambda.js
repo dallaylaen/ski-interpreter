@@ -101,7 +101,6 @@ describe ('Lambda parsing', () => {
     it ('forbids naughty syntax III', () => {
         expect(()=>ski.parseLine('x->y->y(x)->S')).to.throw();
     });
-
 });
 
 describe ('more lambdas', () =>{
@@ -110,5 +109,12 @@ describe ('more lambdas', () =>{
         const expr = ski.parse('(x->y->x) S');
 
         expect(expr.run().expr.toString()).to.equal('y->S');
+    });
+
+    it ('can expand into elementary terms', () => {
+        const ski = new SKI();
+        ski.add('T', 'CI');
+        const expr = ski.parse('x->K(Tx)');
+        expr.expand().expect( ski.parse('y->K(CIy)') );
     });
 });

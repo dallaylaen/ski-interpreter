@@ -9,7 +9,8 @@ describe('Expr <-> string', () => {
         ['free var', 'foobared'],
         ['some expr', 'SI(Kx)'],
         ['lambda with args', '(x->z->y(x))(t1)(t2)'],
-        ['more than 1 free vars', 'yadda yadda yeek']
+        ['more than 1 free vars', 'yadda yadda yeek'],
+        ['numbers + other terms', 'B (T 2) (2 K) (foo 3)'],
     ];
 
     const ski = new SKI();
