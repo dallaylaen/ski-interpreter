@@ -238,7 +238,7 @@
             // output state
             if (!line || lcount <= showlines)
                 line = out('');
-            line.rewrite(next.expr);
+            line.rewrite(next.expr.toString({terse: true}));
             iterfield.innerHTML = ''+next.steps;
 
             if (!next.final) {
