@@ -59,10 +59,14 @@
     function init() {
         rubberDesign('main');
 
-        store.load('engine').then(spec => {
-            ski = new SKI(spec || {allow: 'SKI'});
-            showKnown();
-        });
+        const defaults = {
+            lambdas: false,
+            numbers: false,
+            allow: 'SKI',
+        };
+
+        ski = new SKI(store.load('engine')??defaults);
+        showKnown();
 
         fetch(questDir + 'index.json')
             .then( resp => resp.json())
@@ -152,17 +156,15 @@
             summary.innerHTML = 'Attempts: '+st.attempts+', total steps: '+st.steps;
         };
 
-        store.load('quest:' + quest.meta.id).then(data => {
-            if (data) {
-                const st = quest.meta.status;
-                st.solved   = data.solved ?? false;
-                st.steps    = data.steps ?? 0;
-                st.attempts = data.attempts ?? 0;
-                if (st.solved)
-                    onComplete(quest.meta.id);
-            }
-            showStatus();
-        })
+        const data = store.load('quest:' + quest.meta.id) ?? {};
+        const st = quest.meta.status;
+        st.solved   = data.solved ?? false;
+        st.steps    = data.steps ?? 0;
+        st.attempts = data.attempts ?? 0;
+        if (st.solved)
+            onComplete(quest.meta.id);
+
+        showStatus();
 
         const appendStatus = report => {
             const st = quest.meta.status;
@@ -183,7 +185,8 @@
                 onComplete(quest.meta.id);
             }
 
-            store.save('quest:'+quest.meta.id, st).then( () => showStatus() );
+            store.save('quest:'+quest.meta.id, st);
+            showStatus();
         }
 
         const runme = () => checkQuest(box, quest, input.value, appendStatus);

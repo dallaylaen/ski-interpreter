@@ -131,7 +131,7 @@
      * Page-specific functions
       */
 
-    async function init() {
+    function init() {
         view.help.hidden = true;
 
         const greet = teletype(view.teletype);
@@ -155,7 +155,7 @@
                 ski.add(name, impl);
             }
         } else {
-            ski = new SKI( await store.load('engine') || {} );
+            ski = new SKI(store.load('engine') ?? {} );
             autosave = true;
         }
         showKnown();
@@ -259,10 +259,8 @@
 
     function showKnown() {
         // TODO should not be here but still
-        if (autosave) {
-            console.log("saving engine:", ski);
+        if (autosave)
             store.save('engine', ski);
-        }
 
         view.known.innerHTML = '';
         const list = ski.getTerms();
