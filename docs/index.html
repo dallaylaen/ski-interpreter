@@ -98,7 +98,7 @@
                 <button class="bigcontrol" onclick="return insert('I')">I</button>
                 <button class="bigcontrol" onclick="return insert('(')">(</button>
                 <button class="bigcontrol" onclick="return insert(')')">)</button>
-                <button class="bigcontrol" onclick="return toggleVerb()"><input type="checkbox" id="verbose" disabled="true">Verbose</button>
+                <button class="bigcontrol" onclick="return toggleVerb()" id="verbose">Verbose</button>
                 <button class="bigcontrol" onclick="return toggleRun()" id="gostop">???</button>
             </div>
         </form>
@@ -124,6 +124,7 @@
     let autosave = false;
     let count = 0;
     let running = false;
+    let verbose = false;
 
     init();
 
@@ -136,6 +137,7 @@
 
         const greet = teletype(view.teletype);
 
+        toggleVerb(false);
         resetGo();
         view.verbose.checked = false;
         view.code.addEventListener('keydown', onKey);
@@ -175,9 +177,10 @@
         return true;
     }
 
-    function toggleVerb () {
-        view.verbose.checked = !view.verbose.checked;
-        showlines = view.verbose.checked ? Infinity : 10;
+    function toggleVerb (val) {
+        verbose = val ?? !verbose;
+        showlines = verbose ? Infinity : 10;
+        view.verbose.innerHTML = (verbose ? '[x]' : '[_]') + ' Verbose';
         return false;
     }
 
