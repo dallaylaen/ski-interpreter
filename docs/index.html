@@ -210,46 +210,36 @@
         const iterfield = append(head, 'span');
         iterfield.innerHTML = '-';
 
-        try {
-            const expr = ski.parse(src);
-            if (expr instanceof SKI.classes.Alias) {
-                ski.add(expr.name, expr.impl);
-                showKnown();
-            }
-            getRunner(out, iterfield, expr.walk());
-        } catch (err) {
-            out(err, {class: 'error'});
-            resetGo();
-        }
-    }
-
-    function getRunner(out, iterfield, gen) {
         let lcount = 0; // lines output may differ from step count
         let line; // element to write to
-        const tick = () => {
-            // check interrupt
-            if (!running) {
-                out ("...interrupted!", {class: "error"});
-                resetGo();
-                return;
-            }
 
-            const next = gen.next().value;
-            // output state
-            if (!line || lcount <= showlines)
-                line = out('');
-            line.rewrite(next.expr.toString({terse: true}));
-            iterfield.innerHTML = ''+next.steps;
-
-            if (!next.final) {
-                lcount++;
-                setTimeout(tick, 0);
-            } else {
-                out('&check;', {class: 'success'});
+        gen2timer(
+            () => {
+                const expr = ski.parse(src);
+                if (expr instanceof SKI.classes.Alias) {
+                    ski.add(expr.name, expr.impl);
+                    showKnown();
+                }
+                return expr.walk();
+            },
+            (next) => {
+                if (!running)
+                    throw new Error('... interrupted by user!');
+                if (!line || lcount++ <= showlines)
+                    line = out('');
+                iterfield.innerHTML = '' + next.steps;
+                line.rewrite(next.expr.toString({terse: true}));
+                if (next.final) {
+                    line.classList.add('success');
+                    resetGo();
+                }
+            },
+            () => {},
+            error => {
+                out (''+error, {class: "error"});
                 resetGo();
             }
-        };
-        tick();
+        );
     }
 
     function resetGo () {

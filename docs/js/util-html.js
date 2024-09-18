@@ -152,3 +152,38 @@ class Store {
         window.localStorage.removeItem(this.ns + key);
     }
 }
+
+
+/**
+ *
+ * @param {function()} onPrepare
+ * @param {function(any, done: boolean): void} onNext
+ * @param {function(): void} onDone
+ * @param {function(Error): void}onError
+ */
+function gen2timer (onPrepare, onNext, onDone, onError) {
+    // TODO this must be an idiom and have a standard impl
+    let iter;
+    try {
+        iter = onPrepare();
+    } catch (e) {
+        onError(e);
+        return;
+    }
+
+    const tick = () => {
+        try {
+            const next = iter.next();
+            if (next.done) {
+                onDone();
+            } else {
+                onNext(next.value);
+                setTimeout(tick, 0);
+            }
+        } catch (e) {
+            onError(e);
+        }
+    }
+
+    setTimeout(tick, 0);
+}
