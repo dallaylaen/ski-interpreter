@@ -161,7 +161,13 @@ class Store {
  * @param {function(): void} onDone
  * @param {function(Error): void}onError
  */
-function gen2timer (onPrepare, onNext, onDone, onError) {
+function gen2timer (options) {
+    const delay = options.delay ?? 0;
+    const onPrepare = options.onPrepare;
+    const onNext = options.onNext;
+    const onDone = options.onDone ?? (() => {});
+    const onError = options.onError ?? console.log;
+
     // TODO this must be an idiom and have a standard impl
     let iter;
     try {
@@ -178,7 +184,7 @@ function gen2timer (onPrepare, onNext, onDone, onError) {
                 onDone();
             } else {
                 onNext(next.value);
-                setTimeout(tick, 0);
+                setTimeout(tick, delay);
             }
         } catch (e) {
             onError(e);

@@ -216,8 +216,8 @@
         let lcount = 0; // lines output may differ from step count
         let line; // element to write to
 
-        gen2timer(
-            () => {
+        gen2timer({
+            onPrepare: () => {
                 const expr = ski.parse(src);
                 if (expr instanceof SKI.classes.Alias) {
                     ski.add(expr.name, expr.impl);
@@ -225,7 +225,7 @@
                 }
                 return expr.walk();
             },
-            (next) => {
+            onNext: (next) => {
                 if (!running)
                     throw new Error('... interrupted by user!');
                 if (!line || lcount++ <= showlines)
@@ -237,12 +237,12 @@
                     resetGo();
                 }
             },
-            () => {},
-            error => {
+            onError: error => {
                 out (''+error, {class: "error"});
                 resetGo();
-            }
-        );
+            },
+            delay: 0,
+        });
     }
 
     function resetGo () {
