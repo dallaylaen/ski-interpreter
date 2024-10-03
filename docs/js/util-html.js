@@ -18,7 +18,7 @@ function grabView (...ids) {
  * Attach a child element to the given parent and return the child.
  * @param parent
  * @param type
- * @param {{class: string[]?, content: string?}} options
+ * @param {{class: string[]?, content: string?, hidden: boolean?}} options
  * @return {HTMLElement}
  */
 function append(parent, type, options={}) {
@@ -27,6 +27,8 @@ function append(parent, type, options={}) {
         child.classList.add(...options.class);
     if (options.content !== undefined)
         child.innerHTML = '' + options.content;
+    if (options.hidden)
+        child.hidden = true;
     parent.appendChild(child);
     return child;
 }
@@ -61,10 +63,7 @@ function rubberDesign (mainId) {
  * @param {boolean} visible
  */
 function showhide(element, visible=false) {
-    if (visible)
-        element.classList.remove('hidden');
-    else
-        element.classList.add('hidden');
+    element.hidden = !visible;
 }
 
 function getParams() {

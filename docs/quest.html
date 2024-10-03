@@ -145,7 +145,7 @@
         const form = append(body, 'div', {class: ['quest-solve']});
         const input = append(form, 'input');
         const btn = append(form, 'button', {content: 'solve!'});
-        const moveOn = append(form, 'button', {content: 'move on >>', class: ['hidden']});
+        const moveOn = append(form, 'button', {content: 'move on >>', hidden: true});
         moveOn.onclick = () => showhide(body, false);
 
         const summary = append(append(title, 'span', {class: ['float-right']}), 'i');
