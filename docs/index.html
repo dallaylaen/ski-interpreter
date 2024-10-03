@@ -141,6 +141,7 @@
         resetGo();
         view.verbose.checked = false;
         view.code.addEventListener('keydown', onKey);
+        view.code.addEventListener('input', saveInput);
 
         rubberDesign('main');
 
@@ -149,7 +150,7 @@
         if (params.code) {
             view.code.value = params.code;
         } else if (!view.code.value.match(/\S/))
-            view.code.value = 'S K I x';
+            view.code.value = loadInput() ?? 'S K I x';
 
         if (params.terms) {
             for (let pair of params.terms.split(',')) {
@@ -175,6 +176,14 @@
             return false;
         }
         return true;
+    }
+
+    function saveInput() {
+        store.save('current-input', this.value);
+    }
+
+    function loadInput () {
+        return store.load('current-input');
     }
 
     function toggleVerb (val) {
