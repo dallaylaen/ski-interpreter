@@ -54,13 +54,45 @@
   },
   {
     "id": "da0bfbf1-7bc0-4865-9fec-64da89aecd99",
-    "title": "Juggle juggle",
+    "title": "Cardinal",
     "descr": [
       "The <code>C</code> combinator: <code>x &rarr; y &rarr; z &rarr; x z y</code>."
     ],
     "unlock": "C",
     "cases": [
       [ "f->f x y z", "f->x z y" ]
+    ]
+  },
+  {
+    "id": "6c2c207f-ac57-431c-9bb2-43d5acc7c016",
+    "title": "Bird of pair",
+    "unlock": "V",
+    "descr": [
+      "The <code>V</code> combinator, aka vireo bird, takes two arguments and waits patiently",
+      "for a function to apply them to: <code>V x y z = z x y</code>."
+    ],
+    "cases": [
+      ["f->f x y z", "f->z x y"]
+    ]
+  },
+  {
+    "id": "0eac509d-14d2-43fc-9f76-71866a08c4c7",
+    "title": "Bird of pair II",
+    "descr": [
+      "You are given <code>V(x, y)</code>. Find <code>x</code>."
+    ],
+    "cases": [
+      ["f->f (BC(CI) x y)", "f->x"]
+    ]
+  },
+  {
+    "id": "7e036749-d7e6-430d-80fa-eb748dd35c16",
+    "title": "Bird of pair III",
+    "descr": [
+      "You are given <code>V(x, y)</code>. Find <code>y</code>."
+    ],
+    "cases": [
+      ["f->f (BC(CI) x y)", "f->y"]
     ]
   }
 ]
