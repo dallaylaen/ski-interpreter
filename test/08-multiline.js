@@ -52,6 +52,22 @@ describe( 'SKI.parse', () => {
         done();
     });
 
+    it('lets local variables trump the global ones', () => {
+        const ski = new SKI();
+
+        // setup some vars in the interpreter itself
+        ski.add('V', 'BC(CI)'); // x->y->z->z x y'
+        const [x, y] = SKI.free('x', 'y');
+        ski.add('pair', ski.getTerms().V.apply(x, y));
+        ski.add('which', SKI.K);
+
+        // self-test
+        ski.parse('pair which').run().expr.expect(x);
+
+        // now override a var
+        ski.parse('which = KI; pair which').run().expr.expect(y);
+    });
+
     it('does not allow to define something twice', done => {
         const ski = new SKI();
         expect( () => ski.parse('false = SK; false = KI')).to.throw(/redefine/);
