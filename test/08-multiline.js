@@ -21,6 +21,12 @@ describe( 'SKI.parse', () => {
         done();
     });
 
+    it ('handles comment at definitions end', () => {
+        const ski = new SKI();
+        const expr = ski.parse('S // just an S combinator');
+        expr.expect(SKI.S);
+    });
+
     it ('makes last expr an alias if = given', done => {
         const ski = new SKI();
         const expr = ski.parse('foo = SKK');
