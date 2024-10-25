@@ -34,14 +34,17 @@ describe( 'quest-data', async () => {
                     for (let i = 0; i < content.length; i++) {
                         const quest = content[i];
                         describe('quest ' + entry.link + ' [' + i + ']', async () => {
-                            let q;
+                            let q, err;
                             try {
                                 q = new Quest(quest)
                             } catch (e) {
+                                err = e;
                                 // do nothing, will be rejected later
                             }
                             it('is a quest', () => {
-                                expect( q instanceof Quest).to.equal(true, 'A quest was generated');
+                                if (err)
+                                    throw err;
+                                expect( q ).to.be.instanceof(Quest, 'A quest was generated');
                                 expect( q.cases.length ).to.be.within(1, Infinity, 'At least 1 case');
                             });
                             if (!(q instanceof Quest))
@@ -53,6 +56,8 @@ describe( 'quest-data', async () => {
                             if (quest.solution) {
                                 it ('passes included example solution', () => {
                                     const result = q.check(quest.solution);
+                                    if (!result.pass)
+                                        console.log('proposed solution failed: ', result);
                                     expect( result.pass ).to.equal(true);
                                 });
                             }
