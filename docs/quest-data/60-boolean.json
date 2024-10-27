@@ -5,9 +5,10 @@
     "descr": [
       "Provide a term that returns <code>K</code> for <code>I</code> and <code>I</code> for <code>K</code>."
     ],
+    "input": "phi",
     "cases": [
-      [ "phi->phi I", "phi->K" ],
-      [ "phi->phi K", "phi->I" ]
+      [ "phi I", "K" ],
+      [ "phi K", "I" ]
     ]
   },
   {
@@ -17,9 +18,10 @@
       "Implement <code>not x</code>, that is,",
       "return <code>K</code> for <code>KI</code> and <code>KI</code> for <code>K</code>"
     ],
+    "input": "phi",
     "cases": [
-      [ "phi->phi (KI) x y", "phi->x" ],
-      [ "phi->phi K x y", "phi->y" ]
+      [ "phi (KI) x y", "x" ],
+      [ "phi K x y", "y" ]
     ]
   },
   {
@@ -29,11 +31,12 @@
       "make a term that takes 2 arguments and returns true (<code>K</code>)",
       " if and only if both are true"
     ],
+    "input": "phi",
     "cases": [
-      [ "phi->phi K K", "phi->K" ],
-      [ "phi->phi (KI) K", "phi->KI" ],
-      [ "phi->phi K (KI)", "phi->KI" ],
-      [ "phi->phi (KI) (KI)", "phi->KI" ]
+      [ "phi K K", "K" ],
+      [ "phi (KI) K", "KI" ],
+      [ "phi K (KI)", "KI" ],
+      [ "phi (KI) (KI)", "KI" ]
     ]
   },
   {
@@ -42,11 +45,12 @@
     "descr": [
       "the title says it"
     ],
+    "input": "phi",
     "cases": [
-      [ "phi->phi K K", "phi->K" ],
-      [ "phi->phi (KI) K", "phi->K" ],
-      [ "phi->phi K (KI)", "phi->K" ],
-      [ "phi->phi (KI) (KI)", "phi->KI" ]
+      [ "phi K K", "K" ],
+      [ "phi (KI) K", "K" ],
+      [ "phi K (KI)", "K" ],
+      [ "phi (KI) (KI)", "KI" ]
     ]
   },
   {
@@ -55,11 +59,12 @@
     "descr": [
       "NAND (not and) is true unless both ot its inputs are true."
     ],
+    "input": "phi",
     "cases": [
-      [ "phi->phi K K", "phi->KI" ],
-      [ "phi->phi (KI) K", "phi->K" ],
-      [ "phi->phi K (KI)", "phi->K" ],
-      [ "phi->phi (KI) (KI)", "phi->K" ]
+      [ "phi K K", "KI" ],
+      [ "phi (KI) K", "K" ],
+      [ "phi K (KI)", "K" ],
+      [ "phi (KI) (KI)", "K" ]
     ]
   },
   {
@@ -69,10 +74,11 @@
       "Often the then/else branches are known before the condition that picks one of them.",
       "Provide a function that takes then/else terms and feeds them to its third argument."
     ],
+    "input": "phi",
     "cases": [
-      [ "phi->phi x y K", "phi->x" ],
-      [ "phi->phi x y (KI)", "phi->y" ],
-      [ "phi->phi x y (SK)", "phi->y" ]
+      [ "phi x y K", "x" ],
+      [ "phi x y (KI)", "y" ],
+      [ "phi x y (SK)", "y" ]
     ]
   }
 ]

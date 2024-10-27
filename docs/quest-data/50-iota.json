@@ -5,9 +5,10 @@
     "descr": "Build <code>x &rarr; x(S)(K)</code>",
     "unlock": "X",
     "solution": "BC(CI)SK",
+    "input": "phi",
     "cases": [
-      [ "f->f K x y z", "f->x z (y z)" ],
-      [ "f->f (KI) x y z", "f->x z" ]
+      [ "phi K x y z", "x z (y z)" ],
+      [ "phi (KI) x y z", "x z" ]
     ]
   },
   {
@@ -19,8 +20,9 @@
     ],
     "allow": "X",
     "hint": "You might want to go back to the very first chapter...",
+    "input": "phi",
     "cases": [
-      [ "f->f x", "f->x" ]
+      [ "phi x", "x" ]
     ]
   },
   {
@@ -31,8 +33,9 @@
     ],
     "allow": "X",
     "hint": "XXX... would alternate between I and X. Try parenthesis...",
+    "input": "phi",
     "cases": [
-      [ "f->f x y", "f->y"]
+      [ "phi x y", "y"]
     ]
   },
   {
@@ -43,8 +46,9 @@
       "(i.e. <code>K</code>)"
     ],
     "allow": "X",
+    "input": "phi",
     "cases": [
-      [ "f->f x y", "f->x"]
+      [ "phi x y", "x"]
     ]
   },
   {
@@ -54,8 +58,9 @@
       "How about <code>S</code>?"
     ],
     "allow": "X",
+    "input": "phi",
     "cases": [
-      [ "f->f x y z", "f->x z (y z)"]
+      [ "phi x y z", "x z (y z)"]
     ]
   }
 ]

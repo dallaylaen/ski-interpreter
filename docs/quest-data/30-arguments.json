@@ -5,8 +5,9 @@
     "title": "Mirror image",
     "descr": "Make a combinator <code>T</code> that swaps its two arguments, that is, <code>(x, y) &rarr; y x</code>",
     "unlock": "T",
+    "input": "phi",
     "cases": [
-      [ "phi->phi x y", "phi->y x" ]
+      [ "phi x y", "y x" ]
     ]
   },
   {
@@ -17,8 +18,9 @@
       "A.K.A. the <code>B</code> combinator: <code>f g x &rarr; f(g(x))</code>"
     ],
     "unlock": "B",
+    "input": "phi",
     "cases": [
-      [ "phi->phi x y z", "phi->x(y z)" ]
+      [ "phi x y z", "x(y z)" ]
     ]
   },
   {
@@ -28,8 +30,9 @@
       "Somewhat similar to the previous one but you have to apply the functions in reverse order:",
       "<code>(f g x)&rarr;g(f(x))</code>"
     ],
+    "input": "phi",
     "cases": [
-      [ "phi->phi f g x", "phi->g(f(x))" ]
+      [ "phi f g x", "g(f(x))" ]
     ]
   },
   {
@@ -37,8 +40,9 @@
     "title": "What you like, do once more!",
     "descr": "The <code>W</code> combinator is defined as x &rArr; y &rArr; x(y)(y). Implement it.",
     "unlock": "W",
+    "input": "phi",
     "cases": [
-      [ "phi->phi x y", "phi->x y y" ]
+      [ "phi x y", "x y y" ]
     ]
   },
   {
@@ -48,8 +52,9 @@
       "Sometimes returning <code>x</code> for any given <code>y</code> is not enough.",
       "Return it twice: <code>(x, y)&rarr;x x</code>"
     ],
+    "input": "phi",
     "cases": [
-      [ "phi->phi x y", "phi->x x" ]
+      [ "phi x y", "x x" ]
     ]
   },
   {
@@ -59,8 +64,9 @@
       "The <code>C</code> combinator: <code>x &rarr; y &rarr; z &rarr; x z y</code>."
     ],
     "unlock": "C",
+    "input": "phi",
     "cases": [
-      [ "f->f x y z", "f->x z y" ]
+      [ "phi x y z", "x z y" ]
     ]
   },
   {
@@ -71,8 +77,9 @@
       "The <code>V</code> combinator, aka vireo bird, takes two arguments and waits patiently",
       "for a function to apply them to: <code>V x y z = z x y</code>."
     ],
+    "input": "phi",
     "cases": [
-      ["f->f x y z", "f->z x y"]
+      ["phi x y z", "z x y"]
     ]
   },
   {
@@ -81,8 +88,9 @@
     "descr": [
       "You are given <code>V(x, y)</code>. Find <code>x</code>."
     ],
+    "input": "phi",
     "cases": [
-      ["f->f (BC(CI) x y)", "f->x"]
+      ["phi (BC(CI) x y)", "x"]
     ]
   },
   {
@@ -91,8 +99,9 @@
     "descr": [
       "You are given <code>V(x, y)</code>. Find <code>y</code>."
     ],
+    "input": "phi",
     "cases": [
-      ["f->f (BC(CI) x y)", "f->y"]
+      ["phi (BC(CI) x y)", "y"]
     ]
   }
 ]

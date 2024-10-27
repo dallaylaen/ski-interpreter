@@ -4,8 +4,9 @@
     "title": "Where am I?",
     "descr": "Build the I combinator (yes, again) from B, C, K, and W.",
     "allow": "BCKW",
+    "input": "phi",
     "cases": [
-      [ "f->f x", "Kx" ]
+      [ "phi x", "Kx" ]
     ]
   },
   {
@@ -13,8 +14,9 @@
     "title": "The way back home",
     "descr": "Build <code>S</code> from B, C, K, and W.",
     "allow": "BCIKW",
+    "input": "phi",
     "cases": [
-      [ "f->f x y z", "f->x z (y z)" ]
+      [ "phi x y z", "x z (y z)" ]
     ]
   }
 ]

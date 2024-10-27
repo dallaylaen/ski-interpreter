@@ -6,9 +6,10 @@
       "Technically, every irreducible combinator is a quine, for it returns itself. ",
       "Write a combinator that returns itself when given <i>any</i> argument."
     ],
+    "input": "phi",
     "cases": [
-      [ "phi->phi x", "phi->phi" ],
-      [ "phi->phi x y z", "phi->phi" ]
+      [ "phi x", "phi" ],
+      [ "phi x y z", "phi" ]
     ]
   },
   {
@@ -19,8 +20,9 @@
       "Construct f such that <code>f x = foo(f, x)</code> for any given <code>x</code>."
     ],
     "vars": ["foo"],
+    "input": "phi",
     "cases": [
-      [ "phi->phi x", "phi->foo phi x" ]
+      [ "phi x", "foo phi x" ]
     ]
   }
 ]

@@ -8,10 +8,12 @@ describe('Quest', () => {
         const quest = new Quest({
             subst: '&phi;',
             allow: 'SK',
+            input: 'phi',
             cases: [
-                [ 'f->f x', 'f->x']
+                [ 'phi x', 'x']
             ]
         });
+
         const pass = quest.check('SKK');
         expect(pass.exception).to.equal(undefined);
         expect(pass.pass).to.equal(true);
@@ -33,7 +35,8 @@ describe('Quest', () => {
     it ('can validate quine', () => {
         const quest = new Quest({
             subst: '&phi;',
-            cases: [['f->f x', 'I']],
+            input: 'f',
+            cases: [['f x', 'f']],
         });
 
         const pass = quest.check('SII (S(S(KS)K)K)');
@@ -44,11 +47,12 @@ describe('Quest', () => {
     it ('can validate truth tables', () => {
         const quest = new Quest({
             subst: '&phi;',
+            input: 'f',
             cases: [
-                [ 'f->f (KI) (KI)', 'f->KI' ],
-                [ {max: 10}, 'f->f (KI) (K )', 'f->KI' ],
-                [ 'f->f (K ) (KI)', 'f->KI' ],
-                [ 'f->f (K ) (K )', 'f->K ' ],
+                [ 'f (KI) (KI)', 'KI' ],
+                [ {max: 10}, 'f (KI) (K )', 'KI' ],
+                [ 'f (K ) (KI)', 'KI' ],
+                [ 'f (K ) (K )', 'K ' ],
             ],
         });
 
@@ -59,13 +63,13 @@ describe('Quest', () => {
     });
 
     it ('rejects bad specs', () => {
-        expect(() => new Quest({cases: [['f->f']]})).to.throw(/exactly 2/);
-        expect(() => new Quest({cases: [['f', 'I', 'I']]})).to.throw(/exactly 2/);
+        expect(() => new Quest({input: "foo", cases: [['f->f']]})).to.throw(/exactly 2/);
+        expect(() => new Quest({input: "foo", cases: [['f', 'I', 'I']]})).to.throw(/exactly 2/);
     });
 
     it ('handles global unlockable engine', () => {
         const ski = new SKI({allow: 'SK'});
-        const quest = new Quest({engine: ski, cases: [['f->f x', 'f->I x']]});
+        const quest = new Quest({engine: ski, input: 'f', cases: [['f x', 'I x']]});
         const fail = quest.check('I');
         expect(fail.exception + '').to.match(/restricted/);
 
