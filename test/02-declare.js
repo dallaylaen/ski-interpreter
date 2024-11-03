@@ -4,9 +4,9 @@ const { SKI } = require('../index');
 describe( 'SKI', () => {
     it('can declare terms', done => {
         const ski = new SKI;
-        ski.add('sub', 'S(K(SI))K');
+        ski.add('T', 'S(K(SI))K');
 
-        const term = ski.parseLine('sub x y');
+        const term = ski.parseLine('T x y');
 
         const result = term.run();
 
@@ -27,9 +27,9 @@ describe( 'SKI', () => {
         expect (known.sub.note).to.equal('just an alias');
 
         let expr = known.sub;
-        expect( expr instanceof SKI.classes.Native ).to.equal(false);
-        expr = expr.step().expr;
-        expect( expr instanceof SKI.classes.Native ).to.equal(true);
+        expect( expr ).to.be.instanceof( SKI.classes.Alias );
+        expr = expr.expand();
+        expect( expr  ).to.be.instanceof( SKI.classes.Native );
 
         done();
     });
