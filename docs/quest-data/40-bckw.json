@@ -10,6 +10,29 @@
     ]
   },
   {
+    "id": "6aa26e64-9f9d-4bda-b544-419dc00e921b",
+    "title": "A cup of T",
+    "descr": "Create the <code>T x y = y x</code> combinator out of this basis",
+    "allow": "BCKWI",
+    "input": "phi",
+    "cases": [
+      [ "phi x y", "y x"]
+    ]
+  },
+  {
+    "id": "986058d2-c2b1-40b1-9e4e-1476a096a9fa",
+    "title": "An inverse cup of tea",
+    "descr": "Create <code>C</code> from <code>B</code> and <code>T</code>",
+    "allow": "B",
+    "input": "phi",
+    "vars": [
+      "T = CI"
+    ],
+    "cases": [
+      [ "phi x y z", "x z y" ]
+    ]
+  },
+  {
     "id": "6684db92-9f1c-465d-ab62-b5cb62d069e4",
     "title": "The way back home",
     "descr": "Build <code>S</code> from B, C, K, and W.",
