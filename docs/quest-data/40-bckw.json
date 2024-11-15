@@ -33,6 +33,50 @@
     ]
   },
   {
+    "id": "41b79716-768f-4ca8-8f67-66e03e958b60",
+    "title": "Dove",
+    "descr": "Provide a bird <code>D</code> such that <code>D x y z t = x y (z t)</code>",
+    "allow": "BCKIW",
+    "unlock": "D",
+    "input": "D",
+    "cases": [
+      ["D x y z t", "x y (z t)"]
+    ]
+  },
+  {
+    "id": "b4616d55-d1b2-491e-8350-cc2480e00eb2",
+    "title": "Blackbird",
+    "descr": "Provide a bird <code>B<sub>1</sub></code> such that <code>B<sub>1</sub> x y z t = x (y z t)</code>",
+    "allow": "BCKIW",
+    "input": "b1",
+    "cases": [
+      ["b1 x y z t", "x (y z t)"]
+    ]
+  },
+  {
+    "id": "4d239336-29c3-43d7-883f-61054a845003",
+    "title": "Robin",
+    "descr": "Provide <code>R</code> such that <code>R x y z = y z x</code>",
+    "allow": "BCKWI",
+    "unlock": "R",
+    "input": "R",
+    "cases": [
+      ["R x y z", "y z x"]
+    ]
+  },
+  {
+    "id": "0b6ee619-981e-48d9-abba-7ef396cc02d4",
+    "title": "Lark",
+    "descr": "Build the <code>L</code> combinator such that <code>L x y = x (y y)</code>",
+    "hint": "It can be done with just <code>B</code> and <code>W</code>",
+    "allow": "BCKWI",
+    "unlock": "L",
+    "input": "L",
+    "cases": [
+      ["L x y", "x (y y)"]
+    ]
+  },
+  {
     "id": "6684db92-9f1c-465d-ab62-b5cb62d069e4",
     "title": "The way back home",
     "descr": "Build <code>S</code> from B, C, K, and W.",
