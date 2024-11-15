@@ -33,7 +33,7 @@ describe( 'quest-data', async () => {
 
                     for (let i = 0; i < content.length; i++) {
                         const quest = content[i];
-                        describe('quest ' + entry.link + ' [' + i + ']', async () => {
+                        describe('quest ' + entry.link + ' [' + i + '] ' + content[i].id, async () => {
                             let q, err;
                             try {
                                 q = new Quest(quest)
