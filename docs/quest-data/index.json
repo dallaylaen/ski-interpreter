@@ -2,11 +2,19 @@
   {
     "name": "Baby steps",
     "intro": [
-      "<p>Welcome to the wonderful world of combinators. ",
-      "The only thing that exists here is functions. ",
-      "To be precise, a combinator is a function that takes a combinator and returns a combinator.",
-      "And there are also not many of them at the start...",
-      "But don't worry, they are <i>powerful enough</i>.<p>"
+      "<p>Welcome to the wonderful world of combinatory logic,",
+      "a lovechild of Lisp and Brainfuck, developed in the 1930s by",
+      "Moses Schönfinkel and Haskell Curry.</p>",
+      "<p>A combinator is a function of one argument that takes a combinator and returns a combinator.",
+      "This alone, given a powerful enough set of starting terms, achieves Turing completeness.</p>",
+      "That will be demonstrated in subsequent exercises, in a multitude of ways.<p>",
+      "<p>The tradition is to depict the combinators as birds, and we are not stepping too far away from it.</p>",
+      "<p>On the notation: we'll be typically using single capital letters for well-known combinators,",
+      "lowercase letters for free variables, and lowercase words for function built from other functions.",
+      "Uppercase letters can be lumped together and lowercase terms should be separated with spaces. </p>",
+      "<p>So <code>XYfoo x (SII)</code> is a shorthand for <code>X(Y)(foo)(x)(S(I)(I))</code>.</p>",
+      "<p>On the reduction: reduction always happens in the leftmost term of a (sub-)expression.</p>",
+      "<p>Examples to follow soon. Let's dive right in!</p>"
       ],
     "link": "10-basics.json"
   },

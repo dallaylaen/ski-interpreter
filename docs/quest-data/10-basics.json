@@ -1,82 +1,55 @@
   [
     {
-      "id": "3a9d526d-ee4c-453d-9930-a6bbfbb95d9f",
-      "title": "First principles I",
+      "id": "aff7189b-ff29-4034-bf9a-b6bdfb7a0f63",
+      "title": "Enter the Kestrel",
+      "allow": "K",
+      "unlock": "K",
       "descr": [
-        "You are given values <code>x</code>, <code>y</code>, and <code>z</code>.",
-        "What would be the result of <code>I x y z</code>?"
+        "<p>The K combinator, or Kestrel, is a function of two arguments that ignores",
+        "the second argument and return the first.</p>",
+        "<p><i>Oh wait, but a combinator is supposed to take just <b>one</b> argument?!</i>",
+        "- Correct. So it takes the first value and returns <i>another</i> function",
+        "that takes the second value, ignores it, and returns the previous one.",
+        "I.e. <code>K(x)(y) = x</code> for any <code>x</code> and <code>y</code>.",
+        "<p>Anyways, write a function that ignores its first and third arguments",
+        "and returns the second one.</p>"
       ],
-      "vars": ["x", "y", "z"],
-      "allow": "=I-I",
       "input": "phi",
       "cases": [
-        [ "phi", "I x y z"]
-      ]
-    },
-    {
-      "id": "8e95602a-9cbf-4e7e-a349-488f9f40d86a",
-      "title": "First principles II",
-      "descr": [
-        "You are given values <code>x</code>, <code>y</code>, and <code>z</code>.",
-        "What would be the result of <code>K x y z</code>?"
-      ],
-      "vars": ["x", "y", "z"],
-      "allow": "=I-I",
-      "input": "phi",
-      "cases": [
-        [ "phi", "K x y z"]
-      ]
-    },
-    {
-      "id": "8a409fb3-3a86-4100-a91f-f7f6f693ea2f",
-      "title": "First principles III",
-      "descr": [
-        "You are given values <code>x</code>, <code>y</code>, and <code>z</code>.",
-        "What would be the result of <code>S x y z</code>?"
-      ],
-      "vars": ["x", "y", "z"],
-      "allow": "=I-I",
-      "input": "phi",
-      "cases": [
-        [ "phi", "S x y z"]
+        [ "phi x y z", "y" ]
       ]
     },
     {
       "id": "432a6dd2-1f56-4002-90e3-c317f0beca81",
       "title": "Ignore all previous instructions",
       "descr": [
-        "The <code>K</code> combinator takes 2 arguments, <code>x</code> and <code>y</code>,",
-        "and returns the first of them. You need to return the second one instead."
+        "<p>The <code>I</code> combinator, the Ibis (or Idiot bird sometimes), is very simple.",
+        "It just returns its argument: <code>I x = x</code>.</p>",
+        "<p>Use I and K to create the opposite of K: a function <code>f</code> such that",
+        "<code>f(x)(y) = y</code> for any given <code>x</code> and <code>y</code>.</p>"
       ],
-      "solution": "SK",
+      "unlock": "I",
+      "allow": "KI",
+      "solution": "KI",
       "input": "phi",
       "cases": [
         [ "phi x y", "y" ]
       ]
     },
     {
-      "id": "36fc11e3-b017-402d-bfe7-50ad0881baa9",
-      "title": "Look at yourself",
+      "id": "facfdc6a-21fe-476d-b3f4-f347391a3de2",
+      "title": "Bluebird, the composition bird",
       "descr": [
-        "In the realm of combinators, everything is a function.",
-        "So, how do you apply a function to itself? I.e. <code>x &rarr; x(x)</code>"
+        "<p>The Bluebird combinator is defined as <code>B x z y = x (y z)</code>. That is, for any functions",
+        "<code>x</code> and <code>y</code>, <code>B x y</code> returns a function that applies <code>y</code>",
+        "to its argument (<code>z</code>) and then applies <code>x</code> to the result.</p>",
+        "<p>What you have to do here is to write a function that takes 3 arguments and returns",
+        "the first of them: <code>f(x)(y)(z) = x</code>. "
       ],
+      "allow": "BKI",
       "input": "phi",
       "cases": [
-        [ "phi x", "x x" ]
-      ]
-    },
-    {
-      "id": "024f0dca-0b75-457c-aa50-1f2a23651cba",
-      "title": "Lost identity",
-      "descr": [
-        "Someone stole the <code>I</code> combinator from your interpreter.",
-        "You have to rebuild it from the remaining two!"],
-      "allow": "SK",
-      "subst": "&psi;",
-      "input": "phi",
-      "cases": [
-        [ "phi x", "x" ]
+        [ "phi x y z", "x" ]
       ]
     }
   ]
