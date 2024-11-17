@@ -1,88 +1,88 @@
-[
-  {
-    "id": "08e7fa65-1a48-45f3-b115-20aa67520a3e",
-    "title": "zero... one... two?!",
-    "descr": [
-      "Look at the definition above once more. What would number 2 look like?"
-    ],
-    "input": "phi",
-    "cases": [
-      [ "phi x y", "x(x(y))" ]
-    ]
-  },
-  {
-    "id": "815847b2-5aec-4496-bc94-07316bd2278b",
-    "title": "inc",
-    "descr": [
-      "Procure a term that increases given number by 1: <code>inc N x y &rarr; x(...N+1 times(y)...)</code>. "
-    ],
-    "hint": "<code>inc N x y &rarr; x (N x y)</code>.",
-    "numbers": true,
-    "input": "phi",
-    "cases": [
-      [ "phi (KI) x y", "x y" ],
-      [ "phi (SK) x y", "x y" ],
-      [ "phi I x y", "x (x y)" ],
-      [ "phi 8 x y", "9 x y" ]
-    ]
-  },
-  {
-    "id": "ca234c6c-a6d3-4d8e-8f41-adb26b2dc246",
-    "title": "Adding numbers",
-    "descr": [
-      "Create a term that takes two numbers and produces their sum."
-    ],
-    "hint": "This can be done by applying <code>inc</code> m times to n",
-    "input": "phi",
-    "cases": [
-      [ "!nat(phi 0 0)", "0" ],
-      [ "!nat(phi 5 0)", "5" ],
-      [ "!nat(phi 0 5)", "5" ],
-      [ "!nat(phi I I)", "2" ],
-      [ "!nat(phi 2 2)", "4" ]
-    ]
-  },
-  {
-    "id": "e61e545e-42b6-4ab0-b311-0372841e87f5",
-    "title": "isZero",
-    "descr": [
-      "Make a term that returns <code>K</code> for 0 and <code>KI</code> for all other numbers. "
-    ],
-    "input": "phi",
-    "cases": [
-      [ "phi (KI)", "K" ],
-      [ "phi (SK)", "K" ],
-      [ "phi I", "KI" ],
-      [ "phi 2", "KI" ],
-      [ "phi 5", "KI" ]
-    ]
-  },
-  {
-    "id": "92d3e3f7-cb26-4294-955b-ba526a61bb42",
-    "title": "dec",
-    "descr": [
-      "Returning the next number wasn't that hard.",
-      "How about returning the previous number, or zero for zero?"
-    ],
-    "input": "phi",
-    "cases": [
-      [ "phi (KI) x y", "y" ],
-      [ "phi I x y", "y" ],
-      [ "phi 2 x y", "x(y)" ],
-      [ "!nat(phi 6)", "5" ]
-    ]
-  },
-  {
-    "id": "706e03ef-dad1-44d7-9dde-784b801ea7c6",
-    "title": "His Majesty Factorial",
-    "descr": [
-      "Make a term that takes a number n and returns a product of all numbers from 1 to n"
-    ],
-    "input": "phi",
-    "cases": [
-      ["!nat (phi(KI))", "1"   ],
-      ["!nat (phi I)",   "1"   ],
-      ["!nat (phi 5)",   "120" ]
-    ]
-  }
-]
+  [
+    {
+      "id": "08e7fa65-1a48-45f3-b115-20aa67520a3e",
+      "title": "zero... one... two?!",
+      "descr": [
+        "Look at the definition above once more. What would number 2 look like?"
+      ],
+      "input": "phi",
+      "cases": [
+        [ "phi x y", "x(x(y))" ]
+      ]
+    },
+    {
+      "id": "815847b2-5aec-4496-bc94-07316bd2278b",
+      "title": "inc",
+      "descr": [
+        "Procure a term that increases given number by 1: <code>inc N x y &rarr; x(...N+1 times(y)...)</code>. "
+      ],
+      "hint": "<code>inc N x y &rarr; x (N x y)</code>.",
+      "numbers": true,
+      "input": "phi",
+      "cases": [
+        [ "phi (KI) x y", "x y" ],
+        [ "phi (SK) x y", "x y" ],
+        [ "phi I x y", "x (x y)" ],
+        [ "phi 8 x y", "9 x y" ]
+      ]
+    },
+    {
+      "id": "ca234c6c-a6d3-4d8e-8f41-adb26b2dc246",
+      "title": "Adding numbers",
+      "descr": [
+        "Create a term that takes two numbers and produces their sum."
+      ],
+      "hint": "This can be done by applying <code>inc</code> m times to n",
+      "input": "phi",
+      "cases": [
+        [ "!nat(phi 0 0)", "0" ],
+        [ "!nat(phi 5 0)", "5" ],
+        [ "!nat(phi 0 5)", "5" ],
+        [ "!nat(phi I I)", "2" ],
+        [ "!nat(phi 2 2)", "4" ]
+      ]
+    },
+    {
+      "id": "e61e545e-42b6-4ab0-b311-0372841e87f5",
+      "title": "isZero",
+      "descr": [
+        "Make a term that returns <code>K</code> for 0 and <code>KI</code> for all other numbers. "
+      ],
+      "input": "phi",
+      "cases": [
+        [ "phi (KI)", "K" ],
+        [ "phi (SK)", "K" ],
+        [ "phi I", "KI" ],
+        [ "phi 2", "KI" ],
+        [ "phi 5", "KI" ]
+      ]
+    },
+    {
+      "id": "92d3e3f7-cb26-4294-955b-ba526a61bb42",
+      "title": "dec",
+      "descr": [
+        "Returning the next number wasn't that hard.",
+        "How about returning the previous number, or zero for zero?"
+      ],
+      "input": "phi",
+      "cases": [
+        [ "phi (KI) x y", "y" ],
+        [ "phi I x y", "y" ],
+        [ "phi 2 x y", "x(y)" ],
+        [ "!nat(phi 6)", "5" ]
+      ]
+    },
+    {
+      "id": "706e03ef-dad1-44d7-9dde-784b801ea7c6",
+      "title": "His Majesty Factorial",
+      "descr": [
+        "Make a term that takes a number n and returns a product of all numbers from 1 to n"
+      ],
+      "input": "phi",
+      "cases": [
+        ["!nat (phi(KI))", "1"   ],
+        ["!nat (phi I)",   "1"   ],
+        ["!nat (phi 5)",   "120" ]
+      ]
+    }
+  ]

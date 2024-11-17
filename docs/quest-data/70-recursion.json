@@ -1,28 +1,28 @@
-[
-  {
-    "id": "7f1da361-e68d-4aeb-954f-bae7911ad114",
-    "title": "Quine",
-    "descr": [
-      "Technically, every irreducible combinator is a quine, for it returns itself. ",
-      "Write a combinator that returns itself when given <i>any</i> argument."
-    ],
-    "input": "phi",
-    "cases": [
-      [ "phi x", "phi" ],
-      [ "phi x y z", "phi" ]
-    ]
-  },
-  {
-    "id": "35d88d58-b0f1-42b1-8c69-ce306bf7c429",
-    "title": "Literal foo",
-    "descr": [
-      "You are given a term <code>foo</code>.",
-      "Construct f such that <code>f x = foo(f, x)</code> for any given <code>x</code>."
-    ],
-    "vars": ["foo"],
-    "input": "phi",
-    "cases": [
-      [ "phi x", "foo phi x" ]
-    ]
-  }
-]
+  [
+    {
+      "id": "7f1da361-e68d-4aeb-954f-bae7911ad114",
+      "title": "Quine",
+      "descr": [
+        "Technically, every irreducible combinator is a quine, for it returns itself. ",
+        "Write a combinator that returns itself when given <i>any</i> argument."
+      ],
+      "input": "phi",
+      "cases": [
+        [ "phi x", "phi" ],
+        [ "phi x y z", "phi" ]
+      ]
+    },
+    {
+      "id": "35d88d58-b0f1-42b1-8c69-ce306bf7c429",
+      "title": "Literal foo",
+      "descr": [
+        "You are given a term <code>foo</code>.",
+        "Construct f such that <code>f x = foo(f, x)</code> for any given <code>x</code>."
+      ],
+      "vars": ["foo"],
+      "input": "phi",
+      "cases": [
+        [ "phi x", "foo phi x" ]
+      ]
+    }
+  ]

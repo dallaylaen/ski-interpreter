@@ -1,66 +1,66 @@
-[
-  {
-    "id": "80ff7199-36e6-458a-9ce6-fd59725d9b41",
-    "title": "All you need is",
-    "descr": "Build <code>x &rarr; x(S)(K)</code>",
-    "unlock": "X",
-    "solution": "BC(CI)SK",
-    "input": "phi",
-    "cases": [
-      [ "phi K x y z", "x z (y z)" ],
-      [ "phi (KI) x y z", "x z" ]
-    ]
-  },
-  {
-    "id": "f7026316-ebf2-4837-9344-75cf88f77452",
-    "title": "Easy peasy",
-    "descr": [
-      "Now build <code>I</code> from <code>X</code>. ",
-      "No other combinators are (hopefully temporarily) available."
-    ],
-    "allow": "X",
-    "hint": "You might want to go back to the very first chapter...",
-    "input": "phi",
-    "cases": [
-      [ "phi x", "x" ]
-    ]
-  },
-  {
-    "id": "a1fe4c8c-9663-45f5-b85a-2f2657d20f68",
-    "title": "Ignore all previous instructions II",
-    "descr": [
-      "Build a combinator that omits its first argument and returns the second one"
-    ],
-    "allow": "X",
-    "hint": "XXX... would alternate between I and X. Try parenthesis...",
-    "input": "phi",
-    "cases": [
-      [ "phi x y", "y"]
-    ]
-  },
-  {
-    "id": "1668f353-3582-4819-b4bd-1aef23d05e48",
-    "title": "Stay constant, whatever you receive",
-    "descr": [
-      "Build a combinator that omits its second argument and returns the first one",
-      "(i.e. <code>K</code>)"
-    ],
-    "allow": "X",
-    "input": "phi",
-    "cases": [
-      [ "phi x y", "x"]
-    ]
-  },
-  {
-    "id": "e1244263-03d8-49b9-9e1e-482a1ebcf625",
-    "title": "Last but not least",
-    "descr": [
-      "How about <code>S</code>?"
-    ],
-    "allow": "X",
-    "input": "phi",
-    "cases": [
-      [ "phi x y z", "x z (y z)"]
-    ]
-  }
-]
+  [
+    {
+      "id": "80ff7199-36e6-458a-9ce6-fd59725d9b41",
+      "title": "All you need is",
+      "descr": "Build <code>x &rarr; x(S)(K)</code>",
+      "unlock": "X",
+      "solution": "BC(CI)SK",
+      "input": "phi",
+      "cases": [
+        [ "phi K x y z", "x z (y z)" ],
+        [ "phi (KI) x y z", "x z" ]
+      ]
+    },
+    {
+      "id": "f7026316-ebf2-4837-9344-75cf88f77452",
+      "title": "Easy peasy",
+      "descr": [
+        "Now build <code>I</code> from <code>X</code>. ",
+        "No other combinators are (hopefully temporarily) available."
+      ],
+      "allow": "X",
+      "hint": "You might want to go back to the very first chapter...",
+      "input": "phi",
+      "cases": [
+        [ "phi x", "x" ]
+      ]
+    },
+    {
+      "id": "a1fe4c8c-9663-45f5-b85a-2f2657d20f68",
+      "title": "Ignore all previous instructions II",
+      "descr": [
+        "Build a combinator that omits its first argument and returns the second one"
+      ],
+      "allow": "X",
+      "hint": "XXX... would alternate between I and X. Try parenthesis...",
+      "input": "phi",
+      "cases": [
+        [ "phi x y", "y"]
+      ]
+    },
+    {
+      "id": "1668f353-3582-4819-b4bd-1aef23d05e48",
+      "title": "Stay constant, whatever you receive",
+      "descr": [
+        "Build a combinator that omits its second argument and returns the first one",
+        "(i.e. <code>K</code>)"
+      ],
+      "allow": "X",
+      "input": "phi",
+      "cases": [
+        [ "phi x y", "x"]
+      ]
+    },
+    {
+      "id": "e1244263-03d8-49b9-9e1e-482a1ebcf625",
+      "title": "Last but not least",
+      "descr": [
+        "How about <code>S</code>?"
+      ],
+      "allow": "X",
+      "input": "phi",
+      "cases": [
+        [ "phi x y z", "x z (y z)"]
+      ]
+    }
+  ]
