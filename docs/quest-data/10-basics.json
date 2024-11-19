@@ -5,14 +5,9 @@
       "allow": "K",
       "unlock": "K",
       "descr": [
-        "<p>The K combinator, or Kestrel, is a function of two arguments that ignores",
-        "the second argument and return the first.</p>",
-        "<p><i>Oh wait, but a combinator is supposed to take just <b>one</b> argument?!</i>",
-        "- Correct. So it takes the first value and returns <i>another</i> function",
-        "that takes the second value, ignores it, and returns the previous one.",
-        "I.e. <code>K(x)(y) = x</code> for any <code>x</code> and <code>y</code>.",
-        "<p>Anyways, write a function that ignores its first and third arguments",
-        "and returns the second one.</p>"
+        "<p>The K combinator, or Kestrel, follows the rule <code>K x y = x</code>",
+        "for any <code>x</code> and <code>y</code>. </p>",
+        "<p>Provide a term that ignores its first and third argument and return the second one.</p>"
       ],
       "input": "phi",
       "cases": [
@@ -25,8 +20,11 @@
       "descr": [
         "<p>The <code>I</code> combinator, the Ibis (or Idiot bird sometimes), is very simple.",
         "It just returns its argument: <code>I x = x</code>.</p>",
-        "<p>Use I and K to create the opposite of K: a function <code>f</code> such that",
-        "<code>f(x)(y) = y</code> for any given <code>x</code> and <code>y</code>.</p>"
+        "<p><code>I</code> alone is not very interesting as <code>II</code>, <code>III</code>,",
+        "<code>I(II)</code> and so on and so forth all evaluate to just <code>I</code>.",
+        "Note, however, that <code>x I</code> does <b>not</b> become <code>x</code>!</p>",
+        "<p>Use I and K to create the opposite of K: a term <code>f</code> such that",
+        "<code>f x y = y</code> for any given <code>x</code> and <code>y</code>.</p>"
       ],
       "unlock": "I",
       "allow": "KI",
@@ -40,11 +38,15 @@
       "id": "facfdc6a-21fe-476d-b3f4-f347391a3de2",
       "title": "Bluebird, the composition bird",
       "descr": [
-        "<p>The Bluebird combinator is defined as <code>B x z y = x (y z)</code>. That is, for any functions",
-        "<code>x</code> and <code>y</code>, <code>B x y</code> returns a function that applies <code>y</code>",
-        "to its argument (<code>z</code>) and then applies <code>x</code> to the result.</p>",
-        "<p>What you have to do here is to write a function that takes 3 arguments and returns",
-        "the first of them: <code>f(x)(y)(z) = x</code>. "
+        "<p>Of course, one can also think of a combinator as of a function of <i>one</i> argument",
+        "which takes a combinator and returns a combinator. For instance, <code>K</code>",
+        "accepts a value and returns a function that accepts another value, discards it,",
+        "and returns the previous one instead.</p>",
+        "<p>The Bluebird is defined by evaluation rule <code>B x y z = x (y z)</code>,",
+        "or alternatively it can be described as a function that returns a composition of two functions",
+        "(<code>y</code> and <code>x</code> in this case).</p>",
+        "<p>Construct a function that takes 3 arguments and returns the first of them,",
+        "discarding the other two.</p>"
       ],
       "allow": "BKI",
       "input": "phi",
