@@ -10,92 +10,86 @@
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-    <div class="layout" id="top">
+    <header>
         <h1><img src="img/mock1.png"> Simple Kombinator Interpreter <img src="img/mock2.png"></h1>
         <a href="quest.html" target="_blank">Quests (beta)!</a>
-    </div>
-    <div class="layout main" id="main">
-        <div class="pane" style="width: 69%">
-            <div id="teletype" class="scroll">
-                <div style="border: 1px dotted lightGray" class="help">
-                    <p>Welcome to the
-                        <a href="https://en.wikipedia.org/wiki/SKI_combinator_calculus" target="_blank">combinatory logic</a>
-                        interpreter.
-                    </p>
-                    <p>Type an expression in the entry field and click <span style='color: darkGreen; vertical-align: middle'>⏵</span>.
-                        A valid expression contains one or more terms and parenthesis around groups of terms.
-                        Unknown terms will be left as is.
-                    </p>
-                    <p>New terms can be declared by prepending <code>"name&nbsp;=&nbsp;"</code> to the expression.
-                        They will appear in the box on the right and can be clicked to add them to the expression.
-                    </p>
-                    <p>
-                        Enter <code>?</code> to get detailed info on syntax.
-                    </p>
-                </div>
-                <div id="help" class="help">
-                    <img src="img/mock2.png" style="height: 5em; float: right;">
-                    <p>The interpreter honors the following rules:</p>
-                    <ul>
-                        <li>
-                            Terms are accepted in the form of upper-case latin letters, or lower case identifiers.
-                            Uppercase letter terms are assumed to always be one letter and do not require spaces
-                            around them.
-                        </li>
-                        <li>
-                            A program consists of one or more statements, separated by semicolons (<code>;</code>).
-                            A statement may contain terms, parentheses (<code>(</code> and <code>)</code>),
-                            and whitespace. Parentheses may be omitted.
-                        </li>
-                        <li>
-                            Unknown terms are assumed to be free variables and will be left as is.
-                            Known terms and their reduction rules (or implementations) are listed in the right panel.
-                        </li>
-                        <li>
-                            If a statement is prepended with <code>identifier = </code>, it defines a new <i>temporary</i>
-                            term that can be used in further expressions.
-                        </li>
-                        <li>
-                            If that happens to the <i>last</i> statement in the group,
-                            it will be permanently added to list of available terms, overriding the existing
-                            term with the same name.
-                        </li>
-                        <li>
-                            An <code>x->y->z->&lt;some expression&gt;</code> is a lambda expression.
-                            Lambdas may be mixed with ordinary combinators.
-                            <s>Please use Haskell instead</s>.
-                        </li>
-                        <li>
-                            A non-negative integer is assumed to be a church number, i.e. a term with
-                            two arguments <code>x</code> and <code>y</code>
-                            returning <code>x(...{n times}...(x(y)...)</code>.
-                        </li>
-                    </ul>
-                    <p>Examples: </p>
-                    <ul>
-                        <li><code>SIIx</code> evaluates to <code>x(x)</code> <i>// where x is a free variable;</i></li>
-                        <li><code>T = S(K(SI))K</code> declares the T combinator;</li>
-                        <li><code>M = SII; Mx</code> evaluates to x(x), M will <b>not</b> be available afterwards;</li>
-                        <li><code>5 x y</code> evaluates to <code>x(x(x(x(x(y)))))</code>;</li>
-                        <li><code>x-&gt;y-&gt;x</code> is an equivalent of <code>Kx</code>.</li>
-                    </ul>
-                    <p>Enter '?' to get this message again.</p>
-                </div>
-            </div>
+    </header>
+    <div id="teletype" class="scroll">
+        <div style="border: 1px dotted lightGray" class="help">
+            <p>Welcome to the
+                <a href="https://en.wikipedia.org/wiki/SKI_combinator_calculus" target="_blank">combinatory logic</a>
+                interpreter.
+            </p>
+            <p>Type an expression in the entry field and click <span style='color: darkGreen; vertical-align: middle'>⏵</span>.
+                A valid expression contains one or more terms and parenthesis around groups of terms.
+                Unknown terms will be left as is.
+            </p>
+            <p>New terms can be declared by prepending <code>"name&nbsp;=&nbsp;"</code> to the expression.
+                They will appear in the box on the right and can be clicked to add them to the expression.
+            </p>
+            <p>
+                Enter <code>?</code> to get detailed info on syntax.
+            </p>
         </div>
+        <div id="help" class="help">
+            <img src="img/mock2.png" style="height: 5em; float: right;">
+            <p>The interpreter honors the following rules:</p>
+            <ul>
+                <li>
+                    Terms are accepted in the form of upper-case latin letters, or lower case identifiers.
+                    Uppercase letter terms are assumed to always be one letter and do not require spaces
+                    around them.
+                </li>
+                <li>
+                    A program consists of one or more statements, separated by semicolons (<code>;</code>).
+                    A statement may contain terms, parentheses (<code>(</code> and <code>)</code>),
+                    and whitespace. Parentheses may be omitted.
+                </li>
+                <li>
+                    Unknown terms are assumed to be free variables and will be left as is.
+                    Known terms and their reduction rules (or implementations) are listed in the right panel.
+                </li>
+                <li>
+                    If a statement is prepended with <code>identifier = </code>, it defines a new <i>temporary</i>
+                    term that can be used in further expressions.
+                </li>
+                <li>
+                    If that happens to the <i>last</i> statement in the group,
+                    it will be permanently added to list of available terms, overriding the existing
+                    term with the same name.
+                </li>
+                <li>
+                    An <code>x->y->z->&lt;some expression&gt;</code> is a lambda expression.
+                    Lambdas may be mixed with ordinary combinators.
+                    <s>Please use Haskell instead</s>.
+                </li>
+                <li>
+                    A non-negative integer is assumed to be a church number, i.e. a term with
+                    two arguments <code>x</code> and <code>y</code>
+                    returning <code>x(...{n times}...(x(y)...)</code>.
+                </li>
+            </ul>
+            <p>Examples: </p>
+            <ul>
+                <li><code>SIIx</code> evaluates to <code>x(x)</code> <i>// where x is a free variable;</i></li>
+                <li><code>T = S(K(SI))K</code> declares the T combinator;</li>
+                <li><code>M = SII; Mx</code> evaluates to x(x), M will <b>not</b> be available afterwards;</li>
+                <li><code>5 x y</code> evaluates to <code>x(x(x(x(x(y)))))</code>;</li>
+                <li><code>x-&gt;y-&gt;x</code> is an equivalent of <code>Kx</code>.</li>
+            </ul>
+            <p>Enter '?' to get this message again.</p>
+        </div>
+    </div>
 
-        <div id="info" class="pane" style="width: 29%;">
-            <p class="caption">Known terms that can be used in expressions:</p>
-            <dl id="known"></dl>
-        </div>
+    <div id="info" class="pane">
+        <p class="caption">Known terms that can be used in expressions:</p>
+        <dl id="known"></dl>
     </div>
-    <div class="layout" id="bottom">
-        <form id="promptLine" onsubmit="return toggleRun()">
-            <input id="code">
-            <button id="runstop" type="submit">⏵</button>
-            <label id="tglVerbose"><input type="checkbox" id="verbose"/>verbose</label>
-        </form>
-    </div>
+    <form id="promptLine" onsubmit="return toggleRun()">
+        <input id="code">
+        <button id="runstop" type="submit">⏵</button>
+        <label id="tglVerbose"><input type="checkbox" id="verbose"/>verbose</label>
+    </form>
     <footer>&copy;2024 Konstantin Uvarin (<a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">sources</a>)</footer>
 <script>
     /**
@@ -129,8 +123,6 @@
         view.verbose.checked = false;
         view.code.addEventListener('keydown', onKey);
         view.code.addEventListener('input', saveInput);
-
-        rubberDesign('main');
 
         const params = getParams();
 
@@ -310,6 +302,81 @@
 
 </script>
     <style>
+        html{
+            height: 100%;
+        }
+        body {
+            min-height: 100%;
+            display: grid;
+            grid-template-columns: minmax(65%, 75%) auto;
+            grid-template-rows: min-content auto min-content min-content;
+            grid-template-areas:
+             "header header"
+             "teletype info"
+             "prompt prompt"
+             "footer footer"
+        }
+        header {
+            grid-area: header;
+            margin: 0 0.5em;
+        }
+
+        #teletype {
+            grid-area: teletype;
+            margin: 0 0.5em;
+        }
+
+        #info {
+            grid-area: info;
+        }
+
+        footer {
+            margin-top: 1ex;
+            grid-area: footer;
+            background: #F3F3F3;            
+            padding: 1px 0.5em;
+        }
+
+        footer::first-letter {
+            padding: 0pt 1pt;
+        }
+
+        #promptLine {
+            margin: 0 0.5em;
+            grid-area: prompt;
+            display: flex;
+        }
+
+        #code {
+            flex: 1 auto;
+        }
+
+        #runstop {
+            font-size: larger;
+            flex: 0 auto;
+            height: 1.15em;
+            line-height: 0.8em;
+            color: darkGreen;
+        }
+
+        #runstop.running {
+            color: inherit;
+        }
+
+        #tglVerbose {
+            flex: 0 auto;
+        }
+
+        #verbose {
+            vertical-align: middle;
+        }
+
+        .con-header {
+            padding: 1px 2px;
+            margin: -2px -2px 0px -2px;
+        }
+
+        
         p.caption {
             font-weight: bold;
             margin: 0;
@@ -345,48 +412,6 @@
         #known .remove {
             float: right;
             text-decoration: none;
-        }
-
-        #promptLine {
-            display: flex;
-        }
-
-        #code {
-            flex: 1 auto;
-        }
-
-        #runstop {
-            font-size: larger;
-            flex: 0 auto;
-            height: 1.15em;
-            line-height: 0.8em;
-            color: darkGreen;
-        }
-
-        #runstop.running {
-            color: inherit;
-        }
-
-        #tglVerbose {
-            flex: 0 auto;
-        }
-
-        #verbose {
-            vertical-align: middle;
-        }
-        
-        footer {
-            background: #F3F3F3;            
-            padding: 0.5ex 1ex;
-        }
-
-        footer::first-letter {
-            padding: 0pt 1pt;
-        }
-
-        .con-header {
-            padding: 1px 2px;
-            margin: -2px -2px 0px -2px;
         }
 
         div.greeting:not(:last-child) {
