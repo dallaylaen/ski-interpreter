@@ -90,29 +90,19 @@
         </div>
     </div>
     <div class="layout" id="bottom">
-        <form onsubmit="return toggleRun()">
-            <div style="width: 99%"><input name="code" id="code" style="width:100%"></div>
-            <div>
-                <button class="bigcontrol" onclick="return insert('S')">S</button>
-                <button class="bigcontrol" onclick="return insert('K')">K</button>
-                <button class="bigcontrol" onclick="return insert('I')">I</button>
-                <button class="bigcontrol" onclick="return insert('(')">(</button>
-                <button class="bigcontrol" onclick="return insert(')')">)</button>
-                <button class="bigcontrol" onclick="return toggleVerb()" id="verbose">Verbose</button>
-                <button class="bigcontrol" onclick="return toggleRun()" id="gostop">???</button>
-            </div>
+        <form id="promptLine" onsubmit="return toggleRun()">
+            <input id="code">
+            <button id="runstop" type="submit">⏵</button>
+            <label id="tglVerbose"><input type="checkbox" id="verbose"/>verbose</label>
         </form>
-        <div>
-            &copy;2024 Konstantin Uvarin.
-            <a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">source code</a>
-        </div>
     </div>
-
+    <footer>&copy;2024 Konstantin Uvarin.
+            <a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">source code</a></footer>
 <script>
     /**
      *   References to static page elements
      */
-    const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'code', 'gostop', 'verbose', 'help');
+    const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'code', 'runstop', 'verbose', 'help');
     const store = new Store('playground');
 
     /**
@@ -124,7 +114,6 @@
     let autosave = false;
     let count = 0;
     let running = false;
-    let verbose = false;
 
     init();
 
@@ -137,7 +126,6 @@
 
         const greet = teletype(view.teletype);
 
-        toggleVerb(false);
         resetGo();
         view.verbose.checked = false;
         view.code.addEventListener('keydown', onKey);
@@ -186,20 +174,15 @@
         return store.load('current-input');
     }
 
-    function toggleVerb (val) {
-        verbose = val ?? !verbose;
-        showlines = verbose ? Infinity : 10;
-        view.verbose.innerHTML = (verbose ? '[x]' : '[_]') + ' Verbose';
-        return false;
-    }
-
     // page functions
     function toggleRun() {
         // FIXME this sucks, rewrite
+        showlines = view.verbose.checked ? Infinity : 10
         if (running) {
             running = false;
         } else {
-            view.gostop.innerHTML = "Stop!";
+            view.runstop.innerHtml = "⏹";
+            view.runstop.class = ["running"];
             running = true;
             run();
         }
@@ -256,7 +239,7 @@
 
     function resetGo () {
         running = false;
-        view.gostop.innerHTML = "Run!";
+        view.runstop.innerHtml = "⏵";
     }
 
     function showKnown() {
@@ -364,6 +347,38 @@
         #known .remove {
             float: right;
             text-decoration: none;
+        }
+
+        #promptLine {
+            display: flex;
+        }
+
+        #code {
+            flex: 1 auto;
+        }
+
+        #runstop {
+            font-size: larger;
+            flex: 0 auto;
+            height: 1.15em;
+            line-height: 0.8em;
+            color: darkGreen;
+        }
+
+        #runstop.running {
+            color: inherit;
+        }
+
+        #tglVerbose {
+            flex: 0 auto;
+        }
+
+        #verbose {
+            vertical-align: middle;
+        }
+        
+        footer {
+            margin: 0.5ex 1ex;
         }
     </style>
 </body>
