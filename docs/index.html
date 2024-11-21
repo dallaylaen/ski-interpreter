@@ -151,7 +151,7 @@
         showKnown();
         greet(
             "Your output goes here. ",
-            {color: "green"}
+            {color: "green", class: "greeting"}
         );
     }
 
@@ -387,6 +387,10 @@
         .con-header {
             padding: 1px 2px;
             margin: -2px -2px 0px -2px;
+        }
+
+        div.greeting:not(:last-child) {
+            display: none;
         }
     </style>
 </body>
