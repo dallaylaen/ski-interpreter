@@ -102,7 +102,9 @@ function teletype(attach, opt={}) {
     const sheet = append(attach, opt.tag ?? 'div');
     if (opt.color)
         sheet.style.color = opt.color;
-    sheet.style.border = 'dotted 1px '+(opt.color ?? 'black');
+    sheet.style.border = 'dotted 1px '+(opt.color ?? 'lightGray');
+    sheet.style.marginTop = '-1px';
+    sheet.style.padding = '1px';
     return function (text, opt={}) {
         const line = append(sheet, opt.tag ?? 'span');
         if (opt.color)
