@@ -107,6 +107,7 @@
     let autosave = false;
     let count = 0;
     let running = false;
+    let greet = teletype(view.teletype);
 
     init();
 
@@ -116,8 +117,6 @@
 
     function init() {
         view.help.hidden = true;
-
-        const greet = teletype(view.teletype);
 
         resetGo();
         view.verbose.checked = false;
@@ -143,7 +142,7 @@
         showKnown();
         greet(
             "Your output goes here. ",
-            {color: "green", class: "greeting"}
+            {color: "green"}
         );
     }
 
@@ -182,6 +181,10 @@
 
     function run() {
         const out = teletype(view.teletype);
+        if (greet.element) {
+            greet.element.remove();
+            greet.element = null;
+        }
         const src = view.code.value;
 
         if (src.match(/^\s*\?[\s?]*$/)) {

@@ -95,17 +95,19 @@ function decode (s) {
  * create a function that takes text and appends it to specific region
  * in a specific <div>
  * @param {Element} attach
- * @param {{color: string?, bgcolor: string?, class: string?, padding: number?}} opt
+ * @param {{color: string?, bgcolor: string?, class: string?, padding: number?, class: string?}} opt
  * @return {(function(string, Object?): void)}
  */
 function teletype(attach, opt={}) {
     const sheet = append(attach, opt.tag ?? 'div');
     if (opt.color)
         sheet.style.color = opt.color;
+    if (opt.class)
+        sheet.classList.add(opt.class);
     sheet.style.border = 'dotted 1px '+(opt.color ?? 'lightGray');
     sheet.style.marginTop = '-1px';
     sheet.style.padding = '1px';
-    return function (text, opt={}) {
+    let tty = function (text, opt={}) {
         const line = append(sheet, opt.tag ?? 'span');
         if (opt.color)
             line.style.color = opt.color;
@@ -125,6 +127,8 @@ function teletype(attach, opt={}) {
             append( sheet, 'br' );
         return line;
     }
+    tty.element = sheet;
+    return tty;
 }
 
 class Store {
