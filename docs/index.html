@@ -258,7 +258,7 @@
             });
             append(entryBlock, 'dd', {
                 content: entry.note
-                    ? entry.note.replaceAll('->', '&rarr;').replaceAll(/\w[a-z]\w/g,"<em>$1</em>")
+                    ? entry.note.replaceAll('->', '&rarr;').replaceAll(/\b([a-z])\b/g,"<em>$1</em>")
                     : '= '+entry.impl,
                 class: entry.note ? ['note'] : []
             });
@@ -274,7 +274,7 @@
         }
         if (ski.hasLambdas) {
             append(view.known, 'a', {
-                content: '<dt>x-&gt;y-&gt;y(x)</dt><dd class="note">— a generic lambda term</dd>',
+                content: '<dt>x-&gt;y-&gt;y(x)</dt><dd class="note">–&numsp;a generic lambda term</dd>',
                 class: ['entry']
             });
         }
