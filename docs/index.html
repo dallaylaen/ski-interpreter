@@ -96,8 +96,7 @@
             <label id="tglVerbose"><input type="checkbox" id="verbose"/>verbose</label>
         </form>
     </div>
-    <footer>&copy;2024 Konstantin Uvarin.
-            <a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">source code</a></footer>
+    <footer>&copy;2024 Konstantin Uvarin (<a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">sources</a>)</footer>
 <script>
     /**
      *   References to static page elements
@@ -378,7 +377,12 @@
         }
         
         footer {
-            margin: 0.5ex 1ex;
+            background: #F3F3F3;            
+            padding: 0.5ex 1ex;
+        }
+
+        footer::first-letter {
+            padding: 0pt 1pt;
         }
     </style>
 </body>
