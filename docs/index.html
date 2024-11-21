@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8"/>
-    <title>Simple Kombinator Interpreter - online combinatory logic and lambda calculus playground</title>
+    <title>Simple Kombinator Interpreter – online combinatory logic and lambda calculus playground</title>
     <link rel="shortcut icon" type="image/png" href="img/ski-64.png">
     <script src="build/js/ski-interpreter.js"></script>
     <script src="js/util-html.js"></script>
@@ -22,7 +22,7 @@
                         <a href="https://en.wikipedia.org/wiki/SKI_combinator_calculus" target="_blank">combinatory logic</a>
                         interpreter.
                     </p>
-                    <p>Type an expression in the entry field and click "run!".
+                    <p>Type an expression in the entry field and click <abbr title="Run!" style='color: darkGreen'>⏵</abbr>.
                         A valid expression contains one or more terms and parenthesis around groups of terms.
                         Unknown terms will be left as is.
                     </p>
@@ -258,7 +258,7 @@
             });
             append(entryBlock, 'dd', {
                 content: entry.note
-                    ? entry.note.replaceAll('->', '&rarr;')
+                    ? entry.note.replaceAll('->', '&rarr;').replaceAll(/\w[a-z]\w/,"<em>$1</em>")
                     : '= '+entry.impl,
                 class: entry.note ? ['note'] : []
             });
@@ -337,7 +337,6 @@
         }
         #known dd.note {
             font-family: inherit;
-            font-style: italic;
         }
         #known a[href]:hover {
             outline: auto rgba(0, 150, 255, 1);
