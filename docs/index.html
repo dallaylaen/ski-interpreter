@@ -258,7 +258,7 @@
             });
             append(entryBlock, 'dd', {
                 content: entry.note
-                    ? entry.note.replaceAll('->', '&rarr;').replaceAll(/\w[a-z]\w/,"<em>$1</em>")
+                    ? entry.note.replaceAll('->', '&rarr;').replaceAll(/\w[a-z]\w/g,"<em>$1</em>")
                     : '= '+entry.impl,
                 class: entry.note ? ['note'] : []
             });
