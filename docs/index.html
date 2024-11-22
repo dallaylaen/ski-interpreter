@@ -13,7 +13,7 @@
     <header>
         <h1><img src="img/mock1.png"> Simple Kombinator Interpreter <img src="img/mock2.png"></h1>
     </header>
-    <div id="teletype" class="scroll">
+    <div id="teletype">
         <div>
             <p>Welcome to the
                 <a href="https://en.wikipedia.org/wiki/SKI_combinator_calculus" target="_blank">combinatory logic</a>
@@ -80,7 +80,7 @@
         </div>
     </div>
 
-    <div id="info" class="pane">
+    <div id="info">
         <p class="caption">Known terms that can be used in expressions:</p>
         <dl id="known"></dl>
     </div>
@@ -295,51 +295,51 @@
 
 </script>
     <style>
-        html{
+        html, body {
             height: 100%;
         }
         body {
-            height: 100%;
             display: grid;
-            grid-template-columns: minmax(65%, 75%) auto;
-            grid-template-rows: min-content auto min-content min-content;
-            grid-template-areas:
-             "header header"
-             "teletype info"
-             "prompt prompt"
-             "footer footer"
+            grid-template:
+             "header header" min-content
+             "teletype info" auto
+             "prompt prompt" min-content
+             "footer footer" min-content
+            / fit-content(69%) auto;
         }
-        header {
-            grid-area: header;
-            margin: 0 0.5em;
+        
+        header, #teletype, #prompt {
+            padding: 0 0.5em;
         }
-
-        #teletype {
-            grid-area: teletype;
-            margin: 0.5em 0.5em 0;
-            overflow: auto;
-        }
-
-        #info {
-            grid-area: info;
-            overflow: auto;
-        }
-
+        
         footer {
-            margin-top: 1ex;
-            grid-area: footer;
-            background: #F3F3F3;            
             padding: 1px 0.5em;
+            margin-top: 1ex;
+            background: #F3F3F3;
+            grid-area: footer;
         }
 
         footer::first-letter {
             padding: 0pt 1pt;
         }
 
+        header {
+            grid-area: header;
+        }
+
+        #teletype {
+            overflow: auto;
+            grid-area: teletype;
+        }
+
+        #info {
+            overflow: auto;
+            grid-area: info;
+        }
+        
         #prompt {
-            margin: 0 0.5em;
-            grid-area: prompt;
             display: flex;
+            grid-area: prompt;
         }
 
         #entryField {
@@ -409,7 +409,7 @@
             margin-top: -1px;
         }
         #teletype > div:first-child {
-            margin-top: 0;
+            margin-top: 0.5em;
         }
         
         .con-header {
