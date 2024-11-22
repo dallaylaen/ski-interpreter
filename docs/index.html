@@ -14,7 +14,7 @@
         <h1><img src="img/mock1.png"> Simple Kombinator Interpreter <img src="img/mock2.png"></h1>
     </header>
     <div id="teletype" class="scroll">
-        <div style="border: 1px dotted lightGray" class="help">
+        <div>
             <p>Welcome to the
                 <a href="https://en.wikipedia.org/wiki/SKI_combinator_calculus" target="_blank">combinatory logic</a>
                 interpreter.
@@ -30,7 +30,7 @@
                 Enter <code>?</code> to get detailed info on syntax.
             </p>
         </div>
-        <div id="help" class="help">
+        <div id="help" hidden>
             <img src="img/mock2.png" style="height: 5em; float: right;">
             <p>The interpreter honors the following rules:</p>
             <ul>
@@ -84,17 +84,17 @@
         <p class="caption">Known terms that can be used in expressions:</p>
         <dl id="known"></dl>
     </div>
-    <form id="promptLine" onsubmit="return toggleRun()">
-        <input id="code">
-        <button id="runstop" type="submit">⏵</button>
-        <label id="tglVerbose"><input type="checkbox" id="verbose"/>verbose</label>
+    <form id="prompt" onsubmit="return runStop()">
+        <input id="entryField">
+        <button id="runstopBtn" type="submit">⏵</button>
+        <label id="verboseBtn"><input type="checkbox" id="verbose"/>verbose</label>
     </form>
     <footer>&copy;2024 Konstantin Uvarin (<a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">sources</a>)</footer>
 <script>
     /**
      *   References to static page elements
      */
-    const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'code', 'runstop', 'verbose', 'help');
+    const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'entryField', 'runstopBtn', 'verbose', 'help');
     const store = new Store('playground');
 
     /**
@@ -115,19 +115,15 @@
       */
 
     function init() {
-        view.help.hidden = true;
-
-        resetGo();
-        view.verbose.checked = false;
-        view.code.addEventListener('keydown', onKey);
-        view.code.addEventListener('input', saveInput);
+        view.entryField.addEventListener('keydown', onKey);
+        view.entryField.addEventListener('input', saveInput);
 
         const params = getParams();
 
-        if (params.code) {
-            view.code.value = params.code;
-        } else if (!view.code.value.match(/\S/))
-            view.code.value = loadInput() ?? 'S K I x';
+        if (params.run) {
+            view.entryField.value = params.run;
+        } else if (!view.entryField.value.match(/\S/))
+            view.entryField.value = loadInput() ?? 'S K I x';
 
         if (params.terms) {
             for (let pair of params.terms.split(',')) {
@@ -148,8 +144,7 @@
     function onKey (event) {
         if (event.keyCode === 13) {
             event.preventDefault();
-            if (!running)
-                toggleRun();
+            if (!running) run();
             return false;
         }
         return true;
@@ -164,35 +159,36 @@
     }
 
     // page functions
-    function toggleRun() {
-        // FIXME this sucks, rewrite
-        showlines = view.verbose.checked ? Infinity : 10
-        if (running) {
-            running = false;
-        } else {
-            view.runstop.innerHtml = "⏹";
-            view.runstop.class = ["running"];
-            running = true;
-            run();
-        }
+    function runStop() {
+        if (running) stop();
+        else run();
+        
         return false;
+    }
+
+    function stop() {
+        running = false;
+        view.runstopBtn.innerHtml = "⏵";
+        view.runstopBtn.class = [];
     }
 
     function run() {
         const out = teletype(view.teletype);
-        if (greet.element) {
-            greet.element.remove();
-            greet.element = null;
-        }
-        const src = view.code.value;
+        greet.element.remove();
+        
+        showlines = view.verbose.checked ? Infinity : 10
+        const src = view.entryField.value;
 
         if (src.match(/^\s*\?[\s?]*$/)) {
-            resetGo();
             out(view.help.innerHTML, {tag: 'div', class: ['help']});
             return;
         }
 
-        const head = out( '<a href="'+permalink(ski, view.code.value)+'" target="_blank"><b>Expression #'+(++count)+'</b></a>',
+        running = true;
+        view.runstopBtn.innerHtml = "⏹";
+        view.runstopBtn.class = ["running"];
+
+        const head = out( '<a href="'+permalink(ski, view.entryField.value)+'" target="_blank"><b>Expression #'+(++count)+'</b></a>',
             {tag: 'div', nobr: true, class: 'con-header'});
         append(head, 'span').innerHTML = '  steps: ';
         const iterfield = append(head, 'span');
@@ -219,20 +215,15 @@
                 line.rewrite(next.expr.toString({terse: true}));
                 if (next.final) {
                     line.classList.add('success');
-                    resetGo();
+                    stop();
                 }
             },
             onError: error => {
                 out (''+error, {class: "error"});
-                resetGo();
+                stop();
             },
             delay: 0,
         });
-    }
-
-    function resetGo () {
-        running = false;
-        view.runstop.innerHtml = "⏵";
     }
 
     function showKnown() {
@@ -287,17 +278,17 @@
     }
 
     function insert (text) {
-        const orig = view.code.value;
-        const prefix = orig.substring(0,  view.code.selectionStart);
-        const postfix = orig.substring(view.code.selectionEnd);
+        const orig = view.entryField.value;
+        const prefix = orig.substring(0,  view.entryField.selectionStart);
+        const postfix = orig.substring(view.entryField.selectionEnd);
 
         // add spaces around if we're not an elementary term
         if (!text.match(/^[()A-Z]$/))
             text = (prefix.match(/(?:^| )$/) ? '' : ' ') + text + (postfix.match(/^(?: |$)/) ? '' : ' ');
 
-        view.code.value = prefix + text + postfix;
-        view.code.selectionStart = prefix.length + text.length;
-        view.code.selectionEnd   = prefix.length + text.length;
+        view.entryField.value = prefix + text + postfix;
+        view.entryField.selectionStart = prefix.length + text.length;
+        view.entryField.selectionEnd   = prefix.length + text.length;
 
         return false;
     }
@@ -343,17 +334,17 @@
             padding: 0pt 1pt;
         }
 
-        #promptLine {
+        #prompt {
             margin: 0 0.5em;
             grid-area: prompt;
             display: flex;
         }
 
-        #code {
+        #entryField {
             flex: 1 auto;
         }
 
-        #runstop {
+        #runstopBtn {
             font-size: larger;
             flex: 0 auto;
             height: 1.15em;
@@ -361,11 +352,11 @@
             color: darkGreen;
         }
 
-        #runstop.running {
+        #runstopBtn.running {
             color: inherit;
         }
 
-        #tglVerbose {
+        #verboseBtn {
             flex: 0 auto;
         }
 
@@ -373,12 +364,6 @@
             vertical-align: middle;
         }
 
-        .con-header {
-            padding: 1px 2px;
-            margin: -2px -2px 0px -2px;
-        }
-
-        
         p.caption {
             font-weight: bold;
             margin: 0;
@@ -416,8 +401,14 @@
             text-decoration: none;
         }
 
-        div.greeting:not(:last-child) {
-            display: none;
+        #teletype div {
+            border: 1px dotted lightGray;
+            
+        }
+        
+        .con-header {
+            padding: 1px 2px;
+            margin: -2px -2px 0px -2px;
         }
     </style>
 </body>
