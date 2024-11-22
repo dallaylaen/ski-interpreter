@@ -86,7 +86,7 @@
     </div>
     <form id="prompt" onsubmit="return runStop()">
         <input id="entryField">
-        <button id="runstopBtn" type="submit">⏵</button>
+        <button id="runstopBtn" type="submit"></button>
         <label id="verboseBtn"><input type="checkbox" id="verbose"/>verbose</label>
     </form>
     <footer>&copy;2024 Konstantin Uvarin (<a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">sources</a>)</footer>
@@ -168,8 +168,7 @@
 
     function stop() {
         running = false;
-        view.runstopBtn.innerHtml = "⏵";
-        view.runstopBtn.class = [];
+        view.runstopBtn.classList.remove('running');
     }
 
     function run() {
@@ -185,8 +184,7 @@
         }
 
         running = true;
-        view.runstopBtn.innerHtml = "⏹";
-        view.runstopBtn.class = ["running"];
+        view.runstopBtn.classList.add('running');
 
         const head = out( '<a href="'+permalink(ski, view.entryField.value)+'" target="_blank"><b>Expression #'+(++count)+'</b></a>',
             {tag: 'div', nobr: true, class: 'con-header'});
@@ -347,15 +345,24 @@
         }
 
         #runstopBtn {
-            font-size: larger;
             flex: 0 auto;
-            height: 1.15em;
-            line-height: 0.8em;
-            color: darkGreen;
+            font-family: monospace;
+            font-size: 120%;
+            line-height: 80%;
+            height: 100%;
+            width: 2em;
         }
 
-        #runstopBtn.running {
-            color: inherit;
+        #runstopBtn::before {
+            display: inline-block;
+            vertical-align: 20%;
+            
+            content: '\25B6\FE0E';
+            color: darkGreen;
+        }
+        #runstopBtn.running::before {
+            content: '\25A0\FE0E';
+            color: black;
         }
 
         #verboseBtn {
