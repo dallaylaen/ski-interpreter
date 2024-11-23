@@ -82,7 +82,7 @@
     </div>
 
     <div id="info">
-        <p class="caption">Known terms that can be used in expressions:</p>
+        <p class="caption">Term inventory:</p>
         <dl id="known"></dl>
     </div>
     <form id="prompt" onsubmit="return runStop()">
@@ -250,21 +250,21 @@
             harakiri.href='#';
             harakiri.onclick = () => removeKnown(name);
         }
-        if (ski.hasNumbers) {
-            append(view.known, 'a', {
-                content: '<dt>&lt;n&gt;</dt><dd>= x(...(x(y))...)</dd>',
-                class: ['entry']
-            });
-        }
         if (ski.hasLambdas) {
             append(view.known, 'a', {
-                content: '<dt>x-&gt;y-&gt;y(x)</dt><dd class="note">–&numsp;a generic lambda term</dd>',
+                content: '<dt>x-&gt;y-&gt;y(x)</dt><dd class="note">–&numsp;a generic <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">λ-term</a></dd>',
                 class: ['entry']
             });
         }
-
+        if (ski.hasNumbers) {
+            append(view.known, 'a', {
+                content: '<dt>&lt;n&gt;</dt><dd>x y = x(…(x(y))…)</dd>',
+                class: ['entry']
+            });
+        }
+    
         const controls = append(view.known, 'div', {class: ['controls', 'float-right']});
-        append(controls, 'button', {content: 'clear'}).onclick = () => {
+        append(controls, 'button', {content: 'reset'}).onclick = () => {
             ski = new SKI();
             store.save('engine', ski);
             showKnown();
@@ -381,7 +381,7 @@
             margin: 0;
         }
         #known {
-            margin: 1ex 1em;
+            margin: .5ex;
         }
         #known .entry {
             float: left;
@@ -411,6 +411,12 @@
         #known .remove {
             float: right;
             text-decoration: none;
+            margin-left: 0.6ex;
+        }
+
+        .controls {
+            margin-left: 0.6ex;
+            margin-top: 0.4ex;
         }
 
         #teletype > div {
