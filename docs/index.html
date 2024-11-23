@@ -19,8 +19,7 @@
                 <a href="https://en.wikipedia.org/wiki/SKI_combinator_calculus" target="_blank">combinatory logic</a>
                 interpreter.
             </p>
-            <p>Type an expression in the entry field and click <tt title="Run!"
-               style="color: darkGreen;padding: 0 2px 1px 4px;margin-left: -4px;margin-right: -1px;outline: 1px solid lightblue;border-radius: 3px;vertical-align: 1px;">▶︎</tt>.
+            <p>Type an expression in the entry field and click <tt title="Run!" class="icon-run">▶︎</tt>.
                 A valid expression contains one or more terms and parenthesis around groups of terms.
                 Unknown terms will be left as is.
             </p>
@@ -294,9 +293,6 @@
 
 </script>
     <style>
-        html, body {
-            height: 100%;
-        }
         body {
             display: grid;
             grid-template:
@@ -431,6 +427,14 @@
         .con-header {
             padding: 1px 2px;
             margin: -2px -2px 0px -2px;
+        }
+
+        tt.icon-run {
+            color: darkGreen;
+            padding: 0 0.9ch 1px 1.1ch;
+            margin: 1px -1px;
+            outline: 1px solid lightblue;border-radius: 3px;
+            vertical-align: 1px;
         }
     </style>
 </body>
