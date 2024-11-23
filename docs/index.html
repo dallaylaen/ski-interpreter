@@ -121,8 +121,8 @@
 
         const params = getParams();
 
-        if (params.run) {
-            view.entryField.value = params.run;
+        if (params.code) {
+            view.entryField.value = params.code;
         } else if (!view.entryField.value.match(/\S/))
             view.entryField.value = loadInput() ?? 'S K I x';
 
