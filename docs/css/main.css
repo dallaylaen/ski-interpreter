@@ -150,11 +150,15 @@ h1 img {
 
 .help {
     font-family: serif;
-
+    padding: 1px;
 }
 
 .help code {
     color: darkgoldenrod;
+}
+
+.help p {
+    margin: 1ex 0;
 }
 
 .chapter {

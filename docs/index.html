@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8"/>
-    <title>Simple Kombinator Interpreter - online combinatory logic and lambda calculus playground</title>
+    <title>Simple Kombinator Interpreter – online combinatory logic and lambda calculus playground</title>
     <link rel="shortcut icon" type="image/png" href="img/ski-64.png">
     <script src="build/js/ski-interpreter.js"></script>
     <script src="js/util-html.js"></script>
@@ -10,109 +10,92 @@
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-    <div class="layout" id="top">
-        <h1><img src="img/mock1.png"> Simple Kombinator Interpreter <img src="img/mock2.png"></h1>
-        <a href="quest.html" target="_blank">Quests (beta)!</a>
-    </div>
-    <div class="layout main" id="main">
-        <div class="pane" style="width: 69%">
-            <div id="teletype" class="scroll">
-                <div style="border: 1px dotted black;" class="help">
-                    <p>Welcome to the
-                        <a href="https://en.wikipedia.org/wiki/SKI_combinator_calculus" target="_blank">combinatory logic</a>
-                        interpreter.
-                    </p>
-                    <p>Type an expression in the entry field and click "run!".
-                        A valid expression contains one or more terms and parenthesis around groups of terms.
-                        Unknown terms will be left as is.
-                    </p>
-                    <p>New terms can be declared by prepending <code>"name&nbsp;=&nbsp;"</code> to the expression.
-                        They will appear in the box on the right and can be clicked to add them to the expression.
-                    </p>
-                    <p>
-                        Enter <code>?</code> to get detailed info on syntax.
-                    </p>
-                </div>
-                <div id="help" class="help">
-                    <img src="img/mock2.png" style="height: 5em; float: right;">
-                    <p>The interpreter honors the following rules:</p>
-                    <ul>
-                        <li>
-                            Terms are accepted in the form of upper-case latin letters, or lower case identifiers.
-                            Uppercase letter terms are assumed to always be one letter and do not require spaces
-                            around them.
-                        </li>
-                        <li>
-                            A program consists of one or more statements, separated by semicolons (<code>;</code>).
-                            A statement may contain terms, parentheses (<code>(</code> and <code>)</code>),
-                            and whitespace. Parentheses may be omitted.
-                        </li>
-                        <li>
-                            Unknown terms are assumed to be free variables and will be left as is.
-                            Known terms and their reduction rules (or implementations) are listed in the right panel.
-                        </li>
-                        <li>
-                            If a statement is prepended with <code>identifier = </code>, it defines a new <i>temporary</i>
-                            term that can be used in further expressions.
-                        </li>
-                        <li>
-                            If that happens to the <i>last</i> statement in the group,
-                            it will be permanently added to list of available terms, overriding the existing
-                            term with the same name.
-                        </li>
-                        <li>
-                            An <code>x->y->z->&lt;some expression&gt;</code> is a lambda expression.
-                            Lambdas may be mixed with ordinary combinators.
-                            <s>Please use Haskell instead</s>.
-                        </li>
-                        <li>
-                            A non-negative integer is assumed to be a church number, i.e. a term with
-                            two arguments <code>x</code> and <code>y</code>
-                            returning <code>x(...{n times}...(x(y)...)</code>.
-                        </li>
-                    </ul>
-                    <p>Examples: </p>
-                    <ul>
-                        <li><code>SIIx</code> evaluates to <code>x(x)</code> <i>// where x is a free variable;</i></li>
-                        <li><code>T = S(K(SI))K</code> declares the T combinator;</li>
-                        <li><code>M = SII; Mx</code> evaluates to x(x), M will <b>not</b> be available afterwards;</li>
-                        <li><code>5 x y</code> evaluates to <code>x(x(x(x(x(y)))))</code>;</li>
-                        <li><code>x-&gt;y-&gt;x</code> is an equivalent of <code>Kx</code>.</li>
-                    </ul>
-                    <p>Enter '?' to get this message again.</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="info" class="pane" style="width: 29%;">
-            <div><b>Known terms that can be used in expressions:</b></div>
-            <ul id="known"></ul>
-        </div>
-    </div>
-    <div class="layout" id="bottom">
-        <form onsubmit="return toggleRun()">
-            <div style="width: 99%"><input name="code" id="code" style="width:100%"></div>
-            <div>
-                <button class="bigcontrol" onclick="return insert('S')">S</button>
-                <button class="bigcontrol" onclick="return insert('K')">K</button>
-                <button class="bigcontrol" onclick="return insert('I')">I</button>
-                <button class="bigcontrol" onclick="return insert('(')">(</button>
-                <button class="bigcontrol" onclick="return insert(')')">)</button>
-                <button class="bigcontrol" onclick="return toggleVerb()" id="verbose">Verbose</button>
-                <button class="bigcontrol" onclick="return toggleRun()" id="gostop">???</button>
-            </div>
-        </form>
+    <header>
+        <h1><img src="img/mock1.png"> Simple Kombinator <nobr>Interpreter <img src="img/mock2.png"></nobr></h1>
+    </header>
+    <div id="teletype">
         <div>
-            &copy;2024 Konstantin Uvarin.
-            <a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">source code</a>
+            <p>Welcome to the
+                <a href="https://en.wikipedia.org/wiki/SKI_combinator_calculus" target="_blank">combinatory logic</a>
+                interpreter.
+            </p>
+            <p>Type an expression in the entry field and click <tt title="Run!"
+               style="color: darkGreen;padding: 0 2px 1px 4px;margin-left: -4px;margin-right: -1px;outline: 1px solid lightblue;border-radius: 3px;vertical-align: 1px;">▶︎</tt>.
+                A valid expression contains one or more terms and parenthesis around groups of terms.
+                Unknown terms will be left as is.
+            </p>
+            <p>New terms can be declared by prepending <code>"name&nbsp;=&nbsp;"</code> to the expression.
+                They will appear in the box on the right and can be clicked to add them to the expression.
+            </p>
+            <p>
+                Enter <code>?</code> to get detailed info on syntax.
+            </p>
+        </div>
+        <div id="help" hidden>
+            <img src="img/mock2.png" style="height: 5em; float: right;">
+            <p>The interpreter honors the following rules:</p>
+            <ul>
+                <li>
+                    Terms are accepted in the form of upper-case latin letters, or lower case identifiers.
+                    Uppercase letter terms are assumed to always be one letter and do not require spaces
+                    around them.
+                </li>
+                <li>
+                    A program consists of one or more statements, separated by semicolons (<code>;</code>).
+                    A statement may contain terms, parentheses (<code>(</code> and <code>)</code>),
+                    and whitespace. Parentheses may be omitted.
+                </li>
+                <li>
+                    Unknown terms are assumed to be free variables and will be left as is.
+                    Known terms and their reduction rules (or implementations) are listed in the right panel.
+                </li>
+                <li>
+                    If a statement is prepended with <code>identifier = </code>, it defines a new <i>temporary</i>
+                    term that can be used in further expressions.
+                </li>
+                <li>
+                    If that happens to the <i>last</i> statement in the group,
+                    it will be permanently added to list of available terms, overriding the existing
+                    term with the same name.
+                </li>
+                <li>
+                    An <code>x->y->z->&lt;some expression&gt;</code> is a lambda expression.
+                    Lambdas may be mixed with ordinary combinators.
+                    <s>Please use Haskell instead</s>.
+                </li>
+                <li>
+                    A non-negative integer is assumed to be a church number, i.e. a term with
+                    two arguments <code>x</code> and <code>y</code>
+                    returning <code>x(...{n times}...(x(y)...)</code>.
+                </li>
+            </ul>
+            <p>Examples: </p>
+            <ul>
+                <li><code>SIIx</code> evaluates to <code>x(x)</code> <i>// where x is a free variable;</i></li>
+                <li><code>T = S(K(SI))K</code> declares the T combinator;</li>
+                <li><code>M = SII; Mx</code> evaluates to x(x), M will <b>not</b> be available afterwards;</li>
+                <li><code>5 x y</code> evaluates to <code>x(x(x(x(x(y)))))</code>;</li>
+                <li><code>x-&gt;y-&gt;x</code> is an equivalent of <code>Kx</code>.</li>
+            </ul>
+            <p>Enter '?' to get this message again.</p>
         </div>
     </div>
 
+    <div id="info">
+        <p class="caption">Term inventory:</p>
+        <dl id="known"></dl>
+    </div>
+    <form id="prompt" onsubmit="return runStop()">
+        <input id="entryField">
+        <button id="runstopBtn" type="submit"></button>
+        <label id="verboseBtn"><input type="checkbox" id="verbose"/>verbose</label>
+    </form>
+    <footer>&copy;2024 Konstantin Uvarin (<a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">sources</a>)</footer>
 <script>
     /**
      *   References to static page elements
      */
-    const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'code', 'gostop', 'verbose', 'help');
+    const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'entryField', 'runstopBtn', 'verbose', 'help');
     const store = new Store('playground');
 
     /**
@@ -124,7 +107,7 @@
     let autosave = false;
     let count = 0;
     let running = false;
-    let verbose = false;
+    let greet = teletype(view.teletype);
 
     init();
 
@@ -133,24 +116,15 @@
       */
 
     function init() {
-        view.help.hidden = true;
-
-        const greet = teletype(view.teletype);
-
-        toggleVerb(false);
-        resetGo();
-        view.verbose.checked = false;
-        view.code.addEventListener('keydown', onKey);
-        view.code.addEventListener('input', saveInput);
-
-        rubberDesign('main');
+        view.entryField.addEventListener('keydown', onKey);
+        view.entryField.addEventListener('input', saveInput);
 
         const params = getParams();
 
         if (params.code) {
-            view.code.value = params.code;
-        } else if (!view.code.value.match(/\S/))
-            view.code.value = loadInput() ?? 'S K I x';
+            view.entryField.value = params.code;
+        } else if (!view.entryField.value.match(/\S/))
+            view.entryField.value = loadInput() ?? 'S K I x';
 
         if (params.terms) {
             for (let pair of params.terms.split(',')) {
@@ -171,8 +145,7 @@
     function onKey (event) {
         if (event.keyCode === 13) {
             event.preventDefault();
-            if (!running)
-                toggleRun();
+            if (!running) run();
             return false;
         }
         return true;
@@ -186,37 +159,35 @@
         return store.load('current-input');
     }
 
-    function toggleVerb (val) {
-        verbose = val ?? !verbose;
-        showlines = verbose ? Infinity : 10;
-        view.verbose.innerHTML = (verbose ? '[x]' : '[_]') + ' Verbose';
+    // page functions
+    function runStop() {
+        if (running) stop();
+        else run();
+        
         return false;
     }
 
-    // page functions
-    function toggleRun() {
-        // FIXME this sucks, rewrite
-        if (running) {
-            running = false;
-        } else {
-            view.gostop.innerHTML = "Stop!";
-            running = true;
-            run();
-        }
-        return false;
+    function stop() {
+        running = false;
+        view.runstopBtn.classList.remove('running');
     }
 
     function run() {
         const out = teletype(view.teletype);
-        const src = view.code.value;
+        greet.element.remove();
+        
+        showlines = view.verbose.checked ? Infinity : 10
+        const src = view.entryField.value;
 
         if (src.match(/^\s*\?[\s?]*$/)) {
-            resetGo();
             out(view.help.innerHTML, {tag: 'div', class: ['help']});
             return;
         }
 
-        const head = out( '<a href="'+permalink(ski, view.code.value)+'" target="_blank"><b>Expression #'+(++count)+'</b></a>',
+        running = true;
+        view.runstopBtn.classList.add('running');
+
+        const head = out( '<a href="'+permalink(ski, view.entryField.value)+'" target="_blank"><b>Expression #'+(++count)+'</b></a>',
             {tag: 'div', nobr: true, class: 'con-header'});
         append(head, 'span').innerHTML = '  steps: ';
         const iterfield = append(head, 'span');
@@ -243,20 +214,15 @@
                 line.rewrite(next.expr.toString({terse: true}));
                 if (next.final) {
                     line.classList.add('success');
-                    resetGo();
+                    stop();
                 }
             },
             onError: error => {
                 out (''+error, {class: "error"});
-                resetGo();
+                stop();
             },
             delay: 0,
         });
-    }
-
-    function resetGo () {
-        running = false;
-        view.gostop.innerHTML = "Run!";
     }
 
     function showKnown() {
@@ -268,34 +234,37 @@
         const list = ski.getTerms();
         for (let name of Object.keys(list).sort()) {
             const entry = list[name];
-            const li = append(view.known, 'li');
-            const out = append(li, 'a', {class: ['note', 'clickable', 'ellipsis']});
-            out.href = '#';
-            out.onclick = event => insert(name);
-            append(out, 'b').innerHTML = name;
-            append(out, 'span').innerHTML = " ";
-            if (entry.note)
-                append(out, 'i').innerHTML = entry.note.replaceAll('->', '&rarr;');
-            else
-                append(out, 'tt').innerHTML = '= '+entry.impl;
-            const harakiri = append(li, 'a', {content: '[&cross;]', class: ['remove', 'float-right']});
+            const entryBlock = append(view.known, 'a', {class: ['entry']});
+            entryBlock.href='#';
+            entryBlock.onclick = event => insert(name);
+            append(entryBlock, 'dt', {
+                content: name,
+            });
+            append(entryBlock, 'dd', {
+                content: entry.note
+                    ? entry.note.replaceAll('->', '&rarr;').replaceAll(/\b([a-z])\b/g,"<em>$1</em>")
+                    : '= '+entry.impl,
+                class: entry.note ? ['note'] : []
+            });
+            const harakiri = append(view.known, 'a', {content: '[&cross;]', class: ['remove']});
             harakiri.href='#';
             harakiri.onclick = () => removeKnown(name);
         }
-        if (ski.hasNumbers) {
-            append(view.known, 'li', {
-                content: '<b>&lt;n&gt;</b>: <code>x(...(x(y))...)</code>;'
+        if (ski.hasLambdas) {
+            append(view.known, 'a', {
+                content: '<dt>x-&gt;y-&gt;y(x)</dt><dd class="note">–&numsp;a generic <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">λ-term</a></dd>',
+                class: ['entry']
             });
         }
-        if (ski.hasLambdas) {
-            append(view.known, 'li', {content: '<b>x-&gt;y-&gt;y(x)</b> - a generic lambda term;'});
+        if (ski.hasNumbers) {
+            append(view.known, 'a', {
+                content: '<dt>&lt;n&gt;</dt><dd>x y = x(…(x(y))…)</dd>',
+                class: ['entry']
+            });
         }
-
-        const controls = append(view.known, 'div', {class: ['controls']});
-        append(controls, 'button', {content: 'save'}).onclick = () => {
-            store.save('engine', ski);
-        };
-        append(controls, 'button', {content: 'reset terms'}).onclick = () => {
+    
+        const controls = append(view.known, 'div', {class: ['controls', 'float-right']});
+        append(controls, 'button', {content: 'reset'}).onclick = () => {
             ski = new SKI();
             store.save('engine', ski);
             showKnown();
@@ -308,21 +277,161 @@
     }
 
     function insert (text) {
-        const orig = view.code.value;
-        const prefix = orig.substring(0,  view.code.selectionStart);
-        const postfix = orig.substring(view.code.selectionEnd);
+        const orig = view.entryField.value;
+        const prefix = orig.substring(0,  view.entryField.selectionStart);
+        const postfix = orig.substring(view.entryField.selectionEnd);
 
         // add spaces around if we're not an elementary term
         if (!text.match(/^[()A-Z]$/))
             text = (prefix.match(/(?:^| )$/) ? '' : ' ') + text + (postfix.match(/^(?: |$)/) ? '' : ' ');
 
-        view.code.value = prefix + text + postfix;
-        view.code.selectionStart = prefix.length + text.length;
-        view.code.selectionEnd   = prefix.length + text.length;
+        view.entryField.value = prefix + text + postfix;
+        view.entryField.selectionStart = prefix.length + text.length;
+        view.entryField.selectionEnd   = prefix.length + text.length;
 
         return false;
     }
 
 </script>
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: grid;
+            grid-template:
+             "header header" min-content
+             "teletype info" auto
+             "prompt prompt" min-content
+             "footer footer" min-content
+            / fit-content(69%) auto;
+        }
+        
+        header, #teletype, #prompt {
+            padding: 0 0.5em;
+        }
+        
+        footer {
+            padding: 1px 0.5em;
+            margin-top: 1ex;
+            background: #F3F3F3;
+            grid-area: footer;
+        }
+
+        footer::first-letter {
+            padding: 0pt 1pt;
+        }
+
+        header {
+            grid-area: header;
+        }
+
+        #teletype {
+            overflow: auto;
+            grid-area: teletype;
+        }
+
+        #info {
+            overflow: auto;
+            grid-area: info;
+        }
+        
+        #prompt {
+            display: flex;
+            grid-area: prompt;
+        }
+
+        #entryField {
+            flex: 1 auto;
+        }
+
+        #runstopBtn {
+            flex: 0 auto;
+            font-family: monospace;
+            font-size: 120%;
+            line-height: 80%;
+            height: 100%;
+            width: 2em;
+            padding: 0;
+        }
+
+        #runstopBtn::before {
+            display: inline-block;
+            vertical-align: 20%;
+            
+            content: '\25B6\FE0E';
+            color: darkGreen;
+        }
+        
+        #runstopBtn.running::before {
+            content: '\25A0\FE0E';
+            color: darkRed;
+        }
+
+        #verboseBtn {
+            flex: 0 auto;
+        }
+
+        #verbose {
+            vertical-align: middle;
+        }
+
+        p.caption {
+            font-weight: bold;
+            margin: 0;
+        }
+        #known {
+            margin: .5ex;
+        }
+        #known .entry {
+            float: left;
+            clear: both;
+            color: inherit;
+            text-decoration: none;
+        }
+        #known dt, dd {
+            margin: 0;
+            display: inline;
+            font-family: monospace;
+        }
+        #known dd::before {
+            content: ' ';
+            font-family: monospace;
+        }
+        #known dt {
+            font-weight: bold;
+        }
+        #known dd.note {
+            font-family: inherit;
+        }
+        #known a[href]:hover {
+            outline: auto rgba(0, 150, 255, 1);
+            outline-offset: 1px;
+        }   
+        #known .remove {
+            float: right;
+            text-decoration: none;
+            margin-left: 0.6ex;
+        }
+
+        .controls {
+            margin-left: 0.6ex;
+            margin-top: 0.4ex;
+        }
+
+        #teletype > div {
+            border: 1px dotted #C8C8C8 !important;
+            padding: 1px;
+            margin-top: -1px;
+        }
+        #teletype > div:first-child {
+            margin-top: 0.5em;
+        }
+        
+        .con-header {
+            padding: 1px 2px;
+            margin: -2px -2px 0px -2px;
+        }
+    </style>
 </body>
 </html>
