@@ -93,7 +93,7 @@
         "<p>Now that we can erase, compose, and double terms, one important thing that is still left",
         "is swapping them.</p>",
         "<p>The Cardinal <code>C x y z = x z y</code> and Thrush <code>T x y = y x</code> are capable of that.</p>",
-        "<p>Build <code>T</code>.</p>"
+        "<p>Build <code>T</code> from <code>C</code>.</p>"
       ],
       "allow": "BWKCI",
       "input": "phi",
@@ -105,7 +105,8 @@
       "id": "9afbc9a5-b262-4d0a-a954-942201f6de50",
       "title": "Swap 'em but later",
       "descr": [
-
+        "A Cardinal can be seen as a delayed Thrush. Can you delay it even more? ",
+        "I.e. leave 2 arguments in place and swap the next two."
       ],
       "allow": "BWCKI",
       "input": "phi",
@@ -114,27 +115,41 @@
       ]
     },
     {
-      "id": "f67a4a18-9ae1-4585-ac25-e4560747228e",
-      "title": "Mirror image",
+      "id": "aca170cd-464f-4075-9673-835cee5e465f",
+      "title": "Enter Starling",
       "descr": [
-        "<p>Swap 1st and 3rd arguments, leaving the 2nd in its place</p>"
+        "<p>A Starling is a combinator that can compose, duplicate, and swap its arguments at the same time:",
+        "<code>S f g x = f x (g x)</code>.",
+        "Looks pretty messy, innit?</p>",
+        "<p>Let's go a bit into details here.",
+        "Given 2 functions and an argument, we see the following happen:</p>",
+        "<ul><li>function f is applied to the argument x;</li>",
+        "<li>function g is applied to the same argument x;</li>",
+        "<li>the results of both calculations are fused together.</li></ul>",
+        "<p>Perhaps the simplest example here is to construct a Mockingbird",
+        "(<code>x&rarr;x x</code>) from S, K, and I."
       ],
-      "input": "r",
+      "unlock": "S",
+      "allow": "SKI",
+      "input": "phi",
       "cases": [
-        [ "r x y z", "x y z"]
+        [ "phi x", "x x" ]
       ]
     },
     {
-      "id": "9fbfe2f2-13b6-45db-a884-9748a7961a55",
-      "title": "Enter Starling",
+      "id": "f52144ba-a821-4866-9ae2-8c00156d20e3",
+      "title": "Lost identity",
       "descr": [
-        "Given x, y, and z, what would SS x y z look like?"
+        "Sadly, after the previous exercise the Ibis has flown away.",
+        "Ask the Starling and the Kertrel to call it back.",
+        "Provide <code>x&rarr;x</code> with <code>S</code> and <code>K</code>.",
+        "This one has multiple solutions."
       ],
-      "allow": "-S",
-      "vars": ["x", "y", "z"],
+      "hint": "What kind of <code>f</code> does one need to reduce <code>f x (g x)</code> to <code>x</code>?",
+      "allow": "SK",
       "input": "phi",
       "cases": [
-        [ "phi", "y z (x y z)" ]
+        ["phi x", "x"]
       ]
     }
   ]
