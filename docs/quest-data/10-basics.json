@@ -5,14 +5,9 @@
       "allow": "K",
       "unlock": "K",
       "descr": [
-        "<p>The K combinator, or Kestrel, is a function of two arguments that ignores",
-        "the second argument and return the first.</p>",
-        "<p><i>Oh wait, but a combinator is supposed to take just <b>one</b> argument?!</i>",
-        "- Correct. So it takes the first value and returns <i>another</i> function",
-        "that takes the second value, ignores it, and returns the previous one.",
-        "I.e. <code>K(x)(y) = x</code> for any <code>x</code> and <code>y</code>.",
-        "<p>Anyways, write a function that ignores its first and third arguments",
-        "and returns the second one.</p>"
+        "<p>The K combinator, or Kestrel, follows the rule <code>K x y = x</code>",
+        "for any <code>x</code> and <code>y</code>. </p>",
+        "<p>Provide a term that ignores its first and third argument and return the second one.</p>"
       ],
       "input": "phi",
       "cases": [
@@ -25,8 +20,11 @@
       "descr": [
         "<p>The <code>I</code> combinator, the Ibis (or Idiot bird sometimes), is very simple.",
         "It just returns its argument: <code>I x = x</code>.</p>",
-        "<p>Use I and K to create the opposite of K: a function <code>f</code> such that",
-        "<code>f(x)(y) = y</code> for any given <code>x</code> and <code>y</code>.</p>"
+        "<p><code>I</code> alone is not very interesting as <code>II</code>, <code>III</code>,",
+        "<code>I(II)</code> and so on and so forth all evaluate to just <code>I</code>.",
+        "Note, however, that <code>x I</code> does <b>not</b> become <code>x</code>!</p>",
+        "<p>Use I and K to create the opposite of K: a term <code>f</code> such that",
+        "<code>f x y = y</code> for any given <code>x</code> and <code>y</code>.</p>"
       ],
       "unlock": "I",
       "allow": "KI",
@@ -40,16 +38,118 @@
       "id": "facfdc6a-21fe-476d-b3f4-f347391a3de2",
       "title": "Bluebird, the composition bird",
       "descr": [
-        "<p>The Bluebird combinator is defined as <code>B x z y = x (y z)</code>. That is, for any functions",
-        "<code>x</code> and <code>y</code>, <code>B x y</code> returns a function that applies <code>y</code>",
-        "to its argument (<code>z</code>) and then applies <code>x</code> to the result.</p>",
-        "<p>What you have to do here is to write a function that takes 3 arguments and returns",
-        "the first of them: <code>f(x)(y)(z) = x</code>. "
+        "<p>Of course, one can also think of a combinator as of a function of <i>one</i> argument",
+        "which takes a combinator and returns a combinator. For instance, <code>K</code>",
+        "accepts a value and returns a function that accepts another value, discards it,",
+        "and returns the previous one instead.</p>",
+        "<p>The Bluebird is defined by evaluation rule <code>B x y z = x (y z)</code>,",
+        "or alternatively it can be described as a function that returns a composition of two functions",
+        "(<code>y</code> and <code>x</code> in this case).</p>",
+        "<p>Construct a function that takes 3 arguments and returns the first of them,",
+        "discarding the other two.</p>"
       ],
       "allow": "BKI",
       "input": "phi",
       "cases": [
         [ "phi x y z", "x" ]
+      ]
+    },
+    {
+      "id": "ef420d94-60db-479b-a38b-d6e6af51757a",
+      "title": "Birds with echoing songs echoing songs",
+      "descr": [
+        "<p>So far we've only been dicarding arguments, how about duplicating them?",
+        "Such combinators do exist, too.</p>",
+        "<p>The Warbler is defined as <code>W x y = x y y</code>. We'll encounter it many times!</p>",
+        "<p>The Lark <code>L x y = x (y y)</code> differs by only a pair of parentheses. ",
+        "Can you construct the latter from the former?</p>"
+      ],
+      "allow": "BKIW",
+      "input": "phi",
+      "cases": [
+        ["phi x y", "x (y y)"]
+      ]
+    },
+    {
+      "id": "19c3d06b-d359-44ea-a7e2-3c9b14f02291",
+      "title": "The Mockingbird",
+      "descr": [
+        "<p>The Mockingbird <code>M x = x x</code> is of high importance in combinatory logic,",
+        "basically an impersonation of recursion.</p>",
+        "<p>It's not that easy to derive other duplicating birds from a Mockingbird,",
+        "however, Mockingbird is easily constructible from either W or L. Go ahead and mock it!</p>"
+      ],
+      "allow": "BKWI",
+      "vars": ["L = x->y->x (y y)"],
+      "input": "phi",
+      "cases": [
+        ["phi x", "x x"]
+      ]
+    },
+    {
+      "id": "9de71f24-3a20-4fba-9bfb-4cddae5a9e82",
+      "title": "Swap 'em",
+      "descr": [
+        "<p>Now that we can erase, compose, and double terms, one important thing that is still left",
+        "is swapping them.</p>",
+        "<p>The Cardinal <code>C x y z = x z y</code> and Thrush <code>T x y = y x</code> are capable of that.</p>",
+        "<p>Build <code>T</code> from <code>C</code>.</p>"
+      ],
+      "allow": "BWKCI",
+      "input": "phi",
+      "cases": [
+        ["phi x y", "y x"]
+      ]
+    },
+    {
+      "id": "9afbc9a5-b262-4d0a-a954-942201f6de50",
+      "title": "Swap 'em but later",
+      "descr": [
+        "A Cardinal can be seen as a delayed Thrush. Can you delay it even more? ",
+        "I.e. leave 2 arguments in place and swap the next two."
+      ],
+      "allow": "BWCKI",
+      "input": "phi",
+      "cases": [
+        ["phi x y z t", "x y t z"]
+      ]
+    },
+    {
+      "id": "aca170cd-464f-4075-9673-835cee5e465f",
+      "title": "Enter Starling",
+      "descr": [
+        "<p>A Starling is a combinator that can compose, duplicate, and swap its arguments at the same time:",
+        "<code>S f g x = f x (g x)</code>.",
+        "Looks pretty messy, innit?</p>",
+        "<p>Let's go a bit into details here.",
+        "Given 2 functions and an argument, we see the following happen:</p>",
+        "<ul><li>function f is applied to the argument x;</li>",
+        "<li>function g is applied to the same argument x;</li>",
+        "<li>the results of both calculations are fused together.</li></ul>",
+        "<p>Perhaps the simplest example here is to construct a Mockingbird",
+        "(<code>x&rarr;x x</code>) from S, K, and I."
+      ],
+      "unlock": "S",
+      "allow": "SKI",
+      "input": "phi",
+      "cases": [
+        [ "phi x", "x x" ]
+      ]
+    },
+    {
+      "id": "f52144ba-a821-4866-9ae2-8c00156d20e3",
+      "title": "Lost identity",
+      "descr": [
+        "Sadly, after the previous exercise the Ibis has flown away.",
+        "Ask the Starling and the Kertrel to call it back.",
+        "Provide <code>x&rarr;x</code> with <code>S</code> and <code>K</code>.",
+        "This one has multiple solutions."
+      ],
+      "hint": "What kind of <code>f</code> does one need to reduce <code>f x (g x)</code> to <code>x</code>?",
+      "allow": "SK",
+      "input": "phi",
+      "cases": [
+        ["phi x", "x"]
       ]
     }
   ]
