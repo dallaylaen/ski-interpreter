@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Introduction - Simple Kombinator Interpreter</title>
+    <link rel="shortcut icon" type="image/png" href="img/ski-64.png">
+    <script src="build/js/ski-interpreter.js"></script>
+    <script src="js/util-html.js"></script>
+    <script src="js/util-ski.js"></script>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<h1><img src="img/mock1.png">Simple Kombinator Interpreter Intro<img src="img/mock2.png"></h1>
+
+<div id="intro-ski" style="padding: 1ex;">
+    <div class="chapter">
+        <h2>Preamble</h2>
+        <p>Welcome to the wonderful world of combinatory logic,
+            a lovechild of lisp and brainfuck, developed by Moses Schönfinkel and Haskell Curry in the 1930s.</p>
+
+        <p>A combinator is a one-argument function that accepts a one-argument function and
+            returns a one-argument function.
+            Everything here is a function - numbers, booleans, lists, and even free variables
+            stand for functions we don't know how to compute just yet.</p>
+        <p>The tradition is to depict the combinators as birds, and we won't be stepping too far away from it.</p>
+    </div>
+
+    <div class="chapter">
+        <h2>How computations work</h2>
+
+        <ul>
+            <li>Given that <code>x</code> and <code>y</code> are combinators, then so is <code>x y</code>;
+                if <code>z</code> is also a combinator, then <code>x y z</code> is calculated as <code>(x y) z</code>.
+                <code>x y z</code>, <code>x(y)(z)</code>, <code>(x y)(z)</code>, <code>(x(y))(z)</code>
+                are all the same thing.
+                <code>x (y z)</code>, however, is <i>not</i> the same as <code>(x y) z</code>
+                (at least not for arbitrary terms).
+            </li>
+
+            <li>
+                If a <i>reduction rule</i> is known for the <i>leftmost</i> term in an (sub-)expression, it is applied.
+                Reduction rules are given in the form of "<code>X a b c = b (c a)</code>"
+                and are interpreted as follows:
+                <code>X a</code> returns a function <code>f1</code> such that
+                <code>f1 b</code> returns a function <code>f2</code> such that
+                <code>f2 c</code> returns expression <code>b (c a)</code>.
+                This technique is known as currying.
+            </li>
+
+            <li>
+                A computation terminates when no more reductions can be made.
+            </li>
+        </ul>
+
+        <p>With a right set of initial terms this is enough for Turing completeness,
+            and at least one such set exists, as we'll see shortly.</p>
+    </div>
+    <div class="chapter">
+        <h2>On the notation</h2>
+        <p>On the notation: we'll be typically using single capital letters for common combinators,
+            lowercase letters for free variables, and lowercase <i>words</i> for compound expressions.
+            Uppercase letters can be lumped together and lowercase terms must be separated with spaces. </p>
+
+        <p>E.g. <code>CBx foo (y z) (SII)</code> - here only <code>C</code> and <code>S</code>
+            are reduction candidates</p>
+    </div>
+    <div class="chapter">
+        <h2>The S, K, I basis</h2>
+
+        <p>
+            <code>I</code>, the Ibis, or Identity, has a very simple reduction rule:
+            for any term <code>x</code>, <code>I x = x</code>.
+            Thus <code>IIx</code>, <code>I(II)x</code>, <code>II(Ix)</code> and so on all converge to <code>x</code>.
+            Note, however, that <code>x I</code> does not equal <code>x</code>
+            and <code>x I y</code> does not equal <code>x y</code>.</p>
+
+        <p>
+            K, the Kestrel, or Konstant, is defined as <code>K x y = x</code>.
+            Here's where currying happens for real:
+            K x returns a function which in turn discards its argument and returns x and nothing else.
+            Note again that <code>x K y z</code> does not become <code>x y</code> because <code>K</code>
+            is not in the first place and the reduction rule is not applicable.
+        </p>
+
+        <p>
+            <code>S</code>, the Starling, adheres <code>S f g x = f x (g x)</code>.
+            That is, given two functions and an argument (which is also a function given the setup,
+            but it's not important here), it applies both functions to the argument and fuses the results together.
+        </p>
+    </div>
+    <div class="chapter">
+        <h2>Connection to lambda calculus</h2>
+
+        <p>An arbitrary lambda expression can be converted to SKI via the following rules:</p>
+        <ul>
+            <li><code>&lambda; x . x</code> becomes <code>I</code>;</li>
+            <li><code>&lambda; x . f(x)</code> (where f is independent of x) becomes <code>f</code>;</li>
+            <li><code>&lambda; x . y</code> (where y does not depend on x) becomes <code>K y</code>;</li>
+            <li><code>&lambda; x . y(z)</code> becomes <code>S(&lambda; x . y)(&lambda; x . z)</code>,
+                where <code>y</code> and <code>z</code> may or may not depend on <code>x</code>.
+            </li>
+            <li>The process is repeated from the innermost lambda expression outwards and
+                is guaranteed to terminate. <i>(proof?..)</i></li>
+        </ul>
+
+        <p>
+            As a matter of fact, <code>I</code> can be derived from <code>S</code> and <code>K</code>
+            and those two thus form a basis together.
+        </p>
+    </div>
+    <div class="chapter">
+        <h2>In place of a conclusion</h2>
+
+        What next?
+        <ul class="menu">
+            <li><a href="index.html">The interpreter</a></li>
+            <li><a href="quest.html">Solve some quests</a></li>
+            <li><a href="https://github.com/dallaylaen/ski-interpreter">Improve this document</a></li>
+        </ul>
+    </div>
+
+</div>
+</body>
+</html>
