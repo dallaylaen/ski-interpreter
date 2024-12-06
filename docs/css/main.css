@@ -179,7 +179,22 @@ h1 img {
     font-size: large;
 }
 
+.chapter h2 {
+    background-color: maroon;
+    color: gold;
+    padding: 0.3em;
+    font-weight: bold;
+    font-size: large;
+    margin: 0;
+}
+
 .chapter .note {
+    margin: 1ex;
+}
+.chapter p {
+    margin: 1ex;
+}
+.chapter ul {
     margin: 1ex;
 }
 
@@ -207,7 +222,14 @@ h1 img {
     font-stretch: condensed;
 }
 
-.chapter .note code {
+.note code {
+    font-family: inherit;
+    font-style: italic;
+    color: indigo;
+    white-space: nowrap;
+}
+
+.chapter code {
     font-family: inherit;
     font-style: italic;
     color: indigo;
