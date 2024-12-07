@@ -2,40 +2,18 @@
   {
     "name": "Baby steps",
     "intro": [
-      "<p>Welcome to the wonderful world of combinatory logic,",
-      "a lovechild of Lisp and Brainfuck, developed in the 1930s by",
-      "Moses Schönfinkel and Haskell Curry.</p>",
-      "<p>The rules are simple: </p>",
-      "<ul><li>If <code>x</code> and <code>y</code> are combinators, then so is <code>x y</code>;",
-      "if <code>z</code> is also a combinator, so is <code>x y z</code> which is same as <code>(x y) z</code>.</li>",
-      "<li>If a <i>reduction</i> is known for the <i>leftmost</i> term in a (sub-)expression, it is applied.</li>",
-      "<li>If no more terms can be reduced, the computation ends.</li></ul>",
-      "<p>This alone, given a powerful enough set of starting terms, achieves Turing completeness,",
-      "which will be demonstrated in subsequent exercises, in a multitude of ways.</p>",
-      "<p>The tradition is to depict the combinators as birds, and we won't be stepping too far away from it.</p>",
-      "<p>On the notation: we'll be typically using single capital letters for common combinators,",
-      "lowercase letters for free variables, and lowercase <i>words</i> for compound expressions.",
-      "Uppercase letters can be lumped together and lowercase terms should be separated with spaces. </p>",
-      "<p>E.g. <code>CBx foo (y z) (SII)</code> - here only <code>C</code> and <code>S</code>",
-      "are reduction candidates</p>",
-      "<p>Examples to follow soon. Let's dive right in!</p>"
+      "<p>Welcome to the world of combinators!</p>",
+      "<p>See the <a href=\"intro.html\">introduction</a> for how stuff works here.</p>",
+      "<p>A short reminder of the rules:</p>",
+      "<ul><li><code>I x</code> evaluates to <code>x</code>;</li>",
+      "<li><code>K x y</code> evaluates to <code>x</code>;</li>",
+      "<li><code>S f g x</code> evaluates to <code>f x (g x)</code>;</li>",
+      "<li>and all of the above only happens <i>at the beginning</i> of a (sub-)expression.</li></ul>",
+      "<p>On the right you can see a list of available terms and their definitions,",
+      "it will be slowly extending as more quests are being completed.</p>",
+      "<p>Let's dive right in!</p>"
       ],
     "link": "10-basics.json"
-  },
-  {
-    "name": "Dull tales",
-    "intro": [
-      "An arbitrary lambda expression can be converted to SKI via the following rules:",
-      "<ul>",
-      "<li><code>&lambda; x . x &rArr; I</code>;</li>",
-      "<li><code>&lambda; x . f(x)</code> (where f is independent of x) <code>&rArr; f</code>;</li>",
-      "<li><code>&lambda; x . y</code> (where y does not depend on x) <code>&rArr; K y</code>;</li>",
-      "<li><code>&lambda; x . y(z) &rArr; S(&lambda; x . y)(&lambda; x . z)</code>,",
-      "where <code>y</code> &amp; <code>z</code> may or may not depend on <code>x</code>.</li>",
-      "</ul><br>",
-      "Let's grind a bit to gain some XP before we can get to interesting stuff!"
-    ],
-    "link": "20-lambda.json"
   },
   {
     "name": "Swing, swing!",
