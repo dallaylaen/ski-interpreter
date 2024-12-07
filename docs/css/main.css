@@ -191,10 +191,10 @@ h1 img {
 .chapter .note {
     margin: 1ex;
 }
-.chapter p {
+#intro p {
     margin: 1ex;
 }
-.chapter ul {
+#intro ul {
     margin: 1ex;
 }
 
