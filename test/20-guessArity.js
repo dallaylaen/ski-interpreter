@@ -21,9 +21,10 @@ describe('Expr.guessArity', () => {
         ['x->y x', {arity: 1, proper: false, found: true}, 'x->y x'],
         ['By', {arity: 2, proper: false, found: true}],
 
-        // infinite
-        ['SII(SII)', {arity: undefined, proper: undefined, found: false}],
-        ['WI(SBK)', {arity: undefined, proper: undefined, found: false}]
+        // infinite recursion
+        ['SII(SII)', {proper: false, found: false}],
+        // quine eats all args
+        ['WI(SBK)', {proper: false, found: false}]
     ];
 
     const ski = new SKI();
