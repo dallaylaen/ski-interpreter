@@ -2,7 +2,7 @@
 
 set -ex
 
-AUTOFILES="docs/build docs/man"
+AUTOFILES="docs/build docs/man types"
 
 modified() {
     LIST=$(git status --porcelain -- "$@" | grep '^ *[AM?]' | awk '{print $2}')
@@ -10,6 +10,7 @@ modified() {
 }
 
 ./aux/browserify.sh
+npx -p typescript tsc index.js --declaration --allowJs --emitDeclarationOnly --outDir types
 
 CHANGED=$(modified $AUTOFILES)
 
