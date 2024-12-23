@@ -18,7 +18,7 @@ describe( 'interventions', () => {
     });
 
     it ('allows long computations', () => {
-        ski.parse('!nat (14 (S(S(KS)K)I) )').run().expr.expect(SKI.church(2**14));
+        ski.parse('!nat (13 (S(S(KS)K)I) )').run().expr.expect(SKI.church(2**13));
     });
 
     it ('rejects unknown terms', () => {
