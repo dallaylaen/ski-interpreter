@@ -14,22 +14,39 @@ describe ('Expr.walk', () => {
         ]);
     });
 
-    it ('produces iterator', () => {
-        const ski = new SKI();
-        let expr = ski.parse('S(K(SI))K foo bar');
+    const cases = [
+        [ 'S(K(SI))K foo bar', 'bar foo'],
+        [ '2 x y ', 'x(x y)'],
+        [ 'WI(C(K(WI))) x y z t', 'C(K(WI))(C(K(WI)))'],
+        [ '10 (CIx) y', 'y x x x x x x x x x x']
+    ];
 
-        let n = 0;
-        let end = false;
-        for (const state of expr.walk()) {
-            expect(end).to.equal(false, 'make sure we don\'t run past last iteration');
-            expect(state.steps).to.equal(n++);
-            expect(typeof state.final).to.equal('boolean');
-            expect(''+state.expr).to.equal(''+expr);
-            expr = expr.step().expr; // keep up with the execution
-            if (state.final) {
-                end = true;
-                expect(''+state.expr).to.equal('bar(foo)');
+    for (const line of cases) {
+        const [ start, result ] = line;
+        it('iterates correctly over '+start, () => {
+            const ski = new SKI();
+
+            const jar = {};
+            let expr = ski.parse(start, jar);
+
+            let n = 0;
+            let end = false;
+            for (const state of expr.walk()) {
+                expect(end).to.equal(false, 'make sure we never run past last iteration');
+
+                console.log("step", state.steps, ":", state.expr.toString({terse: true}));
+
+                // steps must be ascending
+                expect(state.steps).to.be.within(n, Infinity);
+                n = state.steps + 1;
+                expect(typeof state.final).to.equal('boolean');
+                expect('' + state.expr).to.equal('' + expr);
+                expr = expr.step().expr; // keep up with the execution
+                if (state.final) {
+                    end = true;
+                    expr.expect(ski.parse(result, jar));
+                }
             }
-        }
-    });
+        });
+    }
 })
