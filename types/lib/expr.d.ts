@@ -183,13 +183,6 @@ export class Church extends Native {
     n: any;
     equals(other: any): boolean;
 }
-/**
- *
- * @type {{[key: string]: Native}}
- */
-export const native: {
-    [key: string]: Native;
-};
 declare class Named extends Expr {
     /**
        * @desc a constant named 'name'

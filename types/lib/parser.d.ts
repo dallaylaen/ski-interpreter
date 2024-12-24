@@ -112,14 +112,14 @@ export namespace SKI {
      * @param {String} names
      * @return {FreeVar[]}
      */
-    function free(...names: string): FreeVar[];
+    export function free(...names: string): FreeVar[];
     /**
      * Convert a number to Church encoding
      * @param {number} n
      * @return {Church}
      */
-    function church(n: number): Church;
-    namespace classes {
+    export function church(n: number): Church;
+    export namespace classes {
         export { Expr };
         export { Native };
         export { Alias };
@@ -127,6 +127,7 @@ export namespace SKI {
         export { Lambda };
         export { Inspector };
     }
+    export { native };
 }
 import { Native } from "./expr";
 import { Expr } from "./expr";
@@ -135,3 +136,11 @@ import { Church } from "./expr";
 import { Alias } from "./expr";
 import { Lambda } from "./expr";
 import { Inspector } from "./inspector";
+/**
+ *
+ * @type {{[key: string]: Native}}
+ */
+declare const native: {
+    [key: string]: Native;
+};
+export {};
