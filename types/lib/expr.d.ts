@@ -25,7 +25,7 @@ export class Expr {
     /**
      *
      * @param {{max: number?, maxArgs: number?}} options
-     * @return {{arity: number?, found: boolean, proper: boolean, canonical?: Expr}}
+     * @return {{arity: number?, found: boolean, proper: boolean, canonical?: Expr, skip: Set<number>?}}
      */
     guessArity(options?: {
         max: number | null;
@@ -35,6 +35,7 @@ export class Expr {
         found: boolean;
         proper: boolean;
         canonical?: Expr;
+        skip: Set<number> | null;
     };
     hasOnly(set: any): any;
     acceptsNoArgs(): boolean;
@@ -108,6 +109,11 @@ export class Expr {
     }): string;
     /**
      *
+     * @return {boolean}
+     */
+    needsParens(): boolean;
+    /**
+     *
      * @return {string}
      */
     toJSON(): string;
@@ -173,6 +179,7 @@ export class Alias extends Named {
        */
     constructor(name: string, impl: Expr);
     impl: Expr;
+    skip: Set<number>;
     subst(plug: any, value: any): Expr;
     reduce(args: any): Expr;
     equals(other: any): any;

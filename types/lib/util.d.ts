@@ -9,3 +9,4 @@ export class Tokenizer {
     split(str: string): string[];
 }
 export function restrict(set: any, spec: any): any;
+export function missingIndices(arr: any, set: any): any;
