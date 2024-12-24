@@ -5,17 +5,17 @@ describe('Expr.guessArity', () => {
     const cases = [
         // proper
         ['I', {arity: 1, proper: true, found: true}, 'x->x'],
-        ['K', {arity: 2, proper: true, found: true}],
+        ['K', {arity: 2, proper: true, found: true, skip: new Set([1])}],
         ['S', {arity: 3, proper: true, found: true}, 'x->y->z->x z (y z)'],
-        ['SK', {arity: 2, proper: true, found: true}],
+        ['SK', {arity: 2, proper: true, found: true, skip: new Set([0])}],
         ['CI', {arity: 2, proper: true, found: true}],
-        ['x->y->x x', {arity: 2, proper: true, found: true}],
+        ['x->y->x x', {arity: 2, proper: true, found: true, skip: new Set([1])}],
         ['10', {arity: 2, proper: true, found: true}],
 
         // improper
         ['CIS', {arity: 1, proper: false, found: true}],
         ['x->xSK', {arity: 1, proper: false, found: true}],
-        ['x->K(xS)', {arity: 2, proper: false, found: true}],
+        ['x->K(xS)', {arity: 2, proper: false, found: true, skip: new Set([1])}],
 
         ['x', {arity: 0, proper: false, found: true}],
         ['x->y x', {arity: 1, proper: false, found: true}, 'x->y x'],

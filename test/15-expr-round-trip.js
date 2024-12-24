@@ -5,6 +5,7 @@ describe('Expr <-> string', () => {
     const cases = [
         ['single native', 'S'],
         ['lambda', 'x->y->z->x z (y z)'],
+        ['aliased lamdba', 'F = a->b->c->c; F x y'],
         ['number', '5 x y'],
         ['free var', 'foobared'],
         ['some expr', 'SI(Kx)'],
