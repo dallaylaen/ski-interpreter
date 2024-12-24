@@ -9,3 +9,5 @@ out
 *.out
 *.out.json
 .idea
+isolate-*.log
+prof.txt
