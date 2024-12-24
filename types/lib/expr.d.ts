@@ -1,4 +1,5 @@
 export class Expr {
+    arity: number;
     /**
        * postprocess term after parsing. typically return self but may return other term or die
        * @return {Expr}
@@ -153,15 +154,14 @@ export class Native extends Named {
        * @param {String} name
        * @param {Number} arity
        * @param {function(...Expr): Expr} impl
-       * @param {{note: string?, fast: boolean?}} opt
+       * @param {{note: string?, skip: Array<number>?}} opt
        */
     constructor(name: string, arity: number, impl: (...args: Expr[]) => Expr, opt?: {
         note: string | null;
-        fast: boolean | null;
+        skip: Array<number> | null;
     });
-    arity: number;
     impl: (...arg0: Expr[]) => Expr;
-    fast: boolean;
+    skip: any;
     note: string;
     reduce(args: any): Expr;
 }
@@ -173,7 +173,6 @@ export class Alias extends Named {
        */
     constructor(name: string, impl: Expr);
     impl: Expr;
-    arity: number;
     subst(plug: any, value: any): Expr;
     reduce(args: any): Expr;
     equals(other: any): any;

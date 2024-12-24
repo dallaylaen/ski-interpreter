@@ -9,7 +9,6 @@ export class Inspector extends Expr {
         onReduce: (arg0: Expr[]) => Expr;
     });
     name: string;
-    arity: number;
     reduce: (args: any) => any;
     register(): this;
     toString(options?: {}): string;
