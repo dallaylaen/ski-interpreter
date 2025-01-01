@@ -38,7 +38,7 @@ export class Expr {
         skip: Set<number> | null;
     };
     hasOnly(set: any): any;
-    acceptsNoArgs(): boolean;
+    hasReduction(): boolean;
     /**
        * Apply self to list of given args.
        * Normally, only native combinators know how to do it.
