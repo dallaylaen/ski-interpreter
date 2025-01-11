@@ -31,6 +31,23 @@
       ]
     },
     {
+      "id": "aff42182-b14e-46eb-9686-69d63266fb87",
+      "title": "Join em harder",
+      "descr": [
+        "Now you are given 3 functions, <code>f</code>, <code>g</code>, and <code>h</code>.",
+        "Create a term that returns <code>h(f(g(x)))</code> for any given <code>x</code>.",
+        "Note that the order of arguments is the same as in the f(g(x)) problem,",
+        "so you can copy part of the solution verbatim."
+      ],
+      "vars": [
+        "f", "g", "h"
+      ],
+      "input": "phi",
+      "cases": [
+        [ "phi x", "h (f (g x))" ]
+      ]
+    },
+    {
       "id": "fb59a599-97a8-44bd-942f-560b44492d6a",
       "title": "Feeding a birdie",
       "descr": [
