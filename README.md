@@ -66,6 +66,11 @@ All expressions are immutable and will return a brand new expression if anything
 * [@ivanaxe](https://github.com/ivanaxe) for luring me into [icfpc 2011](http://icfpc2011.blogspot.com/2011/06/task-description-contest-starts-now.html) where I was introduced to combinators.
 * [@akuklev](https://github.com/akuklev) for explaining functional programming to me so many times that I actually got some idea.
 
+# Prior art
+
+* "To Mock The Mockingbird" by Raymond Smulian.
+* [combinator birds](https://www.angelfire.com/tx4/cus/combinator/birds.html) by [Chris Rathman](https://www.angelfire.com/tx4/cus/index.html)
+
 # License and copyright
 
 This software is free and available under the MIT license.
