@@ -142,13 +142,15 @@ class Store {
         return JSON.parse(window.localStorage.getItem(this.ns + key));
     }
 
-    * scan() {
+    scan() {
         const st = window.localStorage;
+        const out = [];
         for (let i = 0; i < st.length; i++) {
             const key = st.key(i);
             if (key.startsWith(this.ns))
-                yield key.substring(this.ns.length);
+                out.push(key.substring(this.ns.length));
         }
+        return out;
     }
 
     delete(key) {
