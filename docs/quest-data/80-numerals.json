@@ -17,7 +17,6 @@
         "Procure a term that increases given number by 1: <code>inc N x y &rarr; x(...N+1 times(y)...)</code>. "
       ],
       "hint": "<code>inc N x y &rarr; x (N x y)</code>.",
-      "numbers": true,
       "input": "phi",
       "cases": [
         [ "phi (KI) x y", "x y" ],
@@ -34,12 +33,13 @@
       ],
       "hint": "This can be done by applying <code>inc</code> m times to n",
       "input": "phi",
+      "solution": "CI(SB)",
       "cases": [
-        [ "!nat(phi 0 0)", "0" ],
-        [ "!nat(phi 5 0)", "5" ],
-        [ "!nat(phi 0 5)", "5" ],
-        [ "!nat(phi I I)", "2" ],
-        [ "!nat(phi 2 2)", "4" ]
+        [ "phi 0 0 + 0", "0" ],
+        [ "phi 5 0 + 0", "5" ],
+        [ "phi 0 5 + 0", "5" ],
+        [ "phi I I + 0", "2" ],
+        [ "phi (S(S(KS)K)I) (WB) + 0", "4" ]
       ]
     },
     {
@@ -64,12 +64,13 @@
         "Returning the next number wasn't that hard.",
         "How about returning the previous number, or zero for zero?"
       ],
+      "solution": "BBBC(BC(CI))  (C(B(CI))(SB))  (K(KI) )I ",
       "input": "phi",
       "cases": [
         [ "phi (KI) x y", "y" ],
         [ "phi I x y", "y" ],
         [ "phi 2 x y", "x(y)" ],
-        [ "!nat(phi 6)", "5" ]
+        [ "phi 6 + 0", "5" ]
       ]
     },
     {
@@ -80,9 +81,9 @@
       ],
       "input": "phi",
       "cases": [
-        ["!nat (phi(KI))", "1"   ],
-        ["!nat (phi I)",   "1"   ],
-        ["!nat (phi 5)",   "120" ]
+        ["phi(KI) + 0", "1"   ],
+        ["phi I + 0",   "1"   ],
+        ["phi 5 + 0",   "120" ]
       ]
     }
   ]
