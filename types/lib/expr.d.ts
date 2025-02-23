@@ -155,20 +155,26 @@ export class Lambda extends Expr {
 }
 export class Native extends Named {
     /**
-       * @desc A term named 'name' that converts next 'arity' arguments into
-       *       an expression returned by 'impl' function
-       * @param {String} name
-       * @param {Number} arity
-       * @param {function(...Expr): Expr} impl
-       * @param {{note: string?, skip: Array<number>?}} opt
-       */
+     * @desc A term named 'name' that converts next 'arity' arguments into
+     *       an expression returned by 'impl' function
+     *       If an apply: Expr=>Expr|null function is given, it will be attempted upon application
+     *       before building an App object. This allows to plug in argument coercions,
+     *       e.g. instantly perform a numeric operation natively if the next term is a number.
+     * @param {String} name
+     * @param {Number} arity
+     * @param {function(...Expr): Expr} impl
+     * @param {{note: string?, skip: Array<number>?, apply?: (expr)=>expr|null}} opt
+     */
     constructor(name: string, arity: number, impl: (...args: Expr[]) => Expr, opt?: {
         note: string | null;
         skip: Array<number> | null;
+        apply?: (expr: any) => any | null;
     });
     impl: (...arg0: Expr[]) => Expr;
     skip: any;
     note: string;
+    onApply: (expr: any) => any | null;
+    apply(...args: any[]): Expr;
     reduce(args: any): Expr;
 }
 export class Alias extends Named {
