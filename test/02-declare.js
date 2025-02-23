@@ -52,4 +52,14 @@ describe( 'SKI', () => {
 
         done();
     });
+
+    it ('can add aliases', () => {
+        const ski = new SKI();
+        const alias = ski.parse('T = S(K(SI))K');
+        expect(alias).to.be.instanceof(SKI.classes.Alias);
+        ski.add(alias);
+        const jar = {};
+        const expr = ski.parse('T x y', jar).run().expr;
+        expr.expect( ski.parse('y x', jar));
+    });
 });
