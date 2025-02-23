@@ -80,5 +80,17 @@
         [ "phi x y (KI)", "y" ],
         [ "phi x y (SK)", "y" ]
       ]
+    },
+    {
+      "id": "88dcba5c-37df-4245-8d21-2a5a27db805e",
+      "title": "Imperative if",
+      "descr": [
+        "TBD!"
+      ],
+      "unlock": "if",
+      "input": "if",
+      "cases": [
+        ["if a b c d", "if a d b c d"]
+      ]
     }
   ]
