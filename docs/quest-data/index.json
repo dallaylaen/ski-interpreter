@@ -89,5 +89,25 @@
       "and 1 is <code>I</code> (easy to confuse)."
     ],
     "link": "80-numerals.json"
+  },
+  {
+    "name": "Least List Lost Last",
+    "intro": [
+      "<p>Since there's a pair(x, y) operation in combinatory logic, one can already construct linked lists:",
+      "<code>(V x V(y (V z KI)))</code>.",
+      "Such approach is very straightforward but requires explicit recursion for almost all operations. <p>",
+      "<p>There is, however, another way. ",
+      "Much like Church numerals, lists can be encoded as parametric higher order functions:</p>",
+      "<code>[a, b, c] f x = f a (f b (f c x))</code>. ",
+      "So a list in this notation is indistinguishable from its <code>fold</code> operation",
+      "(or <code>foldr</code> more specifically).</p>",
+      "<p>We won't (yet) extend the notation with the <code>[</code> and <code>]</code>;",
+      "you can find such syntactic sugar in your favourite programming language.",
+      "Instead, we'll use <code>nil</code> to denote an empty list and <code>list val tail</code> for a list node,",
+      "where <code>tail</code> is either another node, or <code>nil</code>.",
+      "So <code>(list a (list b (list c nil))) f x</code> evaluates to <code>f a (f b (f c x))</code>",
+      "and <code>nil f x</code> evaluates to just <code>x</code>.</p>"
+    ],
+    "link": "90-lists.json"
   }
 ]

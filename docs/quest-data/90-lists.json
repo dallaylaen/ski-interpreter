@@ -1,0 +1,32 @@
+  [
+    {
+      "id": "d623f076-c4e3-4dad-922f-327d1946d816",
+      "title": "The blade itself",
+      "descr": [
+        "As is clear from the definition, <code>nil</code> equals to <code>KI</code>, as <code>nil f x = x</code>.",
+        "<code>list a (something) f z</code> evaluates to <code>f a (something f z)</code>.",
+        "Find <code>list</code>."
+      ],
+      "solution": "BS(C(BB))",
+      "input": "list",
+      "cases": [
+        ["list head tail f x", "f head (tail f x)"]
+      ]
+    },
+    {
+      "id": "6f8bdf54-8615-4972-862d-957aa56fbf05",
+      "title": "Reverse a list",
+      "descr": [
+        "You are given 2 functions: <code>list</code> and <code>nil</code>. ",
+        "Reverse a list."
+      ],
+      "solution": "BBBC(BC(CI)) (B(CB)list) I nil",
+      "vars": ["nil=KI", "list=BS(C(BB))"],
+      "input": "rev",
+      "cases": [
+        ["rev nil", "nil"],
+        ["rev (list a nil)", "list a nil"],
+        ["rev (list a(list b(list c nil)))", "list c (list b (list a nil))"]
+      ]
+    }
+  ]
