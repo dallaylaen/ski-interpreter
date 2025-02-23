@@ -11,7 +11,7 @@
     "url": "git+https://github.com/dallaylaen/ski-interpreter.git"
   },
   "author": "Konstantin Uvarin",
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/dallaylaen/ski-interpreter/issues"
   },
