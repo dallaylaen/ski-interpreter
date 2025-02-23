@@ -24,12 +24,12 @@ export class SKI {
     allow: any;
     /**
      *
-     * @param {String} name
-     * @param {Expr|String|[number, function(...Expr): Expr, {note: string?, fast: boolean?}]} impl
+     * @param {Alias|String} term
+     * @param {Expr|String|[number, function(...Expr): Expr, {note: string?, fast: boolean?}]} [impl]
      * @param {String} [note]
      * @return {SKI} chainable
      */
-    add(name: string, impl: Expr | string | [number, (...args: Expr[]) => Expr, {
+    add(term: Alias | string, impl?: Expr | string | [number, (...args: Expr[]) => Expr, {
         note: string | null;
         fast: boolean | null;
     }], note?: string): SKI;
@@ -125,10 +125,10 @@ export namespace SKI {
     export { native };
 }
 import { Native } from "./expr";
+import { Alias } from "./expr";
 import { Expr } from "./expr";
 import { FreeVar } from "./expr";
 import { Church } from "./expr";
-import { Alias } from "./expr";
 import { Lambda } from "./expr";
 /**
  *
