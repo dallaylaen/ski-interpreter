@@ -74,6 +74,24 @@
       ]
     },
     {
+      "id": "3cbfbce6-6701-4d5c-8217-ab36647f4185",
+      "title": "Multiplication",
+      "descr": [
+        "Create a term that takes two numbers and produces their product."
+      ],
+      "input": "phi",
+      "cases": [
+        [ "phi 0 0 + 0", "0" ],
+        [ "phi 0 5 + 0", "0" ],
+        [ "phi 5 0 + 0", "0" ],
+        [ "phi 2 3 + 0", "6" ],
+        [ "phi 3 2 + 0", "6" ],
+        [ "phi 3 3 + 0", "9" ],
+        [ "phi 4 4 + 0", "16" ],
+        [ "phi 5 5 + 0", "25" ]
+      ]
+    },
+    {
       "id": "706e03ef-dad1-44d7-9dde-784b801ea7c6",
       "title": "His Majesty Factorial",
       "descr": [
