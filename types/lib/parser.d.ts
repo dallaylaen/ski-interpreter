@@ -5,7 +5,6 @@ export class SKI {
      *    allow: string?,
      *    numbers: boolean?,
      *    lambdas: boolean?,
-     *    inspectors: boolean?,
      *    terms: { [key: string]: Expr|string}?
      * }} [options]
      */
@@ -13,7 +12,6 @@ export class SKI {
         allow: string | null;
         numbers: boolean | null;
         lambdas: boolean | null;
-        inspectors: boolean | null;
         terms: {
             [key: string]: Expr | string;
         } | null;
@@ -24,9 +22,6 @@ export class SKI {
     hasNumbers: boolean;
     hasLambdas: boolean;
     allow: any;
-    inspectors: {
-        [x: string]: Injection;
-    };
     /**
      *
      * @param {String} name
@@ -125,7 +120,7 @@ export namespace SKI {
         export { Alias };
         export { FreeVar };
         export { Lambda };
-        export { Inspector };
+        export { Church };
     }
     export { native };
 }
@@ -135,7 +130,6 @@ import { FreeVar } from "./expr";
 import { Church } from "./expr";
 import { Alias } from "./expr";
 import { Lambda } from "./expr";
-import { Inspector } from "./inspector";
 /**
  *
  * @type {{[key: string]: Native}}

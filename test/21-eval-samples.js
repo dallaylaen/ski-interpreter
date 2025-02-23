@@ -26,6 +26,12 @@ describe ('expression samples evaluate correctly', () => {
         //
         ['WI(a->b->a b) x y', 'x y', 7],
 
+        // church numerals coercion
+        ['+ x y z', 'y(x y z)', 1],
+        ['+x', '+x', 0],
+        ['4 + 3', '7', 4],
+        ['WB(WB)(WB) + 0', '16', 32],
+
     ];
 
     for (const entry of cases) {

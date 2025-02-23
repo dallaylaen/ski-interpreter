@@ -5,7 +5,7 @@ set -ex
 AUTOFILES="docs/build docs/man types"
 
 modified() {
-    LIST=$(git status --porcelain -- "$@" | grep '^ *[AM?]' | awk '{print $2}')
+    LIST=$(git status --porcelain -- "$@" | grep '^ *[AMD?]' | awk '{print $2}')
     echo $LIST
 }
 
