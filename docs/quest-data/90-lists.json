@@ -14,19 +14,112 @@
       ]
     },
     {
+      "id": "099e10ce-5b0a-4c6d-b99e-d6aae9331a93",
+      "title": "Mene, tekel, upharsin",
+      "descr": [
+        "Find the length of a given list."
+      ],
+      "vars": ["nil=KI", "lst=BS(C(BB))"],
+      "input": "len",
+      "cases": [
+        ["len nil + 0", "0"],
+        ["len (lst a nil) + 0", "1"],
+        ["len (lst a(lst b(lst c nil))) + 0", "3"]
+      ]
+    },
+    {
+      "id": "1e619c6e-36e0-4598-9b88-439fc9ad9cd0",
+      "title": "The ring of the master cat",
+      "descr": [
+        "Concatenate two lists given as arguments."
+      ],
+        "vars": ["nil=KI", "lst=BS(C(BB))"],
+      "input": "cat",
+        "cases": [
+          ["cat nil nil", "nil"],
+          ["cat nil (lst a nil)", "lst a nil"],
+          ["cat (lst a nil) nil", "lst a nil"],
+          ["cat (lst a nil) (lst b nil)", "lst a (lst b nil)"],
+          ["cat (lst a(lst b nil)) (lst c(lst d nil))", "lst a (lst b (lst c (lst d nil)))"]
+        ],
+      "solution": "CI lst"
+    },
+    {
+      "id": "38441ba2-84df-4002-8b8e-47bfe3a36f3b",
+      "title": "The antediluvian map fragment",
+      "descr":   [
+        "Build function <code>map f</code> that applies a given function to each element of a list.",
+        "You can use <code>list</code> and <code>nil</code> to build the result, but aren't required to."
+      ],
+      "vars": ["nil=KI", "lst=BS(C(BB))"],
+      "input": "map",
+      "cases": [
+        ["map f nil", "nil"],
+        ["map f (lst a nil) g y", "g (f a) y"],
+        ["map f (lst a(lst b (lst c nil))) g y", "g (f a) (g (f b) (g (f c) y))"]
+      ],
+      "solution": "B(C(BC(CI))nil) (B lst)"
+    },
+    {
+      "id": "a5a33119-4594-44c9-b752-97162dc883b4",
+      "title": "The last argument",
+      "descr": [
+          "Find the last element of a nonempty list."
+      ],
+      "vars": ["nil=KI", "lst=BS(C(BB))"],
+      "input": "last",
+      "cases": [
+        ["last (lst a nil)", "a"],
+        ["last (lst a(lst b nil))", "b"],
+        ["last (lst a(lst b(lst c nil)))", "c"]
+      ],
+      "solution": "BBBC(BC(CI)) (C(BK)) I _"
+    },
+    {
+      "id": "864f73dc-0d32-4dbc-a7b6-0945bdaf1191",
+      "title": "The fairy tail",
+      "descr": [
+        "Find the tail of a list, or an empty list if the list is empty."
+      ],
+      "vars": ["nil=KI", "lst=BS(C(BB))"],
+      "input": "tail",
+      "cases": [
+        ["tail nil f x", "x"],
+        ["tail (lst a nil) f x", "x"],
+        ["tail (lst a(lst b nil)) f x", "f b x"],
+        ["tail (lst a(lst b(lst c nil))) f x", "f b (f c x)"]
+      ]
+    },
+    {
+      "id": "712aaed0-4a81-49b1-a0ac-bc76ed8a6186",
+      "title": "Random access",
+      "descr": [
+        "Find the element at a <code>nth</code> position in a list.",
+        "Assume the list to have enough elements."
+      ],
+      "vars": ["nil=KI", "lst=BS(C(BB))"],
+      "input": "nth",
+      "cases": [
+        ["nth 0 (lst a nil)", "a"],
+        ["nth 1 (lst a(lst b nil))", "b"],
+        ["nth 2 (lst a(lst b(lst c nil)))", "c"],
+        ["nth 0 (lst a(lst b(lst c nil)))", "a"]
+      ]
+    },
+    {
       "id": "6f8bdf54-8615-4972-862d-957aa56fbf05",
       "title": "Reverse a list",
       "descr": [
-        "You are given 2 functions: <code>list</code> and <code>nil</code>. ",
+        "You are given 2 functions: <code>lst</code> and <code>nil</code>. ",
         "Reverse a list."
       ],
-      "solution": "BBBC(BC(CI)) (B(CB)list) I nil",
-      "vars": ["nil=KI", "list=BS(C(BB))"],
+      "solution": "BBBC(BC(CI)) (B(CB)lst) I nil",
+      "vars": ["nil=KI", "lst=BS(C(BB))"],
       "input": "rev",
       "cases": [
         ["rev nil", "nil"],
-        ["rev (list a nil)", "list a nil"],
-        ["rev (list a(list b(list c nil)))", "list c (list b (list a nil))"]
+        ["rev (lst a nil)", "lst a nil"],
+        ["rev (lst a(lst b(lst c nil)))", "lst c (lst b (lst a nil))"]
       ]
     }
   ]
