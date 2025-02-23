@@ -61,7 +61,9 @@ export class Quest {
      *             expr: Expr?,
      *             pass: boolean,
      *             details: {pass: boolean, steps: number, found: Expr, expected: Expr, start: Expr?, args: Expr[]?}[],
-     *             exception: Error?
+     *             exception: Error?,
+     *             steps: number,
+     *             input: Expr[]
      *         }}
      */
     check(...input: typeof import("./expr").Expr | string): {
@@ -76,6 +78,8 @@ export class Quest {
             args: typeof import("./expr").Expr[] | null;
         }[];
         exception: Error | null;
+        steps: number;
+        input: typeof import("./expr").Expr[];
     };
     /**
        *
