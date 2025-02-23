@@ -56,8 +56,13 @@ describe( 'quest-data', async () => {
                             if (quest.solution) {
                                 it ('passes included example solution', () => {
                                     const result = q.check(quest.solution);
-                                    if (!result.pass)
-                                        console.log('proposed solution failed: ', result);
+                                    if (!result.pass) {
+                                        console.log('proposed solution failed: '+result.expr.expand().toString({terse: false}));
+                                        for (const entry of result.details) {
+                                            console.log("found:    " + entry.found);
+                                            console.log("expected: " + entry.expected);
+                                        }
+                                    }
                                     expect( result.pass ).to.equal(true);
                                 });
                             }
