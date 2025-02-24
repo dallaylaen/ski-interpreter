@@ -104,9 +104,9 @@ class TeletypeBox {
         this.parent = parent;
         this.options = options;
         this.content = append(parent, 'div', {class: ['console']});
-        this.head = append(this.content, 'div', {class: ['con-head']});
+        this.head = append(this.content, 'div', {class: ['con-header']});
         this.box = append(this.content, 'div', {class: ['eval-box']});
-        this.foot = append(this.content, 'div', {class: ['con-foot']});
+        this.foot = append(this.content, 'div', {class: ['con-footer']});
         this.height = options.height ?? Infinity;
     };
     print (text, options={}) {
