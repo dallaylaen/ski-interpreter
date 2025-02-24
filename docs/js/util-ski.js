@@ -46,7 +46,7 @@ class EvalBox {
         this.permalink.target = '_blank';
         this.permalink.innerHTML = '#' + this.id;
         this.src = append(this.head, 'span', {class: ['con-source']});
-        this.counter = append(this.head, 'span', {class: ['con-number']});
+        this.counter = append(this.head, 'span', {class: ['con-number', 'float-right']});
     }
 
     setup (src, expr) {

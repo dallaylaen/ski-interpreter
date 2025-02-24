@@ -29,6 +29,8 @@ function append(parent, type, options={}) {
         child.innerHTML = '' + options.content;
     if (options.hidden)
         child.hidden = true;
+    if (options.color)
+        child.style.color = options.color;
     parent.appendChild(child);
     return child;
 }
@@ -136,26 +138,27 @@ class TeletypeBox {
      * @param {{height: number?}} options
      */
 
-    constructor (parent, options) {
+    constructor (parent, options={}) {
         this.parent = parent;
         this.options = options;
         this.content = append(parent, 'div', {class: ['console']});
         this.head = append(this.content, 'div', {class: ['con-head']});
         this.box = append(this.content, 'div', {class: ['eval-box']});
         this.foot = append(this.content, 'div', {class: ['con-foot']});
-        this.height = options.height ?? 5;
-        this.line = 0;
+        this.height = options.height ?? Infinity;
     };
     print (text, options={}) {
         const line = append(this.box, 'div', options);
         this.last = line;
-        this.line++;
 
         if (options.raw) {
             line.innerHTML = text;
         } else {
-            writeElement(append(line, 'span', {class: ["line-number"]}), options.line ?? this.line);
-            writeElement(append(line, 'span', {class: ["line-text"]}), text);
+            writeElement(append(line, 'span', {class: ["line-number"]}), options.line ?? '');
+            writeElement(append(line, 'span', {
+                class: options.class ?? ["line-text"],
+                color: options.color,
+            }), text);
 
             while (this.box.children.length > this.height)
                 this.box.removeChild(this.box.firstChild);
@@ -166,7 +169,17 @@ class TeletypeBox {
         return line;
     }
 
+    remove() {
+        if (this.parent) {
+            this.parent.removeChild(this.content);
+            this.parent = null;
+        }
+    }
 
+    attach(parent) {
+        this.parent = parent;
+        parent.appendChild(this.content);
+    }
 }
 
 
