@@ -93,44 +93,6 @@ function decode (s) {
     return decodeURIComponent((''+s).replace(/\+/g, ' '));
 }
 
-/**
- * create a function that takes text and appends it to specific region
- * in a specific <div>
- * @param {Element} attach
- * @param {{color: string?, bgcolor: string?, class: string?, padding: number?, class: string?}} opt
- * @return {(function(string, Object?): void)}
- */
-function teletype(attach, opt={}) {
-    const sheet = append(attach, opt.tag ?? 'div');
-    if (opt.color)
-        sheet.style.color = opt.color;
-    if (opt.class)
-        sheet.classList.add(opt.class);
-    sheet.style.border = 'dotted 1px '+(opt.color ?? 'lightGray');
-    let tty = function (text, opt={}) {
-        const line = append(sheet, opt.tag ?? 'span');
-        if (opt.color)
-            line.style.color = opt.color;
-        if (opt.bgcolor)
-            line.style.background = opt.bgcolor;
-        if (opt.padding)
-            line.style.paddingLeft = line.style.paddingRight = opt.padding+"em";
-        if (opt.class)
-            line.classList.add(opt.class);
-        line.rewrite = function(str) {
-            this.innerHTML = ''+str;
-            attach.scrollTop = this.offsetTop;
-            return this;
-        }
-        line.rewrite(text);
-        if (!opt.nobr)
-            append( sheet, 'br' );
-        return line;
-    }
-    tty.element = sheet;
-    return tty;
-}
-
 class TeletypeBox {
     /**
      *
@@ -182,8 +144,6 @@ class TeletypeBox {
     }
 }
 
-
-
 function writeElement (element, text) {
     // make text safe for HTML
     element.innerHTML = sanitize(text);
@@ -223,45 +183,4 @@ class Store {
     delete(key) {
         window.localStorage.removeItem(this.ns + key);
     }
-}
-
-
-/**
- *
- * @param {function()} onPrepare
- * @param {function(any, done: boolean): void} onNext
- * @param {function(): void} onDone
- * @param {function(Error): void}onError
- */
-function gen2timer (options) {
-    const delay = options.delay ?? 0;
-    const onPrepare = options.onPrepare;
-    const onNext = options.onNext;
-    const onDone = options.onDone ?? (() => {});
-    const onError = options.onError ?? console.log;
-
-    // TODO this must be an idiom and have a standard impl
-    let iter;
-    try {
-        iter = onPrepare();
-    } catch (e) {
-        onError(e);
-        return;
-    }
-
-    const tick = () => {
-        try {
-            const next = iter.next();
-            if (next.done) {
-                onDone();
-            } else {
-                onNext(next.value);
-                setTimeout(tick, delay);
-            }
-        } catch (e) {
-            onError(e);
-        }
-    }
-
-    setTimeout(tick, 0);
 }
