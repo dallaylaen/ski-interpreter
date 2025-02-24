@@ -129,6 +129,60 @@ function teletype(attach, opt={}) {
     return tty;
 }
 
+class TeletypeBox {
+    /**
+     *
+     * @param {Element} parent
+     * @param {{height: number?}} options
+     */
+
+    constructor (parent, options) {
+        this.parent = parent;
+        this.options = options;
+        this.content = append(parent, 'div', {class: ['console']});
+        this.head = append(this.content, 'div', {class: ['con-head']});
+        this.box = append(this.content, 'div', {class: ['eval-box']});
+        this.foot = append(this.content, 'div', {class: ['con-foot']});
+        this.height = options.height ?? 5;
+        this.line = 0;
+    };
+    print (text, options={}) {
+        const line = append(this.box, 'div', options);
+        this.last = line;
+        this.line++;
+
+        if (options.raw) {
+            line.innerHTML = text;
+        } else {
+            writeElement(append(line, 'span', {class: ["line-number"]}), options.line ?? this.line);
+            writeElement(append(line, 'span', {class: ["line-text"]}), text);
+
+            while (this.box.children.length > this.height)
+                this.box.removeChild(this.box.firstChild);
+        }
+
+        this.parent.scrollTop = line.offsetTop;
+
+        return line;
+    }
+
+
+}
+
+
+
+function writeElement (element, text) {
+    // make text safe for HTML
+    element.innerHTML = sanitize(text);
+    return element;
+}
+
+function sanitize (text) {
+    if (typeof text !== 'string')
+        text = ''+text;
+    return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 class Store {
     constructor(namespace) {
         this.ns = namespace + ':';

@@ -103,11 +103,10 @@
      */
 
     let ski = new SKI({numbers: true, allow: 'SKIBCKW', lambdas: true});
-    let showlines = 10;
+    let showlines = 7;
     let autosave = false;
-    let count = 0;
-    let running = false;
     let greet = teletype(view.teletype);
+    let currentBox = null;
 
     init();
 
@@ -145,7 +144,9 @@
     function onKey (event) {
         if (event.keyCode === 13) {
             event.preventDefault();
-            if (!running) run();
+            if (currentBox)
+                currentBox.stop("interrupted by user");
+            run();
             return false;
         }
         return true;
@@ -161,68 +162,46 @@
 
     // page functions
     function runStop() {
-        if (running) stop();
-        else run();
-        
-        return false;
-    }
-
-    function stop() {
-        running = false;
-        view.runstopBtn.classList.remove('running');
+        if (currentBox) {
+            currentBox.stop("interrupted by user");
+            return false;
+        };
+        return run();
     }
 
     function run() {
-        const out = teletype(view.teletype);
-        greet.element.remove();
-        
-        showlines = view.verbose.checked ? Infinity : 10
-        const src = view.entryField.value;
+        const box = new TeletypeBox(view.teletype, {height: showlines});
 
+        const src = view.entryField.value;
         if (src.match(/^\s*\?[\s?]*$/)) {
-            out(view.help.innerHTML, {tag: 'div', class: ['help']});
+            box.print(view.help.innerHTML, {raw: true});
             return;
         }
 
-        running = true;
-        view.runstopBtn.classList.add('running');
-
-        const head = out( '<a href="'+permalink(ski, view.entryField.value)+'" target="_blank"><b>Expression #'+(++count)+'</b></a>',
-            {tag: 'div', nobr: true, class: 'con-header'});
-        append(head, 'span').innerHTML = '  steps: ';
-        const iterfield = append(head, 'span');
-        iterfield.innerHTML = '-';
-
-        let lcount = 0; // lines output may differ from step count
-        let line; // element to write to
-
-        gen2timer({
-            onPrepare: () => {
-                const expr = ski.parse(src);
-                if (expr instanceof SKI.classes.Alias) {
-                    ski.add(expr.name, expr.impl);
+        const runner = new EvalBox(box, {
+            height: view.verbose.checked ? Infinity : 7,
+            engine: ski,
+            delay: 300,
+            onStart: function() {
+                currentBox = this;
+                view.runstopBtn.classList.add('running');
+                if (this.expr instanceof SKI.classes.Alias) {
+                    // user defined a new term
+                    this.engine.add(this.expr);
                     showKnown();
                 }
-                return expr.walk();
             },
-            onNext: (next) => {
-                if (!running)
-                    throw new Error('... interrupted by user!');
-                if (!line || lcount++ <= showlines)
-                    line = out('');
-                iterfield.innerHTML = '' + next.steps;
-                line.rewrite(next.expr.toString({terse: true}));
-                if (next.final) {
-                    line.classList.add('success');
-                    stop();
-                }
-            },
-            onError: error => {
-                out (''+error, {class: "error"});
-                stop();
-            },
-            delay: 0,
+            onStop: function () {
+                view.runstopBtn.classList.remove('running');
+                currentBox = null;
+            }
         });
+
+        runner.setup(src);
+
+        view.runstopBtn.classList.add('running');
+
+        return false;
     }
 
     function showKnown() {
@@ -262,7 +241,7 @@
                 class: ['entry']
             });
         }
-    
+
         const controls = append(view.known, 'div', {class: ['controls', 'float-right']});
         append(controls, 'button', {content: 'reset'}).onclick = () => {
             ski = new SKI();
@@ -306,11 +285,11 @@
              "footer footer" min-content
             / fit-content(69%) auto;
         }
-        
+
         header, #teletype, #prompt {
             padding: 0 0.5em;
         }
-        
+
         footer {
             padding: 1px 0.5em;
             margin-top: 1ex;
@@ -335,7 +314,7 @@
             overflow: auto;
             grid-area: info;
         }
-        
+
         #prompt {
             display: flex;
             grid-area: prompt;
@@ -358,11 +337,11 @@
         #runstopBtn::before {
             display: inline-block;
             vertical-align: 20%;
-            
+
             content: '\25B6\FE0E';
             color: darkGreen;
         }
-        
+
         #runstopBtn.running::before {
             content: '\25A0\FE0E';
             color: darkRed;
@@ -407,7 +386,7 @@
         #known a[href]:hover {
             outline: auto rgba(0, 150, 255, 1);
             outline-offset: 1px;
-        }   
+        }
         #known .remove {
             float: right;
             text-decoration: none;
@@ -427,7 +406,7 @@
         #teletype > div:first-child {
             margin-top: 0.5em;
         }
-        
+
         .con-header {
             padding: 1px 2px;
             margin: -2px -2px 0px -2px;
