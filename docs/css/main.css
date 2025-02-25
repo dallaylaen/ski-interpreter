@@ -1,4 +1,5 @@
 /* ski-specific */
+
 .term-def {
     text-decoration: none;
     color: inherit;
@@ -11,9 +12,25 @@
     text-overflow: ellipsis;
 }
 
+.hint {
+    cursor: pointer;
+}
 
 /* teletype */
 
+#teletype {
+    font-family: monospace;
+    color: #363636;
+    overflow-wrap: break-word;
+}
+
+.line-number {
+    color: #999;
+    padding-right: 1em;
+    text-align: right;
+    display: inline-block;
+    width: 2em;
+}
 
 .con-permalink {
     padding-right: 1em;
@@ -39,7 +56,6 @@ ul.hamburger {
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
     z-index: 1;
 }
-
 
 ul.hamburger-right {
     right: 0;
@@ -76,36 +92,7 @@ ul.hamburger-right {
     color: white;
 }
 
-
 /* general */
-
-
-
-.flex {
-    display: inline-block;
-    float: left;
-    border: solid red 1px;
-}
-
-.rightmost {
-    display: inline-block;
-    float: right;
-}
-
-#teletype {
-    font-family: monospace;
-    color: #363636;
-    overflow-wrap: break-word;
-}
-
-.line-number {
-    color: #999;
-    padding-right: 1em;
-    text-align: right;
-    display: inline-block;
-    width: 2em;
-}
-
 
 .scroll {
     overflow: scroll;
@@ -170,15 +157,6 @@ ul#known li {
     height: 1.5em;
 }
 
-button input {
-    display: inline-block;
-    padding: 0;
-    margin: 0;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-
-}
-
 #top {
     padding-top: 0.5em;
 }
@@ -191,13 +169,6 @@ button input {
     height: 20em;
 }
 
-.clickable {
-    text-decoration: none;
-    color: inherit;
-}
-
-
-
 .error {
     color: red;
 }
@@ -205,12 +176,6 @@ button input {
 .success {
     color: green;
 }
-
-.mode-pick {
-    color: dodgerblue;
-}
-
-
 
 h1 {
     margin: 0;
@@ -247,7 +212,6 @@ h1 img {
     margin: 1ex 0;
 }
 
-
 #intro p {
     margin: 1ex;
 }
@@ -255,33 +219,12 @@ h1 img {
     margin: 1ex;
 }
 
-.hint {
-    cursor: pointer;
-}
-
-.block-header {
-    background-color: burlywood;
-    color: maroon;
-    padding: 0 0.5em;
-    border-radius: 0.5em;
-    font-weight: bold;
-}
-
-.block-header .success {
-    color: darkgreen;
-    font-stretch: condensed;
-}
 
 .note code {
     font-family: inherit;
     font-style: italic;
     color: indigo;
     white-space: nowrap;
-}
-
-
-.remove {
-    color: red;
 }
 
 .big {
