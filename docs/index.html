@@ -247,7 +247,7 @@
         for (let name of Object.keys(list).sort()) {
             const entry = list[name];
             const entryBlock = append(view.known, 'div' );
-            const entryLink = append(entryBlock, 'a', {class: ['entry']});
+            const entryLink = append(entryBlock, 'a', {class: ['term-def']});
             entryLink.href='#';
             entryLink.onclick = event => insert(name);
             append(entryLink, 'dt', {
@@ -260,6 +260,7 @@
             });
             const placeholder = append(entryBlock, 'span', {class: [ 'float-right' ], content: '&Xi;'});
             const menu = new Hamburger(placeholder, {right: true});
+            menu.addLabel('manage ' + name);
             if (entry instanceof SKI.classes.Alias) {
                 menu.addAction('copy definition', () => navigator.clipboard.writeText(
                     `${name} = ${entry.impl.toString({terse: true})}`));

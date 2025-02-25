@@ -59,6 +59,8 @@ function rubberDesign (mainId) {
   return resize;
 }
 
+let currentHamburger = null;
+
 class Hamburger {
   constructor (button, options = {}) {
     this.button = button;
@@ -71,6 +73,12 @@ class Hamburger {
 
   appendLi () {
     return append(this.content, 'li');
+  }
+
+  addLabel (label) {
+    const li = this.appendLi();
+    append(li, 'span', { content: label });
+    return this; // for chaining
   }
 
   addLink (label, href, target) {
@@ -127,11 +135,16 @@ class Hamburger {
   }
 
   hide () {
+    if (currentHamburger === this)
+      currentHamburger = null;
     this.hidden = true;
     this.content.style.display = 'none';
   }
 
   show () {
+    if(currentHamburger)
+      currentHamburger.hide();
+    currentHamburger = this;
     this.hidden = false;
     this.content.style.display = 'block';
   }
