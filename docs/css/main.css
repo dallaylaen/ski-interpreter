@@ -262,6 +262,19 @@ h1 img {
     font-size: 2em;
 }
 
+/* ski-specific */
+.term-def {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    /* shorten long lines */
+    display: inline-block;
+    width: calc(100% - 2em);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* hamburger menu */
 
 .hamburger-button {
