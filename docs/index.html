@@ -11,6 +11,7 @@
 </head>
 <body>
     <header>
+        <div class="float-left" id="menu"></div>
         <h1><img src="img/mock1.png"> Simple Kombinator <nobr>Interpreter <img src="img/mock2.png"></nobr></h1>
     </header>
     <div id="teletype">
@@ -88,14 +89,14 @@
     <form id="prompt" onsubmit="return runStop()">
         <input id="entryField">
         <button id="runstopBtn" type="submit"></button>
-        <label id="verboseBtn"><input type="checkbox" id="verbose"/>verbose</label>
     </form>
     <footer>&copy;2024 Konstantin Uvarin (<a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">sources</a>)</footer>
 <script>
     /**
      *   References to static page elements
      */
-    const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'entryField', 'runstopBtn', 'verbose', 'help');
+    const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'entryField',
+        'runstopBtn', 'help', 'menu');
     const store = new Store('playground');
 
     /**
@@ -103,18 +104,18 @@
      */
 
     let ski = new SKI({numbers: true, allow: 'SKIBCKW', lambdas: true});
-    let showlines = 7;
     let autosave = false;
     let greet = new TeletypeBox(view.teletype);
     let currentBox = null;
+    const evalOptions = {
+        delay: 300,
+        height: 7,
+    };
 
-    init();
+    setupMenu();
+    setupMain();
 
-    /**
-     * Page-specific functions
-      */
-
-    function init() {
+    function setupMain() {
         view.entryField.addEventListener('keydown', onKey);
         view.entryField.addEventListener('input', saveInput);
 
@@ -140,6 +141,36 @@
             {color: "green"}
         );
     }
+
+    function setupMenu() {
+        const menu = new Hamburger(view.menu);
+        menu.addChoice('speed (ms)', val => {
+            evalOptions.delay = val;
+            if(currentBox)
+                currentBox.delay = val;
+            store.save('delay', val);
+        }, [0, 50, 100, 200, 300, 500, 1000], 4);
+        menu.addChoice('history lines', val => {
+            evalOptions.height = val;
+            if(currentBox)
+                currentBox.setHeight(val);
+            store.save('height', val);
+        }, [3, 5, 7, 10, ['&infin;', Infinity]], 2);
+        menu.addAction('reset terms', () => {
+            if (!window.confirm('Really erase all terms?'))
+                return;
+            ski = new SKI();
+            store.save('engine', ski);
+            showKnown();
+        });
+        menu.addLink('quest mode', 'quest.html', '_blank');
+        menu.addLink('ski calculus', 'https://en.wikipedia.org/wiki/SKI_combinator_calculus', '_blank');
+        menu.addAction('help', () => new TeletypeBox(view.teletype).print(view.help.innerHTML, {raw: true}));
+    }
+
+    /**
+     * Page-specific functions
+     */
 
     function onKey (event) {
         if (event.keyCode === 13) {
@@ -171,7 +202,7 @@
 
     function run() {
         greet.remove();
-        const box = new TeletypeBox(view.teletype, {height: showlines});
+        const box = new TeletypeBox(view.teletype);
 
         const src = view.entryField.value;
         if (src.match(/^\s*\?[\s?]*$/)) {
@@ -180,9 +211,9 @@
         }
 
         const runner = new EvalBox(box, {
-            height: view.verbose.checked ? Infinity : 7,
+            height: evalOptions.height,
+            delay: evalOptions.delay,
             engine: ski,
-            delay: 300,
             onStart: function() {
                 currentBox = this;
                 view.runstopBtn.classList.add('running');
@@ -242,14 +273,7 @@
                 class: ['entry']
             });
         }
-
-        const controls = append(view.known, 'div', {class: ['controls', 'float-right']});
-        append(controls, 'button', {content: 'reset'}).onclick = () => {
-            ski = new SKI();
-            store.save('engine', ski);
-            showKnown();
-        };
-    };
+    }
 
     function removeKnown(name) {
         ski.remove(name);
@@ -346,14 +370,6 @@
         #runstopBtn.running::before {
             content: '\25A0\FE0E';
             color: darkRed;
-        }
-
-        #verboseBtn {
-            flex: 0 auto;
-        }
-
-        #verbose {
-            vertical-align: middle;
         }
 
         p.caption {

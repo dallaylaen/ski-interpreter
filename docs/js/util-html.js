@@ -58,6 +58,106 @@ function rubberDesign (mainId) {
     resize();
     return resize;
 }
+/*
+    hamburger:
+        list of:
+            section:
+                - label
+                - one of:
+                    - action()
+                    - choice:
+                        action(picked)
+                        list of:
+                            - label
+                    - link
+                        - just href, we already have label
+                        - target
+ */
+
+class Hamburger {
+    constructor(parent, options={}) {
+        this.parent = parent;
+        this.button = append(parent, 'button', {class: ['hamburger-button']});
+        this.button.innerHTML = '&#9776;';
+        this.button.addEventListener('click', () => this.toggle());
+        this.hidden = true;
+        this.content = append(parent, 'ul', {class: options.right ? ['hamburger', 'hamburger-right'] : ['hamburger']});
+        // escape closes the menu
+        this.content.addEventListener('keydown', e => {
+            console.log("ley pressed", e.key);
+            if (e.key === 'Escape')
+                this.hide();
+        });
+    }
+
+    appendLi() {
+        return append(this.content, 'li');
+    }
+
+    addLink(label, href, target) {
+        const li = this.appendLi();
+        const link = append(li, 'a', {content: label});
+        link.href = href;
+        link.target = target;
+        link.onclick = () => this.hide();
+        return this; // for chaining
+    }
+
+    addAction(label, action) {
+        const li = this.appendLi();
+        const link = append(li, 'a', {content: label});
+        link.onclick = () => {
+            action();
+            this.hide();
+        };
+        return this; // for chaining
+    }
+
+    /**
+     * A sticky options choice
+     * @param label
+     * @param action
+     * @param choices
+     * @return {Hamburger}
+     */
+    addChoice(label, action, choices, startAt=null) {
+        let current = startAt;
+        const li = this.appendLi();
+        const span = append(li, 'span', {content: label});
+        const entries = [];
+        for (let i = 0; i < choices.length; i++) {
+            const pick = Array.isArray(choices[i]) ? choices[i][1] : choices[i];
+            const display = Array.isArray(choices[i]) ? choices[i][0] : choices[i];
+            const entry = append(li, 'a', {content: display, class: ['hamburger-choice']});
+            entries.push(entry);
+            if (i === startAt)
+                entry.classList.add('hamburger-current');
+            entry.onclick = () => {
+                if (current !== null)
+                    entries[current].classList.remove('hamburger-current');
+                current = i;
+                entries[i].classList.add('hamburger-current');
+                action(pick);
+                this.hide();
+            };
+        }
+        return this; // for chaining
+    }
+
+    hide() {
+        this.hidden = true;
+        this.content.style.display = 'none';
+    }
+
+    show() {
+        this.hidden = false;
+        this.content.style.display = 'block';
+    }
+
+    toggle() {
+        this.hidden ? this.show() : this.hide();
+    }
+}
 
 /**
  *
@@ -153,7 +253,12 @@ function writeElement (element, text) {
 function sanitize (text) {
     if (typeof text !== 'string')
         text = ''+text;
-    return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const escape = {
+        '<': '&lt;',
+        '>': '&gt;',
+        '&': '&amp;',
+    };
+    return text.replace(/[<>&]/g, c => escape[c]);
 }
 
 class Store {

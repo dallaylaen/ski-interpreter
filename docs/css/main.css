@@ -161,6 +161,11 @@ h1 img {
     float: right;
 }
 
+.float-left {
+    display: inline-block;
+    float: left;
+}
+
 .help {
     font-family: serif;
     padding: 1px;
@@ -252,3 +257,52 @@ h1 img {
 .remove {
     color: red;
 }
+
+/* hamburger menu */
+
+
+ul.hamburger {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+ul.hamburger-right {
+    right: 0;
+}
+
+.hamburger li {
+    display: block;
+    padding: 0.5em;
+}
+
+.hamburger li a {
+    text-decoration: none;
+    color: black;
+}
+
+.hamburger li a.hamburger-choice {
+    display: inline-block;
+    margin-left: 0.2em;
+    /* add round corners */
+    border-radius: 0.3em;
+    padding: 0 0.3em;
+    border: lightskyblue solid 0.1em;
+}
+
+.hamburger li a:hover {
+    background-color: #ddeeff;
+    /* cursor */
+    cursor: pointer;
+}
+
+.hamburger li .hamburger-current {
+    /* white on nice blue */
+    background-color: blue;
+    color: white;
+}
+
+
+
