@@ -1,3 +1,4 @@
+
 /**
  *   HTML-related utility functions. Poor man's jquery & react.
  */
@@ -58,21 +59,6 @@ function rubberDesign (mainId) {
     resize();
     return resize;
 }
-/*
-    hamburger:
-        list of:
-            section:
-                - label
-                - one of:
-                    - action()
-                    - choice:
-                        action(picked)
-                        list of:
-                            - label
-                    - link
-                        - just href, we already have label
-                        - target
- */
 
 class Hamburger {
     constructor(parent, options={}) {
@@ -82,12 +68,6 @@ class Hamburger {
         this.button.addEventListener('click', () => this.toggle());
         this.hidden = true;
         this.content = append(parent, 'ul', {class: options.right ? ['hamburger', 'hamburger-right'] : ['hamburger']});
-        // escape closes the menu
-        this.content.addEventListener('keydown', e => {
-            console.log("ley pressed", e.key);
-            if (e.key === 'Escape')
-                this.hide();
-        });
     }
 
     appendLi() {
@@ -95,6 +75,9 @@ class Hamburger {
     }
 
     addLink(label, href, target) {
+        if (target === '_blank')
+            label = label + ' ' + '&#x1F517;';
+
         const li = this.appendLi();
         const link = append(li, 'a', {content: label});
         link.href = href;
