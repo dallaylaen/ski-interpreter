@@ -105,4 +105,9 @@ class EvalBox {
       this.box.print(reason, { class: ['error'], line: '' });
     this.onStop();
   }
+
+  setHeight (height) {
+    this.height = height;
+    this.box.height = height;
+  }
 }
