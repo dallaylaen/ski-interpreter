@@ -14,7 +14,7 @@ let nextId = 0;
 
 class EvalBox {
   /**
-     * @param { TeletypeBox } box
+     * @param { TeletypeBox|Element } box
      * @param {{
      *      height: number?,
      *      engine: SKI?,
@@ -24,7 +24,10 @@ class EvalBox {
      *      id: number?
      * }} options
      */
-  constructor (box, options) {
+  constructor (box, options={}) {
+    if (box instanceof Element)
+      box = new TeletypeBox(box, options);
+
     this.id = options.id ?? ++nextId;
 
     this.height = options.height ?? 5;
@@ -42,14 +45,16 @@ class EvalBox {
     this.head = this.box.head;
     this.foot = this.box.foot;
 
+
+  }
+
+  setup (src, expr) {
     this.permalink = append(this.head, 'a', { class: ['con-permalink'] });
     this.permalink.target = '_blank';
     this.permalink.innerHTML = '#' + this.id;
     this.src = append(this.head, 'span', { class: ['con-source'] });
     this.counter = append(this.head, 'span', { class: ['con-number', 'float-right'] });
-  }
 
-  setup (src, expr) {
     this.running = false;
     this.count = 0;
     this.counter.innerHTML = this.count;
@@ -62,13 +67,15 @@ class EvalBox {
     }
     this.permalink.href = permalink(this.engine, src);
     this.src.innerHTML = sanitize(src);
-    this.box.print(this.expr.toString({ terse: true }), { line: this.count });
     return this.start();
   }
 
-  start () {
+  start (expr) {
     if (this.running) return;
+    if (expr)
+      this.expr = expr;
     this.running = true;
+    this.box.print(this.expr.toString({ terse: true }), { line: this.count });
     this.onStart();
     this.tick();
   }
@@ -79,7 +86,8 @@ class EvalBox {
 
     if (next.steps === 0) {
       // no steps = finished execution, congratulations
-      this.box.last.classList.add('success');
+      if (this.box.last)
+        this.box.last.classList.add('success');
       return this.stop();
     }
 

@@ -175,8 +175,6 @@
     function onKey (event) {
         if (event.keyCode === 13) {
             event.preventDefault();
-            if (currentBox)
-                currentBox.stop("interrupted by user");
             run();
             return false;
         }
@@ -200,11 +198,14 @@
         return run();
     }
 
-    function run() {
+    function run(src) {
         greet.remove();
         const box = new TeletypeBox(view.teletype);
 
-        const src = view.entryField.value;
+        if (currentBox)
+            currentBox.stop("interrupted by different command");
+
+        src = src ?? view.entryField.value;
         if (src.match(/^\s*\?[\s?]*$/)) {
             box.print(view.help.innerHTML, {raw: true});
             return;
@@ -259,9 +260,13 @@
             });
             const placeholder = append(entryBlock, 'span', {class: [ 'float-right' ], content: '&Xi;'});
             const menu = new Hamburger(placeholder, {right: true});
-            if (entry instanceof SKI.classes.Alias)
+            if (entry instanceof SKI.classes.Alias) {
                 menu.addAction('copy definition', () => navigator.clipboard.writeText(
                     `${name} = ${entry.impl.toString({terse: true})}`));
+                menu.addAction('play in terminal', () => {
+                    run(entry.name + ' = ' + entry.impl.toString({terse: true}));
+                });
+            }
             menu.addAction('&cross; remove', () => removeKnown(name));
         }
         if (ski.hasLambdas) {
