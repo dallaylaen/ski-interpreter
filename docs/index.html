@@ -11,7 +11,7 @@
 </head>
 <body>
     <header>
-        <div class="float-left" id="menu"></div>
+        <div class="float-left"><span id="menu" class="big">&#9776;</span></div>
         <h1><img src="img/mock1.png"> Simple Kombinator <nobr>Interpreter <img src="img/mock2.png"></nobr></h1>
     </header>
     <div id="teletype">
@@ -245,20 +245,24 @@
         const list = ski.getTerms();
         for (let name of Object.keys(list).sort()) {
             const entry = list[name];
-            const entryBlock = append(view.known, 'a', {class: ['entry']});
-            entryBlock.href='#';
-            entryBlock.onclick = event => insert(name);
-            append(entryBlock, 'dt', {
+            const entryBlock = append(view.known, 'div' );
+            const entryLink = append(entryBlock, 'a', {class: ['entry']});
+            entryLink.href='#';
+            entryLink.onclick = event => insert(name);
+            append(entryLink, 'dt', {
                 content: name,
             });
-            append(entryBlock, 'dd', {
+            append(entryLink, 'dd', {
                 content: '= '+(entry.note ?? entry.impl.toString({terse: true}))
                     .replaceAll(/\s*->\s*/g, ' &rarr; '),
                 class: ['note'],
             });
-            const harakiri = append(view.known, 'a', {content: '[&cross;]', class: ['remove']});
-            harakiri.href='#';
-            harakiri.onclick = () => removeKnown(name);
+            const placeholder = append(entryBlock, 'span', {class: [ 'float-right' ], content: '&Xi;'});
+            const menu = new Hamburger(placeholder, {right: true});
+            if (entry instanceof SKI.classes.Alias)
+                menu.addAction('copy definition', () => navigator.clipboard.writeText(
+                    `${name} = ${entry.impl.toString({terse: true})}`));
+            menu.addAction('&cross; remove', () => removeKnown(name));
         }
         if (ski.hasLambdas) {
             append(view.known, 'a', {

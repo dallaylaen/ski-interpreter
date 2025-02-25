@@ -60,13 +60,13 @@ function rubberDesign (mainId) {
 }
 
 class Hamburger {
-  constructor (parent, options = {}) {
-    this.parent = parent;
-    this.button = append(parent, 'button', { class: ['hamburger-button'] });
-    this.button.innerHTML = '&#9776;';
-    this.button.addEventListener('click', () => this.toggle());
+  constructor (button, options = {}) {
+    this.button = button;
+    button.classList.add('hamburger-button');
+    this.parent = button.parentElement;
     this.hidden = true;
-    this.content = append(parent, 'ul', { class: options.right ? ['hamburger', 'hamburger-right'] : ['hamburger'] });
+    this.content = append(this.parent, 'ul', { class: options.right ? ['hamburger', 'hamburger-right'] : ['hamburger'] });
+    this.button.addEventListener('click', () => this.toggle());
   }
 
   appendLi () {
@@ -138,6 +138,7 @@ class Hamburger {
 
   toggle () {
     this.hidden ? this.show() : this.hide();
+    return false;
   }
 }
 

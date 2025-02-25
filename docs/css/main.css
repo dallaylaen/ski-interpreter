@@ -258,8 +258,18 @@ h1 img {
     color: red;
 }
 
+.big {
+    font-size: 2em;
+}
+
 /* hamburger menu */
 
+.hamburger-button {
+    display: inline-block;
+}
+.hamburger-button:hover {
+    cursor: pointer;
+}
 
 ul.hamburger {
     display: none;
@@ -268,6 +278,7 @@ ul.hamburger {
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
     z-index: 1;
 }
+
 
 ul.hamburger-right {
     right: 0;
