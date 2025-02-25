@@ -252,10 +252,9 @@
                 content: name,
             });
             append(entryBlock, 'dd', {
-                content: entry.note
-                    ? entry.note.replaceAll('->', '&rarr;').replaceAll(/\b([a-z])\b/g,"<em>$1</em>")
-                    : '= '+entry.impl,
-                class: entry.note ? ['note'] : []
+                content: '= '+(entry.note ?? entry.impl.toString({terse: true}))
+                    .replaceAll(/\s*->\s*/g, ' &rarr; '),
+                class: ['note'],
             });
             const harakiri = append(view.known, 'a', {content: '[&cross;]', class: ['remove']});
             harakiri.href='#';
@@ -269,7 +268,7 @@
         }
         if (ski.hasNumbers) {
             append(view.known, 'a', {
-                content: '<dt>&lt;n&gt;</dt><dd>x y = x(…(x(y))…)</dd>',
+                content: '<dt>&lt;n&gt; x y</dt><dd class="note">= x(…(x(y))…)</dd>',
                 class: ['entry']
             });
         }
