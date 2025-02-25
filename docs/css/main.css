@@ -1,15 +1,28 @@
 /* ski-specific */
 
-.term-def {
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
-    /* shorten long lines */
-    display: inline-block;
-    width: calc(100% - 2em);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.term-list {
+    margin: .5ex;
+}
+
+.term-list dt, dd {
+    margin: 0;
+    display: inline;
+    font-family: monospace;
+}
+.term-list dd::before {
+    content: ' ';
+    font-family: monospace;
+}
+.term-list dt {
+    font-weight: bold;
+}
+.term-list dd.note {
+    font-family: inherit;
+    font-style: italic;
+}
+.term-list a[href]:hover {
+    outline: auto rgba(0, 150, 255, 1);
+    outline-offset: 1px;
 }
 
 .hint {
@@ -94,6 +107,14 @@ ul.hamburger-right {
 
 /* general */
 
+.ellipsis {
+    display: inline-block;
+    width: calc(100% - 2em);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .scroll {
     overflow: scroll;
     height: 100%;
@@ -141,11 +162,11 @@ ul {
     color: darkgray;
 }
 
-ul#known {
+ul.term-list {
     padding-left: 2em;
 }
 
-ul#known li {
+ul.term-list li {
     overflow: hidden;
     white-space: nowrap;
 }

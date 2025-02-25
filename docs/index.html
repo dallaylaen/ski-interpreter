@@ -84,7 +84,7 @@
 
     <div id="info">
         <p class="caption">Term inventory:</p>
-        <dl id="known"></dl>
+        <dl id="known" class="term-list"></dl>
     </div>
     <form id="prompt" onsubmit="return runStop()">
         <input id="entryField">
@@ -246,8 +246,8 @@
         const list = ski.getTerms();
         for (let name of Object.keys(list).sort()) {
             const entry = list[name];
-            const entryBlock = append(view.known, 'div' );
-            const entryLink = append(entryBlock, 'a', {class: ['term-def']});
+            const entryBlock = append(view.known, 'div', {class: ['term-def']} );
+            const entryLink = append(entryBlock, 'span', {class: ['ellipsis']});
             entryLink.href='#';
             entryLink.onclick = event => insert(name);
             append(entryLink, 'dt', {
@@ -385,29 +385,7 @@
             font-weight: bold;
             margin: 0;
         }
-        #known {
-            margin: .5ex;
-        }
 
-        #known dt, dd {
-            margin: 0;
-            display: inline;
-            font-family: monospace;
-        }
-        #known dd::before {
-            content: ' ';
-            font-family: monospace;
-        }
-        #known dt {
-            font-weight: bold;
-        }
-        #known dd.note {
-            font-family: inherit;
-        }
-        #known a[href]:hover {
-            outline: auto rgba(0, 150, 255, 1);
-            outline-offset: 1px;
-        }
 
         #teletype > div {
             border: 1px dotted #C8C8C8 !important;
