@@ -1,3 +1,86 @@
+/* ski-specific */
+.term-def {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    /* shorten long lines */
+    display: inline-block;
+    width: calc(100% - 2em);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* teletype */
+
+
+.con-permalink {
+    padding-right: 1em;
+}
+
+.con-header {
+    background-color: lightgray;
+}
+
+/* hamburger menu */
+
+.hamburger-button {
+    display: inline-block;
+}
+.hamburger-button:hover {
+    cursor: pointer;
+}
+
+ul.hamburger {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+
+ul.hamburger-right {
+    right: 0;
+}
+
+.hamburger li {
+    display: block;
+    padding: 0.5em;
+}
+
+.hamburger li a {
+    text-decoration: none;
+    color: black;
+}
+
+.hamburger li a.hamburger-choice {
+    display: inline-block;
+    margin-left: 0.2em;
+    /* add round corners */
+    border-radius: 0.3em;
+    padding: 0 0.3em;
+    border: lightskyblue solid 0.1em;
+}
+
+.hamburger li a:hover {
+    background-color: #ddeeff;
+    /* cursor */
+    cursor: pointer;
+}
+
+.hamburger li .hamburger-current {
+    /* white on nice blue */
+    background-color: blue;
+    color: white;
+}
+
+
+/* general */
+
+
+
 .flex {
     display: inline-block;
     float: left;
@@ -23,10 +106,6 @@
     width: 2em;
 }
 
-.con-permalink {
-    padding-right: 1em;
-
-}
 
 .scroll {
     overflow: scroll;
@@ -117,9 +196,7 @@ button input {
     color: inherit;
 }
 
-.con-header {
-    background-color: lightgray;
-}
+
 
 .error {
     color: red;
@@ -129,20 +206,11 @@ button input {
     color: green;
 }
 
-.hidden {
-    display: none;
-}
-
 .mode-pick {
     color: dodgerblue;
 }
 
-.quest-box {
-    margin: 0.5em;
-    border: 0.3em solid maroon;
-    padding: 0.2em;
-    border-radius: 0.5em;
-}
+
 
 h1 {
     margin: 0;
@@ -179,49 +247,13 @@ h1 img {
     margin: 1ex 0;
 }
 
-.chapter {
-    border: maroon solid 0.3em;
-    border-radius: 0.5em;
-    background-color: antiquewhite;
-}
 
-.chapter ~ .chapter {
-    margin-top: 1em;
-}
-
-.chapter .title {
-    background-color: maroon;
-    color: gold;
-    padding: 0.3em;
-    font-weight: bold;
-    font-size: large;
-}
-
-.chapter h2 {
-    background-color: maroon;
-    color: gold;
-    padding: 0.3em;
-    font-weight: bold;
-    font-size: large;
-    margin: 0;
-}
-
-.chapter .note {
-    margin: 1ex;
-}
 #intro p {
     margin: 1ex;
 }
 #intro ul {
     margin: 1ex;
 }
-
-.quest-box .note {
-    border: 1px solid goldenrod;
-    border-radius: 0.5em;
-    padding: 0 0.5em;
-    margin: 1ex 0;
-};
 
 .hint {
     cursor: pointer;
@@ -247,12 +279,6 @@ h1 img {
     white-space: nowrap;
 }
 
-.chapter code {
-    font-family: inherit;
-    font-style: italic;
-    color: indigo;
-    white-space: nowrap;
-}
 
 .remove {
     color: red;
@@ -260,72 +286,6 @@ h1 img {
 
 .big {
     font-size: 2em;
-}
-
-/* ski-specific */
-.term-def {
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
-    /* shorten long lines */
-    display: inline-block;
-    width: calc(100% - 2em);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* hamburger menu */
-
-.hamburger-button {
-    display: inline-block;
-}
-.hamburger-button:hover {
-    cursor: pointer;
-}
-
-ul.hamburger {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-    z-index: 1;
-}
-
-
-ul.hamburger-right {
-    right: 0;
-}
-
-.hamburger li {
-    display: block;
-    padding: 0.5em;
-}
-
-.hamburger li a {
-    text-decoration: none;
-    color: black;
-}
-
-.hamburger li a.hamburger-choice {
-    display: inline-block;
-    margin-left: 0.2em;
-    /* add round corners */
-    border-radius: 0.3em;
-    padding: 0 0.3em;
-    border: lightskyblue solid 0.1em;
-}
-
-.hamburger li a:hover {
-    background-color: #ddeeff;
-    /* cursor */
-    cursor: pointer;
-}
-
-.hamburger li .hamburger-current {
-    /* white on nice blue */
-    background-color: blue;
-    color: white;
 }
 
 

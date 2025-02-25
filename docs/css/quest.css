@@ -1,0 +1,52 @@
+/* quest-specific */
+
+.quest-box {
+    margin: 0.5em;
+    border: 0.3em solid maroon;
+    padding: 0.2em;
+    border-radius: 0.5em;
+}
+.chapter {
+    border: maroon solid 0.3em;
+    border-radius: 0.5em;
+    background-color: antiquewhite;
+}
+
+.chapter ~ .chapter {
+    margin-top: 1em;
+}
+
+.chapter .title {
+    background-color: maroon;
+    color: gold;
+    padding: 0.3em;
+    font-weight: bold;
+    font-size: large;
+}
+
+.chapter h2 {
+    background-color: maroon;
+    color: gold;
+    padding: 0.3em;
+    font-weight: bold;
+    font-size: large;
+    margin: 0;
+}
+
+.chapter .note {
+    margin: 1ex;
+}
+
+.chapter code {
+    font-family: inherit;
+    font-style: italic;
+    color: indigo;
+    white-space: nowrap;
+}
+
+.quest-box .note {
+    border: 1px solid goldenrod;
+    border-radius: 0.5em;
+    padding: 0 0.5em;
+    margin: 1ex 0;
+};
