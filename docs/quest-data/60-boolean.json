@@ -95,11 +95,17 @@
       ],
       "unlock": "if",
       "input": "if",
+      "comment": [
+        "Note to future maintainer (or me):",
+        "The cases with limited steps produce a never-terminating alternative branch",
+        "to filter out non-solutions like (a d)(b d)(c d).",
+        "BC(CI)CK n tells whether n is even in ~n steps."
+      ],
       "cases": [
         ["if (K(KI)) b c d", "c d"],
         ["if (KK) b c d", "b d"],
-        [{"max": 100}, "if (BC(CI)CK) (S(K(WI))(K(WI))) I 51", "51"],
-        [{"max": 100}, "if (BC(CI)CK) I (S(K(WI))(K(WI))) 52", "52"]
+        [{"max": 140}, "if (BC(CI)CK) (S(K(WI))(K(WI))) I 71", "71"],
+        [{"max": 140}, "if (BC(CI)CK) I (S(K(WI))(K(WI))) 72", "72"]
       ]
     }
   ]
