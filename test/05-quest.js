@@ -82,4 +82,14 @@ describe('Quest', () => {
 
     });
 
+    it ('honors own restrictions', () => {
+        const ski = new SKI();
+        const quest = new Quest({engine: ski, vars: ['foo'], input: 'f', cases: [['f x', 'x']], allow: 'SK'});
+        expect(quest.allowed()).to.equal('KS foo');
+        const fail = quest.check('I');
+        expect(fail.exception + '').to.match(/restricted/);
+        const pass = quest.check('SK foo');
+        expect(pass.pass).to.equal(true);
+    });
+
 });
