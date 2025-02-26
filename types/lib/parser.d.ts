@@ -59,10 +59,10 @@ export class SKI {
     remove(name: string): SKI;
     /**
      *
-     * @return {{[key:string]: Expr}}
+     * @return {{[key:string]: Native|Alias}}
      */
     getTerms(): {
-        [key: string]: Expr;
+        [key: string]: Native | Alias;
     };
     /**
      *
@@ -97,7 +97,7 @@ export class SKI {
         numbers: boolean;
         lambdas: boolean;
         terms: {
-            [key: string]: Expr;
+            [key: string]: Native | Alias;
         };
     };
 }

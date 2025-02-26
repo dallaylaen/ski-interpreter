@@ -23,6 +23,11 @@ export class Expr {
      */
     freeVars(): Set<FreeVar>;
     /**
+     * @desc rought estimate of the complexity of the term
+     * @return {number}
+     */
+    weight(): number;
+    /**
      *
      * @param {{max: number?, maxArgs: number?}} options
      * @return {{arity: number?, found: boolean, proper: boolean, canonical?: Expr, skip: Set<number>?}}
@@ -128,6 +133,7 @@ export class App extends Expr {
     fun: Expr;
     args: Expr;
     final: boolean;
+    weight(): Expr;
     hasOnly(set: any): boolean;
     apply(...args: any[]): any;
     subst(plug: any, value: any): Expr;
