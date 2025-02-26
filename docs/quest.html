@@ -20,7 +20,7 @@
             <a href="intro.html">introduction</a>
             <a href="index.html" target="_blank">playground</a>
         </div>
-        <div class="quest-box" id="chapterlist">
+        <div class="content-table" id="chapterlist">
         </div>
         <div class="quest-box" id="left-footer">
             <button onclick="demolish()">erase progress</button>
@@ -50,11 +50,7 @@
     const questDir = 'quest-data/';
 
     const linkedTo = window.location.hash.slice(1);
-    let focusLater; // @type Element
-    const onLoad = () => {
-        if (focusLater)
-            focusLater.scrollIntoView();
-    }
+    console.log('linked to', linkedTo);
 
     init();
 
@@ -67,177 +63,49 @@
             allow: 'SKI',
         };
 
-        ski = new SKI(store.load('engine')??defaults);
+        ski = new SKI(store.load('engine') ?? defaults);
         showKnown();
 
         fetch(questDir + 'index.json')
             .then( resp => resp.json())
             .then( list => {
                 const joint = [];
-                let chap = 1;
                 for (const item of list) {
-                    joint.push(makeChapter(item, chap++));
+                    const chapter = new Chapter(item);
+                    chapter.addLink(view.chapterlist);
+                    joint.push(chapter.fetch().then(chapter => {
+                        chapter.draw();
+                    }));
                 }
-                Promise.all(joint).then( onLoad );
+                Promise.all(joint).then( () => {
+                    if (linkedTo) {
+                        const target = document.getElementById(linkedTo);
+                        if (target)
+                            target.scrollIntoView();
+                    }
+                });
             });
     }
 
-    function makeChapter (opt, n) {
-        const container = append(view.quest, 'div', {class: ['chapter']});
-        const title = append(container, 'div', {class: ['title'], content: 'Chapter '+n+': '+opt.name});
-        const stats = append(title, 'span', {class: ['float-right']});
-        const counter = append( stats, 'span', {content: '0'});
-        const done = new Set();
-
-        const inner = append(container, 'div', {class: ['chapter-content']});
-
-        const linkDiv = append(view.chapterlist, 'div', {});
-        const linkTo = append(linkDiv, 'a', {content: n + '. ' + opt.name});
-        linkTo.href = '#';
-        linkTo.onclick = () => {container.scrollIntoView()};
-
-        append(inner, 'div', {class: ['note'], content: cat(opt.intro)});
-        return fetch(questDir + opt.link)
-            .then( resp => resp.json() )
-            .then( list => {
-                let k = 0;
-                for (const item of list) {
-                    makeQuest(inner, item, n + '.' + ++k, id => { done.add(id); counter.innerHTML = '' + done.size });
-                }
-                append(stats, 'span', {content: '/'+k});
-            });
-    }
 
     /**
-     * @param {Element} container
-     * @param {Array} spec
-     * @param {string} n
-     * @param {Function} onComplete
-     * @return {void}
+     * @desc Coerce array of strings to string
+     * @param {string[]|string|number} input
+     * @return {string}
      */
-
-    function makeQuest (container, spec, n, onComplete = ()=>{}) {
-        const quest = new SKI.Quest({subst: '&phi;', ...spec, engine: ski});
-        const name = 'quest-' + quest.meta.id;
-        quest.meta.status = { solved: false, steps: 0, attempts: 0};
-
-        const frame = append(container, 'div', {class: ['quest-box']});
-        frame.id = name;
-        if (name === linkedTo)
-            focusLater = frame;
-
-        const title = append(frame, 'div', {class: ['block-header']});
-        const expand = append(title, 'a', {content: n ? '#' + n + '' : 'Quest'});
-        expand.href = '#'+name;
-        append(title, 'span', {content: ' '+quest.title});
-        if (quest.restrict.allow !== undefined || Object.keys(quest.vars).length !== 0) {
-            const terms = (quest.restrict.allow ?? '') + ' + ' + Object.keys(quest.vars).join(' ');
-            append(title, 'span', {content: ' [' + (ski.showRestrict(terms) || '-') + ']'});
-        }
-
-        const body = append(frame, 'div');
-        expand.onclick = () => showhide(body, true);
-
-        const descr = append(body, 'div', {content: cat(quest.descr), class:['note']});
-        if (quest.meta.hint)
-            hint(descr, ' Hint:...', ' Hint: '+quest.meta.hint);
-
-        const box = append(body, 'div', {class: ['quest-content'], content: '....'});
-
-        const form = append(body, 'div', {class: ['quest-solve']});
-        const input = append(form, 'input');
-        const btn = append(form, 'button', {content: 'solve!'});
-        const moveOn = append(form, 'button', {content: 'move on >>', hidden: true});
-        moveOn.onclick = () => showhide(body, false);
-
-        const summary = append(append(title, 'span', {class: ['float-right']}), 'i');
-        const showStatus = () => {
-            const st = quest.meta.status;
-            if (st.solved)
-                summary.classList.add('success');
-            summary.innerHTML = 'Attempts: '+st.attempts+', total steps: '+st.steps;
-        };
-
-        const data = store.load('quest:' + quest.meta.id) ?? {};
-        const st = quest.meta.status;
-        st.solved   = data.solved ?? false;
-        st.steps    = data.steps ?? 0;
-        st.attempts = data.attempts ?? 0;
-        if (st.solved)
-            onComplete(quest.meta.id);
-
-        showStatus();
-
-        const appendStatus = report => {
-            const st = quest.meta.status;
-            if (st.solved)
-                return;
-            st.attempts++;
-            for (const item of report.details)
-                st.steps += item.steps;
-
-            if (report.pass) {
-                st.solved = true;
-                if (quest.meta.unlock) {
-                    ski.maybeAdd(quest.meta.unlock, report.expr.expand());
-                    store.save('engine', ski);
-                    showKnown();
-                }
-                showhide(moveOn, true);
-                onComplete(quest.meta.id);
-            }
-
-            store.save('quest:'+quest.meta.id, st);
-            showStatus();
-        }
-
-        const runme = () => checkQuest(box, quest, input.value, appendStatus);
-        btn.onclick = runme;
-        input.onkeydown = (ev => ev.key === "Enter" ? runme() : true);
-    }
-
-    /**
-     *
-     * @param {Element} output
-     * @param {Quest} quest
-     * @param {Expr} input
-     * @param {function} [callback]
-     */
-    function checkQuest (output, quest, input, callback) {
-        output.innerHTML = 'running...';
-        const report = quest.check(input);
-        output.innerHTML = '';
-
-        const echo = append(output, 'div');
-        append(echo, 'span', {content: 'Your solution: ' + expand(report.expr ?? input) + ' '});
-        const linque = append(echo, 'a', {content: 'playground'});
-        linque.href='index.html'+permalink(ski, input);
-        linque.target = '_blank';
-
-        if (report.exception)
-            append(output, 'div', {class: ['error'], content: 'Execution failed: '+report.exception});
-
-        for (const item of report.details) {
-            const line = append(output, 'div', {class: item.pass ? ['success'] : ['error']});
-            append(line, 'span', {content: item.pass ? '&check; ' : '&cross; '});
-            append(line, 'span', {content: `${item.start} &rarr; ${item.found} in ${item.steps} steps`});
-            if (!item.pass) {
-                append(line, 'br');
-                append(line, 'span', {content: '&nbsp;&nbsp;expected '+item.expected});
-            }
-        }
-
-        if (callback)
-            callback(report);
-        return false;
-    }
-
     function cat(input) {
         if (Array.isArray(input))
             return input.join(' ');
         else
             return ''+input;
     }
+
+    /**
+     * @desc Create a self-revealing spoiler
+     * @param element
+     * @param shown
+     * @param hidden
+     */
 
     function hint (element, shown, hidden) {
         const container = append(element, 'span', {});
@@ -269,6 +137,215 @@
         };
         window.location.reload();
     }
+
+    class QuestBox {
+        constructor(spec, options) {
+            this.impl = new SKI.Quest(spec);
+            this.name = 'quest-' + this.impl.meta.id;
+            this.chapter = options.chapter;
+            if (this.chapter && options.number)
+                this.number = this.chapter.number + '.' + options.number;
+            this.view = {};
+        }
+
+        load() {
+            const data = store.load(this.name) ?? {};
+            this.status = {
+                solved: data.solved ?? false,
+                steps: data.steps ?? 0,
+                attempts: data.attempts ?? 0,
+            };
+            if (this.status.solved)
+                this.onSolved();
+            return this;
+        }
+
+        save() {
+            store.save(this.name, this.status);
+            return this;
+        }
+
+        update(result) {
+            if (this.status.solved)
+                return;
+            this.status.attempts++;
+            this.status.steps += result.steps;
+            if (result.pass) {
+                this.status.solved = true;
+                this.onSolved(result);
+            }
+            this.save();
+            this.showStatus();
+        }
+
+        onSolved(result) {
+            if (this.impl.meta.unlock && result) {
+                ski.maybeAdd(this.impl.meta.unlock, result.expr.expand());
+                store.save('engine', ski);
+                showKnown();
+            }
+            if (this.chapter)
+                this.chapter.addSolved(this.impl.meta.id);
+        }
+
+        check(input) {
+            if (this.view.display)
+                this.view.display.innerHTML = 'running...';
+            const result = this.impl.check(input);
+            this.showResult(result);
+            this.update(result);
+        }
+
+        draw (element) {
+            this.view.frame = append(element, 'div', {class: ['quest-box']});
+            this.view.frame.id = this.name;
+
+            const title = append(this.view.frame, 'h3');
+            const body = append(this.view.frame, 'div');
+            const expand = append(title, 'a', {content: this.number ? '#' + this.number + '' : 'Quest'});
+            expand.href = '#'+this.name;
+            expand.onclick = () => showhide(body, true);
+
+            append(title, 'span', {content: ' '+this.impl.title});
+            const allowed = this.impl.allowed();
+            if (allowed)
+                append(title, 'span', {content: ' [' + allowed + ']'});
+            this.view.stat = append(title, 'span', {class: ['float-right']});
+
+            const descr = append(body, 'div');
+            append(descr, 'div', {content: cat(this.impl.descr), class:['note']});
+            if (this.impl.meta.hint)
+                hint(descr, ' Hint:...', ' Hint: '+this.impl.meta.hint);
+
+            this.view.display = append(body, 'div', {class: ['quest-display'], content: '.....'});
+
+            this.view.solution = append(body, 'div', {class: ['quest-solution']});
+            const input = append(this.view.solution, 'input');
+            input.onkeydown = e => {
+                if (e.key === 'Enter')
+                    this.check(input.value);
+            };
+            const btn = append(this.view.solution, 'button', {content: 'solve!'});
+            btn.onclick = () => this.check(input.value);
+            const moveOn = append(this.view.solution, 'button', {content: 'move on >>', hidden: true});
+            moveOn.onclick = () => showhide(body, false);
+
+            this.showStatus();
+        }
+
+        showStatus() {
+            if (!this.view.stat)
+                return;
+            this.view.stat.innerHTML = !this.status.attempts
+                ? ''
+                : (this.status.solved ? '&check; ' : '') +
+                    this.status.steps + ' steps in ' + this.status.attempts + ' tries';
+        }
+
+        showResult(result) {
+            if (!this.view.display)
+                return;
+            this.view.display.innerHTML = '';
+            const echo = append(this.view.display, 'div');
+            append(echo, 'span', {content: 'Your solution: ' + expand(result.expr) + ' '});
+            const linque = append(echo, 'a', {content: 'playground'});
+            linque.href='index.html'+permalink(ski, result.expr);
+            linque.target = '_blank';
+
+            if (result.exception)
+                append(this.view.display, 'div', {class: ['error'], content: 'Execution failed: '+result.exception});
+
+            for (const item of result.details) {
+                const line = append(this.view.display, 'div', {class: item.pass ? ['success'] : ['error']});
+                append(line, 'span', {content: item.pass ? '&check; ' : '&cross; '});
+                append(line, 'span', {content: `${item.start} &rarr; ${item.found} in ${item.steps} steps`});
+                if (!item.pass) {
+                    append(line, 'br');
+                    append(line, 'span', {content: '&nbsp;&nbsp;expected '+item.expected});
+                }
+            }
+        }
+    }
+
+    chapterId = 0;
+    class Chapter {
+        constructor(options) {
+            this.options = options;
+            this.quests = [];
+            this.solved = new Set();
+            this.view = {};
+            this.number = options.number ?? ++chapterId;
+            this.id = 'chapter-'+ (options.id ?? this.number);
+        }
+
+        fetch() {
+            return fetch(questDir + this.options.link)
+                .then( resp => resp.json() )
+                .then( list => {
+                    let k = 0;
+                    for (const item of list) {
+                        this.quests.push(new QuestBox(item, {chapter: this, number: ++k}));
+                    }
+                    return this;
+                });
+        }
+
+        addSolved(questId) {
+            if (this.solved.has(questId))
+                return;
+            this.solved.add(questId);
+            this.showStatus();
+        }
+
+        getProgress() {
+            return {
+                total: this.quests.length,
+                solved: this.solved.size,
+                complete: this.solved.size === this.quests.length,
+                percentage: Math.round(this.solved.size / this.quests.length * 100),
+            }
+        }
+
+        draw() {
+            this.visible = true;
+
+            this.view.frame = append(view.quest, 'div', {class: ['chapter']});
+            this.view.frame.id = this.id;
+            const title = append(this.view.frame, 'h2');
+            const body = append(this.view.frame, 'div');
+            append(title, 'span', {content: 'Chapter '+this.number+': '+this.options.name});
+            this.view.stat = append(title, 'span', {class: ['float-right']});
+            title.onclick = () => showhide(body, this.visible = !this.visible);
+
+            this.view.intro = append(body, 'div', {content: cat(this.options.intro), class:['note', 'chapter-intro']});
+            this.view.content = append(body, 'div', {class: ['chapter-content']});
+
+            for (const quest of this.quests) {
+                quest.load();
+                quest.draw(this.view.content);
+            }
+
+            this.showStatus();
+        }
+
+        showStatus() {
+            if (!this.view.stat)
+                return;
+            const progress = this.getProgress();
+            this.view.stat.innerHTML = 'Progress: '+progress.solved+'/'+progress.total+' ('+progress.percentage+'%)';
+            if (progress.complete)
+                this.view.stat.classList.add('success');
+        }
+
+        addLink(element) {
+            const link = append(element, 'a', {content: 'Chapter '+this.number+': '+this.options.name});
+            link.href = '#'+this.id;
+            this.view.link = link;
+        }
+
+        // TODO hide solved chapters
+    }
+
 </script>
 </body>
 </html>

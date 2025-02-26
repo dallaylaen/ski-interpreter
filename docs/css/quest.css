@@ -16,21 +16,29 @@
     margin-top: 1em;
 }
 
-.chapter .title {
-    background-color: maroon;
-    color: gold;
-    padding: 0.3em;
-    font-weight: bold;
-    font-size: large;
-}
-
 .chapter h2 {
     background-color: maroon;
-    color: gold;
-    padding: 0.3em;
+    color: palegoldenrod;
     font-weight: bold;
     font-size: large;
+    padding: 0.3em;
     margin: 0;
+}
+
+.chapter h3 {
+    background-color: maroon;
+    color: palegoldenrod;
+    font-weight: bold;
+    font-size: medium;
+    margin: 0;
+    /* wider but not higher */
+    padding: 0.1em 1em;
+    border-radius: 0.7em;
+}
+
+.chapter h3 a {
+    color: inherit;
+    text-decoration: inherit;
 }
 
 .chapter .note {
