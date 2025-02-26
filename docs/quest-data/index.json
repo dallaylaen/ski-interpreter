@@ -1,5 +1,6 @@
 [
   {
+    "id": "10",
     "name": "Baby steps",
     "intro": [
       "<p>Welcome to the world of combinators!</p>",
@@ -16,6 +17,7 @@
     "link": "10-basics.json"
   },
   {
+    "id": "30",
     "name": "Swing, swing!",
     "intro": [
       "Let's move some arguments around.",
@@ -27,6 +29,7 @@
     "link": "30-arguments.json"
   },
   {
+    "id": "40",
     "name": "The BCKW forest",
     "intro": [
       "<p>As you progress discovering more and more combinators,",
@@ -41,6 +44,7 @@
     "link": "40-bckw.json"
   },
   {
+    "id": "50",
     "name": "The island of Iota",
     "intro": [
       "Now you know two bases: the SK(I) and the BCKW.",
@@ -49,6 +53,7 @@
     "link": "50-iota.json"
   },
   {
+    "id": "60",
     "name": "Boolean logic",
     "intro": [
       "<code>K</code> and <code>KI</code> terms may be interpreted as <b>true</b> and <b>false</b>",
@@ -59,6 +64,7 @@
     "link": "60-boolean.json"
   },
   {
+    "id": "70",
     "name": "Recursion",
     "intro": [
       "Say we need to construct a combinator f that satisfies <code>f x = foo(f, x)</code> for a given <code>foo</code>.",
@@ -77,6 +83,7 @@
     "link": "70-recursion.json"
   },
   {
+    "id": "80",
     "name": "The Church of Numerals",
     "intro": [
       "As everything in the world of combinators is a function, numbers are functions, too.",
@@ -91,6 +98,7 @@
     "link": "80-numerals.json"
   },
   {
+    "id": "90",
     "name": "Least List Lost Last",
     "intro": [
       "<p>Since there's a pair(x, y) operation in combinatory logic, one can already construct linked lists:",
