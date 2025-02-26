@@ -35,6 +35,7 @@ class EvalBox {
     this.running = false;
     this.delay = options.delay ?? 0;
     this.count = 0;
+    this.maxSteps = options.max ?? Infinity;
     this.onStart = options.onStart ?? (() => {});
     this.onStop = options.onStop ?? (() => {});
 
@@ -44,8 +45,6 @@ class EvalBox {
     this.box.height = this.height;
     this.head = this.box.head;
     this.foot = this.box.foot;
-
-
   }
 
   setup (src, expr) {
@@ -55,8 +54,6 @@ class EvalBox {
     this.src = append(this.head, 'span', { class: ['con-source'] });
     this.counter = append(this.head, 'span', { class: ['con-number', 'float-right'] });
 
-    this.running = false;
-    this.count = 0;
     this.counter.innerHTML = this.count;
     this.src.innerHTML = sanitize(src);
     try {
@@ -75,6 +72,7 @@ class EvalBox {
     if (expr)
       this.expr = expr;
     this.running = true;
+    this.limit = this.maxSteps + this.count;
     this.box.print(this.expr.toString({ terse: true }), { line: this.count });
     this.onStart();
     this.tick();
@@ -94,8 +92,11 @@ class EvalBox {
     this.expr = next.expr;
     this.count += next.steps;
     this.box.print(this.expr.toString({ terse: true }), { line: this.count });
-    this.counter.innerHTML = this.count;
+    if(this.counter)
+      this.counter.innerHTML = '' + this.count;
     this.expr = next.expr;
+    if (this.count >= this.limit)
+      return this.stop('Max steps reached: '+ this.limit);
     setTimeout(() => this.tick(), this.delay);
   }
 
