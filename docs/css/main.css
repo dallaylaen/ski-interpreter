@@ -256,7 +256,15 @@ h1 img {
     display: block;
     text-decoration: inherit;
     color: #444444;
-    padding: 0.5em;
-    border 1px dotted #444444;
+    padding: 0.3em;
+    border: 1px dotted #444444;
+    border-radius: 0.3em;
 }
 
+.content-table a:hover {
+    background-color: #f0f0f0;
+}
+
+.content-table a~a {
+    margin-top: 0.2em;
+}
