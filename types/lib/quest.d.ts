@@ -48,6 +48,11 @@ export class Quest {
         descr: string | null;
     };
     /**
+     *   Display allowed terms based on what engine thinks of this.vars + this.restrict.allow
+     *   @return {string | undefined}
+     */
+    allowed(): string | undefined;
+    /**
      *
      * @param {{} | string} opt
      * @param {string} terms
