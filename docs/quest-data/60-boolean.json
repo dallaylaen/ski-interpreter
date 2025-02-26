@@ -83,14 +83,23 @@
     },
     {
       "id": "88dcba5c-37df-4245-8d21-2a5a27db805e",
-      "title": "Imperative if",
+      "title": "Plan first, execute later",
       "descr": [
-        "TBD!"
+        "<p>The problem with the above approach is that both branches are always evaluated.",
+        "This is not an issue from the logical standpoint - if a normal form exists, it will be reached -",
+        "but actually seeing the computation terminate is more fun!</p>",
+        "<p>So, you are given functions <code>cond</code>, <code>then</code>, and <code>else</code>,",
+        "as well as a value <code>val</code>.</p>",
+        "<p>Return <code>then val</code> if <code>cond val</code> is true,",
+        "and <code>else val</code> otherwise.</p>"
       ],
       "unlock": "if",
       "input": "if",
       "cases": [
-        ["if a b c d", "if a d b c d"]
+        ["if (K(KI)) b c d", "c d"],
+        ["if (KK) b c d", "b d"],
+        [{"max": 100}, "if (BC(CI)CK) (S(K(WI))(K(WI))) I 51", "51"],
+        [{"max": 100}, "if (BC(CI)CK) I (S(K(WI))(K(WI))) 52", "52"]
       ]
     }
   ]
