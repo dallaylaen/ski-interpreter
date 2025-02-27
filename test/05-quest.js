@@ -92,4 +92,17 @@ describe('Quest', () => {
         expect(pass.pass).to.equal(true);
     });
 
+    it ('detects infinite loops', () => {
+        const quest = new Quest({
+            input: 'x',
+            cases: [[{max: 20}, 'x x', 'x']],
+        });
+
+        const fail = quest.check('SII');
+        expect(fail.pass).to.equal(false);
+        expect(fail.details[0].steps).to.be.within(20, 100);
+        expect(fail.details[0].pass).to.equal(false);
+        expect(fail.details[0].reason).to.match(/in 20 steps/);
+    });
+
 });
