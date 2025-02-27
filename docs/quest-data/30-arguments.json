@@ -1,5 +1,5 @@
   [
-  
+
     {
       "id": "a678a5bc-ce73-466d-b4e1-251e698885be",
       "title": "Mirror image",
@@ -12,10 +12,10 @@
     },
     {
       "id": "b695072d-1077-4cb8-963b-7207c2ab2c9f",
-      "title": "But just you wait...",
+      "title": "Lost at GoF, found at g&compfn;f",
       "descr": [
-        "Don't take the argument just yet, let it take what comes after it first.",
-        "A.K.A. the <code>B</code> combinator: <code>f g x &rarr; f(g(x))</code>"
+        "Create a term that applies a function to the result of the next function,",
+        "a.k.a. <code>B</code>, the Bluebird: <code>f g x &rarr; f(g(x))</code>"
       ],
       "unlock": "B",
       "input": "phi",
@@ -25,9 +25,9 @@
     },
     {
       "id": "1c95d614-1977-4469-b40b-5f82bc52166d",
-      "title": "Lost at GoF, found at g&compfn;f",
+      "title": "First come, first served",
       "descr": [
-        "Somewhat similar to the previous one but you have to apply the functions in reverse order:",
+        "Somewhat similar to the previous one but you have to apply the functions in the order they appear.",
         "<code>(f g x)&rarr;g(f(x))</code>"
       ],
       "input": "phi",
@@ -49,19 +49,35 @@
       "id": "31447c3a-90a0-40ed-8359-09112631474d",
       "title": "K forte",
       "descr": [
-        "Sometimes returning <code>x</code> for any given <code>y</code> is not enough.",
-        "Return it twice: <code>(x, y)&rarr;x x</code>"
+        "<p>Sometimes returning <code>x</code> for any given <code>y</code> is not enough.",
+        "Return it twice: <code>(x, y)&rarr;x x</code>.</p>",
+        "<p>Note: you should avoid applying <code>x</code> to itself until the next argument is given.</p>"
       ],
       "input": "phi",
       "cases": [
-        [ "phi x y", "x x" ]
+        [ "phi x y", "x x" ],
+        [ {"max": 20}, "phi (SII)", "phi (SII)"]
+      ]
+    },
+    {
+      "id": "45723c95-40b3-47a8-8481-72dc2541cbf9",
+      "title": "Round Robin",
+      "descr": [
+        "The Robin bird, <code>R</code>, puts its first argument after the next two: ",
+        "<code>R x y z = y z x</code>."
+      ],
+      "unlock": "R",
+      "input": "r",
+      "cases": [
+        [ "r x y z", "y z x" ]
       ]
     },
     {
       "id": "da0bfbf1-7bc0-4865-9fec-64da89aecd99",
-      "title": "Cardinal",
+      "title": "Éminence grise",
       "descr": [
-        "The <code>C</code> combinator: <code>x &rarr; y &rarr; z &rarr; x z y</code>."
+        "<p>The King passes the judgement, but the Cardinal dictates the order of execution.</p>",
+        "<p>Derive the <code>C</code> combinator, or Cardinal: <code>C x y z = x z y</code>.</p>"
       ],
       "unlock": "C",
       "input": "phi",
