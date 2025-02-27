@@ -263,7 +263,7 @@
                 append(line, 'span', {content: `${item.start} &rarr; ${item.found} in ${item.steps} steps`});
                 if (!item.pass) {
                     append(line, 'br');
-                    append(line, 'span', {content: '&nbsp;&nbsp;expected '+item.expected});
+                    append(line, 'span', {content: '&nbsp;&nbsp;' + (item.reason ?? 'expected '+item.expected)});
                 }
             }
         }
