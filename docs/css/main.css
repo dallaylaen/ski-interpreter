@@ -268,3 +268,10 @@ h1 img {
 .content-table a~a {
     margin-top: 0.2em;
 }
+
+.completion{
+    background-color: lightgreen;
+    border-radius: 0.2em;
+}
+
+

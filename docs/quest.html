@@ -12,19 +12,12 @@
 </head>
 <body>
 <div class="layout" id="top">
+    <div class="float-left"><span id="menu" class="big">&#9776;</span></div>
     <h1><img src="img/mock1.png">Simple Kombinator Interpreter Quests<img src="img/mock2.png"></h1>
 </div>
 <div class="layout" id="main">
     <div class="side pane" style="width: 15%">
-        <div class="quest-box">
-            <a href="intro.html">introduction</a>
-            <a href="index.html" target="_blank">playground</a>
-        </div>
-        <div class="content-table" id="chapterlist">
-        </div>
-        <div class="quest-box" id="left-footer">
-            <button onclick="demolish()">erase progress</button>
-        </div>
+        <div class="content-table" id="chapterlist"></div>
     </div>
     <div class="pane" id="quest" style="width: 70%;"></div>
     <div class="side pane" style="width: 15%">
@@ -46,24 +39,18 @@
     const store = new Store('quest-page');
     let ski; // global interpreter
 
-    const view = grabView('quest', 'known', 'chapterlist');
+    const view = grabView('quest', 'known', 'chapterlist', 'menu');
     const questDir = 'quest-data/';
 
     const linkedTo = window.location.hash.slice(1);
-    console.log('linked to', linkedTo);
 
+    initMenu();
     init();
 
     function init() {
         rubberDesign('main');
 
-        const defaults = {
-            lambdas: false,
-            numbers: false,
-            allow: 'SKI',
-        };
-
-        ski = new SKI(store.load('engine') ?? defaults);
+        ski = new SKI(store.load('engine') ?? {lambdas: false, numbers: false, allow: 'SKI'});
         showKnown();
 
         fetch(questDir + 'index.json')
@@ -87,6 +74,13 @@
             });
     }
 
+    function initMenu() {
+        const menu = new Hamburger(view.menu);
+        menu.addLink('playground', 'index.html', '_blank');
+        menu.addLink('introduction', 'intro.html', '_blank');
+        menu.addLink('combinatory logic', 'https://en.wikipedia.org/wiki/Combinatory_logic', '_blank');
+        menu.addAction('<span class="denger">&cross; erase progress</span>', demolish);
+    }
 
     /**
      * @desc Coerce array of strings to string
@@ -239,7 +233,8 @@
             this.view.stat.innerHTML = !this.status.attempts
                 ? ''
                 : (this.status.solved ? '&check; ' : '') +
-                    this.status.steps + ' steps in ' + this.status.attempts + ' tries';
+                    this.status.steps + ' steps in ' + this.status.attempts
+                        + (this.status.attempts === 1 ? ' try' : ' tries');
         }
 
         showResult(result) {
@@ -335,12 +330,18 @@
             this.view.stat.innerHTML = 'Progress: '+progress.solved+'/'+progress.total+' ('+progress.percentage+'%)';
             if (progress.complete)
                 this.view.stat.classList.add('success');
+            if (this.view.progressbar) {
+                this.view.progressbar.style.paddingRight = progress.percentage + '%';
+                this.view.progressbar.style.marginRight = -progress.percentage + '%';
+            }
         }
 
         addLink(element) {
-            const link = append(element, 'a', {content: 'Chapter '+this.number+': '+this.options.name});
+            const link = append(element, 'a');
+            const progressbar = append(link, 'span', {class: ['completion']});
+            append(link, 'span', {content: 'Chapter '+this.number+': '+this.options.name});
             link.href = '#'+this.id;
-            this.view.link = link;
+            this.view.progressbar = progressbar;
         }
 
         // TODO hide solved chapters
