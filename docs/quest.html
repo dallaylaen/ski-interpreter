@@ -61,6 +61,7 @@
                 for (const item of list) {
                     const chapter = new Chapter(item);
                     chapters.push(chapter);
+                    chapter.attach(view.quest, {placeholder: 'loading chapter' + chapter.number + '...'});
                     chapter.addLink(view.chapterlist);
                     joint.push(chapter.fetch().then(chapter => {
                         chapter.draw();
@@ -81,7 +82,10 @@
         menu.addLink('playground', 'index.html', '_blank');
         menu.addLink('introduction', 'intro.html', '_blank');
         menu.addLink('combinatory logic', 'https://en.wikipedia.org/wiki/Combinatory_logic', '_blank');
-        menu.addAction('<span class="denger">&cross; erase progress</span>', demolish);
+        menu.addAction('<span class="danger">&cross; erase progress</span>', () => {
+            if (confirm('Are you sure you want to start over?'))
+                demolish();
+        });
     }
 
     /**
@@ -303,11 +307,18 @@
             }
         }
 
+        attach(element, options) {
+            this.view.frame = append(element, 'div', {class: ['chapter']});
+            this.view.frame.id = this.id;
+
+            if (options.placeholder)
+                this.view.placeholder = append(this.view.frame, 'div', {content: options.placeholder});
+            return this;
+        }
+
         draw() {
             this.visible = true;
-
-            this.view.frame = append(view.quest, 'div', {class: ['chapter']});
-            this.view.frame.id = this.id;
+            this.view.placeholder?.remove();
             const title = append(this.view.frame, 'h2');
             const body = append(this.view.frame, 'div');
             append(title, 'span', {content: 'Chapter '+this.number+': '+this.options.name});
