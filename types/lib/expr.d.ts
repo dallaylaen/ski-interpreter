@@ -192,6 +192,7 @@ export class Alias extends Named {
     constructor(name: string, impl: Expr);
     impl: Expr;
     skip: Set<number>;
+    proper: boolean;
     subst(plug: any, value: any): Expr;
     reduce(args: any): Expr;
     equals(other: any): any;
