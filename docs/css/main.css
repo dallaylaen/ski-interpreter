@@ -205,6 +205,10 @@ ul.term-list li {
     color: green;
 }
 
+.danger {
+    color: orangered;
+}
+
 h1 {
     margin: 0;
     padding: 05.em;
