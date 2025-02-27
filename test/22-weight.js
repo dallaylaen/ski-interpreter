@@ -27,11 +27,17 @@ describe ('Expr.weight', () => {
         expect(SKI.church(100).weight()).to.equal(1);
     });
 
-    it ('works for aliases', () => {
+    it ('works for proper aliases', () => {
         const ski = new SKI();
         ski.add('T','CI');
         const expr = ski.parse('T x y');
-        expect(expr.weight()).to.equal(2);
+        expect(expr.weight()).to.equal(1);
+    });
+
+    it ('works for improper aliases', () => {
+        const ski = new SKI();
+        ski.add('X', 'x->xSK');
+        expect(ski.parse('X').weight()).to.equal(3);
     });
 
     it ('works for lambdas', () => {
