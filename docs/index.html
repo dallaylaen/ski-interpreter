@@ -163,8 +163,11 @@
             store.save('engine', ski);
             showKnown();
         });
+        menu.addSeparator();
         menu.addLink('quest mode', 'quest.html', '_blank');
+        menu.addLink('combinator cheat sheet', 'https://angelfire.com/tx4/cus/combinator/birds.html', '_blank');
         menu.addLink('ski calculus', 'https://en.wikipedia.org/wiki/SKI_combinator_calculus', '_blank');
+        menu.addSeparator();
         menu.addAction('help', () => new TeletypeBox(view.teletype).print(view.help.innerHTML, {raw: true}));
     }
 
