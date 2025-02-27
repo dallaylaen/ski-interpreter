@@ -76,7 +76,7 @@ ul.hamburger-right {
 
 .hamburger li {
     display: block;
-    padding: 0.5em;
+    padding: 0.3em;
 }
 
 .hamburger li a {
@@ -103,6 +103,13 @@ ul.hamburger-right {
     /* white on nice blue */
     background-color: blue;
     color: white;
+}
+
+li.hamburger-separator {
+    border-top: 5px solid #ddd;
+    height: 0;
+    padding: 0;
+    margin: 0 2em 0 2em;
 }
 
 /* general */

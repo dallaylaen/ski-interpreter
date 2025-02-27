@@ -75,6 +75,12 @@ class Hamburger {
     return append(this.content, 'li');
   }
 
+  addSeparator () {
+    const li = this.appendLi();
+    li.classList.add('hamburger-separator');
+    return this; // for chaining
+  }
+
   addLabel (label) {
     const li = this.appendLi();
     append(li, 'span', { content: label });
