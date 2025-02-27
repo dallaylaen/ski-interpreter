@@ -38,6 +38,7 @@
 
     const store = new Store('quest-page');
     let ski; // global interpreter
+    const chapters = [];
 
     const view = grabView('quest', 'known', 'chapterlist', 'menu');
     const questDir = 'quest-data/';
@@ -59,6 +60,7 @@
                 const joint = [];
                 for (const item of list) {
                     const chapter = new Chapter(item);
+                    chapters.push(chapter);
                     chapter.addLink(view.chapterlist);
                     joint.push(chapter.fetch().then(chapter => {
                         chapter.draw();
@@ -134,7 +136,7 @@
 
     class QuestBox {
         constructor(spec, options) {
-            this.impl = new SKI.Quest(spec);
+            this.impl = new SKI.Quest({...spec, engine: ski});
             this.name = 'quest-' + this.impl.meta.id;
             this.chapter = options.chapter;
             if (this.chapter && options.number)
