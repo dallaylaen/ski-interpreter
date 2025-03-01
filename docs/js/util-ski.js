@@ -10,6 +10,17 @@ function permalink (engine, sample) {
   return '?code=' + encode(sample) + '&terms=' + encode(saved);
 }
 
+/**
+ *
+ * @param {Expr} term
+ * @return {string}
+ */
+function showTerm(term) {
+  // TODO terser name
+  return (term.note ?? term.impl?.toString({terse:true}) ?? term.toString({terse: true}))
+      .replaceAll(/\s*->\s*/g, '&rarr;');
+}
+
 let nextId = 0;
 
 class EvalBox {
