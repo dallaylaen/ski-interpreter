@@ -1,5 +1,35 @@
   [
-
+    {
+      "id": "b695072d-1077-4cb8-963b-7207c2ab2c9f",
+      "title": "Lost at GoF, found at g&compfn;f",
+      "descr": [
+        "<p>The combinator application is not associative, i.e. <code>(x y) z != x (y z)</code>",
+        "(find examples!). However, a different operation is: composition. ",
+        "And it will be used extensively in the subsequent quests, so buckle up...</p>",
+        "<p>...and provide a composition term: <code>B f g x = f(g x)</code>,",
+        "also known as the Bluebird.</p>"
+      ],
+      "hint": "You have already built a term that make <code>f(g x)</code> from known <code>f</code>. Break it down so that <code>f</code> is in the last place!",
+      "unlock": "B",
+      "input": "phi",
+      "cases": [
+        [ "phi x y z", "x(y z)" ]
+      ]
+    },
+    {
+      "id": "471b7994-3a4c-410b-a71e-13319a9b470f",
+      "title": "Blackbird singing in the dead of night",
+      "descr": [
+        "<p>Here comes Bluebird's cousin, Blackbird: <code>B<sub>1</sub> a b c d = a (b c d)</code>.</p>",
+        "<p>Unfortunately, this <s>small and simple</s> interpreter does not support indexed terms,",
+        "so no shortcut will be unlocked in this quest.</p>"
+      ],
+      "hint": "Use B to move the last term in the parentheses outside and see what is left.",
+      "input": "phi",
+      "cases": [
+        [ "phi a b c d", "a (b c d)" ]
+      ]
+    },
     {
       "id": "a678a5bc-ce73-466d-b4e1-251e698885be",
       "title": "Mirror image",
@@ -8,31 +38,6 @@
       "input": "phi",
       "cases": [
         [ "phi x y", "y x" ]
-      ]
-    },
-    {
-      "id": "b695072d-1077-4cb8-963b-7207c2ab2c9f",
-      "title": "Lost at GoF, found at g&compfn;f",
-      "descr": [
-        "Create a term that applies a function to the result of the next function,",
-        "a.k.a. <code>B</code>, the Bluebird: <code>f g x &rarr; f(g(x))</code>"
-      ],
-      "unlock": "B",
-      "input": "phi",
-      "cases": [
-        [ "phi x y z", "x(y z)" ]
-      ]
-    },
-    {
-      "id": "1c95d614-1977-4469-b40b-5f82bc52166d",
-      "title": "First come, first served",
-      "descr": [
-        "Somewhat similar to the previous one but you have to apply the functions in the order they appear.",
-        "<code>(f g x)&rarr;g(f(x))</code>"
-      ],
-      "input": "phi",
-      "cases": [
-        [ "phi f g x", "g(f(x))" ]
       ]
     },
     {
@@ -118,6 +123,21 @@
       "input": "phi",
       "cases": [
         ["phi (BC(CI) x y)", "y"]
+      ]
+    },
+    {
+      "id": "c113c527-ab36-4833-915b-aced2e6c193b",
+      "title": "The trident of Poseidon",
+      "descr": [
+        "<p>Create a term that takes three arguments and applies the forth to them:",
+        "<code>f a b c d = d a b c</code>.</p>",
+        "<p>This combinator has no common name, so we'll just call it <code>v3</code>.",
+        "It might come in handy later.</p>"
+      ],
+      "input": "phi",
+      "unlock": "v3",
+      "cases": [
+        [ "phi a b c d", "d a b c" ]
       ]
     }
   ]
