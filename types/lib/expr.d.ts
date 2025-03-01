@@ -185,15 +185,23 @@ export class Native extends Named {
 }
 export class Alias extends Named {
     /**
-       * @desc An existing expression under a different name.
-       * @param {String} name
-       * @param {Expr} impl
-       */
-    constructor(name: string, impl: Expr);
+     * @desc An existing expression under a different name.
+     * @param {String} name
+     * @param {Expr} impl
+     * @param {{canonize: boolean?, max: number?, maxArgs: number?, note: string?}} [options]
+     */
+    constructor(name: string, impl: Expr, options?: {
+        canonize: boolean | null;
+        max: number | null;
+        maxArgs: number | null;
+        note: string | null;
+    });
     impl: Expr;
-    skip: Set<number>;
-    proper: boolean;
-    canonical: Expr;
+    note: string;
+    arity: any;
+    skip: any;
+    proper: any;
+    canonical: any;
     subst(plug: any, value: any): Expr;
     reduce(args: any): Expr;
     equals(other: any): any;
