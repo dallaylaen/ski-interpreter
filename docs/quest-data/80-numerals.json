@@ -17,6 +17,7 @@
         "Procure a term that increases given number by 1: <code>inc N x y &rarr; x(...N+1 times(y)...)</code>. "
       ],
       "hint": "<code>inc N x y &rarr; x (N x y)</code>.",
+      "unlock": "+",
       "input": "phi",
       "cases": [
         [ "phi (KI) x y", "x y" ],
@@ -44,33 +45,78 @@
     },
     {
       "id": "e61e545e-42b6-4ab0-b311-0372841e87f5",
-      "title": "isZero",
+      "title": "Hello? Is there anybody in there?",
       "descr": [
-        "Make a term that returns <code>K</code> for 0 and <code>KI</code> for all other numbers. "
+        "Make a term that returns <code>K</code> for 0 and <code>KI</code> for all other numbers. ",
+        "As often with numbers, you need to find <code>f</code> and <code>x</code>",
+        "such that <code>f(f(...f(x)...))<code> does what you want."
       ],
+      "unlocks": "is_zero",
       "input": "phi",
       "cases": [
-        [ "phi (KI)", "K" ],
-        [ "phi (SK)", "K" ],
-        [ "phi I", "KI" ],
-        [ "phi 2", "KI" ],
-        [ "phi 5", "KI" ]
+        [ "phi (KI) x y", "x" ],
+        [ "phi (SK) x y", "x" ],
+        [ "phi I x y", "y" ],
+        [ "phi 2 x y", "y" ],
+        [ "phi 43 x y", "y" ]
+      ]
+    },
+    {
+      "id": "40a76eaa-faa3-4631-944a-1f9f60696fce",
+      "title": "Space oddity",
+      "descr": [
+        "<p>Create a term that returns <code>K</code> (or equivalent) for odd numbers",
+        "and <code>KI</code> for even numbers.</p>",
+        "<p>Note that the test suite evaluates the effect of the term and not its composition",
+        "(e.g. SK instead of KI is fine).</p>"
+      ],
+      "unlock": "is_even",
+      "input": "phi",
+      "cases": [
+        [ "phi 0 x y", "x"],
+        [ "phi 1 x y", "y"],
+        [ "phi 22 x y", "x"],
+        [ "phi 23 x y", "y"]
       ]
     },
     {
       "id": "92d3e3f7-cb26-4294-955b-ba526a61bb42",
-      "title": "dec",
+      "title": "Take a little trip back with father Tiresias...",
       "descr": [
-        "Returning the next number wasn't that hard.",
-        "How about returning the previous number, or zero for zero?"
+        "<p>Here you'll have to return the predecessor of a number, or 0 for 0.</p>",
+        "<p>This cannot be done by passing just 2 arguments to a number (prove it!),",
+        "however, 3 should suffice.</p>"
       ],
       "solution": "BBBC(BC(CI))  (C(B(CI))(SB))  (K(KI) )I ",
+      "unlock": "dec",
       "input": "phi",
       "cases": [
-        [ "phi (KI) x y", "y" ],
-        [ "phi I x y", "y" ],
-        [ "phi 2 x y", "x(y)" ],
-        [ "phi 6 + 0", "5" ]
+        [ "phi (KI) + 0", "0" ],
+        [ "phi I + 0", "0" ],
+        [ "phi 2 + 0", "1" ],
+        [ "phi 13 + 0", "12" ]
+      ]
+    },
+    {
+      "id": "2bcd7557-aa93-4a3f-a56a-8bc81442a7d7",
+      "title": "Half-life",
+      "descr": [
+        "<p>Create a term that takes a number <em>n</em> and returns <em>n/2</em>.</p>",
+        "<p>You can of course use <code>dec</code>, <code>is_zero</code>, and recursion,",
+        "however, doing the same trick as above will be more efficient,",
+        "as Church numeral already have recursion built into them.</p>"
+      ],
+      "input": "phi",
+      "cases": [
+        [ "phi (KI) + 0", "0" ],
+        [ "phi I + 0", "0" ],
+        [ "phi 2 + 0", "1" ],
+        [ "phi 3 + 0", "1" ],
+        [ "phi 4 + 0", "2" ],
+        [ "phi 5 + 0", "2" ],
+        [ "phi 6 + 0", "3" ],
+        [ "phi 20 + 0", "10" ],
+        [ "phi 21 + 0", "10" ]
       ]
     },
     {
@@ -92,6 +138,24 @@
       ]
     },
     {
+      "id": "023f8486-03ee-4e55-98ce-a779c6325844",
+      "title": "Power to the people",
+      "descr": [
+        "Create a term that takes two numbers and produces the first number raised to the power of the second."
+      ],
+      "input": "phi",
+      "cases": [
+        [ "phi 0 0 + 0", "1" ],
+        [ "phi 0 5 + 0", "0" ],
+        [ "phi 5 0 + 0", "1" ],
+        [ "phi 2 3 + 0", "8" ],
+        [ "phi 3 2 + 0", "9" ],
+        [ "phi 3 3 + 0", "27" ],
+        [ "phi 4 4 + 0", "256" ],
+        [ "phi 5 5 + 0", "3125" ]
+      ]
+    },
+    {
       "id": "706e03ef-dad1-44d7-9dde-784b801ea7c6",
       "title": "His Majesty Factorial",
       "descr": [
@@ -103,5 +167,40 @@
         ["phi I + 0",   "1"   ],
         ["phi 5 + 0",   "120" ]
       ]
+    },
+    {
+      "id": "56b36d8d-0945-4457-a7b3-f4f7e8cb344a",
+      "title": "Down the rabbit hole",
+        "descr": [
+          "<p>Create a term that takes a number n and returns the nth Fibonacci number.</p>",
+          "<p>Note that it might be easier to build n-th <i>pair</i> of Fibonacci numbers first.<p>"
+        ],
+        "input": "phi",
+        "cases": [
+            ["phi(KI) + 0", "0" ],
+            ["phi I + 0",   "1" ],
+            ["phi 5 + 0",   "5" ],
+            ["phi 6 + 0",   "8" ],
+            ["phi 7 + 0",   "13" ]
+        ]
+    },
+    {
+      "id": "c89bd1b9-56fd-4947-97fd-caf0e3320001",
+      "title": "Something in common",
+        "descr": [
+            "<p>Create a term that takes two numbers and returns their greatest common divisor.</p>",
+            "<p>This is the first task where true recursion is inevitable.</p>"
+        ],
+        "input": "euclid",
+        "cases": [
+          [ "euclid  0  0 + 0",   "0" ],
+          [ "euclid  1  0 + 0",   "1" ],
+          [ "euclid  0  1 + 0",   "1" ],
+          [ "euclid  1  1 + 0",   "1" ],
+          [ "euclid  2  3 + 0",   "1" ],
+          [ "euclid  4  6 + 0",   "2" ],
+          [ "euclid  9  6 + 0",   "3" ],
+          [ "euclid  12 15 + 0",  "3" ]
+        ]
     }
   ]
