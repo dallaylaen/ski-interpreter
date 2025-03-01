@@ -20,8 +20,7 @@
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-align-assignments": "^1.1.2",
-    "eslint-plugin-import": "^2.29.1"
-  },
-  "dependencies": {
+    "eslint-plugin-import": "^2.29.1",
+    "typescript": "^5.8.2"
   }
 }
