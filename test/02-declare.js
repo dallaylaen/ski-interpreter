@@ -62,4 +62,11 @@ describe( 'SKI', () => {
         const expr = ski.parse('T x y', jar).run().expr;
         expr.expect( ski.parse('y x', jar));
     });
+
+    it ('can auto-annotate proper terms', () => {
+        const ski = new SKI({annotate: true});
+        ski.add('v3', 'BBBC(BC(CI))');
+        expect(ski.getTerms().v3.note).to.equal('a->b->c->d->d a b c');
+    });
+
 });
