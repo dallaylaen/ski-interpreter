@@ -38,7 +38,10 @@
     const { Expr, FreeVar } = SKI.classes; // just for type annotations
 
     const store = new Store('quest-page');
-    let ski; // global interpreter
+    const skiopt = store.load('engine') ?? {lambdas: false, numbers: false, allow: 'SKI'};
+    skiopt.annotate = true;
+    const ski = new SKI(skiopt);
+
     const chapters = [];
 
     const view = grabView('quest', 'known', 'chapterlist', 'menu');
@@ -52,7 +55,6 @@
     function init() {
         rubberDesign('main');
 
-        ski = new SKI(store.load('engine') ?? {lambdas: false, numbers: false, allow: 'SKI'});
         showKnown();
 
         fetch(questDir + 'index.json')
@@ -129,7 +131,7 @@
         view.known.innerHTML = '';
         const terms = ski.getTerms();
         for (const entry of Object.keys(terms).sort().map(x => [x, terms[x]]))
-            append(view.known, 'div', {content: `<b>${entry[0]}</b> = ${entry[1].note ?? entry[1].impl}`});
+            append(view.known, 'div', {content: `<b>${entry[0]}</b> = ${showTerm(entry[1])}`});
     }
 
     function demolish() {
