@@ -204,6 +204,11 @@ export class Church extends Native {
     n: any;
     equals(other: any): boolean;
 }
+export namespace globalOptions {
+    let terse: boolean;
+    let max: number;
+    let maxArgs: number;
+}
 declare class Named extends Expr {
     /**
        * @desc a constant named 'name'

@@ -127,6 +127,7 @@ export namespace SKI {
         export { Church };
     }
     export { native };
+    export { globalOptions as options };
 }
 import { Native } from "./expr";
 import { Alias } from "./expr";
@@ -141,4 +142,5 @@ import { Lambda } from "./expr";
 declare const native: {
     [key: string]: Native;
 };
+import { globalOptions } from "./expr";
 export {};
