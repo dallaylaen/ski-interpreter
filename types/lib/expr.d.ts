@@ -193,6 +193,7 @@ export class Alias extends Named {
     impl: Expr;
     skip: Set<number>;
     proper: boolean;
+    canonical: Expr;
     subst(plug: any, value: any): Expr;
     reduce(args: any): Expr;
     equals(other: any): any;

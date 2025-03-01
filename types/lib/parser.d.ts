@@ -5,7 +5,8 @@ export class SKI {
      *    allow: string?,
      *    numbers: boolean?,
      *    lambdas: boolean?,
-     *    terms: { [key: string]: Expr|string}?
+     *    terms: { [key: string]: Expr|string}?,
+     *    annotate: boolean?,
      * }} [options]
      */
     constructor(options?: {
@@ -15,9 +16,11 @@ export class SKI {
         terms: {
             [key: string]: Expr | string;
         } | null;
+        annotate: boolean | null;
     });
+    annotate: boolean;
     known: {
-        [x: string]: Native;
+        [key: string]: Native;
     };
     hasNumbers: boolean;
     hasLambdas: boolean;
@@ -99,6 +102,7 @@ export class SKI {
         terms: {
             [key: string]: Native | Alias;
         };
+        annotate: boolean;
     };
 }
 export namespace SKI {
