@@ -253,9 +253,6 @@
             this.view.display.innerHTML = '';
             const echo = append(this.view.display, 'div');
             append(echo, 'span', {content: 'Your solution: ' + expand(result.expr) + ' '});
-            const linque = append(echo, 'a', {content: 'playground'});
-            linque.href='index.html'+permalink(ski, result.expr);
-            linque.target = '_blank';
 
             if (result.exception)
                 append(this.view.display, 'div', {class: ['error'], content: 'Execution failed: '+result.exception});
@@ -263,11 +260,27 @@
             for (const item of result.details) {
                 const line = append(this.view.display, 'div', {class: item.pass ? ['success'] : ['error']});
                 append(line, 'span', {content: item.pass ? '&check; ' : '&cross; '});
-                append(line, 'span', {content: `${item.start} &rarr; ${item.found} in ${item.steps} steps`});
+                append(line, 'span', {content: `${item.start} &rarr; ${item.found} `});
+                const showSteps = append(line, 'a', {content: `in ${item.steps} steps`, class: ['control']});
+                append(line, 'span', {content: ' '});
+                const hideSteps = append(line, 'a', {content: ' (hide)', class: ['control'], hidden: true});
+
                 if (!item.pass) {
                     append(line, 'br');
                     append(line, 'span', {content: '&nbsp;&nbsp;' + (item.reason ?? 'expected '+item.expected)});
                 }
+                // replay specific test case via EvalBox
+                const console = append(line, 'div', {});
+                showSteps.onclick = () => {
+                    console.innerHTML = '';
+                    hideSteps.hidden = false;
+                    const box = new EvalBox(console, {engine: ski, height: Infinity, max: item.steps+2});
+                    box.start(item.start);
+                };
+                hideSteps.onclick = () => {
+                    console.innerHTML = '';
+                    hideSteps.hidden = true;
+                };
             }
         }
     }

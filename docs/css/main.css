@@ -285,4 +285,17 @@ h1 img {
     border-radius: 0.2em;
 }
 
+.control {
+    /* display: inline-block; */
+    /* border: 1px solid cornflowerblue; */
+    border-radius: 0.5em;
+    padding: -0.1em 0.7em;
+    margin: 0.1em 0.3em;
+    color: cornflowerblue;
+    /* background-color: white; */
+}
 
+.control:hover {
+    cursor: pointer;
+    background-color: lightyellow;
+}
