@@ -158,6 +158,8 @@
                 solved: data.solved ?? false,
                 steps: data.steps ?? 0,
                 attempts: data.attempts ?? 0,
+                weight: data.weight ?? 0,
+                total: data.total ?? 0,
             };
             if (this.status.solved)
                 this.onSolved();
@@ -173,7 +175,9 @@
             if (this.status.solved)
                 return;
             this.status.attempts++;
-            this.status.steps += result.steps;
+            this.status.total += result.steps;
+            this.status.steps = result.steps;
+            this.status.weight = result.expr.weight();
             if (result.pass) {
                 this.status.solved = true;
                 this.onSolved(result);
@@ -240,11 +244,13 @@
         showStatus() {
             if (!this.view.stat)
                 return;
-            this.view.stat.innerHTML = !this.status.attempts
-                ? ''
-                : (this.status.solved ? '&check; ' : '') +
-                    this.status.steps + ' steps in ' + this.status.attempts
-                        + (this.status.attempts === 1 ? ' try' : ' tries');
+            if (this.status.attempts) {
+                const tries = 'in ' + this.status.attempts + (this.status.attempts === 1 ? ' try' : ' tries');
+                const steps = this.status.solved
+                    ? '&check; ' + this.status.steps + ' steps/' + this.status.weight + ' terms '
+                    : this.status.total + ' total steps ';
+                this.view.stat.innerHTML = steps + ' ' + tries;
+            }
         }
 
         showResult(result) {
