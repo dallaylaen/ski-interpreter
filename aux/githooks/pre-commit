@@ -23,6 +23,9 @@ for i in `git diff --name-only --cached --diff-filter=AM | grep 'lib/.*\.js'`; d
 done
 assert npm test
 
+assert ./aux/browserify.sh
+assert npx -p typescript tsc index.js --declaration --allowJs --emitDeclarationOnly --outDir types
+
 if [ ! -z "$FAIL" ]; then
     die "$FAIL"
 fi

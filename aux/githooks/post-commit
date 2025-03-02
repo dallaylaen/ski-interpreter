@@ -9,9 +9,6 @@ modified() {
     echo $LIST
 }
 
-./aux/browserify.sh
-npx -p typescript tsc index.js --declaration --allowJs --emitDeclarationOnly --outDir types
-
 CHANGED=$(modified $AUTOFILES)
 
 if [ ! -z "$CHANGED" ]; then
