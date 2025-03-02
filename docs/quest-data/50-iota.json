@@ -3,7 +3,6 @@
       "id": "80ff7199-36e6-458a-9ce6-fd59725d9b41",
       "title": "All you need is",
       "descr": "Build <code>x &rarr; x(S)(K)</code>",
-      "unlock": "X",
       "solution": "BC(CI)SK",
       "input": "phi",
       "cases": [
@@ -18,7 +17,8 @@
         "Now build <code>I</code> from <code>X</code>. ",
         "No other combinators are (hopefully temporarily) available."
       ],
-      "allow": "X",
+      "allow": "I-I",
+      "vars": ["X=BC(CI)SK"],
       "hint": "You might want to go back to the very first chapter...",
       "input": "phi",
       "cases": [
@@ -31,7 +31,7 @@
       "descr": [
         "Build a combinator that omits its first argument and returns the second one"
       ],
-      "allow": "X",
+      "vars": ["X=BC(CI)SK"],
       "hint": "XXX... would alternate between I and X. Try parenthesis...",
       "input": "phi",
       "cases": [
@@ -45,7 +45,7 @@
         "Build a combinator that omits its second argument and returns the first one",
         "(i.e. <code>K</code>)"
       ],
-      "allow": "X",
+      "vars": ["X=BC(CI)SK"],
       "input": "phi",
       "cases": [
         [ "phi x y", "x"]
@@ -57,7 +57,7 @@
       "descr": [
         "How about <code>S</code>?"
       ],
-      "allow": "X",
+      "vars": ["X=BC(CI)SK"],
       "input": "phi",
       "cases": [
         [ "phi x y z", "x z (y z)"]
