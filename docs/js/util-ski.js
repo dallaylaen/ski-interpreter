@@ -50,7 +50,7 @@ class EvalBox {
     this.onStart = options.onStart ?? (() => {});
     this.onStop = options.onStop ?? (() => {});
 
-    this.parent = parent;
+    this.parent = box.parent;
     this.engine = options.engine;
     this.box = box;
     this.box.height = this.height;
@@ -116,6 +116,10 @@ class EvalBox {
     if (reason)
       this.box.print(reason, { class: ['error'], line: '' });
     this.onStop();
+  }
+
+  remove() {
+    this.box.remove();
   }
 
   setHeight (height) {
