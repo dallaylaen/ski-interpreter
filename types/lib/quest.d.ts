@@ -49,9 +49,9 @@ export class Quest {
     };
     /**
      *   Display allowed terms based on what engine thinks of this.vars + this.restrict.allow
-     *   @return {string | undefined}
+     *   @return {string}
      */
-    allowed(): string | undefined;
+    allowed(): string;
     /**
      *
      * @param {{} | string} opt
