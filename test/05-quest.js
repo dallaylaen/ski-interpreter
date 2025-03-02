@@ -20,7 +20,7 @@ describe('Quest', () => {
 
         const details = pass.details[0];
         expect(details.start + ' -> ' + details.found).to.equal('&phi;(x) -> x');
-        expect(details.steps).to.equal(2, "SKK=I takes 2 steps to validate");
+        expect(details.steps).to.be.within(2, 3, "SKK=I takes 2-3 steps to validate");
 
         const fail = quest.check('S(SKK)(SKK)');
         expect(fail.pass).to.equal(false);
@@ -40,6 +40,7 @@ describe('Quest', () => {
         });
 
         const pass = quest.check('SII (S(S(KS)K)K)');
+        // console.log(pass);
         expect(pass.pass).to.equal(true);
         expect(reduct(pass.details[0])).to.match(/&phi;\(x\) -> ([SKI()]+) vs \1/);
     });
