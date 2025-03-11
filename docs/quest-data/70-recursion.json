@@ -4,7 +4,7 @@
       "title": "Quine",
       "descr": [
         "Technically, every irreducible combinator is a quine, for it returns itself. ",
-        "Write a combinator that returns itself when given <i>any</i> argument."
+        "Write a combinator that returns itself when given <i>any</i> argument: <code>f x = f</code>."
       ],
       "input": "phi",
       "cases": [
@@ -14,15 +14,51 @@
     },
     {
       "id": "35d88d58-b0f1-42b1-8c69-ce306bf7c429",
-      "title": "Literal foo",
+      "title": "All of the above",
       "descr": [
-        "You are given a term <code>foo</code>.",
-        "Construct f such that <code>f x = foo(f, x)</code> for any given <code>x</code>."
+        "<p>You are given a term <code>expr</code>.",
+        "Construct f such that <code>f x = expr f x</code> for any given <code>x</code>.</p>",
+        "<p>Bonus points for having <code>expr</code> at the end of your solution.</p>"
       ],
-      "vars": ["foo"],
+      "vars": ["expr"],
       "input": "phi",
       "cases": [
-        [ "phi x", "foo phi x" ]
+        [ "phi x", "expr phi x" ],
+        [ "phi", "phi" ]
+      ]
+    },
+    {
+      "id": "292e29e7-41bc-4bf8-ac8c-88e6851d880a",
+      "title": "Tell me Y",
+      "descr": [
+        "Implement the famous fixed point combinator, <code>Y</code>: <code>Y f = f (Y f)</code>."
+      ],
+      "input": "Y",
+      "unlock": "Y",
+      "solution": "WI(W(B(SI)))",
+      "comment": "Implementing meaningful tests for Y is damn hard I should say...",
+      "cases": [
+        [ "Y (a->b->a) x", "Y (a->b->a)"],
+        [ "Y (Kx)", "x" ],
+        [ "Y (f->a->b->b (f (a b)) a ) filler K K K (KI)", "filler KKK"]
+      ]
+    },
+    {
+      "id": "b7a47859-5350-489a-b30d-04206dbb384a",
+      "title": "The lazy fixed point",
+      "descr": [
+        "<p>Under a normal reduction strategy, the classical fixed point combinator will terminate",
+        "if given the right input. However, it may run indefinitely in <i>absence</i> of input.</p>",
+        "<p>Make a variant of <code>Y</code>, <ode>Z</code>, that doesn't start until there's some input:",
+        "<code>Z f x = f (Z f) x</code>."
+      ],
+      "solution": "WI(B(S(BSC))(BC(C(K(WI)))))",
+      "unlock": "Z",
+      "input": "Z",
+      "cases": [
+        [ "Z f", "Z f" ],
+        [ "Z f x", "f (Z f) x" ],
+        [ "Z (Kx) y", "x y" ]
       ]
     }
   ]
