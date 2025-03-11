@@ -299,3 +299,7 @@ h1 img {
     cursor: pointer;
     background-color: lightyellow;
 }
+
+sub {
+    font-size: 0.5em;
+}
