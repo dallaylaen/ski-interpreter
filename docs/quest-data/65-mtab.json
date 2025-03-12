@@ -1,0 +1,55 @@
+  [
+    {
+      "id": "e22a955d-b899-4704-a4c0-62c04f668959",
+      "title": "Identity, again",
+      "descr": [
+        "Build <code>I</code> from M, T, A, and B."
+      ],
+      "allow": "B",
+      "vars": ["M=WI", "T=CI", "A=KI"],
+      "input": "phi",
+      "cases": [
+        [ "phi x", "x" ]
+      ]
+    },
+    {
+      "id": "787626a9-438a-42bc-b8f4-eb3318088ac4",
+      "title": "Cardinal revisited",
+      "descr": [
+        "Build <code>C</code> from M, T, A, and B."
+      ],
+      "allow": "B",
+      "vars": ["M=WI", "T=CI", "A=KI"],
+      "hint": "<code>B</code> and <code>T</code> are enough.",
+      "input": "phi",
+      "cases": [
+        [ "phi x y z", "x z y" ]
+      ]
+    },
+    {
+      "id": "1c99f066-0bf9-4b77-adf6-f76fa01b9072",
+      "title": "Truth coming out of her well",
+      "descr": [
+        "Build <code>K</code> from M, T, A, and B."
+      ],
+      "allow": "B",
+      "vars": ["M=WI", "T=CI", "A=KI"],
+      "input": "phi",
+      "cases": [
+        [ "phi x y", "x" ]
+      ]
+    },
+    {
+      "id": "0bdefc22-6755-4e65-b4aa-2bdeafb762a3",
+      "title": "The last step",
+      "descr": [
+          "Build <code>W</code> from M, T, A, and B."
+      ],
+      "allow": "B",
+      "vars": ["M=WI", "T=CI", "A=KI"],
+      "input": "phi",
+      "cases": [
+          [ "phi x", "x" ]
+      ]
+    }
+  ]

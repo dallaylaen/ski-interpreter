@@ -64,6 +64,19 @@
     "link": "60-boolean.json"
   },
   {
+    "id": "65",
+    "name": "More than a bit",
+    "intro": [
+      "<p>Another weird combinator base is <b>MTAB</b>.",
+      "Just like the BCKW system, it consists of four combinators,",
+      "representing repetition, transposition, discarding, and composition, respectively:",
+      "<code>M a = a</code>, <code>T a b = b a</code>, <code>A a b = b</code>,",
+      "and <code>B a b c = a (b c)</code>.</p>",
+      "<p>Your task is to go back to BCKW from here. Good luck!</p>"
+    ],
+    "link": "65-mtab.json"
+  },
+  {
     "id": "70",
     "name": "Recursion",
     "intro": [
