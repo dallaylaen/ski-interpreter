@@ -43,10 +43,10 @@ describe( 'SKI', () => {
 
     it ('can perform unlimited calculations', done => {
         const ski = new SKI;
-        const expr = ski.parseLine('SII(SII)');
+        const expr = ski.parseLine('WWW');
         const result = expr.run({max: 42});
 
-        expect(''+result.expr).to.equal('S(I)(I)(S(I)(I))');
+        expect(''+result.expr).to.equal('W(W)(W)');
         expect(result.steps).to.equal(42);
         expect(result.final).to.equal(false);
 
