@@ -43,7 +43,13 @@ export class Expr {
         skip: Set<number> | null;
     };
     hasOnly(set: any): any;
-    hasReduction(): boolean;
+    /**
+     * @desc Whether the term will reduce further if given more arguments.
+     *       In practice, equivalent to "starts with a FreeVar"
+     *       Used by guessArity (duh...)
+     * @return {boolean}
+     */
+    wantsArgs(): boolean;
     /**
        * Apply self to list of given args.
        * Normally, only native combinators know how to do it.
@@ -53,7 +59,7 @@ export class Expr {
     reduce(args: Expr[]): Expr | null;
     /**
        * Replace all instances of free vars with corresponding values and return the resulting expression.
-       * return nulls if no changes could be made, just like step() does, to save memory.
+       * return null if no changes could be made.
        * @param {FreeVar} plug
        * @param {Expr} value
        * @return {Expr|null}
@@ -61,12 +67,12 @@ export class Expr {
     subst(plug: FreeVar, value: Expr): Expr | null;
     /**
        * @desc iterate one step of calculation in accordance with known rules.
-       *       return the new expression if reduction was possible. or null otherwise
-       * @return {{expr: Expr, steps: number}}
+       * @return {{expr: Expr, steps: number, changed: boolean}}
        */
     step(): {
         expr: Expr;
         steps: number;
+        changed: boolean;
     };
     /**
        * @desc Run uninterrupted sequence of step() applications
@@ -137,6 +143,13 @@ export class App extends Expr {
     hasOnly(set: any): boolean;
     apply(...args: any[]): any;
     subst(plug: any, value: any): Expr;
+    /**
+     * @return {{expr: Expr, steps: number}}
+     */
+    step(): {
+        expr: Expr;
+        steps: number;
+    };
     equals(other: any): boolean;
     toString(opt?: {}): string;
 }
@@ -203,6 +216,14 @@ export class Alias extends Named {
     proper: any;
     canonical: any;
     subst(plug: any, value: any): Expr;
+    /**
+     *
+     * @return {{expr: Expr, steps: number}}
+     */
+    step(): {
+        expr: Expr;
+        steps: number;
+    };
     reduce(args: any): Expr;
     equals(other: any): any;
     toString(opt: any): string;
