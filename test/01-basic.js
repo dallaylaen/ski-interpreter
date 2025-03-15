@@ -33,11 +33,11 @@ describe( 'SKI', () => {
         done();
     });
 
-    it ('can parseLine unknown words', done => {
+    it ('can parse unknown words', done => {
         const ski = new SKI;
         const expr = ski.parseLine("food bard");
         expect(''+expr).to.equal("food(bard)");
-        expect(expr.step()).to.deep.equal({expr, steps: 0});
+        expect(expr.step()).to.deep.equal({expr, steps: 0, changed: false});
         done();
     });
 
@@ -59,5 +59,5 @@ describe( 'SKI', () => {
         expect( () => expr.run({max: 15, throw: true}) ).to.throw(/failed.*15.*steps/i);
 
         done();
-    })
+    });
 });
