@@ -93,8 +93,8 @@ class EvalBox {
     if (!this.running) return;
     const next = this.expr.step();
 
-    if (next.steps === 0) {
-      // no steps = finished execution, congratulations
+    if (!next.changed) {
+      // finished execution, congratulations
       if (this.box.last)
         this.box.last.classList.add('success');
       return this.stop();
