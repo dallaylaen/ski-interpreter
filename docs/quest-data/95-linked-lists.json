@@ -1,0 +1,35 @@
+  [
+    {
+      "id": "821301c0-a9e8-4f57-8f2e-f9cd82987f16",
+      "title": "Are we there yet?",
+      "descr": [
+        "<p>Before we start, we'll need a way to tell when a list ends</p>",
+        "<p>Find a function <code>is_empty</code> that returns <code>K</code> for <code>nil</code>",
+        "and <code>KI</code> for <code>V x y</code>, whatever <code>x</code> and <code>y</code> are.</p>"
+      ],
+      "input": "is_empty",
+      "unlock": "is_empty",
+      "cases": [
+        ["is_empty (KI) x y", "x"],
+        ["is_empty (V a b) x y", "y"]
+      ]
+    },
+    {
+      "id": "9fd9c7be-cf72-466f-98f7-a3b4d0efd607",
+      "title": "Fold",
+      "descr": [
+        "<p>Implement fold: <code>fold [a, b, ... z] f x = f a (f b (... (f z x) ...))</code>.",
+        "More specifically, <code>fold nil f x = x</code>",
+        "and <code>fold (V a b) f x = f a (fold b f x)</code>.</p>",
+        "<p>Note that is you reuse <code>lst</code> and <code>nil</code> from the previous chapter,",
+        "you could care less about what <code>f</code> and <code>x</code> are.</p>"
+      ],
+      "input": "fold",
+      "unlock": "fold",
+      "cases": [
+        ["fold (KI) f x", "x"],
+        ["V=BC(CI); fold (V a b) f x", "f a (fold b f x)"],
+        ["V=BC(CI); fold (Va (Vb (Vc (KI)))) f x", "f a (f b (f c x))"]
+      ]
+    }
+  ]
