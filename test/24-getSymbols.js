@@ -27,13 +27,13 @@ describe( "Expr.getSymbols", () => {
     const ski = new SKI();
     const jar = {};
     const expr = ski.parse("x->y->y (x y)", jar);
-    expect(expr.getSymbols()).to.deep.equal(new Map());
+    expect(expr.getSymbols()).to.deep.equal(new Map([[SKI.lambdaPlaceholder, 2]]));
   });
 
   it ("handles more lambda exprs", () => {
     const ski = new SKI();
     const jar = {};
     const expr = ski.parse("x->xSK", jar);
-    expect(expr.getSymbols()).to.deep.equal(new Map([[SKI.S, 1], [SKI.K, 1]]));
+    expect(expr.getSymbols()).to.deep.equal(new Map([[SKI.S, 1], [SKI.K, 1], [SKI.lambdaPlaceholder, 1]]));
   });
 });
