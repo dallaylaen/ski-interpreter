@@ -18,10 +18,16 @@ export class Expr {
        */
     expand(): Expr;
     /**
-     *
+     * @desc return all free variables within the term
      * @return {Set<FreeVar>}
      */
     freeVars(): Set<FreeVar>;
+    /**
+     * @desc return all terminal values within the term, that is, values not
+     * composed of other terms. For example, in S(KI)K, the terminals are S, K, I.
+     * @return {Map<Expr, number>}
+     */
+    getSymbols(): Map<Expr, number>;
     /**
      * @desc rought estimate of the complexity of the term
      * @return {number}
@@ -42,7 +48,7 @@ export class Expr {
         canonical?: Expr;
         skip: Set<number> | null;
     };
-    hasOnly(set: any): any;
+    hasOnly(set: any): boolean;
     /**
      * @desc Whether the term will reduce further if given more arguments.
      *       In practice, equivalent to "starts with a FreeVar"
@@ -140,7 +146,6 @@ export class App extends Expr {
     args: Expr;
     final: boolean;
     weight(): Expr;
-    hasOnly(set: any): boolean;
     apply(...args: any[]): any;
     subst(plug: any, value: any): Expr;
     /**
