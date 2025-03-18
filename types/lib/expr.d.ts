@@ -213,19 +213,21 @@ export class Alias extends Named {
      * @desc An existing expression under a different name.
      * @param {String} name
      * @param {Expr} impl
-     * @param {{canonize: boolean?, max: number?, maxArgs: number?, note: string?}} [options]
+     * @param {{canonize: boolean?, max: number?, maxArgs: number?, note: string?, terminal: boolean?}} [options]
      */
     constructor(name: string, impl: Expr, options?: {
         canonize: boolean | null;
         max: number | null;
         maxArgs: number | null;
         note: string | null;
+        terminal: boolean | null;
     });
     impl: Expr;
     note: string;
     arity: any;
     skip: any;
     proper: any;
+    terminal: any;
     canonical: any;
     subst(plug: any, value: any): Expr;
     /**
