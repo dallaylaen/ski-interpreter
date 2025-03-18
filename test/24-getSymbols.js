@@ -36,4 +36,12 @@ describe( "Expr.getSymbols", () => {
     const expr = ski.parse("x->xSK", jar);
     expect(expr.getSymbols()).to.deep.equal(new Map([[SKI.S, 1], [SKI.K, 1], [SKI.lambdaPlaceholder, 1]]));
   });
+
+  it ("respects terminal aliases", () => {
+    const ski = new SKI();
+    const jar = {};
+    ski.add("T", "CI");
+    const expr = ski.parse("T x y", jar);
+    expect(expr.getSymbols()).to.deep.equal(new Map([[ski.getTerms().T, 1], [jar.x, 1], [jar.y, 1]]));
+  });
 });
