@@ -10,3 +10,4 @@ export class Tokenizer {
 }
 export function restrict(set: any, spec: any): any;
 export function missingIndices(arr: any, set: any): any;
+export function isSubset(a: any, b: any): boolean;

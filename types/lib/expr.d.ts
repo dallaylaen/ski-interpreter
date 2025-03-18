@@ -36,19 +36,26 @@ export class Expr {
     /**
      *
      * @param {{max: number?, maxArgs: number?}} options
-     * @return {{arity: number?, found: boolean, proper: boolean, canonical?: Expr, skip: Set<number>?}}
+     * @return {{
+     *    found: boolean,
+     *    proper: boolean,
+     *    arity: number?,
+     *    linear: boolean?,
+     *    canonical?: Expr,
+     *    skip: Set<number>?
+     * }}
      */
     guessArity(options?: {
         max: number | null;
         maxArgs: number | null;
     }): {
-        arity: number | null;
         found: boolean;
         proper: boolean;
+        arity: number | null;
+        linear: boolean | null;
         canonical?: Expr;
         skip: Set<number> | null;
     };
-    hasOnly(set: any): boolean;
     /**
      * @desc Whether the term will reduce further if given more arguments.
      *       In practice, equivalent to "starts with a FreeVar"
@@ -243,6 +250,7 @@ export namespace globalOptions {
     let max: number;
     let maxArgs: number;
 }
+export const lambdaPlaceholder: Native;
 declare class Named extends Expr {
     /**
        * @desc a constant named 'name'
