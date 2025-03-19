@@ -106,4 +106,19 @@ describe('Quest', () => {
         expect(fail.details[0].reason).to.match(/in 20 steps/);
     });
 
+    it ('honors given vars', () => {
+        const quest = new Quest({
+            "vars": ["nil=KI", "lst=BS(C(BB))"],
+            "input": "rev",
+            "cases": [
+                ["rev nil", "nil"],
+                ["rev (lst a nil)", "lst a nil"],
+                ["rev (lst a(lst b(lst c nil)))", "lst c (lst b (lst a nil))"]
+            ]
+        });
+
+        const result = quest.check("BBBC(BC(CI)) (B(CB)lst) I nil");
+        expect(result.pass).to.equal(true, result.details[0].reason);
+    });
+
 });
