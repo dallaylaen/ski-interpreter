@@ -31,6 +31,7 @@
       "descr": [
         "Build a combinator that omits its first argument and returns the second one"
       ],
+      "allow": "I-I",
       "vars": ["X=BC(CI)SK"],
       "hint": "XXX... would alternate between I and X. Try parenthesis...",
       "input": "phi",
@@ -45,6 +46,7 @@
         "Build a combinator that omits its second argument and returns the first one",
         "(i.e. <code>K</code>)"
       ],
+      "allow": "I-I",
       "vars": ["X=BC(CI)SK"],
       "input": "phi",
       "cases": [
@@ -57,6 +59,7 @@
       "descr": [
         "How about <code>S</code>?"
       ],
+      "allow": "I-I",
       "vars": ["X=BC(CI)SK"],
       "input": "phi",
       "cases": [

@@ -11,7 +11,7 @@
       "unlock": "is_empty",
       "cases": [
         ["is_empty (KI) x y", "x"],
-        ["is_empty (V a b) x y", "y"]
+        ["V=BC(CI); is_empty (V a b) x y", "y"]
       ]
     },
     {
