@@ -105,6 +105,21 @@
       ]
     },
     {
+      "id": "30211050-4764-4373-8ee4-250119368571",
+      "title": "A parliament of owls",
+      "descr": [
+        "<p>The Owl combinator is an important form of recursion, slightly more complicated than the Mockingbird:",
+        "<code>O x y = y (x y)</code>.</p>",
+        "<p>Here the duplicated argument is not just applied to itself, but also modified before doing so.</p>",
+        "<p>Find O.</p>"
+      ],
+      "allow": "SKI",
+      "input": "phi",
+      "cases": [
+        [ "phi x y", "y (x y)" ]
+      ]
+    },
+    {
       "id": "f52144ba-a821-4866-9ae2-8c00156d20e3",
       "title": "Lost identity",
       "descr": [
