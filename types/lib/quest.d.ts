@@ -1,6 +1,30 @@
+export type CaseResult = {
+    pass: boolean;
+    reason: string | null;
+    steps: number;
+    start: typeof import("./expr").Expr;
+    found: typeof import("./expr").Expr;
+    expected: typeof import("./expr").Expr;
+    note: string | null;
+    args: typeof import("./expr").Expr[];
+    case: Case;
+};
+/**
+ * @typedef {{
+ *   pass: boolean,
+ *   reason: string?,
+ *   steps: number,
+ *   start: Expr,
+ *   found: Expr,
+ *   expected: Expr,
+ *   note: string?,
+ *   args: Expr[],
+ *   case: Case
+ * }} CaseResult
+ */
 export class Quest {
     /**
-     *
+     * @description A combinator problem with a set of test cases for the proposed solution.
      * @param {{
      *    title: string?,
      *    descr: string?,
@@ -65,7 +89,7 @@ export class Quest {
      * @return {{
      *             expr: Expr?,
      *             pass: boolean,
-     *             details: {pass: boolean, steps: number, found: Expr, expected: Expr, start: Expr?, args: Expr[]?}[],
+     *             details: CaseResult[],
      *             exception: Error?,
      *             steps: number,
      *             input: Expr[]
@@ -74,14 +98,7 @@ export class Quest {
     check(...input: typeof import("./expr").Expr | string): {
         expr: typeof import("./expr").Expr | null;
         pass: boolean;
-        details: {
-            pass: boolean;
-            steps: number;
-            found: typeof import("./expr").Expr;
-            expected: typeof import("./expr").Expr;
-            start: typeof import("./expr").Expr | null;
-            args: typeof import("./expr").Expr[] | null;
-        }[];
+        details: CaseResult[];
         exception: Error | null;
         steps: number;
         input: typeof import("./expr").Expr[];
@@ -92,4 +109,32 @@ export class Quest {
        */
     show(): TestCase[];
 }
+declare class Case {
+    /**
+     * @param {FreeVar[]} input
+     * @param {[e1: string, e2: string]} terms
+     * @param {{
+     *    max: number?,
+     *    note: string?,
+     *    vars: {string: Expr}?,
+     *    engine: SKI?
+     * }} options
+     */
+    constructor(input: typeof import("./expr").FreeVar[], terms: [e1: string, e2: string], options?: {
+        max: number | null;
+        note: string | null;
+        vars: {
+            string: typeof import("./expr").Expr;
+        } | null;
+        engine: SKI | null;
+    });
+    max: number;
+    note: string;
+    /**
+     * @param {Expr} expr
+     * @return {CaseResult}
+     */
+    check(...expr: typeof import("./expr").Expr): CaseResult;
+}
 import { SKI } from "./parser";
+export {};
