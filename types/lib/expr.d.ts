@@ -22,6 +22,7 @@ export class Expr {
      * @return {Set<FreeVar>}
      */
     freeVars(): Set<FreeVar>;
+    hasLambda(): any;
     /**
      * @desc return all terminal values within the term, that is, values not
      * composed of other terms. For example, in S(KI)K, the terminals are S, K, I.
@@ -142,6 +143,9 @@ export class Expr {
      */
     toJSON(): string;
 }
+export namespace Expr {
+    let lambdaPlaceholder: Native;
+}
 export class App extends Expr {
     /**
        * @desc Application of fun() to args
@@ -252,7 +256,6 @@ export namespace globalOptions {
     let max: number;
     let maxArgs: number;
 }
-export const lambdaPlaceholder: Native;
 declare class Named extends Expr {
     /**
        * @desc a constant named 'name'

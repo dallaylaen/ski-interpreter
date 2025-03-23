@@ -128,7 +128,7 @@ export namespace SKI {
     }
     export { native };
     export { globalOptions as options };
-    export { lambdaPlaceholder };
+    export let lambdaPlaceholder: Native;
 }
 import { Native } from "./expr";
 import { Alias } from "./expr";
@@ -144,5 +144,4 @@ declare const native: {
     [key: string]: Native;
 };
 import { globalOptions } from "./expr";
-import { lambdaPlaceholder } from "./expr";
 export {};
