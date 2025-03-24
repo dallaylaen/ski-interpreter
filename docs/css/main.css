@@ -303,3 +303,8 @@ h1 img {
 sub {
     font-size: 0.5em;
 }
+
+.comment {
+    color: grey;
+    font-style: italic;
+}
