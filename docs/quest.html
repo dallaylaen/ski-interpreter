@@ -178,7 +178,7 @@
             this.status.attempts++;
             this.status.total += result.steps;
             this.status.steps = result.steps;
-            this.status.weight = result.expr.weight();
+            this.status.weight = result.weight;
             if (result.pass) {
                 this.status.solved = true;
                 this.onSolved(result);
