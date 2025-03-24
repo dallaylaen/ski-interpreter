@@ -121,4 +121,24 @@ describe('Quest', () => {
         expect(result.pass).to.equal(true, result.details[0].reason);
     });
 
+    it ('supports linear cases', () => {
+        const quest = new Quest({
+            input: 't',
+            cases: [
+                [{linear: true}, 't'],
+                [ 't x y', 'y x'],
+            ],
+        });
+
+        const pass = quest.check('B(SI)K');
+        expect(pass.pass).to.equal(true);
+
+        const fail = quest.check('KI');
+        const details = fail.details;
+        expect(details[0].reason).to.match(/linear/);
+        expect(details[1].reason).to.match(/expected/);
+        expect(details[0].pass).to.equal(false);
+        expect(details[1].pass).to.equal(false);
+        expect(fail.pass).to.equal(false);
+    });
 });
