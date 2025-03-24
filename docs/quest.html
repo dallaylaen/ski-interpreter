@@ -150,6 +150,7 @@
             if (this.chapter && options.number)
                 this.number = this.chapter.number + '.' + options.number;
             this.view = {};
+            this.input = [];
         }
 
         load() {
@@ -196,10 +197,12 @@
                 this.chapter.addSolved(this.impl.meta.id);
         }
 
-        check(input) {
+        check() {
             if (this.view.display)
                 this.view.display.innerHTML = 'running...';
-            const result = this.impl.check(input);
+            const got = this.input.map(x => x.value);
+            console.log('checking', got);
+            const result = this.impl.check(...got);
             this.showResult(result);
             this.update(result);
         }
@@ -228,17 +231,37 @@
             this.view.display = append(body, 'div', {class: ['quest-display'], content: '.....'});
 
             this.view.solution = append(body, 'div', {class: ['quest-solution']});
-            const input = append(this.view.solution, 'input');
-            input.onkeydown = e => {
-                if (e.key === 'Enter')
-                    this.check(input.value);
-            };
-            const btn = append(this.view.solution, 'button', {content: 'solve!'});
-            btn.onclick = () => this.check(input.value);
-            const moveOn = append(this.view.solution, 'button', {content: 'move on >>', hidden: true});
-            moveOn.onclick = () => showhide(body, false);
+
+            this.drawInput(this.view.solution);
+
 
             this.showStatus();
+        }
+
+        drawInput(element) {
+          const spec = this.impl.input;
+          const multi = spec.length !== 1;
+
+          for (const item of spec) {
+
+            const input = append(element, 'input');
+            input.onkeydown = e => {
+              if (e.key === 'Enter')
+                this.check();
+            };
+            this.input.push(input);
+            if (multi) {
+              append(element, 'span', {content: ' &rarr; '+item.name});
+              if (item.note)
+                append(element, 'span', {content: ' // '+item.note, class: ['comment']});
+              append(element, 'br');
+            }
+          }
+
+          const btn = append(element, 'button', {content: 'solve!'});
+          btn.onclick = () => this.check();
+          this.view.moveOn = append(element, 'button', {content: 'move on >>', hidden: true});
+          this.view.moveOn.onclick = () => showhide(body, false);
         }
 
         showStatus() {
