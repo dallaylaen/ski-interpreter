@@ -1,0 +1,59 @@
+  [
+    {
+      "id": "843b5770-dc86-464d-94b4-746552b21830",
+      "title": "Cardinal once removed",
+      "descr": [
+        "<p>Make a combinator that swaps its 3rd and 4th arguments, starting from 1:</p>",
+        "<p><code>C<sup>*</sup> a b c d = a b d c</code>.</p>",
+        "<p>Only linear combinators are allowed.</p>"
+      ],
+      "allow": "BCTVIR",
+      "input": {
+        "name": "x",
+        "fancy": "C<sup>*</sup>"
+      },
+      "cases": [
+        [ "x a b c d", "a b d c" ]
+      ]
+    },
+    {
+      "id": "8769c8fb-fabe-4a04-86b7-54a4b9bf5729",
+      "title": "The linear base",
+      "descr": [
+        "<p>This is one of the hardest <i>[citation needed]</i> problems from To Mock a Mockingbird.</p>",
+        "<p>It can be proven that <code>I</code>, <code>B</code>, and either <code>C</code> or <code>T</code>",
+        "form a basis for all linear combinators. ",
+        "(Show that <code>C</code> and <code>T</code> are interchangeable here.)</p>",
+        "<p>However, does a base of less than 3 combinators exist?",
+        "Well apparently it's impossible to get rid of <code>I</code>, but the other two can indeed be merged.</p>",
+        "<p>Your task will be to <i>declare</i> a combinator that would, together with <code>I</code>,",
+        "form a basis for all linear combinators.",
+        "You'll then have to <i>prove</i> it's a basis by implementing <code>B</code> and <code>T</code>.</p>"
+      ],
+      "input": [
+        {
+          "name": "P",
+          "lambdas": true,
+          "allow": "I-I",
+          "note": "Declare your own combinator, lambdas allowed. It should be linear."
+        },
+        {
+          "name": "B",
+          "lambdas": false,
+          "allow": "I",
+          "note": "Implement <code>B</code>. <code>P</code> (declared above) and <code>I</code> are allowed."
+        },
+        {
+          "name": "T",
+          "lambdas": false,
+          "allow": "I",
+            "note": "Implement <code>T</code>. <code>P</code> (declared above) and <code>I</code> are allowed."
+        }
+      ],
+      "cases": [
+        [ { "linear": true }, "P" ],
+        [ "B a b c", "a (b c)" ],
+        [ "T a b", "b a" ]
+      ]
+    }
+  ]

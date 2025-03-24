@@ -53,18 +53,7 @@
     "link": "50-iota.json"
   },
   {
-    "id": "60",
-    "name": "Boolean logic",
-    "intro": [
-      "<code>K</code> and <code>KI</code> terms may be interpreted as <b>true</b> and <b>false</b>",
-      ", respectively, as <code>K then else</code> will result in <code>then</code>",
-      "and <code>KI then else</code> will result in <code>else</code>.",
-      "The trick is almost always to feed a function to a boolean value, and not the other way around."
-    ],
-    "link": "60-boolean.json"
-  },
-  {
-    "id": "65",
+    "id": "55",
     "name": "MTAB jailbreak",
     "intro": [
       "<p>Another weird combinator base is <b>MTAB</b>.",
@@ -75,6 +64,31 @@
       "<p>Your task is to go back to BCKW from here. Good luck!</p>"
     ],
     "link": "65-mtab.json"
+  },
+  {
+    "id": "57",
+    "name": "Linear combinators",
+    "intro": [
+      "<p>A lambda expression (and, subsequently, a combinator) is called <b>linear</b>",
+      "if it uses all of its arguments exactly once and adds no new terms.",
+      "It can thus compose and swap terms, but not duplicate or discard them.</p>",
+      "For example, <code>B</code> and <code>C</code> are linear, but <code>W</code> and <code>K</code> are not.</p>",
+      "<p>Quite naturally, applications and compositions of linear combinators are also linear.",
+      "However, a linear combinator may be composed from non-linear ones.</p>",
+      "<p>Let's move some terms around!</p>"
+    ],
+    "link": "57-linear.json"
+  },
+  {
+    "id": "60",
+    "name": "Boolean logic",
+    "intro": [
+      "<code>K</code> and <code>KI</code> terms may be interpreted as <b>true</b> and <b>false</b>",
+      ", respectively, as <code>K then else</code> will result in <code>then</code>",
+      "and <code>KI then else</code> will result in <code>else</code>.",
+      "The trick is almost always to feed a function to a boolean value, and not the other way around."
+    ],
+    "link": "60-boolean.json"
   },
   {
     "id": "70",
