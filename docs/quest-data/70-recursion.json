@@ -56,9 +56,12 @@
       "unlock": "Z",
       "input": "Z",
       "cases": [
-        [ "Z f", "Z f" ],
+        [ { "max": 200 },"Z f", "Z f" ],
         [ "Z f x", "f (Z f) x" ],
         [ "Z (Kx) y", "x y" ]
+      ],
+      "wrong": [
+        "WI(W(B(SI)))"
       ]
     }
   ]
