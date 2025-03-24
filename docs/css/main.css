@@ -304,6 +304,10 @@ sub {
     font-size: 0.5em;
 }
 
+sup {
+    font-size: 0.5em;
+}
+
 .comment {
     color: grey;
     font-style: italic;
