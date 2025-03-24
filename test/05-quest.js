@@ -17,6 +17,7 @@ describe('Quest', () => {
         const pass = quest.check('SKK');
         expect(pass.exception).to.equal(undefined);
         expect(pass.pass).to.equal(true);
+        expect(pass.weight).to.equal(3);
 
         const details = pass.details[0];
         expect(details.start + ' -> ' + details.found).to.equal('&phi;(x) -> x');
@@ -159,9 +160,11 @@ describe('Quest', () => {
 
         const pass = quest.check('a->b->c->d->b(a d c)', 'P(PII)', 'PII');
 
-        expect(pass.exception).to.equal(undefined, 'verified without exception');
+        console.log(flattenExpr(pass));
 
-        // console.log(flattenExpr(pass));
+
+        expect(pass.exception).to.equal(undefined, 'verified without exception');
+        expect(pass.weight).to.equal(4+4+3);
 
         expect(pass.pass).to.equal(true);
 
