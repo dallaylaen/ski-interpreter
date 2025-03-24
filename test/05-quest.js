@@ -141,4 +141,61 @@ describe('Quest', () => {
         expect(details[1].pass).to.equal(false);
         expect(fail.pass).to.equal(false);
     });
+
+    it ('supports harder linear cases', () => {
+        const quest = new Quest({
+            allow: 'I',
+            input: [
+                {name: 'P', lambdas: true, allow: 'I-I'},
+                {name: 'B'},
+                {name: 'T'},
+            ],
+            cases: [
+                [{linear: true}, 'P'],
+                ['B a b c', 'a (b c)'],
+                ['T a b', 'b a'],
+            ],
+        });
+
+        const pass = quest.check('a->b->c->d->b(a d c)', 'P(PII)', 'PII');
+
+        expect(pass.exception).to.equal(undefined, 'verified without exception');
+
+        // console.log(flattenExpr(pass));
+
+        expect(pass.pass).to.equal(true);
+
+        // implement B and T with X = x->xSK
+        const nolinear = quest.check(
+          'x->x(a->b->c->a c (b c))(a->b->a)',
+          'P(P(P(P(P(P(PP))))(PP)))',
+          'P(BB(P(BBB)(PP)))'
+        );
+
+        // console.log(flattenExpr(nolinear));
+
+        expect(nolinear.exception).to.equal(undefined, 'verified without exception');
+
+        const details = nolinear.details;
+        expect(details[0].pass).to.equal(false, 'nonlinear!');
+        expect(details[1].pass).to.equal(true, 'B pass');
+        expect(details[2].pass).to.equal(true, 'T pass');
+        expect(nolinear.pass).to.equal(false, 'overall failed');
+    });
 });
+
+
+function flattenExpr(obj) {
+    if (Array.isArray(obj))
+        return obj.map(flattenExpr);
+    if (typeof obj !== 'object')
+        return obj;
+    if (obj instanceof SKI.classes.Expr)
+        return obj.toString({terse: true});
+
+    const out = {};
+    for (const key in obj)
+        out[key] = flattenExpr(obj[key]);
+
+    return out;
+}
