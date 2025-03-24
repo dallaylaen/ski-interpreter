@@ -87,28 +87,33 @@ export class Quest {
     /**
      * @description Statefully parse a list of strings into expressions or fancy aliases thereof.
      * @param {string[]} input
-     * @return {Expr[]}
+     * @return {{terms: Expr[], weight: number}}
      */
-    prepare(...input: string[]): typeof import("./expr").Expr[];
+    prepare(...input: string[]): {
+        terms: typeof import("./expr").Expr[];
+        weight: number;
+    };
     /**
      *
-     * @param {Expr|string} input
+     * @param {string} input
      * @return {{
      *             expr: Expr?,
      *             pass: boolean,
      *             details: CaseResult[],
      *             exception: Error?,
      *             steps: number,
-     *             input: Expr[]
+     *             input: Expr[]|string[],
+     *             weight: number?
      *         }}
      */
-    check(...input: typeof import("./expr").Expr | string): {
+    check(...input: string): {
         expr: typeof import("./expr").Expr | null;
         pass: boolean;
         details: CaseResult[];
         exception: Error | null;
         steps: number;
-        input: typeof import("./expr").Expr[];
+        input: typeof import("./expr").Expr[] | string[];
+        weight: number | null;
     };
     /**
        *
