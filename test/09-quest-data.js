@@ -66,6 +66,13 @@ describe( 'quest-data', async () => {
                                     expect( result.pass ).to.equal(true);
                                 });
                             }
+                            for (const wrong of quest.wrong ?? []) {
+                                it ('fails on wrong solution: '+wrong, () => {
+                                    const result = q.check(wrong);
+                                    expect( result.pass ).to.equal(false);
+                                    // TODO check error details but later
+                                });
+                            }
                             it ('has unique id', () => {
                                 const id = q.meta.id;
                                 expect(typeof id).to.equal('string');
