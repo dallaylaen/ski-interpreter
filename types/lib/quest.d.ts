@@ -62,7 +62,7 @@ export class Quest {
     };
     vars: {};
     subst: string[] | (string & any[]);
-    input: import("./expr").FreeVar[];
+    input: any[];
     varsFull: {};
     cases: any[];
     title: string;
@@ -76,6 +76,7 @@ export class Quest {
      *   @return {string}
      */
     allowed(): string;
+    addInput(term: any): void;
     /**
      *
      * @param {{} | string} opt
@@ -83,6 +84,12 @@ export class Quest {
      * @return {Quest}
      */
     add(opt: {} | string, ...terms: string): Quest;
+    /**
+     * @description Statefully parse a list of strings into expressions or fancy aliases thereof.
+     * @param {string[]} input
+     * @return {Expr[]}
+     */
+    prepare(...input: string[]): typeof import("./expr").Expr[];
     /**
      *
      * @param {Expr|string} input
@@ -110,26 +117,13 @@ export class Quest {
     show(): TestCase[];
 }
 declare class Case {
-    /**
-     * @param {FreeVar[]} input
-     * @param {[e1: string, e2: string]} terms
-     * @param {{
-     *    max: number?,
-     *    note: string?,
-     *    vars: {string: Expr}?,
-     *    engine: SKI?
-     * }} options
-     */
-    constructor(input: typeof import("./expr").FreeVar[], terms: [e1: string, e2: string], options?: {
-        max: number | null;
-        note: string | null;
-        vars: {
-            string: typeof import("./expr").Expr;
-        } | null;
-        engine: SKI | null;
-    });
-    max: number;
-    note: string;
+    constructor(input: any, options: any);
+    max: any;
+    note: any;
+    vars: any;
+    input: any;
+    engine: any;
+    parse(src: any): import("./expr").Lambda;
     /**
      * @param {Expr} expr
      * @return {CaseResult}
