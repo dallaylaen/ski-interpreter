@@ -26,6 +26,7 @@
         "f", "g"
       ],
       "input": "phi",
+      "subst": "&phi;",
       "cases": [
         [ "phi x", "f (g x)" ]
       ]
