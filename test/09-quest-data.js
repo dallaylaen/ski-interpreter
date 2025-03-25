@@ -18,7 +18,7 @@ describe('quest-data', () => {
 
     describe('index', () => {
       for (let n = 0; n < index.length; n++) {
-        const entry = index[n];
+        const entry = typeof index[n] === 'string' ? { link: index[n] } : index[n];
         it('entry ' + n + ' has quest file ' + entry.link, () => {
           expect(typeof entry.link).to.equal('string');
           return fs.readFile(dir + entry.link)
