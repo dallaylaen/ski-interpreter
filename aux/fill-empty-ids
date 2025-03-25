@@ -13,7 +13,7 @@ with
 
     "id": "(10 bytes of random base62)"
 
-within json files under /docs/quest-data/ directory. 
+within json files under /docs/quest-data/ directory.
 
 This felt less ugly than random UUIDs at the time of this writing.
 
@@ -24,7 +24,7 @@ use warnings;
 use File::Find;
 
 find sub {
-    /\.json$/ and return;
+    /\.json$/ or return;
     in_place($_, sub {
         s/("id" *: *")"/$1 . id() . q{"}/gre;
     });
@@ -45,7 +45,7 @@ sub in_place {
         close $fd;
 
         $_ = $change->($_);
-        
+
         open (my $out, ">", $name) || die "Couldn't open(w) $name: $!";
         print $out $_ || die "Failed to write $name: $!";
         close $out || die "Failed to sync $name: $!";
