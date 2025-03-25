@@ -321,7 +321,18 @@
             this.solved = new Set();
             this.view = {};
             this.number = options.number ?? ++chapterId;
-            this.id = 'chapter-'+ (options.id ?? this.number);
+            this.updateMeta();
+        }
+
+        updateMeta(meta={}) {
+            this.options = { ...this.options, ...meta };
+            this.id = 'chapter-'+ (meta.id ?? this.number);
+            if (this.view.frame)
+                this.view.frame.id = this.id;
+            if (this.view.link)
+                this.view.link.href = '#'+this.id;
+            if (this.options.name && this.view.linkText)
+                this.view.linkText.innerHTML = 'Chapter '+this.number+': '+this.options.name;
         }
 
         fetch() {
@@ -333,10 +344,7 @@
                     if (!Array.isArray(data.content))
                         throw new Error('Invalid quest list in '+this.options.link);
 
-                    // merge options from index & fetched file
-                    this.options = { ...this.options, ...data };
-                    if (this.options.name)
-                        this.view.link.innerHTML = 'Chapter '+this.number+': '+this.options.name;
+                    this.updateMeta(data);
 
                     let k = 0;
                     for (const item of data.content) {
@@ -407,8 +415,9 @@
         addLink(element) {
             const link = append(element, 'a');
             link.href = '#'+this.id;
+            this.view.link = link;
             this.view.progressbar = append(link, 'span', {class: ['completion']});
-            this.view.link = append(link, 'span', {content: 'Chapter '+this.number});
+            this.view.linkText = append(link, 'span', {content: 'Chapter '+this.number+'...'});
         }
 
         // TODO hide solved chapters
