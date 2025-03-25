@@ -1,4 +1,10 @@
 {
+  "id": "NJpjdogX",
+  "name": "The island of Iota",
+  "intro": [
+    "Now you know two bases: the SK(I) and the BCKW.",
+    "Apparently, there is a one element base: <code>X = x &rarr; xSK</code>. Try it!"
+  ],
   "content": [
     {
       "id": "80ff7199-36e6-458a-9ce6-fd59725d9b41",

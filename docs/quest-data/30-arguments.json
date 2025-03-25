@@ -1,4 +1,13 @@
 {
+  "id": "xQymFNkW",
+  "name": "Swing, swing!",
+  "intro": [
+    "Let's move some arguments around.",
+    "Just like in many chess and math problems, work backwards:",
+    "what &lambda;-expression do you want to see before applying to the last argument?",
+    "Then construct it via the above technique and go one argument back,",
+    "until you run out of them."
+  ],
   "content": [
     {
       "id": "b695072d-1077-4cb8-963b-7207c2ab2c9f",

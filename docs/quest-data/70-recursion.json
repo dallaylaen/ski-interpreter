@@ -1,4 +1,26 @@
 {
+  "id": "EGae2IkX",
+  "name": "Recursion",
+  "intro": [
+    "<p>Recursive functions can be expressed in combinators, however, they cannot refer to themselves by name.",
+    "Instead, such function has to be passed to itself as an argument.</p>",
+    "<p>Let's say we want to find <code>f</code> such that <code>f x = expr f x</code>",
+    "for a given expression <code>expr</code> and arbitrary <code>x</code>.",
+    "This cannot be done directly because <code>f</code> appears in both parts of the equation.",
+    "We have, however, a couple tricks",
+    "somewhat in the spirit of separation of variables in differential equations.</p>",
+    "<p>First, let's assume that <code>f = g g</code> for some <code>g</code>.",
+    "<i>(btw, can you prove that at least one such <code>g</code> exists for any given <code>f</code>?)</i>",
+    "The equation thus becomes <code>g g x = expr (g g) x</code>,",
+    "but it still contains <code>g</code> on both sides.</p>",
+    "<p>Second, instead of looking for <code>g</code> itself, we look for a <code>g<sub>0</sub></code>",
+    "satisfying <code>g<sub>0</sub> g x = expr (g g) x</code> for <i>any</i> <code>g</code>",
+    "(including, of course, <code>g<sub>0</sub></code>).</p>",
+    "<p>Now <i>this</i> can be solved for <code>g<sub>0</sub></code> using the methods from the previous quests,",
+    "and the function with the required properties is then <code>f = g<sub>0</sub> g<sub>0</sub></code>.</p>",
+    "<p>Side note: <code>C(KM) g x</code>, or cross constant mocker, may be used in place of <code>g g</code>",
+    "to defer evaluation. This can radically decrease computation time, or even avoid an infinite loop.</p>"
+  ],
   "content": [
     {
       "id": "7f1da361-e68d-4aeb-954f-bae7911ad114",

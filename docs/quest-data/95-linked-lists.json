@@ -1,4 +1,14 @@
 {
+  "id": "Zc62TKDe",
+  "name": "Lists revisited",
+  "intro": [
+    "<p>Self-reducing lists are all fun and games, but it many applications (such as the LISP family)",
+    "simplicity and observability and more practical.",
+    "So here comes the linked list: each node is either a pair of (value, next)",
+    " - traditionally denoted cons - or a nil.",
+    "<code>nil</code> is, of course, <code>KI</code>, and <code>cons</code> is <code>V</code>.",
+    "Let's go!</p>"
+  ],
   "content": [
     {
       "id": "821301c0-a9e8-4f57-8f2e-f9cd82987f16",

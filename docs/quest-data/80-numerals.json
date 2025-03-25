@@ -1,4 +1,16 @@
 {
+  "id": "Oad7RqXx",
+  "name": "The Church of Numerals",
+  "intro": [
+    "As everything in the world of combinators is a function, numbers are functions, too.",
+    "A Church numeral (named after ",
+    "<a href=\"https://en.wikipedia.org/wiki/Alonzo_Church\" target=\"_blank\">Alonzo Church</a>)",
+    "is a function <code>N</code> that takes 2 arguments, <code>x</code> and <code>y</code>,",
+    "and returns <code>x(...N times...(x(y))...).</code>",
+    "By that definition, 0 is <code>KI</code> (just as false),",
+    "as it repeats the first argument exactly 0 times,",
+    "and 1 is <code>I</code> (easy to confuse)."
+  ],
   "content": [
     {
       "id": "08e7fa65-1a48-45f3-b115-20aa67520a3e",

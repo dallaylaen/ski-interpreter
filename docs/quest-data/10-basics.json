@@ -1,4 +1,18 @@
 {
+  "id": "swBY7gpD",
+  "name": "Baby steps",
+  "intro": [
+    "<p>Welcome to the world of combinators!</p>",
+    "<p>See the <a href=\"intro.html\">introduction</a> for how stuff works here.</p>",
+    "<p>A short reminder of the rules:</p>",
+    "<ul><li><code>I x</code> evaluates to <code>x</code>;</li>",
+    "<li><code>K x y</code> evaluates to <code>x</code>;</li>",
+    "<li><code>S f g x</code> evaluates to <code>f x (g x)</code>;</li>",
+    "<li>and all of the above only happens <i>at the beginning</i> of a (sub-)expression.</li></ul>",
+    "<p>On the right you can see a list of available terms and their definitions,",
+    "it will be slowly extending as more quests are being completed.</p>",
+    "<p>Let's dive right in!</p>"
+  ],
   "content": [
     {
       "id": "432a6dd2-1f56-4002-90e3-c317f0beca81",

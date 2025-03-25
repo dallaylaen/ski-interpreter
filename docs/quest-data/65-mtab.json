@@ -1,4 +1,14 @@
 {
+  "id": "uTxVHWJa",
+  "name": "MTAB jailbreak",
+  "intro": [
+    "<p>Another weird combinator base is <b>MTAB</b>.",
+    "Just like the BCKW system, it consists of four combinators,",
+    "representing duplication, swapping, discarding, and composition, respectively:",
+    "<code>M a = a</code>, <code>T a b = b a</code>, <code>A a b = b</code>,",
+    "and <code>B a b c = a (b c)</code>.</p>",
+    "<p>Your task is to go back to BCKW from here. Good luck!</p>"
+  ],
   "content": [
     {
       "id": "e22a955d-b899-4704-a4c0-62c04f668959",
