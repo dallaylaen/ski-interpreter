@@ -73,10 +73,14 @@ function verifyChapter (entry, n) {
         });
         if (!(q instanceof Quest))
           return;
-        it('has title & description', () => {
-          expect(typeof q.descr).to.equal('string');
+        it('has title', () => {
           expect(typeof q.title).to.equal('string');
         });
+        it ('has description', () => {
+          expect(typeof q.descr).to.equal('string');
+          checkHtml(q.descr);
+        });
+
         if (quest.solution) {
           it('passes included example solution', () => {
             const result = q.check(quest.solution);
@@ -111,7 +115,7 @@ function verifyChapter (entry, n) {
 }
 
 function checkHtml(text) {
-  const tokenizer = new Tokenizer('</?[a-z][a-z_0-9]*[^>]*>', '[^<>&]+', '&[a-z_0-9#]+;');
+  const tokenizer = new Tokenizer('</?[a-z][a-z_0-9]*[^>]*>', '[^<>&]+', '&[A-Za-z_0-9#]+;');
 
   const tokens = tokenizer.split(text);
   const stack = [];
