@@ -1,4 +1,5 @@
-  [
+{
+  "content": [
     {
       "id": "164aa3bd-5bad-4f1c-baf2-8702b5f438a3",
       "title": "Where am I?",
@@ -87,3 +88,4 @@
       ]
     }
   ]
+}

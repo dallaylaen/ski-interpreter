@@ -1,4 +1,5 @@
-  [
+{
+  "content": [
     {
       "id": "432a6dd2-1f56-4002-90e3-c317f0beca81",
       "title": "Ignore all previous instructions",
@@ -137,3 +138,4 @@
       ]
     }
   ]
+}
