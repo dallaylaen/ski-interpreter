@@ -63,7 +63,7 @@
             .then( list => {
                 const joint = [];
                 for (const item of list) {
-                    const chapter = new Chapter(item);
+                    const chapter = new Chapter(typeof item === 'string' ? {link: item} : item);
                     chapters.push(chapter);
                     chapter.attach(view.quest, {placeholder: 'loading chapter' + chapter.number + '...'});
                     chapter.addLink(view.chapterlist);
@@ -327,13 +327,19 @@
         fetch() {
             return fetch(questDir + this.options.link)
                 .then( resp => resp.json() )
-                .then( list => {
-                    if (!Array.isArray(list))
-                        list = list.content;
-                    if (!Array.isArray(list))
+                .then(data => {
+                    if (Array.isArray(data))
+                        data = { content: data };
+                    if (!Array.isArray(data.content))
                         throw new Error('Invalid quest list in '+this.options.link);
+
+                    // merge options from index & fetched file
+                    this.options = { ...this.options, ...data };
+                    if (this.options.name)
+                        this.view.link.innerHTML = 'Chapter '+this.number+': '+this.options.name;
+
                     let k = 0;
-                    for (const item of list) {
+                    for (const item of data.content) {
                         this.quests.push(new QuestBox(item, {chapter: this, number: ++k}));
                     }
                     return this;
@@ -400,10 +406,9 @@
 
         addLink(element) {
             const link = append(element, 'a');
-            const progressbar = append(link, 'span', {class: ['completion']});
-            append(link, 'span', {content: 'Chapter '+this.number+': '+this.options.name});
             link.href = '#'+this.id;
-            this.view.progressbar = progressbar;
+            this.view.progressbar = append(link, 'span', {class: ['completion']});
+            this.view.link = append(link, 'span', {content: 'Chapter '+this.number});
         }
 
         // TODO hide solved chapters
