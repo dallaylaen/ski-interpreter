@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+
+=head1 DESCRIPTION
+
+Dear future maintainer!
+I'm sorry for this island of barely readable garbage in this repo.
+
+What this file does is replaces all occurances of
+
+    "id": ""
+
+with
+
+    "id": "(10 bytes of random base62)"
+
+within json files under /docs/quest-data/ directory. 
+
+This felt less ugly than random UUIDs at the time of this writing.
+
+=cut
+
+use strict;
+use warnings;
+use File::Find;
+
+find sub {
+    /\.json$/ and return;
+    in_place($_, sub {
+        s/("id" *: *")"/$1 . id() . q{"}/gre;
+    });
+}, "docs/quest-data";
+
+sub in_place {
+    my ($name, $change) = @_;
+    return if -d $name;
+
+    my $backup = $name.".orig";
+
+    open (my $fd, "<", $name) || die "Couldn't open(r) $name: $!";
+    rename $name, $backup || die "Couldn't make backup $backup: $!";
+
+    eval {
+        local $/;
+        local $_ = <$fd>;
+        close $fd;
+
+        $_ = $change->($_);
+        
+        open (my $out, ">", $name) || die "Couldn't open(w) $name: $!";
+        print $out $_ || die "Failed to write $name: $!";
+        close $out || die "Failed to sync $name: $!";
+
+        unlink $backup || warn "Failed to erase $backup: $!";
+    } || do {
+        rename $backup, $name || warn "Failed to move $backup to $name: $!";
+        die $@;
+    }
+}
+
+sub id {
+    my $str = '';
+    for (1 .. $_[0] || 8) {
+        $str .= ['A'..'Z', 'a'..'z', 0..9]->[rand(62)]
+    };
+    return $str;
+}
