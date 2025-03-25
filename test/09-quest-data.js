@@ -26,8 +26,10 @@ describe( 'quest-data', async () => {
         })
         it('has actual file with quest data array', async () => {
           expect(typeof entry.link).to.equal('string');
-          const content = await fs.readFile(dir + entry.link)
+          const raw = await fs.readFile(dir + entry.link)
             .then(data => JSON.parse(data));
+
+          const content = Array.isArray(raw) ? raw : raw.content;
 
           expect(Array.isArray(content)).to.equal(true, 'Content must be an array');
 

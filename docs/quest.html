@@ -201,7 +201,6 @@
             if (this.view.display)
                 this.view.display.innerHTML = 'running...';
             const got = this.input.map(x => x.value);
-            console.log('checking', got);
             const result = this.impl.check(...got);
             this.showResult(result);
             this.update(result);
@@ -299,15 +298,15 @@
                     append(line, 'span', {content: '&nbsp;&nbsp;' + (item.reason ?? 'expected '+item.expected)});
                 }
                 // replay specific test case via EvalBox
-                const console = append(line, 'div', {});
+                const termDiv = append(line, 'div', {});
                 showSteps.onclick = () => {
-                    console.innerHTML = '';
+                    termDiv.innerHTML = '';
                     hideSteps.hidden = false;
-                    const box = new EvalBox(console, {engine: ski, height: Infinity, max: item.steps+2});
+                    const box = new EvalBox(termDiv, {engine: ski, height: Infinity, max: item.steps+2});
                     box.start(item.start);
                 };
                 hideSteps.onclick = () => {
-                    console.innerHTML = '';
+                    termDiv.innerHTML = '';
                     hideSteps.hidden = true;
                 };
             }
@@ -329,6 +328,10 @@
             return fetch(questDir + this.options.link)
                 .then( resp => resp.json() )
                 .then( list => {
+                    if (!Array.isArray(list))
+                        list = list.content;
+                    if (!Array.isArray(list))
+                        throw new Error('Invalid quest list in '+this.options.link);
                     let k = 0;
                     for (const item of list) {
                         this.quests.push(new QuestBox(item, {chapter: this, number: ++k}));
