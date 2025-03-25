@@ -50,7 +50,7 @@
       "descr": [
         "Make a term that returns <code>K</code> for 0 and <code>KI</code> for all other numbers. ",
         "As often with numbers, you need to find <code>f</code> and <code>x</code>",
-        "such that <code>f(f(...f(x)...))<code> does what you want."
+        "such that <code>f(f(...f(x)...))</code> does what you want."
       ],
       "unlocks": "is_zero",
       "input": "phi",
@@ -159,7 +159,7 @@
       "id": "706e03ef-dad1-44d7-9dde-784b801ea7c6",
       "title": "His Majesty Factorial",
       "descr": [
-        "Make a term that takes a number n and returns a product of all numbers from 1 to n"
+        "Make a term that takes a number n and returns a product of all numbers from 1 to n."
       ],
       "input": "phi",
       "cases": [
@@ -173,7 +173,7 @@
       "title": "Down the rabbit hole",
         "descr": [
           "<p>Create a term that takes a number n and returns the nth Fibonacci number.</p>",
-          "<p>Note that it might be easier to build n-th <i>pair</i> of Fibonacci numbers first.<p>"
+          "<p>Note that it might be easier to build n-th <i>pair</i> of Fibonacci numbers first.</p>"
         ],
         "input": "phi",
         "cases": [

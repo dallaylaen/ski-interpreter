@@ -50,8 +50,8 @@
       "descr": [
         "<p>Under a normal reduction strategy, the classical fixed point combinator will terminate",
         "if given the right input. However, it may run indefinitely in <i>absence</i> of input.</p>",
-        "<p>Make a variant of <code>Y</code>, <ode>Z</code>, that doesn't start until there's some input:",
-        "<code>Z f x = f (Z f) x</code>."
+        "<p>Make a variant of <code>Y</code>, <code>Z</code>, that doesn't start until there's some input:",
+        "<code>Z f x = f (Z f) x</code>.</p>"
       ],
       "solution": "WI(B(S(BSC))(BC(C(K(WI)))))",
       "unlock": "Z",
