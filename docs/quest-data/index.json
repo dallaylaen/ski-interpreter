@@ -1,6 +1,6 @@
 [
   {
-    "id": "10",
+    "id": "swBY7gpD",
     "name": "Baby steps",
     "intro": [
       "<p>Welcome to the world of combinators!</p>",
@@ -17,7 +17,7 @@
     "link": "10-basics.json"
   },
   {
-    "id": "30",
+    "id": "xQymFNkW",
     "name": "Swing, swing!",
     "intro": [
       "Let's move some arguments around.",
@@ -29,7 +29,7 @@
     "link": "30-arguments.json"
   },
   {
-    "id": "40",
+    "id": "rd1key1L",
     "name": "The BCKW forest",
     "intro": [
       "<p>As you progress discovering more and more combinators,",
@@ -44,7 +44,7 @@
     "link": "40-bckw.json"
   },
   {
-    "id": "50",
+    "id": "NJpjdogX",
     "name": "The island of Iota",
     "intro": [
       "Now you know two bases: the SK(I) and the BCKW.",
@@ -53,7 +53,7 @@
     "link": "50-iota.json"
   },
   {
-    "id": "55",
+    "id": "uTxVHWJa",
     "name": "MTAB jailbreak",
     "intro": [
       "<p>Another weird combinator base is <b>MTAB</b>.",
@@ -66,7 +66,7 @@
     "link": "65-mtab.json"
   },
   {
-    "id": "57",
+    "id": "IheXweZm",
     "name": "Linear combinators",
     "intro": [
       "<p>A lambda expression (and, subsequently, a combinator) is called <b>linear</b>",
@@ -80,7 +80,7 @@
     "link": "57-linear.json"
   },
   {
-    "id": "60",
+    "id": "naAI2zi3",
     "name": "Boolean logic",
     "intro": [
       "<code>K</code> and <code>KI</code> terms may be interpreted as <b>true</b> and <b>false</b>",
@@ -91,7 +91,7 @@
     "link": "60-boolean.json"
   },
   {
-    "id": "70",
+    "id": "EGae2IkX",
     "name": "Recursion",
     "intro": [
       "<p>Recursive functions can be expressed in combinators, however, they cannot refer to themselves by name.",
@@ -116,7 +116,7 @@
     "link": "70-recursion.json"
   },
   {
-    "id": "80",
+    "id": "Oad7RqXx",
     "name": "The Church of Numerals",
     "intro": [
       "As everything in the world of combinators is a function, numbers are functions, too.",
@@ -131,7 +131,7 @@
     "link": "80-numerals.json"
   },
   {
-    "id": "90",
+    "id": "HxygT90G",
     "name": "Least List Lost Last",
     "intro": [
       "<p>Since there's a pair(x, y) operation in combinatory logic, one can already construct linked lists:",
@@ -152,7 +152,7 @@
     "link": "90-lists.json"
   },
   {
-    "id": "95",
+    "id": "Zc62TKDe",
     "name": "Lists revisited",
     "intro": [
       "<p>Self-reducing lists are all fun and games, but it many applications (such as the LISP family)",
