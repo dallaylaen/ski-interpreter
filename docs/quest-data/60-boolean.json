@@ -9,18 +9,6 @@
   ],
   "content": [
     {
-      "id": "9ea93c63-362f-4a67-ae36-17357fc5e5a5",
-      "title": "Warm up",
-      "descr": [
-        "Provide a term that returns <code>K</code> for <code>I</code> and <code>I</code> for <code>K</code>."
-      ],
-      "input": "phi",
-      "cases": [
-        [ "phi I", "K" ],
-        [ "phi K", "I" ]
-      ]
-    },
-    {
       "id": "d05bb5f9-51e9-4db7-8a70-7566572236bb",
       "title": "not",
       "descr": [

@@ -1,0 +1,62 @@
+{
+  "id": "kd6g1DdD",
+  "name": "Inspection",
+  "intro": [
+    "<p>It is impossible, by construction, to say what terms a given combinator consists of",
+    "by means of combinatory logic alone.",
+    "<i>(In fact, this interpreter goes to great lengths to provide the tools to do so).</i></p>",
+    "<p>However, the behavior of a combinator can be studied by applying it to other terms.",
+    "Typically more than one term is needed, so <code>V</code> and it's 3-argument cousin",
+    "may come in handy.</p>",
+    "<p>Unfortunately, there's no way to ensure that the term we're looking at behaves.",
+    "As soon as we get to decide what is allowed to be applied to what,",
+    "we end up with a full-fledged typed functional programming language. Like Haskell.</p>",
+    "<p>We'll only be checking happy path use cases throughout this chapter.</p>"
+  ],
+  "content": [
+    {
+      "id": "9ea93c63-362f-4a67-ae36-17357fc5e5a5",
+      "title": "Warm up",
+      "descr": [
+        "Provide a term that returns <code>K</code> for <code>I</code> and <code>I</code> for <code>K</code>."
+      ],
+      "input": "phi",
+      "subst": "&phi;",
+      "cases": [
+        [ "phi I", "K" ],
+        [ "phi K", "I" ]
+      ]
+    },
+    {
+      "id": "EkHTaeLW",
+      "title": "Circular",
+      "descr": [
+        "<p>Provide a term that converts <code>I</code> to <code>S</code>,",
+        "<code>S</code> to <code>K</code>, and <code>K</code> to <code>I</code>.</p>"
+      ],
+      "input": "phi",
+      "subst": "&phi;",
+      "cases": [
+        [ "phi I", "S" ],
+        [ "phi S", "K" ],
+        [ "phi K", "I" ]
+      ]
+    },
+    {
+      "id": "r84l8LcX",
+      "title": "Bird of pair",
+      "descr": [
+        "<p>You now have enough information to construct and deconstruct pairs of values,",
+        "and thus arbitrarily complicated data structures.</p>",
+        "<p>Define three functions, <code>pair</code>, <code>first</code>, and <code>second</code>,",
+        "such that <code>first (pair x y) = x</code> and <code>second (pair x y) = y</code>.</p>"
+      ],
+      "input": ["pair", "first", "second"],
+      "cases": [
+        [ "first (pair x y)", "x" ],
+        [ "second (pair x y)", "y" ],
+        [ "pair (SII)(SII) x", "pair (SII)(SII) x" ]
+      ]
+    }
+  ]
+}
