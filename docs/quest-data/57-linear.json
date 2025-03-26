@@ -6,8 +6,8 @@
     "if it uses all of its arguments exactly once and adds no new terms.",
     "It can thus compose and swap terms, but not duplicate or discard them.</p>",
     "<p>For example, <code>B</code> and <code>C</code> are linear, but <code>W</code> and <code>K</code> are not.</p>",
-    "<p>Quite naturally, applications and compositions of linear combinators are also linear.",
-    "However, a linear combinator may be composed from non-linear ones.</p>",
+    "<p>Combinators built from linear combinators are linear as long as",
+    "they don't apply arguments to anything but arguments.</p>",
     "<p>Let's move some terms around!</p>"
   ],
   "content": [
