@@ -1,3 +1,4 @@
+export type AnyArity = (arg0: Expr) => Expr | AnyArity;
 export class Expr {
     arity: number;
     /**
@@ -36,7 +37,7 @@ export class Expr {
     weight(): number;
     /**
      *
-     * @param {{max: number?, maxArgs: number?}} options
+     * @param {{max: number?, maxArgs: number?, bestGuess?: Expr}} options
      * @return {{
      *    found: boolean,
      *    proper: boolean,
@@ -46,9 +47,10 @@ export class Expr {
      *    skip: Set<number>?
      * }}
      */
-    guessArity(options?: {
+    canonize(options?: {
         max: number | null;
         maxArgs: number | null;
+        bestGuess?: Expr;
     }): {
         found: boolean;
         proper: boolean;
@@ -57,10 +59,11 @@ export class Expr {
         canonical?: Expr;
         skip: Set<number> | null;
     };
+    rewriteSKI(): this;
     /**
      * @desc Whether the term will reduce further if given more arguments.
      *       In practice, equivalent to "starts with a FreeVar"
-     *       Used by guessArity (duh...)
+     *       Used by canonize (duh...)
      * @return {boolean}
      */
     wantsArgs(): boolean;
@@ -148,16 +151,25 @@ export namespace Expr {
 }
 export class App extends Expr {
     /**
-       * @desc Application of fun() to args
-       * @param {Expr} fun
-       * @param {Expr} args
-       */
+     * @desc Application of fun() to args.
+     * Never ever use new App(fun, ...args) directly, use fun.apply(...args) instead.
+     * @param {Expr} fun
+     * @param {Expr} args
+     */
     constructor(fun: Expr, ...args: Expr);
     fun: Expr;
     args: Expr;
     final: boolean;
     weight(): Expr;
     apply(...args: any[]): any;
+    canonize(options?: {}): {
+        found: boolean;
+        proper: boolean;
+        arity: number | null;
+        linear: boolean | null;
+        canonical?: Expr;
+        skip: Set<number> | null;
+    };
     subst(plug: any, value: any): Expr;
     /**
      * @return {{expr: Expr, steps: number}}
@@ -166,6 +178,7 @@ export class App extends Expr {
         expr: Expr;
         steps: number;
     };
+    split(): any[];
     equals(other: any): boolean;
     toString(opt?: {}): string;
 }
@@ -185,9 +198,13 @@ export class Lambda extends Expr {
     reduce(input: any): Expr;
     subst(plug: any, value: any): Lambda;
     expand(): Lambda;
+    rewriteSKI(): any;
     equals(other: any): boolean;
     toString(opt?: {}): string;
 }
+/**
+ * @typedef {function(Expr): Expr | AnyArity} AnyArity
+ */
 export class Native extends Named {
     /**
      * @desc A term named 'name' that converts next 'arity' arguments into
@@ -196,21 +213,21 @@ export class Native extends Named {
      *       before building an App object. This allows to plug in argument coercions,
      *       e.g. instantly perform a numeric operation natively if the next term is a number.
      * @param {String} name
-     * @param {Number} arity
-     * @param {function(...Expr): Expr} impl
-     * @param {{note: string?, skip: Array<number>?, apply?: (expr)=>expr|null}} opt
+     * @param {AnyArity} impl
+     * @param {{note: string?, arity: number?, canonize: boolean?, apply: function(Expr):(Expr|null) }} [opt]
      */
-    constructor(name: string, arity: number, impl: (...args: Expr[]) => Expr, opt?: {
+    constructor(name: string, impl: AnyArity, opt?: {
         note: string | null;
-        skip: Array<number> | null;
-        apply?: (expr: any) => any | null;
+        arity: number | null;
+        canonize: boolean | null;
+        apply: (arg0: Expr) => (Expr | null);
     });
-    impl: (...arg0: Expr[]) => Expr;
-    skip: any;
-    note: string;
-    onApply: (expr: any) => any | null;
+    impl: AnyArity;
+    onApply: (arg0: Expr) => (Expr | null);
+    arity: any;
+    note: any;
     apply(...args: any[]): Expr;
-    reduce(args: any): Expr;
+    reduce(args: any): any;
 }
 export class Alias extends Named {
     /**
@@ -229,7 +246,6 @@ export class Alias extends Named {
     impl: Expr;
     note: string;
     arity: any;
-    skip: any;
     proper: any;
     terminal: any;
     canonical: any;
@@ -244,11 +260,14 @@ export class Alias extends Named {
     };
     reduce(args: any): Expr;
     equals(other: any): any;
+    rewriteSKI(): Expr;
     toString(opt: any): string;
 }
 export class Church extends Native {
     constructor(n: any);
     n: any;
+    arity: number;
+    rewriteSKI(): Expr;
     equals(other: any): boolean;
 }
 export namespace globalOptions {
@@ -256,6 +275,7 @@ export namespace globalOptions {
     let max: number;
     let maxArgs: number;
 }
+export const native: {};
 declare class Named extends Expr {
     /**
        * @desc a constant named 'name'

@@ -19,9 +19,7 @@ export class SKI {
         annotate: boolean | null;
     });
     annotate: boolean;
-    known: {
-        [key: string]: Native;
-    };
+    known: {};
     hasNumbers: boolean;
     hasLambdas: boolean;
     allow: any;
@@ -130,18 +128,11 @@ export namespace SKI {
     export { globalOptions as options };
     export let lambdaPlaceholder: Native;
 }
-import { Native } from "./expr";
 import { Alias } from "./expr";
 import { Expr } from "./expr";
+import { Native } from "./expr";
 import { FreeVar } from "./expr";
 import { Church } from "./expr";
 import { Lambda } from "./expr";
-/**
- *
- * @type {{[key: string]: Native}}
- */
-declare const native: {
-    [key: string]: Native;
-};
+import { native } from "./expr";
 import { globalOptions } from "./expr";
-export {};
