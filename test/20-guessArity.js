@@ -10,7 +10,7 @@ describe('Expr.guessArity', () => {
     ['SK',          {arity: 2, proper: true, linear: false, found: true, skip: new Set([0])}],
     ['CI',          {arity: 2, proper: true, linear: true,  found: true}, 'x->y->y x'],
     ['x->y->x x',   {arity: 2, proper: true, linear: false, found: true, skip: new Set([1])}],
-    ['10',          {arity: 2, proper: true, linear: false, found: true}],
+    ['5',           {arity: 2, proper: true, linear: false, found: true}, 'x->y->x(x(x(x(x y))))'],
 
     // improper
     ['CIS',         {arity: 1, proper: false, linear: false, found: true}],
