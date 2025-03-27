@@ -14,21 +14,21 @@ describe('Expr.ski()', () => {
     'B',
     'W',
     'BC(CI)',
+    '5',
   ];
 
   const ski = new SKI();
 
   for (const [got, expected] of predictable) {
     it(`${got} -> ${expected}`, () => {
-      expect(ski.parse(got).ski().toString({terse: true})).to.equal(expected);
+      ski.parse(expected).expect(ski.parse(got).rewriteSKI());
     });
   }
   for (const src of canonical) {
-    const expr = ski.parse(src);
-    const canon = expr.guessArity().canonical;
-    it(`round trips for ${expr} aka ${canon}`, () => {
-      const ski = expr.ski();
-      canon.expect(ski.guessArity().canonical);
+    const canon = ski.parse(src).guessArity().canonical;
+    it(`round trips for ${src} aka ${canon}`, () => {
+      const bare = canon.rewriteSKI();
+      canon.expect(bare.guessArity().canonical);
     });
   }
 });
