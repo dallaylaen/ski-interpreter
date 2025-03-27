@@ -25,16 +25,17 @@ let nextId = 0;
 
 class EvalBox {
   /**
-     * @param { TeletypeBox|Element } box
-     * @param {{
-     *      height: number?,
-     *      engine: SKI?,
-     *      onStop: function?,
-     *      onStart: function?,
-     *      delay: number?,
-     *      id: number?
-     * }} options
-     */
+   * @param { TeletypeBox|Element } box
+   * @param {{
+   *      height: number?,
+   *      engine: SKI?,
+   *      onStop: function?,
+   *      onStart: function?,
+   *      step: function?,
+   *      delay: number?,
+   *      id: number?
+   * }} options
+   */
   constructor (box, options={}) {
     if (box instanceof Element)
       box = new TeletypeBox(box, options);
@@ -49,6 +50,7 @@ class EvalBox {
     this.maxSteps = options.max ?? Infinity;
     this.onStart = options.onStart ?? (() => {});
     this.onStop = options.onStop ?? (() => {});
+    this.step = options.step ?? ((expr) => expr.step());
 
     this.parent = box.parent;
     this.engine = options.engine;
@@ -91,7 +93,7 @@ class EvalBox {
 
   tick () {
     if (!this.running) return;
-    const next = this.expr.step();
+    const next = this.step(this.expr);
 
     if (!next.changed) {
       // finished execution, congratulations
