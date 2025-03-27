@@ -59,7 +59,19 @@ export class Expr {
         canonical?: Expr;
         skip: Set<number> | null;
     };
-    rewriteSKI(): this;
+    /**
+     *
+     * @param {{max: number?}}options
+     * @return {{final: boolean, expr: Expr, steps: number}}
+     */
+    rewriteSKI(options?: {
+        max: number | null;
+    }): {
+        final: boolean;
+        expr: Expr;
+        steps: number;
+    };
+    _rski(options: any): this;
     /**
      * @desc Whether the term will reduce further if given more arguments.
      *       In practice, equivalent to "starts with a FreeVar"
@@ -198,7 +210,7 @@ export class Lambda extends Expr {
     reduce(input: any): Expr;
     subst(plug: any, value: any): Lambda;
     expand(): Lambda;
-    rewriteSKI(): any;
+    _rski(options: any): any;
     equals(other: any): boolean;
     toString(opt?: {}): string;
 }
@@ -227,7 +239,7 @@ export class Native extends Named {
     arity: any;
     note: any;
     apply(...args: any[]): Expr;
-    rewriteSKI(): Expr | this;
+    _rski(options: any): Expr | this;
     reduce(args: any): any;
 }
 export class Alias extends Named {
@@ -261,7 +273,7 @@ export class Alias extends Named {
     };
     reduce(args: any): Expr;
     equals(other: any): any;
-    rewriteSKI(): Expr;
+    _rski(options: any): Expr;
     toString(opt: any): string;
 }
 export class Church extends Native {
