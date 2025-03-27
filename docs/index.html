@@ -89,6 +89,7 @@
     <form id="prompt" onsubmit="return runStop()">
         <input id="entryField">
         <button id="runstopBtn" type="submit"></button>
+        <button id="rewriteSKI">&lambda;</button>
     </form>
     <footer><small>&copy; 2024 &mdash; 2025 Konstantin Uvarin
         (<a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">sources</a>)</small></footer>
@@ -97,7 +98,7 @@
      *   References to static page elements
      */
     const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'entryField',
-        'runstopBtn', 'help', 'menu');
+        'runstopBtn', 'rewriteSKI', 'help', 'menu');
     const store = new Store('playground');
 
     /**
@@ -137,6 +138,13 @@
             autosave = true;
         }
         showKnown();
+
+        view.rewriteSKI.addEventListener('click', ev => {
+            ev.preventDefault();
+            run({src: view.entryField.value, rewrite: true});
+            return false;
+        });
+
         greet.print(
             "Emulator ready. Your output goes here. ",
             {color: "green"}
@@ -198,27 +206,28 @@
         if (currentBox) {
             currentBox.stop("interrupted by user");
             return false;
-        };
+        }
         return run();
     }
 
-    function run(src) {
+    function run(options={}) {
         greet.remove();
+        const src = options.src ?? view.entryField.value;
         const box = new TeletypeBox(view.teletype);
 
         if (currentBox)
             currentBox.stop("interrupted by different command");
 
-        src = src ?? view.entryField.value;
         if (src.match(/^\s*\?[\s?]*$/)) {
             box.print(view.help.innerHTML, {raw: true});
             return;
         }
 
         const runner = new EvalBox(box, {
-            height: evalOptions.height,
-            delay: evalOptions.delay,
-            engine: ski,
+            height:  evalOptions.height,
+            delay:   evalOptions.delay,
+            engine:  ski,
+            step:    options.rewrite ? (expr => expr.rewriteSKI({max: 1})) : undefined,
             onStart: function() {
                 currentBox = this;
                 view.runstopBtn.classList.add('running');
@@ -228,7 +237,7 @@
                     showKnown();
                 }
             },
-            onStop: function () {
+            onStop:  function () {
                 view.runstopBtn.classList.remove('running');
                 currentBox = null;
             }
@@ -269,7 +278,7 @@
                 menu.addAction('copy definition', () => navigator.clipboard.writeText(
                     `${name} = ${entry.impl.toString({terse: true})}`));
                 menu.addAction('play in terminal', () => {
-                    run(entry.name + ' = ' + entry.impl.toString({terse: true}));
+                    run({src: entry.name + ' = ' + entry.impl.toString({terse: true})});
                 });
             }
             menu.addAction('&cross; remove', () => removeKnown(name));
