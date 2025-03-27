@@ -25,10 +25,10 @@ describe('Expr.ski()', () => {
     });
   }
   for (const src of canonical) {
-    const canon = ski.parse(src).guessArity().canonical;
+    const canon = ski.parse(src).canonize().canonical;
     it(`round trips for ${src} aka ${canon}`, () => {
       const bare = canon.rewriteSKI();
-      canon.expect(bare.guessArity().canonical);
+      canon.expect(bare.canonize().canonical);
     });
   }
 });

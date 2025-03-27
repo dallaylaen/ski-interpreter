@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { SKI } = require('../index');
 
-describe('Expr.guessArity', () => {
+describe('Expr.canonize', () => {
   const cases = [
     // proper
     ['I',           {arity: 1, proper: true, linear: true,  found: true}, 'x->x'],
@@ -24,9 +24,9 @@ describe('Expr.guessArity', () => {
     ['By',          {arity: 2, proper: false, linear: false, found: true}],
 
     // infinite recursion
-    ['SII(SII)',    {proper: false, found: false}],
+    ['SII(SII)',    {proper: false, found: false}, '(x->x x)(x->x x)'],
     // quine eats all args
-    ['WI(SBK)',     {proper: false, found: false}],
+    ['WI(SBK)',     {proper: false, found: false}, '(x->x x) (x->y->x x)'],
 
     // hidden by an alias
     ['P=a->b->c->d->b(a d c); P',       {proper: true, found: true, linear: true,  arity: 4}, 'a->b->c->d->b(a d c)'],
@@ -38,7 +38,7 @@ describe('Expr.guessArity', () => {
     const [term, expected, lambda] = pair;
     it ('handles '+term, ()=> {
       const jar = {};
-      const found = ski.parse(term, jar).guessArity();
+      const found = ski.parse(term, jar).canonize();
       const canon = found.canonical;
       delete found.canonical;
       expect(found).to.deep.equal(expected);
@@ -46,6 +46,7 @@ describe('Expr.guessArity', () => {
         expect(canon).to.be.instanceof(SKI.classes.Expr);
       if (lambda)
         canon.expect(ski.parse(lambda, jar));
+      expect(canon).to.be.instanceof(SKI.classes.Expr);
     });
   }
 });
