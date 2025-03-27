@@ -61,13 +61,13 @@ export class Expr {
     };
     /**
      *
-     * @param {{max: number?}}options
-     * @return {{final: boolean, expr: Expr, steps: number}}
+     * @param {{max: number?}} options
+     * @return {{changed: boolean, expr: Expr, steps: number}}
      */
     rewriteSKI(options?: {
         max: number | null;
     }): {
-        final: boolean;
+        changed: boolean;
         expr: Expr;
         steps: number;
     };
