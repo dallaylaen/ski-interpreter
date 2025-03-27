@@ -8,6 +8,8 @@ describe('Expr.ski()', () => {
     ['x->x', 'I'],
     ['x->x x', 'SII'],
     ['x->y->y x', 'S(K(SI))K'],
+    ['B', 'S(KS)K'],
+    ['3', 'S(S(K(S))(K))(S(S(K(S))(K))(I))'],
   ];
   const canonical = [
     'C',
