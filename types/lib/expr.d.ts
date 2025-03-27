@@ -227,6 +227,7 @@ export class Native extends Named {
     arity: any;
     note: any;
     apply(...args: any[]): Expr;
+    rewriteSKI(): Expr | this;
     reduce(args: any): any;
 }
 export class Alias extends Named {
@@ -267,7 +268,6 @@ export class Church extends Native {
     constructor(n: any);
     n: any;
     arity: number;
-    rewriteSKI(): Expr;
     equals(other: any): boolean;
 }
 export namespace globalOptions {
