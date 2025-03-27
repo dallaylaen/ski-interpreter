@@ -19,11 +19,15 @@ describe( 'SKI', () => {
 
   it('does not overwrite read-only data', done => {
     const ski = new SKI;
+
+    const note = SKI.S.note;
+    expect (note).to.match(/([a-z]) *-> *([a-z]) *-> *([a-z]) *-> *\1 \3 *\(\2 \3\)/);
+
     ski.add('sub', 'S', 'just an alias');
 
     const known = ski.getTerms();
 
-    expect (known.S.note).to.match(/x.*y.*z.*->.*x.*z.*\(y.*z\)/);
+    expect (known.S.note).to.equal(note);
     expect (known.sub.note).to.equal('just an alias');
 
     let expr = known.sub;
