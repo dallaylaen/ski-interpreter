@@ -44,7 +44,7 @@ describe('Expr.rewriteSKI()', () => {
     while (1) {
       expected.expect(expr.run(a, b, c).expr);
       const next = expr.rewriteSKI({max: 1});
-      if (next.final)
+      if (!next.changed)
         break;
       expr = next.expr;
       steps++;
