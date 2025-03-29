@@ -16,6 +16,7 @@
   "content": [
     {
       "id": "432a6dd2-1f56-4002-90e3-c317f0beca81",
+      "created_at": "2024-08-29T09:15:33",
       "title": "Ignore all previous instructions",
       "descr": [
         "<p>The <code>K</code> combinator, or Kestrel, takes two arguments and returns the first of them.</p>",
@@ -31,6 +32,7 @@
     },
     {
       "id": "e78cbce3-11f4-4a85-943c-d96dd4120315",
+      "created_at": "2024-12-07T01:42:42",
       "title": "Join em!",
       "descr": [
         "Remember, the Starling combinator works as follows: <code>S f g x = f x (g x)</code>.",
@@ -48,6 +50,7 @@
     },
     {
       "id": "aff42182-b14e-46eb-9686-69d63266fb87",
+      "created_at": "2025-01-11T12:04:10",
       "title": "Join em harder",
       "descr": [
         "Now you are given 3 functions, <code>f</code>, <code>g</code>, and <code>h</code>.",
@@ -65,6 +68,7 @@
     },
     {
       "id": "fb59a599-97a8-44bd-942f-560b44492d6a",
+      "created_at": "2024-12-07T01:42:42",
       "title": "Feeding a birdie",
       "descr": [
         "You are given a <i>known</i> value <code>x</code>.",
@@ -79,6 +83,7 @@
     },
     {
       "id": "d25152ba-7ad5-476a-ab58-575bb086c9f4",
+      "created_at": "2024-12-07T01:42:42",
       "title": "May the force be with you",
       "descr": [
         "How about ignoring 3 consecutive arguments and returning the fourth?"
@@ -90,6 +95,7 @@
     },
     {
       "id": "6f88ef3c-8736-40d3-8453-d9f9c58fe54f",
+      "created_at": "2024-12-07T01:42:42",
       "title": "Between the rock and a hard place",
       "descr": [
         "Given <code>f</code> and <code>x</code>, creating a term that outputs <code>f x y</code>",
@@ -104,6 +110,7 @@
     },
     {
       "id": "aca170cd-464f-4075-9673-835cee5e465f",
+      "created_at": "2024-12-01T16:54:23",
       "title": "The Mockingbird",
       "descr": [
         "<p><a href=\"https://en.wikipedia.org/wiki/To_Mock_a_Mockingbird\">To Mock A Mockingbird</a>",
@@ -122,6 +129,7 @@
     },
     {
       "id": "30211050-4764-4373-8ee4-250119368571",
+      "created_at": "2025-03-21T23:39:01",
       "title": "A parliament of owls",
       "descr": [
         "<p>The Owl combinator is an important form of recursion, slightly more complicated than the Mockingbird:",
@@ -137,6 +145,7 @@
     },
     {
       "id": "f52144ba-a821-4866-9ae2-8c00156d20e3",
+      "created_at": "2024-12-01T16:54:23",
       "title": "Lost identity",
       "descr": [
         "Sadly, after the previous exercise the Ibis has flown away.",

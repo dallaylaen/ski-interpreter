@@ -1,5 +1,6 @@
 {
   "id": "HxygT90G",
+  "created_at": "2025-03-25T14:17:10",
   "name": "Least List Lost Last",
   "intro": [
     "<p>Since there's a pair(x, y) operation in combinatory logic, one can already construct linked lists:",
@@ -20,6 +21,7 @@
   "content": [
     {
       "id": "d623f076-c4e3-4dad-922f-327d1946d816",
+      "created_at": "2025-02-23T13:17:21",
       "title": "The blade itself",
       "descr": [
         "As is clear from the definition, <code>nil</code> equals to <code>KI</code>, as <code>nil f x = x</code>.",
@@ -34,6 +36,7 @@
     },
     {
       "id": "099e10ce-5b0a-4c6d-b99e-d6aae9331a93",
+      "created_at": "2025-02-23T18:02:36",
       "title": "Mene, tekel, upharsin",
       "descr": [
         "Find the length of a given list."
@@ -48,6 +51,7 @@
     },
     {
       "id": "1e619c6e-36e0-4598-9b88-439fc9ad9cd0",
+      "created_at": "2025-02-23T18:02:36",
       "title": "The ring of the master cat",
       "descr": [
         "Concatenate two lists given as arguments."
@@ -65,6 +69,7 @@
     },
     {
       "id": "38441ba2-84df-4002-8b8e-47bfe3a36f3b",
+      "created_at": "2025-02-23T18:02:36",
       "title": "The antediluvian map fragment",
       "descr":   [
         "Build function <code>map f</code> that applies a given function to each element of a list.",
@@ -81,6 +86,7 @@
     },
     {
       "id": "a5a33119-4594-44c9-b752-97162dc883b4",
+      "created_at": "2025-02-23T18:02:36",
       "title": "The last argument",
       "descr": [
           "Find the last element of a nonempty list."
@@ -96,6 +102,7 @@
     },
     {
       "id": "864f73dc-0d32-4dbc-a7b6-0945bdaf1191",
+      "created_at": "2025-02-23T18:02:36",
       "title": "The fairy tail",
       "descr": [
         "Find the tail of a list, or an empty list if the list is empty."
@@ -111,6 +118,7 @@
     },
     {
       "id": "712aaed0-4a81-49b1-a0ac-bc76ed8a6186",
+      "created_at": "2025-02-23T18:02:36",
       "title": "Random access",
       "descr": [
         "Find the element at a <code>nth</code> position in a list.",
@@ -127,6 +135,7 @@
     },
     {
       "id": "6f8bdf54-8615-4972-862d-957aa56fbf05",
+      "created_at": "2025-02-23T13:17:21",
       "title": "Reverse a list",
       "descr": [
         "You are given 2 functions: <code>lst</code> and <code>nil</code>. ",

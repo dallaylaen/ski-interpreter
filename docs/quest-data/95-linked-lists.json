@@ -1,5 +1,6 @@
 {
   "id": "Zc62TKDe",
+  "created_at": "2025-03-25T14:17:10",
   "name": "Lists revisited",
   "intro": [
     "<p>Self-reducing lists are all fun and games, but it many applications (such as the LISP family)",
@@ -12,6 +13,7 @@
   "content": [
     {
       "id": "821301c0-a9e8-4f57-8f2e-f9cd82987f16",
+      "created_at": "2025-03-16T03:10:08",
       "title": "Are we there yet?",
       "descr": [
         "<p>Before we start, we'll need a way to tell when a list ends</p>",
@@ -27,6 +29,7 @@
     },
     {
       "id": "9fd9c7be-cf72-466f-98f7-a3b4d0efd607",
+      "created_at": "2025-03-16T03:10:08",
       "title": "Fold",
       "descr": [
         "<p>Implement fold: <code>fold [a, b, ... z] f x = f a (f b (... (f z x) ...))</code>.",

@@ -1,5 +1,6 @@
 {
   "id": "rd1key1L",
+  "created_at": "2025-03-25T14:17:10",
   "name": "The BCKW forest",
   "intro": [
     "<p>As you progress discovering more and more combinators,",
@@ -14,6 +15,7 @@
   "content": [
     {
       "id": "164aa3bd-5bad-4f1c-baf2-8702b5f438a3",
+      "created_at": "2024-08-29T09:15:33",
       "title": "Where am I?",
       "descr": "Build the I combinator (yes, again) from B, C, K, and W.",
       "allow": "BCKW",
@@ -24,6 +26,7 @@
     },
     {
       "id": "6aa26e64-9f9d-4bda-b544-419dc00e921b",
+      "created_at": "2024-11-13T01:18:18",
       "title": "A cup of T",
       "descr": "Create the <code>T x y = y x</code> combinator out of this basis",
       "allow": "BCKWI",
@@ -34,6 +37,7 @@
     },
     {
       "id": "986058d2-c2b1-40b1-9e4e-1476a096a9fa",
+      "created_at": "2024-11-13T01:18:18",
       "title": "An inverse cup of tea",
       "descr": "Create <code>C</code> from <code>B</code> and <code>T</code>",
       "allow": "B",
@@ -47,6 +51,7 @@
     },
     {
       "id": "41b79716-768f-4ca8-8f67-66e03e958b60",
+      "created_at": "2024-11-15T01:01:00",
       "title": "Dove",
       "descr": "Provide a bird <code>D</code> such that <code>D x y z t = x y (z t)</code>",
       "allow": "BCKIW",
@@ -58,6 +63,7 @@
     },
     {
       "id": "b4616d55-d1b2-491e-8350-cc2480e00eb2",
+      "created_at": "2024-11-15T01:01:00",
       "title": "Blackbird",
       "descr": "Provide a bird <code>B<sub>1</sub></code> such that <code>B<sub>1</sub> x y z t = x (y z t)</code>",
       "allow": "BCKIW",
@@ -68,6 +74,7 @@
     },
     {
       "id": "4d239336-29c3-43d7-883f-61054a845003",
+      "created_at": "2024-11-15T01:01:00",
       "title": "Robin",
       "descr": "Provide <code>R</code> such that <code>R x y z = y z x</code>",
       "allow": "BCKWI",
@@ -79,6 +86,7 @@
     },
     {
       "id": "0b6ee619-981e-48d9-abba-7ef396cc02d4",
+      "created_at": "2024-11-15T01:01:00",
       "title": "Lark",
       "descr": "Build the <code>L</code> combinator such that <code>L x y = x (y y)</code>",
       "hint": "It can be done with just <code>B</code> and <code>W</code>",
@@ -91,6 +99,7 @@
     },
     {
       "id": "6684db92-9f1c-465d-ab62-b5cb62d069e4",
+      "created_at": "2024-08-29T09:15:33",
       "title": "The way back home",
       "descr": "Build <code>S</code> from B, C, K, and W.",
       "allow": "BCIKW",

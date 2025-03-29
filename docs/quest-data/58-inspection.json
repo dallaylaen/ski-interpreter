@@ -1,5 +1,6 @@
 {
   "id": "kd6g1DdD",
+  "created_at": "2025-03-25T15:59:45",
   "name": "Inspection",
   "intro": [
     "<p>It is impossible, by construction, to say what terms a given combinator consists of",
@@ -16,6 +17,7 @@
   "content": [
     {
       "id": "9ea93c63-362f-4a67-ae36-17357fc5e5a5",
+      "created_at": "2025-03-25T15:59:45",
       "title": "Warm up",
       "descr": [
         "Provide a term that returns <code>K</code> for <code>I</code> and <code>I</code> for <code>K</code>."
@@ -29,6 +31,7 @@
     },
     {
       "id": "EkHTaeLW",
+      "created_at": "2025-03-25T15:59:45",
       "title": "Circular",
       "descr": [
         "<p>Provide a term that converts <code>I</code> to <code>S</code>,",
@@ -44,6 +47,7 @@
     },
     {
       "id": "r84l8LcX",
+      "created_at": "2025-03-25T15:59:45",
       "title": "Bird of pair",
       "descr": [
         "<p>You now have enough information to construct and deconstruct pairs of values,",

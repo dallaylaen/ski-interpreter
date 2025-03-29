@@ -1,5 +1,6 @@
 {
   "id": "Oad7RqXx",
+  "created_at": "2025-03-25T14:17:10",
   "name": "The Church of Numerals",
   "intro": [
     "As everything in the world of combinators is a function, numbers are functions, too.",
@@ -14,6 +15,7 @@
   "content": [
     {
       "id": "08e7fa65-1a48-45f3-b115-20aa67520a3e",
+      "created_at": "2024-08-29T09:15:33",
       "title": "zero... one... two?!",
       "descr": [
         "Look at the definition above once more. What would number 2 look like?"
@@ -25,6 +27,7 @@
     },
     {
       "id": "815847b2-5aec-4496-bc94-07316bd2278b",
+      "created_at": "2024-08-29T09:15:33",
       "title": "inc",
       "descr": [
         "Procure a term that increases given number by 1: <code>inc N x y &rarr; x(...N+1 times(y)...)</code>. "
@@ -41,6 +44,7 @@
     },
     {
       "id": "ca234c6c-a6d3-4d8e-8f41-adb26b2dc246",
+      "created_at": "2024-09-08T23:55:19",
       "title": "Adding numbers",
       "descr": [
         "Create a term that takes two numbers and produces their sum."
@@ -58,6 +62,7 @@
     },
     {
       "id": "e61e545e-42b6-4ab0-b311-0372841e87f5",
+      "created_at": "2024-08-29T09:15:33",
       "title": "Hello? Is there anybody in there?",
       "descr": [
         "Make a term that returns <code>K</code> for 0 and <code>KI</code> for all other numbers. ",
@@ -76,6 +81,7 @@
     },
     {
       "id": "40a76eaa-faa3-4631-944a-1f9f60696fce",
+      "created_at": "2025-03-01T01:12:54",
       "title": "Space oddity",
       "descr": [
         "<p>Create a term that returns <code>K</code> (or equivalent) for odd numbers",
@@ -94,6 +100,7 @@
     },
     {
       "id": "92d3e3f7-cb26-4294-955b-ba526a61bb42",
+      "created_at": "2024-08-29T09:15:33",
       "title": "Take a little trip back with father Tiresias...",
       "descr": [
         "<p>Here you'll have to return the predecessor of a number, or 0 for 0.</p>",
@@ -112,6 +119,7 @@
     },
     {
       "id": "2bcd7557-aa93-4a3f-a56a-8bc81442a7d7",
+      "created_at": "2025-03-01T01:12:54",
       "title": "Half-life",
       "descr": [
         "<p>Create a term that takes a number <em>n</em> and returns <em>n/2</em>.</p>",
@@ -133,6 +141,7 @@
     },
     {
       "id": "3cbfbce6-6701-4d5c-8217-ab36647f4185",
+      "created_at": "2025-02-23T18:43:32",
       "title": "Multiplication",
       "descr": [
         "Create a term that takes two numbers and produces their product."
@@ -151,6 +160,7 @@
     },
     {
       "id": "023f8486-03ee-4e55-98ce-a779c6325844",
+      "created_at": "2025-03-01T01:12:54",
       "title": "Power to the people",
       "descr": [
         "Create a term that takes two numbers and produces the first number raised to the power of the second."
@@ -169,6 +179,7 @@
     },
     {
       "id": "706e03ef-dad1-44d7-9dde-784b801ea7c6",
+      "created_at": "2024-09-08T23:55:19",
       "title": "His Majesty Factorial",
       "descr": [
         "Make a term that takes a number n and returns a product of all numbers from 1 to n."
@@ -182,6 +193,7 @@
     },
     {
       "id": "56b36d8d-0945-4457-a7b3-f4f7e8cb344a",
+      "created_at": "2025-03-01T01:12:54",
       "title": "Down the rabbit hole",
         "descr": [
           "<p>Create a term that takes a number n and returns the nth Fibonacci number.</p>",
@@ -198,6 +210,7 @@
     },
     {
       "id": "c89bd1b9-56fd-4947-97fd-caf0e3320001",
+      "created_at": "2025-03-01T01:12:54",
       "title": "Something in common",
         "descr": [
             "<p>Create a term that takes two numbers and returns their greatest common divisor.</p>",
