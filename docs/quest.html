@@ -50,14 +50,27 @@
 
     const linkedTo = window.location.hash.slice(1);
 
+    rubberDesign('main');
+    showKnown();
+
     initMenu();
-    init();
 
-    function init() {
-        rubberDesign('main');
+    fetch('quest-data/renamed-quests.json')
+        .then( resp => resp.json())
+        .then( dict => {
+           for (const old in dict) {
+                const quest = store.load('quest-'+old);
+                const replaced = dict[old];
+                if (quest && !store.load('quest-'+replaced)) {
+                     store.save('quest-'+replaced, quest);
+                     store.delete('quest-'+old);
+                }
+           }
+        })
+        .catch( e => console.error('Failed to rename quests', e))
+        .finally(loadQuests);
 
-        showKnown();
-
+    function loadQuests() {
         fetch(questDir + 'index.json')
             .then( resp => resp.json())
             .then( list => {
