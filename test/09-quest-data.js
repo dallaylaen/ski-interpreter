@@ -73,12 +73,19 @@ function verifyChapter (entry, n) {
         });
         if (!(q instanceof Quest))
           return;
+        console.log(q.meta);
         it('has title', () => {
           expect(typeof q.title).to.equal('string');
         });
         it ('has description', () => {
           expect(typeof q.descr).to.equal('string');
           checkHtml(q.descr);
+        });
+        it ('has date', () => {
+          const date = q.meta.created_at;
+          expect(date).to.be.a('string');
+          expect(new Date(date)).to.be.instanceof(Date);
+          expect(new Date(date)).to.be.within(new Date('2024-07-15'), new Date());
         });
 
         if (quest.solution) {
