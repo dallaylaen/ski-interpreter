@@ -18,15 +18,28 @@ describe('Expr.lambdify', () => {
     it(`evaluates ${term} to ${final}`, () => {
       const jar = {};
       const expr = ski.parse(term, jar);
-      const steps = [...expr.lambdify()];
+      const seq = expr.lambdify({latin: 6});
+      const expected = ski.parse(final, jar);
 
-      console.log(steps.map(step => ({
-        ...step,
-        expr: step.expr.toString({terse: true}),
-      })));
+      let done = false;
+      for (const step of seq) {
+        expect(step.expr).to.be.instanceOf(SKI.classes.Expr);
+        expect(step.final).to.be.a('boolean');
+        expect(step.steps).to.be.a('number');
+        expect(done).to.equal(false, 'we didn\'t iterate past the final step');
 
-      const last = steps[steps.length - 1];
-      ski.parse(final, jar).expect(last.expr);
+        console.log(step.expr.toString({terse:true}));
+
+        // don't do fancy variables unless explicitly told to
+        ski.parse('' + step.expr, jar); // TODO .expect(step.expr);
+
+        if (step.final) {
+          expected.expect(step.expr);
+          done = true;
+        }
+      }
     });
   }
+
+
 });
