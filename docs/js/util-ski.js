@@ -64,7 +64,7 @@ class EvalBox {
    * @param {string} src
    * @param {function(e:Expr): IterableIterator<{final: boolean, expr: Expr, steps: number}>} [generator]
    */
-  setup (src, generator = e => e.walk()) {
+  run (src, generator = e => e.walk()) {
     // scr is required because we need to start with the actual user input, not with the parsed expr
 
     if (!this.options.headless) {
@@ -92,10 +92,10 @@ class EvalBox {
       this.view.src.innerHTML = sanitize(src);
     }
 
-    return this.start();
+    return this.restart();
   }
 
-  start () {
+  restart () {
     // separated from setup() to avoid restarting a stopped evaluation
     if (this.running) return;
     this.running = true;

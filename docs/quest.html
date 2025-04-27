@@ -315,8 +315,8 @@
                 showSteps.onclick = () => {
                     termDiv.innerHTML = '';
                     hideSteps.hidden = false;
-                    const box = new EvalBox(termDiv, {engine: ski, height: Infinity, max: item.steps+2});
-                    box.start(item.start);
+                    const box = new EvalBox(termDiv, {engine: ski, height: Infinity, max: item.steps+2, headless: true});
+                    box.run(item.start);
                 };
                 hideSteps.onclick = () => {
                     termDiv.innerHTML = '';
