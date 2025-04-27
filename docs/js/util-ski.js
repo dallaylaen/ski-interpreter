@@ -46,11 +46,9 @@ class EvalBox {
     this.options = options;
     this.running = false;
     this.delay = options.delay ?? 0;
-    this.count = 0;
     this.maxSteps = options.max ?? Infinity;
     this.onStart = options.onStart ?? (() => {});
     this.onStop = options.onStop ?? (() => {});
-    this.step = options.step ?? ((expr) => expr.step());
 
     this.parent = box.parent;
     this.engine = options.engine;
@@ -60,56 +58,63 @@ class EvalBox {
     this.foot = this.box.foot;
   }
 
-  setup (src, expr) {
+  /**
+   * @desc Takes a string and a iterator containing expr: Expr, steps: number, and final: boolean
+   * @param {string} src
+   * @param {function(e:Expr): IterableIterator<{final: boolean, expr: Expr, steps: number}>} [generator]
+   */
+  setup (src, generator = (e=>e.walk())) {
+    // scr is required because we need to start with the actual user input, not with the parsed expr
+
+    // TODO demolish content beforehand
     this.permalink = append(this.head, 'a', { class: ['con-permalink'] });
     this.permalink.target = '_blank';
     this.permalink.innerHTML = '#' + this.id;
     this.src = append(this.head, 'span', { class: ['con-source'] });
     this.counter = append(this.head, 'span', { class: ['con-number', 'float-right'] });
 
-    this.counter.innerHTML = this.count;
+    this.counter.innerHTML = '-';
     this.src.innerHTML = sanitize(src);
     try {
-      this.expr = expr ?? this.engine.parse(src);
+      this.expr = this.engine.parse(src); // this is used for alias setup
+      this.seq = generator(this.expr);
     } catch (e) {
-      this.box.print(e.message, { class: ['error'] });
-      return this.stop();
+      return this.stop(e.message);
     }
     this.permalink.href = permalink(this.engine, src);
     this.src.innerHTML = sanitize(src);
     return this.start();
   }
 
-  start (expr) {
+  start () {
+    // separated from setup() to avoid restarting a stopped evaluation
     if (this.running) return;
-    if (expr)
-      this.expr = expr;
     this.running = true;
-    this.limit = this.maxSteps + this.count;
-    this.box.print(this.expr.toString({ terse: true }), { line: this.count });
     this.onStart();
     this.tick();
   }
 
   tick () {
     if (!this.running) return;
-    const next = this.step(this.expr);
+    const { value } = this.seq.next();
 
-    if (!next.changed) {
+    if (!value)
+      return this.stop('unexpected end of sequence');
+
+    this.box.print(value.expr.toString({ terse: true }), { line: value.steps });
+
+    if (value.final) {
+      // could've used next().done but that creates one extra iteration
       // finished execution, congratulations
       if (this.box.last)
         this.box.last.classList.add('success');
       return this.stop();
     }
 
-    this.expr = next.expr;
-    this.count += next.steps;
-    this.box.print(this.expr.toString({ terse: true }), { line: this.count });
     if(this.counter)
-      this.counter.innerHTML = '' + this.count;
-    this.expr = next.expr;
-    if (this.count >= this.limit)
-      return this.stop('Max steps reached: '+ this.limit);
+      this.counter.innerHTML = '' + value.steps;
+    if (value.steps >= this.maxSteps)
+      return this.stop('Max steps reached: '+ this.maxSteps);
     setTimeout(() => this.tick(), this.delay);
   }
 

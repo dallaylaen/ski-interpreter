@@ -89,7 +89,8 @@
     <form id="prompt" onsubmit="return runStop()">
         <input id="entryField">
         <button id="runstopBtn" type="submit"></button>
-        <button id="rewriteSKI">&lambda;</button>
+        <button id="rewriteSKI">&rarr;SK</button>
+        <button id="lambdify">&rarr;&lambda;</button>
     </form>
     <footer><small>&copy; 2024 &mdash; 2025 Konstantin Uvarin
         (<a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">sources</a>)</small></footer>
@@ -97,8 +98,8 @@
     /**
      *   References to static page elements
      */
-    const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'entryField',
-        'runstopBtn', 'rewriteSKI', 'help', 'menu');
+    const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'help', 'menu',
+      'entryField', 'runstopBtn', 'rewriteSKI', 'lambdify');
     const store = new Store('playground');
 
     /**
@@ -141,7 +142,13 @@
 
         view.rewriteSKI.addEventListener('click', ev => {
             ev.preventDefault();
-            run({src: view.entryField.value, rewrite: true});
+            run({src: view.entryField.value, action: 'toSKI'});
+            return false;
+        });
+
+        view.lambdify.addEventListener('click', ev => {
+            ev.preventDefault();
+            run({src: view.entryField.value, action: 'toLambda'});
             return false;
         });
 
@@ -210,6 +217,11 @@
         return run();
     }
 
+    const generator = {
+        toSKI: e => e.rewriteSKI(),
+        toLambda: e => e.lambdify(),
+    }
+
     function run(options={}) {
         greet.remove();
         const src = options.src ?? view.entryField.value;
@@ -227,7 +239,6 @@
             height:  evalOptions.height,
             delay:   evalOptions.delay,
             engine:  ski,
-            step:    options.rewrite ? (expr => expr.rewriteSKI({max: 1})) : undefined,
             onStart: function() {
                 currentBox = this;
                 view.runstopBtn.classList.add('running');
@@ -243,7 +254,7 @@
             }
         });
 
-        runner.setup(src);
+        runner.setup(src, generator[options.action]);
 
         view.runstopBtn.classList.add('running');
 
