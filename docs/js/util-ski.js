@@ -40,7 +40,7 @@ class EvalBox {
     if (box instanceof Element)
       box = new TeletypeBox(box, options);
 
-    this.id = options.id ?? ++nextId;
+    this.id = options.id ?? nextId++;
 
     this.height = options.height ?? 5;
     this.options = options;
@@ -101,7 +101,7 @@ class EvalBox {
     if (!value)
       return this.stop('unexpected end of sequence');
 
-    this.box.print(value.expr.toString({ terse: true }), { line: value.steps });
+    this.print(value.expr.toString({ terse: true }), { line: value.steps });
 
     if (value.final) {
       // could've used next().done but that creates one extra iteration
@@ -121,7 +121,7 @@ class EvalBox {
   stop (reason) {
     this.running = false;
     if (reason)
-      this.box.print(reason, { class: ['error'], line: '' });
+      this.print(reason, { class: ['error'], line: '' });
     this.onStop();
   }
 
@@ -132,5 +132,9 @@ class EvalBox {
   setHeight (height) {
     this.height = height;
     this.box.height = height;
+  }
+
+  print(text, options = {}) {
+    this.box.print(text, options);
   }
 }

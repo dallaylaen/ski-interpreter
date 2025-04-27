@@ -108,7 +108,7 @@
 
     let ski = new SKI({numbers: true, allow: 'SKIBCKW', lambdas: true});
     let autosave = false;
-    let greet = new TeletypeBox(view.teletype);
+    let greet = new EvalBox(view.teletype);
     let currentBox = null;
     const evalOptions = {
         delay: 300,
@@ -184,7 +184,7 @@
         menu.addLink('combinator cheat sheet', 'https://angelfire.com/tx4/cus/combinator/birds.html', '_blank');
         menu.addLink('ski calculus', 'https://en.wikipedia.org/wiki/SKI_combinator_calculus', '_blank');
         menu.addSeparator();
-        menu.addAction('help', () => new TeletypeBox(view.teletype).print(view.help.innerHTML, {raw: true}));
+        menu.addAction('help', () => new EvalBox(view.teletype).print(view.help.innerHTML, {raw: true}));
     }
 
     /**
@@ -225,17 +225,11 @@
     function run(options={}) {
         greet.remove();
         const src = options.src ?? view.entryField.value;
-        const box = new TeletypeBox(view.teletype);
 
         if (currentBox)
-            currentBox.stop("interrupted by different command");
+            currentBox.stop("interrupted by a different command");
 
-        if (src.match(/^\s*\?[\s?]*$/)) {
-            box.print(view.help.innerHTML, {raw: true});
-            return;
-        }
-
-        const runner = new EvalBox(box, {
+        const runner = new EvalBox(view.teletype, {
             height:  evalOptions.height,
             delay:   evalOptions.delay,
             engine:  ski,
@@ -254,9 +248,12 @@
             }
         });
 
-        runner.setup(src, generator[options.action]);
+        if (src.match(/^\s*\?[\s?]*$/)) {
+            runner.print(view.help.innerHTML, {raw: true});
+            return false;
+        }
 
-        view.runstopBtn.classList.add('running');
+        runner.setup(src, generator[options.action]);
 
         return false;
     }
