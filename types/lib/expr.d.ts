@@ -60,17 +60,42 @@ export class Expr {
         skip: Set<number> | null;
     };
     /**
-     *
+     * @desc Convert expression to equivalent lambda form, step by step,
+     *       preferably by evaluation as a whole but falling back to divide and conquer.
+     * @param {{
+     *   max: number?,
+     *   maxArgs: number?,
+     *   varGen: function(void): FreeVar?,
+     *   steps: number?,
+     *   html: boolean?,
+     *   latin: number?,
+     * }} options
+     * @return {IterableIterator<{expr: Expr, steps: number, final: boolean}>}
+     */
+    lambdify(options?: {
+        max: number | null;
+        maxArgs: number | null;
+        varGen: (arg0: void) => FreeVar | null;
+        steps: number | null;
+        html: boolean | null;
+        latin: number | null;
+    }): IterableIterator<{
+        expr: Expr;
+        steps: number;
+        final: boolean;
+    }>;
+    /**
+     * @desc same semantics as walk() but rewrite step by step instead of computing
      * @param {{max: number?}} options
-     * @return {{changed: boolean, expr: Expr, steps: number}}
+     * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
      */
     rewriteSKI(options?: {
         max: number | null;
-    }): {
-        changed: boolean;
+    }): IterableIterator<{
+        final: boolean;
         expr: Expr;
         steps: number;
-    };
+    }>;
     _rski(options: any): this;
     /**
      * @desc Whether the term will reduce further if given more arguments.
