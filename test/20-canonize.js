@@ -41,12 +41,20 @@ describe('Expr.canonize', () => {
       const found = ski.parse(term, jar).canonize();
       const canon = found.canonical;
       delete found.canonical;
+      const steps = found.steps;
+      delete found.steps;
       expect(found).to.deep.equal(expected);
       if (found.found)
         expect(canon).to.be.instanceof(SKI.classes.Expr);
       if (lambda)
         canon.expect(ski.parse(lambda, jar));
       expect(canon).to.be.instanceof(SKI.classes.Expr);
+      expect(steps).to.be.a('number');
+      expect(steps).to.be.within(
+        0,
+        SKI.options.max * (found.arity ?? SKI.options.maxArgs),
+        'steps should be less than max * arity'
+      );
     });
   }
 });
