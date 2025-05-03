@@ -13,6 +13,7 @@ describe('Expr.lambdify', () => {
     ["a->b->b a", "x->y->y x"],
 
     ["x->xSK", "x->x (a->b->c->a c (b c)) (a->b->a)" ],
+    ["X=x->xSK; X(X(X(XX)))", "a->b->c->a c (b c)"],
     ["M=SII; MM", "(x->x x) (x->x x)"],
     ["BC(CI)", "a->b->c->c a b"],
     ["T=CI; 5 (Ty) x", "x y y y y y"],
