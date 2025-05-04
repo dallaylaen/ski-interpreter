@@ -33,6 +33,7 @@ describe('Expr.lambdify', () => {
     ["WI(BW(BW (C(K(WI))))) ", "(f->f f)(g->x->g g x x)"],
     ["BW(BW (C(K(WI))))", "g->x->g g x x"],
 
+    ["BS(C(BB))", "a->b->c->d->c a(b c d)"],
   ];
 
   for (const [term, final] of cases) {
@@ -44,11 +45,20 @@ describe('Expr.lambdify', () => {
 
       let done = false;
       let i = 0;
+      let steps = 0;
+      let weight = Infinity;
       for (const step of seq) {
+        expect(done).to.equal(false, 'we didn\'t iterate past the final step');
+        expect(i++).to.be.lessThanOrEqual(30, 'no runaway sequence');
+
+        expect(step.steps).to.be.a('number');
+        expect(step.steps).to.be.greaterThanOrEqual(steps);
+        steps = step.steps;
+
         const expr = step.expr;
         expect(expr).to.be.instanceOf(SKI.classes.Expr);
-        // expect(step.steps).to.be.a('number');
-        expect(done).to.equal(false, 'we didn\'t iterate past the final step');
+        expect(expr.weight()).to.be.lessThan(weight, 'term weight must strictly diminish');
+        weight = expr.weight();
 
         console.log('[' + step.steps + '] ' + expr.toString({terse:true}) + ' // ' + step.comment);
 
@@ -59,15 +69,12 @@ describe('Expr.lambdify', () => {
         // don't do fancy variables unless explicitly told to
         ski.parse('' + expr, jar); // TODO .expect(step.expr);
 
-        if (step.final) {
-          expected.expect(expr);
+        if (expected.equals(expr)) {
           done = true;
         }
-
-        // TODO add max steps expectation to every step
-        expect(i).to.be.lessThanOrEqual(30);
-        i++;
       }
+
+      expect(done).to.equal(true, 'we reached ' + expected + ' the final step');
     });
   }
 
