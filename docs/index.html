@@ -23,10 +23,20 @@
             <p>Type an expression in the entry field and click <tt title="Run!"
                style="color: darkGreen;padding: 0 2px 1px 4px;margin-left: -4px;margin-right: -1px;outline: 1px solid lightblue;border-radius: 3px;vertical-align: 1px;">▶︎</tt>.
                 A valid expression contains one or more terms and parenthesis around groups of terms.
-                Unknown terms will be left as is.
+                Unknown terms will be considered free variables and left as is.
             </p>
             <p>New terms can be declared by prepending <code>"name&nbsp;=&nbsp;"</code> to the expression.
                 They will appear in the box on the right and can be clicked to add them to the expression.
+            </p>
+            <p>
+                The interpreter supports <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">lambda calculus</a>
+                and <a href="https://en.wikipedia.org/wiki/Church_encoding" target="_blank">Church numerals</a>.
+                Lambda expressions are written as <code>x-&gt;y-&gt;z-&gt;&lt;expression&gt;</code>.
+                Church numerals are written as non-negative integers.
+            </p>
+            <p>
+                The <b>&rarr;SK</b> button converts an expression into the SKI basis, term by term, and
+                the <b>&rarr;&lambda;</b> button attempts to find the shortest equivalent lambda term.
             </p>
             <p>
                 Enter <code>?</code> to get detailed info on syntax.
@@ -89,8 +99,8 @@
     <form id="prompt" onsubmit="return runStop()">
         <input id="entryField">
         <button id="runstopBtn" type="submit"></button>
-        <button id="rewriteSKI">&rarr;SK</button>
-        <button id="lambdify">&rarr;&lambda;</button>
+        <button id="rewriteSKI" title="Convert to SKI basis">&rarr;SK</button>
+        <button id="lambdify" title="Attempt to find the shortest equivalent &lambda;-term">&rarr;&lambda;</button>
     </form>
     <footer><small>&copy; 2024 &mdash; 2025 Konstantin Uvarin
         (<a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">sources</a>)</small></footer>
