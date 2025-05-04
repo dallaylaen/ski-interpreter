@@ -24,6 +24,7 @@ export class Expr {
      */
     freeVars(): Set<FreeVar>;
     hasLambda(): any;
+    freeOnly(): boolean;
     /**
      * @desc return all terminal values within the term, that is, values not
      * composed of other terms. For example, in S(KI)K, the terminals are S, K, I.
@@ -44,6 +45,7 @@ export class Expr {
      *    arity: number?,
      *    linear: boolean?,
      *    canonical?: Expr,
+     *    steps: number?,
      *    skip: Set<number>?
      * }}
      */
@@ -57,11 +59,13 @@ export class Expr {
         arity: number | null;
         linear: boolean | null;
         canonical?: Expr;
+        steps: number | null;
         skip: Set<number> | null;
     };
     /**
-     * @desc Convert expression to equivalent lambda form, step by step,
-     *       preferably by evaluation as a whole but falling back to divide and conquer.
+     * @desc Returns a series of lambda terms equivalent to the given expression,
+     *       up to the provided computation steps limit,
+     *       in decreasing weight order.
      * @param {{
      *   max: number?,
      *   maxArgs: number?,
@@ -70,7 +74,8 @@ export class Expr {
      *   html: boolean?,
      *   latin: number?,
      * }} options
-     * @return {IterableIterator<{expr: Expr, steps: number, final: boolean}>}
+     * @param {number} [maxWeight] - maximum allowed weight of terms in the sequence
+     * @return {IterableIterator<{expr: Expr, steps: number?, comment: string?}>}
      */
     lambdify(options?: {
         max: number | null;
@@ -81,8 +86,8 @@ export class Expr {
         latin: number | null;
     }): IterableIterator<{
         expr: Expr;
-        steps: number;
-        final: boolean;
+        steps: number | null;
+        comment: string | null;
     }>;
     /**
      * @desc same semantics as walk() but rewrite step by step instead of computing
@@ -96,6 +101,14 @@ export class Expr {
         expr: Expr;
         steps: number;
     }>;
+    /**
+     * @desc Rename free variables in the expression using the given sequence
+     *       This is for eye-candy only, as the interpreter knows darn well hot to distinguish vars,
+     *       regardless of names.
+     * @param {IterableIterator<string>} seq
+     * @return {Expr}
+     */
+    renameVars(seq: IterableIterator<string>): Expr;
     _rski(options: any): this;
     /**
      * @desc Whether the term will reduce further if given more arguments.
@@ -205,8 +218,10 @@ export class App extends Expr {
         arity: number | null;
         linear: boolean | null;
         canonical?: Expr;
+        steps: number | null;
         skip: Set<number> | null;
     };
+    renameVars(seq: any): Expr;
     subst(plug: any, value: any): Expr;
     /**
      * @return {{expr: Expr, steps: number}}
@@ -235,6 +250,7 @@ export class Lambda extends Expr {
     reduce(input: any): Expr;
     subst(plug: any, value: any): Lambda;
     expand(): Lambda;
+    renameVars(seq: any): Lambda;
     _rski(options: any): any;
     equals(other: any): boolean;
     toString(opt?: {}): string;
