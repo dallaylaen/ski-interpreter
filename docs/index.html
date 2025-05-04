@@ -181,7 +181,7 @@
             if(currentBox)
                 currentBox.setHeight(val);
             store.save('height', val);
-        }, [3, 5, 7, 10, ['&infin;', Infinity]], 2);
+        }, [3, 5, 7, 10, 20, ['&infin;', Infinity]], 2);
         menu.addAction('reset terms', () => {
             if (!window.confirm('Really erase all terms?'))
                 return;
