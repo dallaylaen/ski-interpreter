@@ -105,15 +105,13 @@ class EvalBox {
 
   tick () {
     if (!this.running) return;
-    const { value } = this.seq.next();
+    const { value, done } = this.seq.next();
 
-    if (!value)
-      return this.stop('unexpected end of sequence');
+    if (value)
+      this.print(value.expr.toString({ terse: true }), { line: value.steps });
 
-    this.print(value.expr.toString({ terse: true }), { line: value.steps });
-
-    if (value.final) {
-      // could've used next().done but that creates one extra iteration
+    if (done || value.final) {
+      // could've just used next().done but that creates one extra iteration
       // finished execution, congratulations
       if (this.view.last)
         this.view.last.classList.add('success');
