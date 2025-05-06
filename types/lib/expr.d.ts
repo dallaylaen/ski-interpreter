@@ -177,6 +177,7 @@ export class Expr {
        * @return {boolean}
        */
     equals(other: Expr): boolean;
+    contains(other: any): boolean;
     expect(other: any): void;
     /**
      * @param {{terse: boolean?}} options
