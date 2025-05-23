@@ -241,7 +241,7 @@
             });
             append(entryBlock, 'dd', {
                 content: entry.note
-                    ? entry.note.replaceAll('->', '&rarr;').replaceAll(/\b([a-z])\b/g,"<em>$1</em>")
+                    ? '= '+entry.note.replaceAll('->', '&rarr;').replaceAll(/\b([a-z])\b/g,"<em>$1</em>")
                     : '= '+entry.impl,
                 class: entry.note ? ['note'] : []
             });
@@ -257,7 +257,7 @@
         }
         if (ski.hasNumbers) {
             append(view.known, 'a', {
-                content: '<dt>&lt;n&gt;</dt><dd>x y = x(…(x(y))…)</dd>',
+                content: '<dt>&lt;n&gt;</dt><dd><em>x</em> <em>y</em> = <em>x</em>(…(<em>x</em>(<em>y</em>))…)</dd>',
                 class: ['entry']
             });
         }
@@ -400,9 +400,8 @@
         #known dt {
             font-weight: bold;
         }
-        #known dd.note {
-            font-family: inherit;
-            font-size: .9rem;
+        #known dd em {
+            font-family: serif;
         }
         #known a[href]:hover {
             outline: auto rgba(0, 150, 255, 1);
