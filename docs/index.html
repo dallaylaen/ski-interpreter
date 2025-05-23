@@ -242,7 +242,7 @@
             append(entryBlock, 'dd', {
                 content: entry.note
                     ? '= '+entry.note.replaceAll('->', '&rarr;').replaceAll(/\b([a-z])\b/g,"<em>$1</em>")
-                    : '= '+entry.impl.replaceAll('/\s*->\s*/g', ' &rarr; ').replaceAll(/\b([a-z])\b/g,"<em>$1</em>"),
+                    : '= '+entry.impl.toString().replaceAll('/\s*->\s*/g', ' &rarr; ').replaceAll(/\b([a-z])\b/g,"<em>$1</em>"),
                 class: entry.note ? ['note'] : []
             });
             const harakiri = append(view.known, 'a', {content: '[&cross;]', class: ['remove']});
