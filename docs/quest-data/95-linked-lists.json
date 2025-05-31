@@ -42,8 +42,28 @@
       "unlock": "fold",
       "cases": [
         ["fold (KI) f x", "x"],
+        ["V=BC(CI); fold (V a (KI)) f x", "f a x"],
         ["V=BC(CI); fold (V a b) f x", "f a (fold b f x)"],
         ["V=BC(CI); fold (Va (Vb (Vc (KI)))) f x", "f a (f b (f c x))"]
+      ]
+    },
+    {
+      "id": "Rpc0i8ff",
+      "created_at": "2025-05-31T14:11:17",
+      "title": "It's all just ones and zeros",
+      "descr": [
+        "<p>Convert a string of booleans (K/KI) starting from low bits (little-endian) to a Church numeral.",
+        "Empty list is zero.</p>"
+      ],
+      "input": "num",
+      "cases": [
+        ["num (KI) + 0", "0"],
+        ["V=BC(CI); t=K; f=KI; num (V f f) + 0", "0"],
+        ["V=BC(CI); t=K; f=KI; num (V t f) + 0", "1"],
+        ["V=BC(CI); t=K; f=KI; num (V t (V f (V t f))) + 0", "5"],
+        ["V=BC(CI); t=K; f=KI; num (V f (V f (V f (V t f)))) + 0", "8"],
+        ["V=BC(CI); t=K; f=KI; num (V f (V f (V f (V f f)))) + 0", "0"],
+        ["V=BC(CI); t=K; f=KI; num (V t (V t (V f (V t f)))) + 0", "11"]
       ]
     }
   ]
