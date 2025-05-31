@@ -65,7 +65,7 @@
       "vars": ["M=WI", "T=CI", "A=KI"],
       "input": "phi",
       "cases": [
-          [ "phi x", "x" ]
+          [ "phi x y", "x y y" ]
       ]
     }
   ]

@@ -21,7 +21,7 @@
       "allow": "BCKW",
       "input": "phi",
       "cases": [
-        [ "phi x", "Kx" ]
+        [ "phi x", "x" ]
       ]
     },
     {
