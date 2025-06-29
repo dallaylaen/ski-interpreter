@@ -93,7 +93,7 @@
 
     <div id="info">
         <p class="caption">Term inventory:</p>
-        <dl id="known" class="term-list"></dl>
+        <dl id="inventory" class="term-list"></dl>
     </div>
     <form id="prompt" onsubmit="return runStop()">
         <input id="entryField">
@@ -107,7 +107,7 @@
     /**
      *   References to static page elements
      */
-    const view = grabView('top', 'bottom', 'main', 'known', 'teletype', 'help', 'menu',
+    const view = grabView('top', 'bottom', 'main', 'inventory', 'teletype', 'help', 'menu',
       'entryField', 'runstopBtn', 'rewriteSKI', 'lambdify');
     const store = new Store('playground');
 
@@ -147,7 +147,7 @@
             ski = new SKI(store.load('engine') ?? {} );
             autosave = true;
         }
-        showKnown();
+        showInventory();
 
         view.rewriteSKI.addEventListener('click', ev => {
             ev.preventDefault();
@@ -186,7 +186,7 @@
                 return;
             ski = new SKI();
             store.save('engine', ski);
-            showKnown();
+            showInventory();
         });
         menu.addSeparator();
         menu.addLink('quest mode', 'quest.html', '_blank');
@@ -248,7 +248,7 @@
                 if (this.expr instanceof SKI.classes.Alias) {
                     // user defined a new term
                     this.engine.add(this.expr);
-                    showKnown();
+                    showInventory();
                 }
             },
             onStop:  function () {
@@ -267,28 +267,27 @@
         return false;
     }
 
-    function showKnown() {
+    function showInventory() {
         // TODO should not be here but still
         if (autosave)
             store.save('engine', ski);
 
-        view.known.innerHTML = '';
+        view.inventory.innerHTML = '';
         const list = ski.getTerms();
         for (let name of Object.keys(list).sort()) {
             const entry = list[name];
-            const entryBlock = append(view.known, 'div');
-            const entryLink = append(entryBlock, 'a', {class: ['term-def', 'ellipsis']} );
-            entryLink.href = "#";
-            entryLink.onclick = event => insert(name);
-            append(entryLink, 'dt', {
+            const entryDiv = append(view.inventory, 'div');
+            const entrySpan = append(entryDiv, 'a', {class: ['term-def', 'ellipsis']} );
+            entrySpan.href = "#";
+            entrySpan.onclick = event => insert(name);
+            append(entrySpan, 'dt', {
                 content: name,
             });
-            append(entryLink, 'dd', {
+            append(entrySpan, 'dd', {
                 content: '= '+(entry.note ?? entry.impl.toString({terse: true}))
-                    .replaceAll(/\s*->\s*/g, ' &mapsto; '),
-                class: ['note'],
+                    .replaceAll(/\s*->\s*/g, ' &mapsto; ')
             });
-            const placeholder = append(entryBlock, 'span', {class: [ 'float-right' ], content: '&Xi;'});
+            const placeholder = append(entryDiv, 'span', {class: [ 'float-right' ], content: '&Xi;'});
             const menu = new Hamburger(placeholder, {right: true});
             menu.addLabel('manage ' + name);
             if (entry instanceof SKI.classes.Alias) {
@@ -298,23 +297,23 @@
                     run({src: entry.name + ' = ' + entry.impl.toString({terse: true})});
                 });
             }
-            menu.addAction('&cross; remove', () => removeKnown(name));
+            menu.addAction('&cross; remove', () => removeInventoryEntry(name));
         }
         if (ski.hasLambdas) {
-            append(view.known, 'div', {
+            append(view.inventory, 'div', {
                 content: '<dt>x-&gt;y-&gt;y(x)</dt><dd class="note">–&numsp;a generic <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">λ-term</a></dd>'
             });
         }
         if (ski.hasNumbers) {
-            append(view.known, 'div', {
+            append(view.inventory, 'div', {
                 content: '<dt>&lt;n&gt;</dt><dd><i>x</i> <i>y</i> = <i>x</i>(…(<i>x</i>(<i>y</i>))…)</dd>'
             });
         }
     }
 
-    function removeKnown(name) {
+    function removeInventoryEntry(name) {
         ski.remove(name);
-        showKnown();
+        showInventory();
     }
 
     function insert (text) {
