@@ -21,6 +21,8 @@
     font-style: italic;
 }
 .term-list a[href]:hover {
+    color: inherit;
+    text-decoration: inherit;
     outline: auto rgba(0, 150, 255, 1);
     outline-offset: 1px;
 }
@@ -116,7 +118,7 @@ li.hamburger-separator {
 
 .ellipsis {
     display: inline-block;
-    width: calc(100% - 2em);
+    max-width: calc(100% - 2em);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
