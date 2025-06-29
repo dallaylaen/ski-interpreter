@@ -284,8 +284,7 @@
                 content: name,
             });
             append(entrySpan, 'dd', {
-                content: '= '+(entry.note ?? entry.impl.toString({terse: true}))
-                    .replaceAll(/\s*->\s*/g, ' &mapsto; ')
+                content: '= '+(entry.note ?? entry.impl.toString({terse: true, html: true}))
             });
             const placeholder = append(entryDiv, 'span', {class: [ 'float-right' ], content: '&Xi;'});
             const menu = new Hamburger(placeholder, {right: true});
