@@ -1,10 +1,6 @@
 /* ski-specific */
 
-@font-face {
-  font-family: "Computer Modern";
-  src: url('http://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunsi.otf');
-  font-style: italic, oblique;
-}
+@import url("https://cdn.jsdelivr.net/gh/vsalvino/computer-modern@main/fonts/serif.css");
 
 .term-list {
     margin: .5ex;
@@ -29,7 +25,7 @@
 }
 
 .term-list dd i {
-    font-family: "Computer Modern", serif;
+    font-family: "Computer Modern Serif", serif;
     font-size: 1rem;
     line-height: 0;
 }
