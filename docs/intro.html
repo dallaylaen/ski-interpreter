@@ -39,7 +39,7 @@
 
             <li>
                 If a <i>reduction rule</i> is known for the <i>leftmost</i> term in an (sub-)expression, it is applied.
-                Reduction rules are given in the form of "<code>X a b c = b (c a)</code>"
+                Reduction rules are given in the form of <code>X a b c = b (c a)</code>
                 and are interpreted as follows:
                 <code>X a</code> returns a function <code>f1</code> such that
                 <code>f1 b</code> returns a function <code>f2</code> such that
@@ -93,10 +93,10 @@
 
         <p>An arbitrary lambda expression can be converted to SKI via the following rules:</p>
         <ul>
-            <li><code>&lambda; x . x</code> becomes <code>I</code>;</li>
-            <li><code>&lambda; x . f(x)</code> (where f is independent of x) becomes <code>f</code>;</li>
-            <li><code>&lambda; x . y</code> (where y does not depend on x) becomes <code>K y</code>;</li>
-            <li><code>&lambda; x . y(z)</code> becomes <code>S(&lambda; x . y)(&lambda; x . z)</code>,
+            <li><code>x &mapsto; x</code> becomes <code>I</code>;</li>
+            <li><code>x &mapsto; f(x)</code> (where f is independent of x) becomes <code>f</code>;</li>
+            <li><code>x &mapsto; y</code> (where y does not depend on x) becomes <code>K y</code>;</li>
+            <li><code>x &mapsto; y(z)</code> becomes <code>S(x &mapsto; y)(x &mapsto; z)</code>,
                 where <code>y</code> and <code>z</code> may or may not depend on <code>x</code>.
             </li>
             <li>The process is repeated from the innermost lambda expression outwards and
