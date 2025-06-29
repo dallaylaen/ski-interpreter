@@ -107,7 +107,7 @@
     /**
      *   References to static page elements
      */
-    const view = grabView('top', 'bottom', 'main', 'inventory', 'teletype', 'help', 'menu',
+    const view = grabView('inventory', 'teletype', 'help', 'menu',
       'entryField', 'runstopBtn', 'rewriteSKI', 'lambdify');
     const store = new Store('playground');
 
@@ -279,7 +279,7 @@
             const entryDiv = append(view.inventory, 'div');
             const entrySpan = append(entryDiv, 'a', {class: ['term-def', 'ellipsis']} );
             entrySpan.href = "#";
-            entrySpan.onclick = event => insert(name);
+            entrySpan.onclick = event => insertInventoryItem(name);
             append(entrySpan, 'dt', {
                 content: name,
             });
@@ -316,7 +316,7 @@
         showInventory();
     }
 
-    function insert (text) {
+    function insertInventoryItem(text) {
         const orig = view.entryField.value;
         const prefix = orig.substring(0,  view.entryField.selectionStart);
         const postfix = orig.substring(view.entryField.selectionEnd);
@@ -366,6 +366,7 @@
         #teletype {
             overflow: auto;
             grid-area: teletype;
+            min-width: 25vw;
         }
 
         #info {
@@ -409,45 +410,6 @@
         p.caption {
             font-weight: bold;
             margin: 0;
-        }
-
-        .controls {
-            margin-left: .6ex;
-            margin-top: .4ex;
-        }
-
-        #teletype > div {
-            border: 1px dotted #C8C8C8 !important;
-            padding: 1px;
-            margin-top: .5em;
-        }
-        #teletype > div ~ div {
-            margin-top: -1px;
-        }
-
-        
-        .con-header {
-            padding: 1px 2px;
-            margin: -2px -2px 0px -2px;
-        }
-
-        tt.icon-run {
-            color: darkGreen;
-            padding: 0 calc(1ch - 1.5px) 2px calc(1ch + .5px);
-            margin-left: -3.5px;
-            margin-right: -2px;
-            vertical-align: .5px;
-            border-radius: 3px;
-            outline: 1px solid lightblue;
-            outline-offset: -1.5px;
-        }
-
-        code {
-            background: #848E981D;
-            padding: 0 1px;
-            margin: 0 -1px;
-            border-radius: .5ex;
-            line-height: calc(1lh + .5px);
         }
     </style>
 </body>
