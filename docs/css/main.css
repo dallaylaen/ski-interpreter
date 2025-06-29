@@ -2,6 +2,7 @@
 
 .term-list {
     margin: .5ex;
+    font-size: .8rem;
 }
 
 .term-list dt, dd {
@@ -20,6 +21,13 @@
     font-family: inherit;
     font-style: italic;
 }
+
+.term-list dd i {
+    font-family: serif;
+    font-size: 1rem;
+    line-height: 0;
+}
+
 .term-list a[href] {
     color: inherit;
     text-decoration: inherit;
@@ -76,7 +84,7 @@ ul.hamburger {
 }
 
 ul.hamburger-right {
-    right: 0;
+    right: 1px;
 }
 
 .hamburger li {
