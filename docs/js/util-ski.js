@@ -110,6 +110,9 @@ class EvalBox {
     if (value)
       this.print(value.expr.toString({ terse: true }), { line: value.steps });
 
+    if(this.view.counter)
+      this.view.counter.innerHTML = '' + value.steps;
+
     if (done || value.final) {
       // could've just used next().done but that creates one extra iteration
       // finished execution, congratulations
@@ -118,8 +121,6 @@ class EvalBox {
       return this.stop();
     }
 
-    if(this.counter)
-      this.counter.innerHTML = '' + value.steps;
     if (value.steps >= this.maxSteps)
       return this.stop('Max steps reached: '+ this.maxSteps);
     setTimeout(() => this.tick(), this.delay);
