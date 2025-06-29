@@ -101,7 +101,7 @@
         <button id="rewriteSKI" title="Convert to SKI basis">&rarr;SK</button>
         <button id="lambdify" title="Attempt to find the shortest equivalent &lambda;-term">&rarr;&lambda;</button>
     </form>
-    <footer><small>&copy;&thinsp;2024&ndash;2025 Konstantin Uvarin
+    <footer><small>&copy;&thinsp;2024&thinsp;&ndash;&thinsp;2025 Konstantin Uvarin
         (<a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">sources</a>)</small></footer>
 <script>
     /**
@@ -285,7 +285,7 @@
             });
             append(entryLink, 'dd', {
                 content: '= '+(entry.note ?? entry.impl.toString({terse: true}))
-                    .replaceAll(/\s*->\s*/g, ' &rarr; '),
+                    .replaceAll(/\s*->\s*/g, ' &mapsto; '),
                 class: ['note'],
             });
             const placeholder = append(entryBlock, 'span', {class: [ 'float-right' ], content: '&Xi;'});
@@ -302,14 +302,12 @@
         }
         if (ski.hasLambdas) {
             append(view.known, 'div', {
-                content: '<dt>x-&gt;y-&gt;y(x)</dt><dd class="note">–&numsp;a generic <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">λ-term</a></dd>',
-                class: ['entry']
+                content: '<dt>x-&gt;y-&gt;y(x)</dt><dd class="note">–&numsp;a generic <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">λ-term</a></dd>'
             });
         }
         if (ski.hasNumbers) {
             append(view.known, 'div', {
-                content: '<dt>&lt;n&gt;</dt><dd><em>x</em> <em>y</em> = <em>x</em>(…(<em>x</em>(<em>y</em>))…)</dd>',
-                class: ['entry']
+                content: '<dt>&lt;n&gt;</dt><dd><i>x</i> <i>y</i> = <i>x</i>(…(<i>x</i>(<i>y</i>))…)</dd>'
             });
         }
     }
