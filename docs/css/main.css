@@ -20,7 +20,7 @@
     font-family: inherit;
     font-style: italic;
 }
-.term-list a[href]:hover {
+.term-list a[href] {
     color: inherit;
     text-decoration: inherit;
 }
