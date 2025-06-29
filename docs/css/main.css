@@ -10,7 +10,11 @@
 
 .term-list {
     margin: .5ex;
-    font-size: .8rem;
+}
+
+.term-list > div {
+    line-height: 1rem;
+    margin-bottom: -0.15rem;
 }
 
 .term-list dt, dd {
