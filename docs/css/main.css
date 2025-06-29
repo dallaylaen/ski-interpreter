@@ -86,7 +86,7 @@
             outline-offset: -1.5px;
         }
 
-        #teletype code {
+     code {
             background: #848E981D;
             padding: 0 1px;
             margin: 0 -1px;
