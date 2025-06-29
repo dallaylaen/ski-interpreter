@@ -66,6 +66,34 @@
     background-color: lightgray;
 }
 
+        #teletype > div {
+            border: 1px dotted #C8C8C8 !important;
+            padding: 1px;
+            margin-top: .5em;
+        }
+        #teletype > div ~ div {
+            margin-top: -1px;
+        }
+
+        tt.icon-run {
+            color: darkGreen;
+            padding: 0 calc(1ch - 1.5px) 2px calc(1ch + .5px);
+            margin-left: -3.5px;
+            margin-right: -2px;
+            vertical-align: .5px;
+            border-radius: 3px;
+            outline: 1px solid lightblue;
+            outline-offset: -1.5px;
+        }
+
+        #teletype code {
+            background: #848E981D;
+            padding: 0 1px;
+            margin: 0 -1px;
+            border-radius: .5ex;
+            line-height: calc(1lh + .5px);
+        }
+
 /* hamburger menu */
 
 .hamburger-button {
