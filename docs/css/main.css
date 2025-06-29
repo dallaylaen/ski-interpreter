@@ -25,17 +25,18 @@
 .term-list dt {
     font-weight: bold;
 }
-.term-list dd.note {
+.term-list dd.note, .term-list dd i, .term-list dd var {
     font-family: "Computer Modern Serif", serif;
     font-size: 1rem;
     line-height: 0;
     font-style: italic;
 }
 
-.term-list dd i {
-    font-family: "Computer Modern Serif", serif;
-    font-size: 1rem;
-    line-height: 0;
+.term-list dd var {
+    width: 1ch;
+    display: inline-block;
+    margin-left: -1px;
+    margin-right: 1px;
 }
 
 .term-list a.term-def[href] {
