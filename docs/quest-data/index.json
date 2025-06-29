@@ -8,6 +8,7 @@
   "58-inspection.json",
   "60-boolean.json",
   "70-recursion.json",
+  "75-finite-fixpoint.json",
   "80-numerals.json",
   "90-lists.json",
   "95-linked-lists.json"

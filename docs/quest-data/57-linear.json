@@ -31,6 +31,62 @@
       ]
     },
     {
+      "id": "buOZQ9o7",
+      "created_at": "2025-06-30T00:00:51",
+      "title": "The Q<sub>n</sub> Quintuples",
+      "descr": [
+        "<p>Exactly six combinators of form <code>&lambda; a b c . x (y z)</code> (where xyz = abc in some order)",
+        "exist. Obviously they are linear.",
+        "One of them, <code>B</code>, is already known to us. Here come the other five.</p>",
+        "<p>Find the Queer bird: <code>Q a b c = b(a c)</code>.</p>"
+      ],
+      "input": "q",
+      "cases": [
+        [ "q a b c", "b (a c)" ]
+      ]
+    },
+    {
+      "id": "EuOQExqe",
+      "created_at": "2025-06-30T00:06:02",
+      "title": "The Q<sub>n</sub> Quintuples: Q<sub>1</sub>",
+      "descr": "Find the Quixotic bird: <code>Q<sub>1</sub> a b c = a(c b)</code>.",
+      "input": "q1",
+      "cases": [
+          [ "q1 a b c", "a (c b)" ]
+      ]
+    },
+    {
+      "id": "xAqffqWv",
+      "created_at": "2025-06-30T00:06:02",
+      "title": "The Q<sub>n</sub> Quintuples: Q<sub>2</sub>",
+      "descr": "Find the Quizzical bird: <code>Q<sub>2</sub> a b c = b(c a)</code>.",
+      "input": "q2",
+      "cases": [
+          [ "q2 a b c", "b (c a)" ]
+      ]
+    },
+    {
+      "id": "f6tNnmm1",
+      "created_at": "2025-06-30T00:06:02",
+      "title": "The Q<sub>n</sub> Quintuples: Q<sub>3</sub>",
+      "descr": "Find the Quirky bird: <code>Q<sub>3</sub> a b c = c(a b)</code>.",
+      "input": "q3",
+      "cases": [
+          [ "q3 a b c", "c (a b)" ]
+      ]
+    },
+    {
+      "id": "DAGc1HC2",
+      "created_at": "2025-06-30T00:06:02",
+      "title": "The Q<sub>n</sub> Quintuples: Q<sub>4</sub>",
+      "descr": "Find the Quacky bird: <code>Q<sub>4</sub> a b c = c(b a)</code>.",
+      "input": "q4",
+      "cases": [
+          [ "q4 a b c", "c (b a)" ]
+      ]
+    },
+
+    {
       "id": "tfcVL6CR",
       "created_at": "2025-03-24T20:55:56",
       "title": "The linear base",

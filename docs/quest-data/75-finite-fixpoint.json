@@ -1,0 +1,119 @@
+{
+  "id": "sKjJba2q",
+  "created_at": "2025-06-24T01:52:15",
+  "name": "Terminating fixed point",
+  "intro": [
+    "<p>Per Raymond Smullyan's poetic definition, a bird <code>y</code> is said to be <i>fond of</i>",
+    "bird <code>x</code> if <code>y x = x</code>. </p>",
+    "<p>Equality here should usually be understood as action on appropriate number of arguments",
+    "rather than by composition, e.g. <code>SK = KI</code> because they act in the same way on two arguments.</p>",
+    "<p>As can be seen from the previous chapter, every bird is fond of at least one bird,",
+    "or every combinator has at least one fixed point.",
+    "However, it's not guaranteed to reach the normal form.</p>",
+    "<p>But in some cases it does, i.e. an equation of form <code>f x = x</code>",
+    "has a specific solution <code>x</code> for a given <code>f</code>.",
+    "Let's have a look on such special cases.</p>"
+  ],
+  "content": [
+    {
+      "id": "sCvZqC2r",
+      "created_at": "2025-06-29T23:04:54",
+      "title": "The Mockingbird's favourite",
+      "descr": [
+        "<p>Find <code>x</code> such that <code>M x = x</code>.</p>",
+        "<p>At least in this case, a solution exists that requires no additional arguments.</p>"
+      ],
+      "input": "x",
+      "cases": [
+        [ "M=WI; M x", "x" ]
+      ]
+    },
+    {
+      "id": "Zlpj8BYe",
+      "created_at": "2025-06-24T01:52:15",
+      "title": "B simple",
+      "descr": [
+        "<p>Find <code>x</code> such that <code>B x a b = x a b</code>.</p>",
+        "<p>Since <code>B</code> requires 3 arguments to resolve into something else,",
+        "you'll need to provide two extra variables on the left, and, subsequently, on the right.",
+        "This logic applies to the following tasks as well.</p>"
+      ],
+      "input": "x",
+      "cases": [
+        [ "B x a b", "x a b" ]
+      ]
+    },
+    {
+      "id": "2vWAfjsP",
+      "created_at": "2025-06-24T01:52:15",
+      "title": "Kestrel's affection",
+      "descr": [
+        "<p>Find <code>x</code> such that <code>K x = x</code>. It might be hiding among the above quests.</p>",
+        "<p>The theorem about the properties of <i>every</i> fixed point of K is one of the exercises",
+        "in <i>To Mock A Mockingbird</i>. ",
+        "Unfortunately, the margins of this interpreter are too narrow to verify proofs...</p>"
+      ],
+      "input": "x",
+      "cases": [
+        [ "K x a", "x a" ]
+      ]
+    },
+    {
+      "id": "1fz2DwNy",
+      "created_at": "2025-06-24T01:52:15",
+      "title": "Use the force, Luke",
+      "descr": [
+        "<p>Remember, <code>T a b = b a</code>. Find <code>x</code> such that <code>T x = x</code>. </p>",
+        "<p>Here you might need to resort to an actual fixed point calculation from the last chapter.</p>"
+      ],
+      "input": "x",
+      "vars": ["T=CI"],
+      "cases": [
+        [ "T x a", "x a" ]
+      ]
+    },
+    {
+      "id": "IWFhxleA",
+      "created_at": "2025-06-24T02:14:13",
+      "title": "Cardinal",
+      "descr": [
+        "<p>Find <code>x</code> such that <code>C x = x</code>.</p>",
+        "<p>If you write down the <code>YC a b</code>, you'll get <code>a</code> and <code>b</code>",
+        "swapped forever in an infinite loop. You'll have to be clever...</p>"
+      ],
+      "hint": "Can't make different variables indistinguishable? Discard them!",
+      "input": "x",
+      "cases": [
+          [ "C x a b", "x a b" ]
+      ]
+    },
+    {
+      "id": "JAfbcmSX",
+      "created_at": "2025-06-29T23:37:34",
+      "title": "Starlink",
+      "descr": [
+        "<p>Find <code>x</code> such that <code>S x = x</code>.</p>"
+      ],
+      "input": "x",
+      "cases": [
+        [ "S x a b", "x a b" ]
+      ]
+    },
+    {
+      "id": "U2xSO7on",
+      "created_at": "2025-06-24T02:14:13",
+      "title": "Iota",
+      "descr": [
+        "<p>Given &iota; = z &rarr; x S K, find <code>x</code> such that <code>&iota; x = x</code>.</p>",
+        "<p>As of this writing, I have no idea how to solve it, aside from adding more variables",
+        "and cycling through x=K, x=S, x=Kx<sub>0</sub>, x=Sx<sub>1</sub>y<sub>1</sub>,",
+        "repeating the process for new unknowns if necessary.</p>",
+        "<p>I happen to know the solution by chance though.</p>"
+      ],
+      "input": "x",
+      "cases": [
+        [ "iot=z->zSK; iot x a b c d e f", "x a b c d e f" ]
+      ]
+    }
+  ]
+}
