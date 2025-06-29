@@ -276,7 +276,7 @@
         const list = ski.getTerms();
         for (let name of Object.keys(list).sort()) {
             const entry = list[name];
-            const entryBlock = append(view.known, 'div', {class: ['inventory-line']} );
+            const entryBlock = append(view.known, 'div');
             const entryLink = append(entryBlock, 'a', {class: ['term-def', 'ellipsis']} );
             entryLink.href = "#";
             entryLink.onclick = event => insert(name);
@@ -301,13 +301,13 @@
             menu.addAction('&cross; remove', () => removeKnown(name));
         }
         if (ski.hasLambdas) {
-            append(view.known, 'a', {
+            append(view.known, 'div', {
                 content: '<dt>x-&gt;y-&gt;y(x)</dt><dd class="note">–&numsp;a generic <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">λ-term</a></dd>',
                 class: ['entry']
             });
         }
         if (ski.hasNumbers) {
-            append(view.known, 'a', {
+            append(view.known, 'div', {
                 content: '<dt>&lt;n&gt;</dt><dd><em>x</em> <em>y</em> = <em>x</em>(…(<em>x</em>(<em>y</em>))…)</dd>',
                 class: ['entry']
             });
@@ -412,44 +412,6 @@
         p.caption {
             font-weight: bold;
             margin: 0;
-        }
-
-        #known {
-            margin: .5ex;
-            font-size: .8rem;
-            line-height: 1.16rem;
-        }
-        #known .entry {
-            float: left;
-            clear: both;
-            color: inherit;
-            text-decoration: none;
-        }
-        #known dt, dd {
-            margin: 0;
-            display: inline;
-            font-family: monospace;
-        }
-        #known dd::before {
-            content: ' ';
-            font-family: monospace;
-        }
-        #known dt {
-            font-weight: bold;
-        }
-        #known dd em {
-            font-family: serif;
-            font-size: 1rem;
-            line-height: 0;
-        }
-        #known a[href]:hover {
-            outline: auto rgba(0, 150, 255, 1);
-            outline-offset: 1px;
-        }   
-        #known .remove {
-            float: right;
-            text-decoration: none;
-            margin-left: .6ex;
         }
 
         .controls {
