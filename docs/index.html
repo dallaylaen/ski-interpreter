@@ -278,7 +278,6 @@
             const entry = list[name];
             const entryBlock = append(view.known, 'div', {class: ['inventory-line']} );
             const entryLink = append(entryBlock, 'a', {class: ['term-def', 'ellipsis']} );
-            entryLink.href='#';
             entryLink.onclick = event => insert(name);
             append(entryLink, 'dt', {
                 content: name,
