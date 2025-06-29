@@ -301,12 +301,12 @@
         }
         if (ski.hasLambdas) {
             append(view.inventory, 'div', {
-                content: '<dt>x-&gt;y-&gt;y(x)</dt><dd class="note">–&numsp;a generic <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">λ-term</a></dd>'
+                content: '<a class=term-def><dt>x-&gt;y-&gt;y(x)</dt><dd class="note">–&numsp;a generic <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">λ-term</a></dd></a>'
             });
         }
         if (ski.hasNumbers) {
             append(view.inventory, 'div', {
-                content: '<dt>&lt;n&gt;</dt><dd><i>x</i> <i>y</i> = <i>x</i>(…(<i>x</i>(<i>y</i>))…)</dd>'
+                content: '<a class=term-def><dt>&lt;n&gt;</dt><dd><i>x</i> <i>y</i> = <i>x</i>(…(<i>x</i>(<i>y</i>))…)</dd></a>'
             });
         }
     }
