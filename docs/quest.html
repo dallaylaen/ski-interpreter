@@ -23,8 +23,8 @@
     <div class="side pane" style="width: 15%">
         <div class="quest-box">
             <p>Available terms:</p>
-            <div id="known">
-            </div>
+            <dl id="known" class="term-list">
+            </dl>
         </div>
     </div>
 </div>
@@ -145,7 +145,7 @@
         view.known.innerHTML = '';
         const terms = ski.getTerms();
         for (const entry of Object.keys(terms).sort().map(x => [x, terms[x]]))
-            append(view.known, 'div', {content: `<b>${entry[0]}</b> = ${showTerm(entry[1])}`});
+            append(view.known, 'div', {content: `<dt>${entry[0]}</dt><dd>= ${showTerm(entry[1])}</dd>`});
     }
 
     function demolish() {
