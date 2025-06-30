@@ -21,7 +21,9 @@ describe( 'SKI', () => {
     const ski = new SKI;
 
     const note = SKI.S.note;
-    expect (note).to.match(/([a-z]) *-> *([a-z]) *-> *([a-z]) *-> *\1 \3 *\(\2 \3\)/);
+    expect(typeof note).to.equal('string', 'note is a string');
+    expect(note.replace(/&rarr;|&mapsto;/gi, '->').replace(/<[^>]+>/g, ''))
+      .to.match(/([a-z]) *-> *([a-z]) *-> *([a-z]) *-> *\1 \3 *\(\2 \3\)/);
 
     ski.add('sub', 'S', 'just an alias');
 
