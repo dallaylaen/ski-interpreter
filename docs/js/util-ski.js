@@ -107,11 +107,12 @@ class EvalBox {
     if (!this.running) return;
     const { value, done } = this.seq.next();
 
-    if (value)
-      this.print(value.expr.toString({ terse: true }), { line: value.steps });
+    if (value) {
+      this.print(value.expr.toString({terse: true}), {line: value.steps});
 
-    if(this.view.counter)
-      this.view.counter.innerHTML = '' + value.steps;
+      if (this.view.counter)
+        this.view.counter.innerHTML = '' + value.steps;
+    }
 
     if (done || value.final) {
       // could've just used next().done but that creates one extra iteration
