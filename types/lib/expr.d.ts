@@ -180,11 +180,12 @@ export class Expr {
     contains(other: any): boolean;
     expect(other: any): void;
     /**
-     * @param {{terse: boolean?}} options
+     * @param {{terse: boolean?, html: boolean?}} [options]
      * @return {string} string representation of the expression
      */
     toString(options?: {
         terse: boolean | null;
+        html: boolean | null;
     }): string;
     /**
      *
@@ -239,6 +240,7 @@ export class FreeVar extends Named {
     constructor(name: any);
     id: number;
     subst(plug: any, value: any): any;
+    toString(opt?: {}): string;
 }
 export class Lambda extends Expr {
     /**
