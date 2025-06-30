@@ -72,7 +72,8 @@ describe( 'SKI', () => {
   it ('can auto-annotate proper terms', () => {
     const ski = new SKI({annotate: true});
     ski.add('v3', 'BBBC(BC(CI))');
-    expect(ski.getTerms().v3.note).to.equal('a->b->c->d->d a b c');
+    expect(ski.getTerms().v3.note.replace(/\s*(&rarr;|&mapsto;)\s*/gi, '->').replace(/<[^>]+>/g, ''))
+      .to.equal('a->b->c->d->d a b c');
   });
 
 });
