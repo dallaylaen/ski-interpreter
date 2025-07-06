@@ -3,14 +3,28 @@
   "created_at": "2025-03-25T14:17:10",
   "name": "The BCKW forest",
   "intro": [
-    "<p>As you progress discovering more and more combinators,",
-    "you find out that some of them can thrive on their own.",
-    "In fact, as you wander further, you find yourself surrounded by a think forest",
-    "built entirely of four combinators:",
-    "<code>B</code>, <code>C</code>, <code>K</code>, and <code>W</code>.",
-    "Can you find the way back?</p>",
-    "<p>See also: <a href=\"https://en.wikipedia.org/wiki/B,_C,_K,_W_system\">BCKW system</a>",
-    "on wikipedia.</p>"
+    "<p>The <a href=\"https://en.wikipedia.org/wiki/B,_C,_K,_W_system\">BCKW system</a>",
+    "consists of four independent operations:</p>",
+    "<ul>",
+    "<li><code>B a b c = a (b c)</code> &mdash; composition,</li>",
+    "<li><code>C a b c = a c b</code> &mdash; swapping,</li>",
+    "<li><code>K a b = a</code> &mdash; discarding, and</li>",
+    "<li><code>W a b = a b b</code> &mdash; duplication.</li>",
+    "</ul>",
+    "<p>Those are sufficient to rewrite an arbitrary expression <code>E</code> in the form",
+    "<code>F x</code> where free variable <code>x</code> may or may not be present in <code>E</code>",
+    "but does not appear in <code>F</code>.</p>",
+    "<p>Such transformation is harder to formalize than the one for <code>S</code> and <code>K</code>,",
+    "but may be more convenient to perform for a human.</p>",
+    "<p>In order to do so, one needs to determine the <i>last</i> free variable to be extracted,",
+    "and then use <code>B</code> to pull it towards the root of the expression tree,",
+    "<code>C</code> to push it to the right, <code>W</code> to merge duplicates, ",
+    "and <code>K</code> to discard unneeded variables.",
+    "Once a variable gets to the end, it is <i>eliminated</i> and the process repeats",
+    "until only constants are left.</p>",
+    "<p>There are often multiple paths to the desired form,",
+    "e.g. it may be feasible to lift a whole subtree and not just one variable.",
+    "But the technique always succeeds.</p>"
   ],
   "content": [
     {
@@ -28,25 +42,32 @@
       "id": "MH4kIGqY",
       "created_at": "2024-11-13T01:18:18",
       "title": "A cup of T",
-      "descr": "Create the <code>T x y = y x</code> combinator out of this basis",
+      "descr": [
+        "<p>An expression <code>f y x</code> can be written as <code>C f x y</code>, and vice versa.",
+        "But what if <code>f</code> is missing and you just have <code>y x</code>",
+        "and want them in different order?",
+        "Perhaps you have to add something to <code>C</code> to pull it off...</p>",
+        "<p>Find an expression <code>T</code> such that <code>T x y = y x</code>.</p>"
+      ],
       "allow": "BCKWI",
-      "input": "phi",
+      "unlock": "T",
+      "input": "t",
       "cases": [
-        [ "phi x y", "y x"]
+        [ "t x y", "y x" ]
       ]
     },
     {
-      "id": "DjKoHcSX",
-      "created_at": "2024-11-13T01:18:18",
-      "title": "An inverse cup of tea",
-      "descr": "Create <code>C</code> from <code>B</code> and <code>T</code>",
-      "allow": "B",
-      "input": "phi",
-      "vars": [
-        "T = CI"
+      "title": "Mockingbird II",
+      "descr": [
+        "Build <code>M</code>: <code>M x = x x</code>."
       ],
+      "id": "F9xS85rq",
+      "created_at": "2025-07-06T01:45:21",
+      "allow": "BCKIW",
+      "unlock": "M",
+      "input": "m",
       "cases": [
-        [ "phi x y z", "x z y" ]
+        [ "m x", "x x" ]
       ]
     },
     {
@@ -59,17 +80,6 @@
       "input": "D",
       "cases": [
         ["D x y z t", "x y (z t)"]
-      ]
-    },
-    {
-      "id": "EKZT8y65",
-      "created_at": "2024-11-15T01:01:00",
-      "title": "Blackbird",
-      "descr": "Provide a bird <code>B<sub>1</sub></code> such that <code>B<sub>1</sub> x y z t = x (y z t)</code>",
-      "allow": "BCKIW",
-      "input": "b1",
-      "cases": [
-        ["b1 x y z t", "x (y z t)"]
       ]
     },
     {
@@ -98,10 +108,55 @@
       ]
     },
     {
+      "title": "The Turing bird",
+      "descr": [
+        "I've seen at least 3 things denoted by <code>U</code> in the literature concerning combinators.",
+        "This time <code>U</code> means a function of 2 arguments: <code>U a b = a (b b a)</code>.",
+        "Build it!"
+      ],
+      "id": "g15Ig4vM",
+      "created_at": "2025-07-06T01:56:16",
+      "allow": "BCKIW",
+      "input": "phi",
+      "cases": [
+        [ "phi a b", "a (b b a)" ]
+      ]
+    },
+    {
+      "title": "ADAC",
+      "descr": [
+        "<p><a href=\"https://en.wikipedia.org/wiki/ADAC\" target=\"_blank\">ADAC</a>",
+        "stands for <i>Allgemeiner Deutscher Automobil-Club</i>, meaning <i>General German Automobile Club</i>.",
+        "It is an organization that provides road-side assistance, insurance, and generally promotion of",
+        "automobile use across Germany.</p>",
+        "<p>Build <code>a d a c</code> from <code>a b c d</code>.</p>"
+      ],
+      "id": "fGRC4aUm",
+      "created_at": "2025-07-06T02:02:37",
+      "allow": "BCKIW",
+      "input": "phi",
+      "cases": [
+        [ "phi a b c d", "a d a c" ]
+      ]
+    },
+    {
+      "title": "Can't think of a name",
+      "descr": [
+        "Build a combinator of three arguments of form <code>a (b c) c</code>."
+      ],
+      "id": "NPQ1PIwx",
+      "created_at": "2025-07-06T01:10:24",
+      "allow": "BCKIW",
+      "input": "phi",
+      "cases": [
+          [ "phi a b c", "a (b c) c" ]
+      ]
+    },
+    {
       "id": "SDFiIPyt",
       "created_at": "2024-08-29T09:15:33",
       "title": "The way back home",
-      "descr": "Build <code>S</code> from B, C, K, and W.",
+      "descr": "Build <code>S</code> from <code>B</code>, <code>C</code>, <code>K</code>, and <code>W</code>.",
       "allow": "BCIKW",
       "input": "phi",
       "cases": [
