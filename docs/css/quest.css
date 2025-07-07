@@ -64,3 +64,10 @@
     background-color: lightgray;
     border: 1px solid black;
 }
+
+.quest-inventory h3 {
+    color: maroon;
+    font-weight: bold;
+    text-align: center;
+    margin: 0.2em;
+}
