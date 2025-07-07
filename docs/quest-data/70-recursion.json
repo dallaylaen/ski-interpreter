@@ -65,9 +65,11 @@
       "solution": "WI(W(B(SI)))",
       "comment": "Implementing meaningful tests for Y is damn hard I should say...",
       "cases": [
-        [ "Y (a->b->a) x", "Y (a->b->a)"],
         [ "Y (Kx)", "x" ],
-        [ "Y (f->a->b->b (f (a b)) a ) filler K K K (KI)", "filler KKK"]
+        [ "Y (f->a->b->b (f (a b)) a ) filler K K K (KI)", "filler KKK"],
+        [ "f = x->y->z->x(y z); Y f a b c d", "f = x->y->z->x(y z); Y f (a b c d)" ],
+        [ "f = x->y->z->x(z y); Y f a b c d", "f = x->y->z->x(z y); Y f (d (c (b a)))" ],
+        [ "f = x->y->z->x(lst z y); Y f nil a b c", "f = x->y->z->x(lst z y); Y f (lst c (lst b (lst a nil)))" ]
       ]
     },
     {
