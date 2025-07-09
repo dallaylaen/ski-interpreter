@@ -6,9 +6,9 @@ describe( 'SKI', () => {
   it ('can parse basic expr: S', done => {
     const ski = new SKI;
     const s0 = ski.parseLine('S x y z');
-    expect(''+s0).to.equal('S(x)(y)(z)');
+    expect(''+s0).to.equal('Sx y z');
     const s1 = s0.step();
-    expect(''+s1.expr).to.equal('x(z)(y(z))');
+    expect(''+s1.expr).to.equal('x z(y z)');
     const s2 = s1.expr.step();
     expect(s2.steps).to.equal(0);
     expect(s2.expr).to.equal(s1.expr);
@@ -28,7 +28,7 @@ describe( 'SKI', () => {
     const ski = new SKI;
     const expr = ski.parseLine("S(K(S(S(KS)K)))K f g x");
     const result = expr.run(15);
-    expect(''+result.expr).to.equal('g(f(x))');
+    expect(''+result.expr).to.equal('g(f x)');
     expect(result.final).to.equal(true);
     done();
   });
@@ -36,7 +36,7 @@ describe( 'SKI', () => {
   it ('can parse unknown words', done => {
     const ski = new SKI;
     const expr = ski.parseLine("food bard");
-    expect(''+expr).to.equal("food(bard)");
+    expect(''+expr).to.equal("food bard");
     expect(expr.step()).to.deep.equal({expr, steps: 0, changed: false});
     done();
   });
@@ -46,7 +46,7 @@ describe( 'SKI', () => {
     const expr = ski.parseLine('WWW');
     const result = expr.run({max: 42});
 
-    expect(''+result.expr).to.equal('W(W)(W)');
+    expect(''+result.expr).to.equal('WWW');
     expect(result.steps).to.equal(42);
     expect(result.final).to.equal(false);
 

@@ -11,7 +11,7 @@ describe('Lambda', function () {
 
     const got = expr.run(t1, t2).expr;
 
-    expect(''+got).to.equal('t2(t1)');
+    expect(''+got).to.equal('t2 t1');
   });
 
   it ('has consistent equality', () => {
@@ -37,7 +37,7 @@ describe('Lambda', function () {
     ski.add('T', 'S(K(SI))K');
     const expr = new Lambda( [x], ski.parse('T', {x}));
 
-    expect(''+expr.run(y, z, t1).expr).to.equal('t1(z)');
+    expect(''+expr.run(y, z, t1).expr).to.equal('t1 z');
     expect(expr.impl).to.be.instanceOf(SKI.classes.Alias);
   });
 
@@ -57,7 +57,7 @@ describe('Lambda', function () {
     const expr = new Lambda( [x, y], y.apply(x));
     const partial = expr.run(z).expr;
     const complete = partial.run(t1).expr;
-    expect( ''+complete ).to.equal('t1(z)');
+    expect( ''+complete ).to.equal('t1 z');
   });
 
   it('stringifies', () => {
@@ -82,7 +82,7 @@ describe ('Lambda parsing', () => {
 
   it ('handles complicated expressions', () => {
     const expr = ski.parse('x->K(y->y(x))');
-    expect(expr.run(x, y, z).expr + '').to.equal('z(x)');
+    expect(expr.run(x, y, z).expr + '').to.equal('z x');
   });
 
   // TODO proper error handling, not this mess

@@ -100,7 +100,7 @@ describe( 'SKI.parse', () => {
 
     // just check the expr to work
     expect(expr.run(...SKI.free('x', 'y', 'z')).expr.toString()
-      ).to.equal('x(y)(z)(z)');
+      ).to.equal('x y z z');
 
     done();
   });

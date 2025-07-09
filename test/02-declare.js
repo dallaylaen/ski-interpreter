@@ -10,7 +10,7 @@ describe( 'SKI', () => {
 
     const result = term.run();
 
-    expect( ''+result.expr).to.equal('y(x)');
+    expect( ''+result.expr).to.equal('y x');
 
     // console.log(ski.list());
 
@@ -47,7 +47,7 @@ describe( 'SKI', () => {
     const expr = ski.parseLine('n2 n2 n2 x y');
 
     const canonic = expr.expand();
-    expect( ''+canonic ).to.match(/^[SKI()]+\(x\)\(y\)$/);
+    expect( canonic.toString({terse: false}) ).to.match(/^[SKI()]+\(x\)\(y\)$/);
 
     const result = expr.run( 10000).expr;
     expect( (''+result).replace(/[() ]/g, '') )

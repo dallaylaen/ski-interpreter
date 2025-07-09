@@ -20,9 +20,9 @@ describe('Expr <-> string', () => {
     it (name + ' (canonical)', () => {
       const jar    = {}; // keep track of common free vars
       const expr   = ski.parse(source, jar);
-      const before = '' + expr;
+      const before = expr.toString({terse: false});
       const expr2  = ski.parse(before, jar);
-      const after  =  '' + expr2;
+      const after  = expr2.toString({ terse: false });
 
       expect(after).to.equal(before);
       expr.expect(expr2);

@@ -15,8 +15,8 @@ describe ('SKI.toJSON', () => {
     expect(copy.hasNumbers).to.equal(false);
     expect(copy.showRestrict('+')).to.equal(ski.showRestrict('+'));
 
-    expect(copy.parse('swap x y').run().expr + '').to.equal('y(x)');
-
+    const jar = {}; // share variables with the same names
+    copy.parse('y x', jar).expect( copy.parse('swap x y', jar).run().expr);
 
   });
 });

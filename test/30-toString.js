@@ -11,15 +11,15 @@ describe('Expr.toString', () => {
   for (const [input, plain, terse, html, terseHtml] of cases) {
     it (`converts "${input}" to "${plain} without options"`, () => {
       const expr = ski.parse(input);
-      expect(expr.toString()).to.equal(plain);
+      expect(expr.toString({ terse: false, html: false })).to.equal(plain);
     });
     it (`converts "${input}" to "${terse}" with terse:true`, () => {
       const expr = ski.parse(input);
-      expect(expr.toString({ terse: true })).to.equal(terse);
+      expect(expr.toString({ terse: true, html: false})).to.equal(terse);
     });
     it (`converts "${input}" to "${html}" with html:true`, () => {
       const expr = ski.parse(input);
-      expect(expr.toString({ html: true })).to.equal(html);
+      expect(expr.toString({ terse: false, html: true })).to.equal(html);
     });
     it (`converts "${input}" to "${terseHtml}" with terse:true and html:true`, () => {
       const expr = ski.parse(input);

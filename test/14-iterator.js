@@ -5,7 +5,7 @@ describe ('Expr.walk', () => {
   it ('works exactly for very simple example', () => {
     const ski = new SKI();
     const expr = ski.parse('KI x y');
-    const frames = [ ... expr.walk() ].map( entry => [entry.expr + '', entry.steps, entry.final]);
+    const frames = [ ... expr.walk() ].map( entry => [entry.expr.toString({terse: false}), entry.steps, entry.final]);
 
     expect (frames).to.deep.equal([
       [ 'K(I)(x)(y)', 0, false ],
