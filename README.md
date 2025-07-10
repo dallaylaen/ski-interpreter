@@ -18,6 +18,34 @@ and can be used in Node.js or in the browser.
 * Comparison of expressions
 * Includes a class for building and executing test cases for combinators
 
+# Syntax
+
+* Uppercase terms are always single characters and may be lumped together;
+* Lowercase alphanumeric terms may have multiple letters and must therefore be separated by spaces;
+* Whole non-negative numbers are interpreted as Church numerals, e.g. `5 x y` evaluates to `x(x(x(x(x y))))`. They must also be space-separated from other terms;
+* `x y z` is the same as `(x y) z` or `x(y)(z)` but **not** `x (y z)`;
+* Unknown terms are assumed to be free variables;
+* Lambda terms are written as `x->y->z->expr`, which is equivalent to 
+`x->(y->(z->expr))` (aka right associative). Free variables in a lambda expression ~~stay in Vegas~~ are isolated from terms with the same name outside it;
+* X = y z defines a new term.
+
+## Starting combinators:
+
+* `I x &mapsto; x` (identity);
+* `K x y &mapsto; x` (constant);
+* `S x y z &mapsto; x z (y z)` (fusion);
+* `B x y z &mapsto; x (y z)` (composition);
+* `C x y z &mapsto; y x z` (swapping);
+* `W x y z &mapsto; x (y z)` (duplication);
+
+# Execution strategy
+
+Applications and native terms use normal strategy, i.e. the first term in the tree
+that has enough arguments is executed and the step ends there.
+
+Lambda terms are lazy, i.e. the body is not touched until
+all free variables are bound.
+
 # Installation
 
 ```bash
@@ -91,13 +119,7 @@ Each task requires the user to build a combinator with specific properties.
 
 REPL comes with the package as [bin/ski.js](bin/ski.js).
 
-# Execution strategy
 
-Applications and native terms use normal strategy, i.e. the first term in the tree
-that has enough arguments is executed and the step ends there.
-
-Lambda terms are lazy, i.e. the body is left intact until
-all free variables are bound.
 
 # Thanks
 
