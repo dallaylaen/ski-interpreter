@@ -1,0 +1,125 @@
+{
+  "id": "ffOQ5Bju",
+  "created_at": "2025-07-13T16:44:03",
+  "name": "The Joy Of Jay",
+  "intro": [
+    "<p>The <code>J</code> combinator, aka Jay bird, works as follows: ",
+    "<code>J a b c d = a b (a d c)</code>.",
+    "It was discovered in 1935 by",
+    "<a href=\"https://en.wikipedia.org/wiki/J._Barkley_Rosser\" target=\"_blank\">J._Barkley_Rosser</a>.</p>",
+    "<p><code>J</code> and <code>I</code> form a basis for all operations that do not <i>discard</i> arguments,",
+    "as it incorporates the opeartions of composition, swapping, and duplication.</p>",
+    "<p>Let's prove it!</p>"
+  ],
+  "content": [
+    {
+      "id": "xWDGLJvA",
+      "created_at": "2025-07-13T16:44:03",
+      "title": "Enter Jay",
+      "descr": [
+        "<p>Build the J combinator: <code>J a b c d = a b (a d c)</code>.</p>"
+      ],
+      "unlock": "J",
+      "input": "J",
+      "cases": [
+        [ "J a b c d", "a b (a d c)" ]
+      ]
+    },
+    {
+      "id": "lphEyMXf",
+      "created_at": "2025-07-13T16:44:03",
+      "title": "Swap",
+      "descr": "<p>Easy one first. Implement <code>T x y = y x</code> with just <code>J</code> and <code>I</code>.</p>",
+      "allow": "JI",
+      "input": "phi",
+      "cases": [
+        [ "phi x y", "y x" ]
+      ]
+    },
+    {
+      "id": "7gLQo32W",
+      "created_at": "2025-07-13T16:44:03",
+      "title": "The missing link",
+      "descr": [
+        "<p>Implement the Quixotic bird: <code>Q<sub>1</sub> x y z = x (z y)</code>.</p>",
+        "<p>While of little interest by itself, it may be helpful as a building block",
+        "for subsequent exercises.</p>"
+      ],
+      "allow": "JI",
+      "input": "phi",
+      "cases": [
+        [ "phi x y z", "x (z y)" ]
+      ]
+    },
+    {
+      "id": "KKFt7eS5",
+      "created_at": "2025-07-13T16:44:03",
+      "title": "B patient",
+      "descr": [
+        "<p>Implement <code>B x y z = x (y z)</code> with just <code>J</code> and <code>I</code>.</p>"
+      ],
+      "allow": "JI",
+      "input": "phi",
+      "cases": [
+        [ "phi x y z", "x (y z)" ]
+      ]
+    },
+    {
+      "id": "16TntDIM",
+      "created_at": "2025-07-13T16:44:03",
+      "title": "C in J",
+      "descr": [
+        "<p>Now that you have both <code>B</code> and <code>T</code>,",
+        "C can be made, for sure. However, maybe you'll find a simpler expression...</p>"
+      ],
+      "allow": "JI",
+      "input": "phi",
+      "cases": [
+        [ "phi x y z", "x z y"]
+      ]
+    },
+    {
+      "id": "ZpRyf6k6",
+      "created_at": "2025-07-13T16:44:03",
+      "title": "Duplication",
+      "descr": [
+        "<p>Duplication is somewhat trickier as the only duplicated argument (<code>a</code>) in J",
+        "only appears on the left hand side of something else. Still it is possible.</p>",
+        "<p>Implement <code>W x y = x y y</code> with just <code>J</code> and <code>I</code>.</p>"
+      ],
+      "allow": "JI",
+      "input": "phi",
+      "cases": [
+        [ "phi x y", "x y y" ]
+      ]
+    },
+    {
+      "id": "yY4t45l5",
+      "created_at": "2025-07-13T16:44:03",
+      "title": "For the sake of completeness",
+      "descr": [
+        "<p>It is not possible to generate all combinators from <code>J</code> and <code>K</code>.",
+        "<i>(If you know a counterexample, please send it to me.)</i></p>",
+        "<p>It is, however, possible to generate everything from <code>J</code> and false, or ",
+        "<code>A x y = y</code>.</p>"
+      ],
+      "vars": ["A = x->y->y"],
+      "input": [
+        {
+          "name": "i",
+          "allow": "J",
+          "note": "Create identity from J and A"
+        },
+        {
+          "name": "k",
+          "allow": "J",
+          "note": "Create K from J and A"
+        }
+      ],
+      "cases": [
+        [ "i x", "x" ],
+        [ "k x y", "x" ]
+      ]
+    }
+  ]
+}
