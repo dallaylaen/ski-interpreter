@@ -160,7 +160,7 @@ describe('Quest', () => {
 
     const pass = quest.check('a->b->c->d->b(a d c)', 'P(PII)', 'PII');
 
-    console.log(flattenExpr(pass));
+    // console.log(flattenExpr(pass));
 
 
     expect(pass.exception).to.equal(undefined, 'verified without exception');
@@ -184,6 +184,36 @@ describe('Quest', () => {
     expect(details[1].pass).to.equal(true, 'B pass');
     expect(details[2].pass).to.equal(true, 'T pass');
     expect(nolinear.pass).to.equal(false, 'overall failed');
+  });
+
+  it ('displays allowed terms correctly', () =>{
+    const quest = new Quest ({
+      input:  'phi',
+      allow:  'J',
+      vars:   ['A=a->b->b'],
+      engine: new SKI().add('J', 'a->b->c->d->a b (a d c)'),
+    });
+
+    expect(quest.allowed()).to.equal('AJ');
+  });
+
+  it ('allow named constants in input', () =>{
+    const quest = new Quest({
+      'input': 'phi',
+      'vars':  [ 'arg' ],
+      'cases': [
+        ['phi x', 'x arg'],
+      ],
+    });
+    const passing = quest.check('SI(K arg)').details[0];
+    passing.expected.expect(passing.found);
+    expect(passing.reason).to.equal(null);
+    expect(passing.pass).to.equal(true, 'should pass with named constant');
+
+    const failing = quest.check('K(x arg)').details[0];
+    expect(failing.reason).to.match(/expected.*arg/);
+    expect(failing.pass).to.equal(false, 'var with the same name but not in the list = no go');
+
   });
 });
 
