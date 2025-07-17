@@ -103,16 +103,15 @@
         "<p>It is, however, possible to generate everything from <code>J</code> and false, or ",
         "<code>A x y = y</code>.</p>"
       ],
-      "vars": ["A = x->y->y"],
+      "vars": ["A = x->y->y", "J=a->b->c->d->a b (a d c)"],
+      "allow": "I-I",
       "input": [
         {
           "name": "i",
-          "allow": "J",
           "note": "Create identity from J and A"
         },
         {
           "name": "k",
-          "allow": "J",
           "note": "Create K from J and A"
         }
       ],
