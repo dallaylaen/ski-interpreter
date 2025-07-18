@@ -1,11 +1,29 @@
 {
-  "name": "ski-interpreter",
+  "name": "@dallaylaen/ski-interpreter",
   "version": "1.0.0",
-  "description": "Simple Kombinator Interpreter",
+  "description": "Simple Kombinator Interpreter - a combinatory logic & lambda calculus parser and interpreter. Supports SKI, BCKW, Church numerals, and setting up assertions ('quests') involving all of the above.",
+  "keywords": [
+    "combinatory logic",
+    "lambda calculus",
+    "functional programming",
+    "education",
+    "interpreter"
+  ],
   "main": "index.js",
+  "types": "types/index.d.ts",
+  "bin": {
+    "ski": "bin/ski.js"
+  },
   "scripts": {
     "test": "nyc mocha"
   },
+  "files": [
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "lib",
+    "types"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dallaylaen/ski-interpreter.git"
@@ -15,12 +33,14 @@
   "bugs": {
     "url": "https://github.com/dallaylaen/ski-interpreter/issues"
   },
-  "homepage": "https://github.com/dallaylaen/ski-interpreter#readme",
+  "homepage": "https://dallaylaen.github.io/ski-interpreter/index.html",
   "devDependencies": {
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-align-assignments": "^1.1.2",
     "eslint-plugin-import": "^2.29.1",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0"
   }
 }

@@ -55,7 +55,7 @@ npm install ski-interpreter
 # Usage
 
 ```javascript
-const {SKI} = require('ski-interpreter');
+const {SKI} = require('@dallaylaen/ski-interpreter');
 const ski = new SKI(); // the parser
 
 // parse an expression
