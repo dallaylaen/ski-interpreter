@@ -49,7 +49,7 @@ all free variables are bound.
 # Installation
 
 ```bash
-npm install ski-interpreter
+npm install @dallaylaen/ski-interpreter
 ```
 
 # Usage
