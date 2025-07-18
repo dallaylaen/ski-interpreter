@@ -35,8 +35,8 @@ and can be used in Node.js or in the browser.
 * <code>K x y &mapsto; x</code> _//constant_;
 * <code>S x y z &mapsto; x z (y z)</code> _// fusion_;
 * <code>B x y z &mapsto; x (y z)</code> _// composition_;
-* <var>C x y z &mapsto; y x z</var> _// swapping_;
-* `W` `x` `y` `z` &mapsto; `x` (`y` `z`) _//duplication_;
+* <code>C x y z &mapsto; x z y</code> _// swapping_;
+* <code>W x y &mapsto; x y y</code> _//duplication_;
 
 # Execution strategy
 
