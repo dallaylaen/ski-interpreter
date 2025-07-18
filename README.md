@@ -31,12 +31,12 @@ and can be used in Node.js or in the browser.
 
 ## Starting combinators:
 
-* `I x &rarr; x` (identity);
-* `K x y &rarr; x` (constant);
-* `S x y z &rArr; x z (y z)` (fusion);
-* `B x y z &rArr; x (y z)` (composition);
-* `C x y z &rArr; y x z` (swapping);
-* `W x y z &rArr; x (y z)` (duplication);
+* <code>I x &mapsto; x</code> _// identity_;
+* <code>K x y &mapsto; x</code> _//constant_;
+* <code>S x y z &mapsto; x z (y z)</code> _// fusion_;
+* <code>B x y z &mapsto; x (y z)</code> _// composition_;
+* <var>C x y z &mapsto; y x z</var> _// swapping_;
+* `W` `x` `y` `z` &mapsto; `x` (`y` `z`) _//duplication_;
 
 # Execution strategy
 
