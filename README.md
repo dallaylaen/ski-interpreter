@@ -31,12 +31,12 @@ and can be used in Node.js or in the browser.
 
 ## Starting combinators:
 
-* `I x &mapsto; x` (identity);
-* `K x y &mapsto; x` (constant);
-* `S x y z &mapsto; x z (y z)` (fusion);
-* `B x y z &mapsto; x (y z)` (composition);
-* `C x y z &mapsto; y x z` (swapping);
-* `W x y z &mapsto; x (y z)` (duplication);
+* <code>I x &mapsto; x</code> _// identity_;
+* <code>K x y &mapsto; x</code> _//constant_;
+* <code>S x y z &mapsto; x z (y z)</code> _// fusion_;
+* <code>B x y z &mapsto; x (y z)</code> _// composition_;
+* <code>C x y z &mapsto; x z y</code> _// swapping_;
+* <code>W x y &mapsto; x y y</code> _//duplication_;
 
 # Execution strategy
 
@@ -49,7 +49,7 @@ all free variables are bound.
 # Installation
 
 ```bash
-npm install ski-interpreter
+npm install @dallaylaen/ski-interpreter
 ```
 
 # Usage
