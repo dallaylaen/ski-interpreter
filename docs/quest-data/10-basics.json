@@ -128,6 +128,19 @@
       ]
     },
     {
+      "id": "hiwf2WWz",
+      "created_at": "2025-07-22T23:59:08",
+      "title": "Triplication",
+      "descr": [
+        "<p>Create a term that make 3 copies of its only argument:</p>",
+        "<p><code>M<sub>3</sub> x = x x x</code>.</p>"
+      ],
+      "input": "phi",
+      "cases": [
+        [ "phi x", "x x x" ]
+      ]
+    },
+    {
       "id": "fvQITKZd",
       "created_at": "2025-03-21T23:39:01",
       "title": "A parliament of owls",
@@ -137,6 +150,7 @@
         "<p>Here the duplicated argument is not just applied to itself, but also modified before doing so.</p>",
         "<p>Find O.</p>"
       ],
+      "unlock": "O",
       "allow": "SKI",
       "input": "phi",
       "cases": [
