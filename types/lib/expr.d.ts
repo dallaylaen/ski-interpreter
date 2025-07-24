@@ -46,7 +46,8 @@ export class Expr {
      *    linear: boolean?,
      *    canonical?: Expr,
      *    steps: number?,
-     *    skip: Set<number>?
+     *    skip: Set<number>?,
+     *    dup: Set<number>?,
      * }}
      */
     canonize(options?: {
@@ -61,6 +62,7 @@ export class Expr {
         canonical?: Expr;
         steps: number | null;
         skip: Set<number> | null;
+        dup: Set<number> | null;
     };
     /**
      * @desc Returns a series of lambda terms equivalent to the given expression,
@@ -222,6 +224,7 @@ export class App extends Expr {
         canonical?: Expr;
         steps: number | null;
         skip: Set<number> | null;
+        dup: Set<number> | null;
     };
     renameVars(seq: any): Expr;
     subst(plug: any, value: any): Expr;
