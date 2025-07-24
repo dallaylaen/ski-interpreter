@@ -6,11 +6,11 @@ describe('Expr.canonize', () => {
     // proper
     ['I',           {arity: 1, proper: true, linear: true,  found: true}, 'x->x'],
     ['K',           {arity: 2, proper: true, linear: false, found: true, skip: new Set([1])}],
-    ['S',           {arity: 3, proper: true, linear: false, found: true}, 'x->y->z->x z (y z)'],
+    ['S',           {arity: 3, proper: true, linear: false, found: true, dup: new Set([2])}, 'x->y->z->x z (y z)'],
     ['SK',          {arity: 2, proper: true, linear: false, found: true, skip: new Set([0])}],
     ['CI',          {arity: 2, proper: true, linear: true,  found: true}, 'x->y->y x'],
-    ['x->y->x x',   {arity: 2, proper: true, linear: false, found: true, skip: new Set([1])}],
-    ['5',           {arity: 2, proper: true, linear: false, found: true}, 'x->y->x(x(x(x(x y))))'],
+    ['x->y->x x',   {arity: 2, proper: true, linear: false, found: true, skip: new Set([1]), dup: new Set([0])}, 'x->y->x x'],
+    ['5',           {arity: 2, proper: true, linear: false, found: true, dup: new Set([0])}, 'x->y->x(x(x(x(x y))))'],
 
     // improper
     ['CIS',         {arity: 1, proper: false, linear: false, found: true}],
