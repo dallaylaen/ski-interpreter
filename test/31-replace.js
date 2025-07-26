@@ -10,6 +10,7 @@ describe('Expr.replace', () => {
     [ 'S', ['I'], 'S' ],
     [ 'Sx x', [['x', 'y']], 'Sy y'],
     [ 'x (SK) (KI) (CK) (a->b->b)', ['KI'], 'x(KI)(KI)(KI)(KI)'],
+    [ 'S(KS)K(S(KS)K)', ['B'], 'BB'],
   ];
 
   const ski = new SKI();
