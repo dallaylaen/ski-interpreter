@@ -32,6 +32,20 @@ export class Expr {
      */
     getSymbols(): Map<Expr, number>;
     /**
+     *   @desc Given a list of pairs of term, replaces every subtree
+     *         that is equivalent to the first term in pair with the second one.
+     *         If a simgle term is given, it is duplicated into a pair.
+     *
+     *   @example  S(SKK)(SKS).replace('I') = SII // we found 2 subtrees equivalent to I
+     *             and replaced them with I
+     *
+     *   @param {(Expr | [find: Expr, replace: Expr])[]} terms
+     *   @param {Object} [opt] - options
+     *   @return {Expr}
+     */
+    replace(terms: (Expr | [find: Expr, replace: Expr])[], opt?: any): Expr;
+    _replace(pairs: any, opt: any): any;
+    /**
      * @desc rought estimate of the complexity of the term
      * @return {number}
      */
