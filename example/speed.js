@@ -16,7 +16,7 @@ let steps = 0;
 const t0 = new Date();
 for (let i = 0; i < iter; i++) {
     const result = expr.run({max: 10000000});
-    if (''+result.expr !== expect)
+    if (result.expr.toString({terse: false}) !== expect)
         console.log('warning: unexpected output: \n'+result.expr);
     steps += result.steps;
 }
