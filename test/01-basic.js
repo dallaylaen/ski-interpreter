@@ -3,6 +3,23 @@ const { SKI } = require('../index');
 const { Expr } = SKI.classes;
 
 describe( 'SKI', () => {
+  it ('can handle pedestrian free var application', () => {
+    const [a, b, c] = SKI.free('a', 'b', 'c');
+    const app = a.apply(c, b.apply(c));
+    expect(app.toString({terse: false})).to.equal('a(c)(b(c))');
+  });
+
+  it ('Can parse basic applications', () => {
+    const ski = new SKI;
+    const expr = ski.parseLine('x z (y z)');
+    console.log(expr.toString({terse: false}));
+  });
+
+  it ('Installed the basic terms correctly', () => {
+    expect(SKI.S.arity).to.equal(3);
+    expect(SKI.S.note.replace(/<\/?var>/g, '').replace(/\s*&mapsto;\s*/g, '->')).to.equal('a->b->c->a c(b c)');
+  });
+
   it ('can parse basic expr: S', done => {
     const ski = new SKI;
     const s0 = ski.parseLine('S x y z');
