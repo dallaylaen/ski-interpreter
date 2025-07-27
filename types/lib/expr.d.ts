@@ -1,6 +1,5 @@
 export type AnyArity = (arg0: Expr) => Expr | AnyArity;
 export class Expr {
-    arity: number;
     /**
        * postprocess term after parsing. typically return self but may return other term or die
        * @return {Expr}
@@ -204,10 +203,11 @@ export class Expr {
         html: boolean | null;
     }): string;
     /**
-     *
+     * @desc Whether the expression needs parentheses when printed.
+     * @param {boolean} [first] - whether this is the first term in a sequence
      * @return {boolean}
      */
-    needsParens(): boolean;
+    needsParens(first?: boolean): boolean;
     /**
      *
      * @return {string}
@@ -225,11 +225,14 @@ export class App extends Expr {
      * @param {Expr} args
      */
     constructor(fun: Expr, ...args: Expr);
-    fun: Expr;
-    args: Expr;
+    arg: any;
+    fun: any;
     final: boolean;
-    weight(): Expr;
-    apply(...args: any[]): any;
+    arity: any;
+    weight(): any;
+    wantsArgs(): any;
+    apply(...args: any[]): App;
+    expand(): any;
     canonize(options?: {}): {
         found: boolean;
         proper: boolean;
@@ -240,8 +243,8 @@ export class App extends Expr {
         skip: Set<number> | null;
         dup: Set<number> | null;
     };
-    renameVars(seq: any): Expr;
-    subst(plug: any, value: any): Expr;
+    renameVars(seq: any): any;
+    subst(plug: any, value: any): any;
     /**
      * @return {{expr: Expr, steps: number}}
      */
@@ -249,8 +252,11 @@ export class App extends Expr {
         expr: Expr;
         steps: number;
     };
+    reduce(args: any): any;
     split(): any[];
-    equals(other: any): boolean;
+    equals(other: any): any;
+    contains(other: any): any;
+    needsParens(first: any): boolean;
     toString(opt?: {}): string;
 }
 export class FreeVar extends Named {
@@ -267,6 +273,7 @@ export class Lambda extends Expr {
     constructor(arg: FreeVar | FreeVar[], impl: Expr);
     arg: FreeVar;
     impl: Expr;
+    arity: number;
     reduce(input: any): Expr;
     subst(plug: any, value: any): Lambda;
     expand(): Lambda;
@@ -274,6 +281,7 @@ export class Lambda extends Expr {
     _rski(options: any): any;
     equals(other: any): boolean;
     toString(opt?: {}): string;
+    needsParens(first: any): boolean;
 }
 /**
  * @typedef {function(Expr): Expr | AnyArity} AnyArity
@@ -300,7 +308,7 @@ export class Native extends Named {
     arity: any;
     note: any;
     apply(...args: any[]): Expr;
-    _rski(options: any): Expr | this;
+    _rski(options: any): any;
     reduce(args: any): any;
 }
 export class Alias extends Named {
@@ -336,6 +344,7 @@ export class Alias extends Named {
     equals(other: any): any;
     _rski(options: any): Expr;
     toString(opt: any): string;
+    needsParens(first: any): boolean;
 }
 export class Church extends Native {
     constructor(n: any);
