@@ -1,0 +1,59 @@
+{
+  "id": "Mht88Mrm",
+  "created_at": "2025-07-29T00:47:13",
+  "name": "Cons: the building block",
+  "intro": [
+    "<p>As we have established earlier, a pair of values is just a special type of function.",
+    "From there, arbitrarily complex data structures - list, trees, hash tables, anything - can be built.</p>",
+    "<p>So a <i>pair</i> here is represented by the Vireo combinator: <code>V a b f = f a b</code>.",
+    "<code>V a b K = K a b = a</code> and <code>V a b (KI) = KI a b = Ib = b</code> allow extracting",
+    "the first and second elements of the pair, respectively.",
+    "However, in many cases manipulating both values simultaneously into a desired shape",
+    "is more convenient than extracting them.</p>",
+    "<p>Let's build some functions that manipulate pairs.</p>"
+  ],
+  "content": [
+    {
+      "id": "fWb8i2Gg",
+      "created_at": "2025-07-29T01:11:42",
+      "title": "Pair map",
+      "descr": [
+          "<p>Build a combinator that takes a function <code>f</code> and a pair <code>(V a b)</code>,",
+          "and returns a pair <code>(V (f a) (f b))</code>.</p>"
+      ],
+      "vars": ["V=BC(CI)"],
+      "input": "phi",
+      "cases": [
+        [ "phi f (V a b) x", "x (f a) (f b)" ]
+      ]
+    },
+    {
+      "id": "NmPkROHm",
+      "created_at": "2025-07-29T01:39:58",
+      "title": "Quantum Starling",
+      "descr": [
+        "<p>Build a function that takes two functions, <code>f</code> and <code>g</code>,",
+        "and a pair <code>(V a b)</code>, and produces <code>f a (g b)</code>.</p>"
+      ],
+      "vars": ["V=BC(CI)"],
+      "input": "phi",
+      "cases": [
+        [ "phi f g (V a b)", "f a (g b)" ]
+      ]
+    },
+    {
+      "id": "gjDIpuTl",
+      "created_at": "2025-07-29T00:47:13",
+      "title": "Pair transform",
+      "descr": [
+        "<p>Build a combinator that takes two functions, <code>f</code> and <code>g</code>,",
+        "and a pair <code>(V a b)</code> and returns a pair <code>(V (f a b), (g a b))</code>.</p>"
+      ],
+      "vars": ["V=BC(CI)"],
+      "input": "phi",
+      "cases": [
+        [ "phi f g (V a b) x", "x (f a b) (g a b)" ]
+      ]
+    }
+  ]
+}
