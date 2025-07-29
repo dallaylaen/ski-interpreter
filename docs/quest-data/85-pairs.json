@@ -47,7 +47,7 @@
       "title": "Pair transform",
       "descr": [
         "<p>Build a combinator that takes two functions, <code>f</code> and <code>g</code>,",
-        "and a pair <code>(V a b)</code> and returns a pair <code>(V (f a b), (g a b))</code>.</p>"
+        "and a pair <code>(V a b)</code> and returns a pair <code>(V (f a b) (g a b))</code>.</p>"
       ],
       "vars": ["V=BC(CI)"],
       "input": "phi",
