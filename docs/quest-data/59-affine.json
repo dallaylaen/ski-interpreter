@@ -1,0 +1,68 @@
+{
+  "id": "ZBSnYgvf",
+  "created_at": "2025-08-01T00:52:21",
+  "name": "Affine logic",
+  "intro": [
+    "<p>Much like the linear logic, affine logic allows for a restricted subset of operations,",
+    "namely, it can swap, discard, and compose terms, but not duplicate them.",
+    "It is not therefore Turing complete, which may actually be beneficial in some applications.</p>"
+  ],
+  "content": [
+    {
+      "id": "Jv13RWtU",
+      "created_at": "2025-08-01T00:52:21",
+      "title": "Identity",
+      "descr": [
+        "<p>Unlike in linear logic, identity is not required to be present in the initial set. ",
+        "This is because discarding is allowed and either <code>K x &lt;something&gt;</code> or",
+        "some variant of <code>KI</code> can be built.</p>",
+        "<p>Create identity from <code>B</code>, <code>K</code> and <code>T</code> combinators.",
+        "<i>(<code>C</code> would've been too easy...)</i></p>"
+      ],
+      "vars": ["T=CI"],
+      "allow": "BK",
+      "input": "phi",
+      "cases": [
+        [ "phi x", "x" ]
+      ]
+    },
+    {
+      "id": "BWom23jE",
+      "created_at": "2025-08-01T00:52:21",
+      "title": "To rule them all",
+      "descr": [
+        "<p>Create a monobasis for affine logic. ",
+        "I made mine by taking <code>x&rarr;x</code>, attaching random affine combinators to the right, ",
+        "plugging the resulting function into itself, and shaking it violently.</p>"
+      ],
+      "input": [
+        {
+          "name": "X",
+          "allow": "BCKIVT",
+          "note": "Declare your own combinator <code>X</code>. It should not duplicate variables."
+        },
+        {
+          "name": "b",
+          "allow": "X",
+          "note": "Derive <code>B</code> from <code>X</code>."
+        },
+        {
+          "name": "k",
+          "allow": "X",
+          "note": "Derive <code>K</code> from <code>X</code>."
+        },
+        {
+          "name": "t",
+          "allow": "X",
+          "note": "Derive <code>T</code> from <code>X</code>."
+        }
+      ],
+      "cases": [
+        [ "b x y z", "x (y z)" ],
+        [ "k x y", "x" ],
+        [ "t x y", "y x" ]
+      ]
+    }
+
+  ]
+}
