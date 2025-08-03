@@ -1,27 +1,35 @@
+#!/usr/bin/env node
+
 /**
- *   Given a list of terms as arguments and an expression as stdin,
+ *   Given a list of terms and an expression as arguments,
  *   print equivalent expression with given terms plugged in.
+ *
+ *   Example:
+ *
+ *      node extract.js M=WI 'S(SKK)(SKS)'
+ *      M
+ *
+ *      bash$ ./example/extract.js WI 'S(SKK)(SKS)'
+ *      WI
+ *
+ *      bash$ ./example/extract.js W I 'S(SKK)(SKS)'
+ *      SII
+ *
+ *   This script was inspired by this riddle: https://happyfellow.bearblog.dev/a-riddle/
+ *
  */
 
-const readline = require('readline');
-const fs = require('fs');
 const { SKI } = require('../index');
 const [node, self, ...args] = process.argv;
 
+if (args.length < 2)
+  throw new Error('a target expression and 1+ known terms are needed');
+
 const ski = new SKI();
 const jar = {};
+const expr = ski.parse(args.pop(), jar);
 const terms = args.map(s => ski.parse(s, jar));
 
-/*
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-*/
-
-
-const input = fs.readFileSync(0, 'utf8');
-const expr = ski.parse(input, jar);
 const rework = expr.replace(terms);
 if (rework === null)
   throw new Error('no equivalent expression found');
