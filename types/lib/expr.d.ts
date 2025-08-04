@@ -61,6 +61,8 @@ export class Expr {
      *    steps: number?,
      *    skip: Set<number>?,
      *    dup: Set<number>?,
+     *    discard: boolean?,
+     *    duplicate: boolean?,
      * }}
      */
     canonize(options?: {
@@ -76,6 +78,8 @@ export class Expr {
         steps: number | null;
         skip: Set<number> | null;
         dup: Set<number> | null;
+        discard: boolean | null;
+        duplicate: boolean | null;
     };
     /**
      * @desc Returns a series of lambda terms equivalent to the given expression,
@@ -233,16 +237,6 @@ export class App extends Expr {
     wantsArgs(): any;
     apply(...args: any[]): App;
     expand(): any;
-    canonize(options?: {}): {
-        found: boolean;
-        proper: boolean;
-        arity: number | null;
-        linear: boolean | null;
-        canonical?: Expr;
-        steps: number | null;
-        skip: Set<number> | null;
-        dup: Set<number> | null;
-    };
     renameVars(seq: any): any;
     subst(plug: any, value: any): any;
     /**
@@ -331,6 +325,18 @@ export class Alias extends Named {
     proper: any;
     terminal: any;
     canonical: any;
+    canonize(options?: {}): {
+        found: boolean;
+        proper: boolean;
+        arity: number | null;
+        linear: boolean | null;
+        canonical?: Expr;
+        steps: number | null;
+        skip: Set<number> | null;
+        dup: Set<number> | null;
+        discard: boolean | null;
+        duplicate: boolean | null;
+    };
     subst(plug: any, value: any): Expr;
     /**
      *
