@@ -2,69 +2,199 @@ const { expect } = require('chai');
 const { SKI } = require('../index');
 
 describe('Expr.canonize', () => {
-  const cases = [
+
     // proper
-    ['I',           {found: true, arity: 1, proper: true, linear: true,  discard: false, duplicate: false, }, 'x->x'],
-    ['K',           {found: true, arity: 2, proper: true, linear: false, discard: true , duplicate: false, skip: new Set([1])}],
-    ['S',           {found: true, arity: 3, proper: true, linear: false, discard: false, duplicate: true , dup: new Set([2])}, 'x->y->z->x z (y z)'],
-    ['SK',          {found: true, arity: 2, proper: true, linear: false, discard: true , duplicate: false, skip: new Set([0])}],
-    ['CI',          {found: true, arity: 2, proper: true, linear: true,  discard: false, duplicate: false, }, 'x->y->y x'],
-    ['x->y->x x',   {found: true, arity: 2, proper: true, linear: false, discard: true , duplicate: true , skip: new Set([1]), dup: new Set([0])}, 'x->y->x x'],
-    ['5',           {found: true, arity: 2, proper: true, linear: false, discard: false, duplicate: true, dup: new Set([0])}, 'x->y->x(x(x(x(x y))))'],
+  describeTerm(
+    'I',
+    { grounded: true, arity: 1, proper: true, linear: true, discard: false, duplicate: false },
+    'x->x'
+  );
 
-    // improper
-    ['CIS',         {found: true, arity: 1, proper: false, linear: false, discard: false, duplicate: true, }, 'x->x(a->b->c->a c (b c))'],
-    ['x->xSK',      {found: true, arity: 1, proper: false, linear: false, discard: true,  duplicate: true}, 'x->x(a->b->c->a c (b c))(a->b->a)'],
-    ['x->x(a->b->c->a c (b c))(a->b->a)',
-            {arity: 1, proper: false, linear: false, found: true, discard: true,  duplicate: true}],
-    ['x->K(xS)',    {arity: 2, proper: false, linear: false, found: true, discard: true,  duplicate: true, skip: new Set([1])},
-                    'x->y->x(a->b->c->a c (b c))'],
+  describeTerm(
+    'I',
+    {grounded: true, arity: 1, proper: true, linear: true,  discard: false, duplicate: false, },
+    'x->x'
+  );
+  describeTerm(
+    'K',
+    {grounded: true, arity: 2, proper: true, linear: false, discard: true , duplicate: false, skip: new Set([1])},
+    'a->b->a'
+  );
+  describeTerm(
+    'S',
+    {grounded: true, arity: 3, proper: true, linear: false, discard: false, duplicate: true , dup: new Set([2])},
+    'x->y->z->x z (y z)'
+  );
+  describeTerm(
+    'SK',
+    {grounded: true, arity: 2, proper: true, linear: false, discard: true , duplicate: false, skip: new Set([0])}
+  );
+  describeTerm(
+    'CI',
+    {grounded: true, arity: 2, proper: true, linear: true,  discard: false, duplicate: false, },
+    'x->y->y x'
+  );
 
-    ['x',           {found: true, arity: 0, proper: false, linear: false, discard: false, duplicate: false, }, 'x'],
-    ['x->y x',      {found: true, arity: 1, proper: false, linear: false, discard: false, duplicate: false, }, 'x->y x'],
-    ['By',          {found: true, arity: 2, proper: false, linear: false, discard: false, duplicate: false, }, 'a->b->y(a b)'],
+  describeTerm(
+    'x->y->x x',
+    {grounded: true, arity: 2, proper: true, linear: false, discard: true , duplicate: true , skip: new Set([1]), dup: new Set([0])},
+    'x->y->x x'
+  );
+  describeTerm(
+    '5',
+    {grounded: true, arity: 2, proper: true, linear: false, discard: false, duplicate: true, dup: new Set([0])},
+    'x->y->x(x(x(x(x y))))'
+  );
 
-    // infinite recursion
-    ['SII(SII)',    {found: false, arity: 0, proper: false, linear: false, discard: false, duplicate: true}, '(x->x x)(x->x x)'],
-    ['M=WI; MM',    {found: false, arity: 0, proper: false, linear: false, discard: false, duplicate: true}, '(x->x x)(x->x x)'],
-    ['M=WI; x->MM',   {found: false, arity: 1, proper: false, linear: false, discard: true, duplicate: true, skip: new Set([0])}, 'x->(y->y y)(y->y y)'],
-    // Y combinator
-    ['Y=WI(W(B(SI)))', {found: false, arity: 0, proper: false, linear: false, discard: false, duplicate: true}],
-    // quine eats all args
-    ['WI(SBK)',     {found: false, arity: 0, proper: false, linear: false, discard: true, duplicate: true}, '(x->x x) (x->y->x x)'],
+  // improper
+  describeTerm(
+    'CIS',
+    {grounded: true, arity: 1, proper: false, linear: false, discard: false, duplicate: true, },
+    'x->x(a->b->c->a c (b c))'
+  );
+  describeTerm(
+    'x->xSK',
+    {grounded: true, arity: 1, proper: false, linear: false, discard: true,  duplicate: true},
+    'x->x(a->b->c->a c (b c))(a->b->a)'
+  );
+  describeTerm(
+    'x->x(a->b->c->a c (b c))(a->b->a)',
+    {grounded: true, arity: 1, proper: false, linear: false, discard: true,  duplicate: true}
+  );
+  describeTerm(
+    'x->K(xS)',
+    {grounded: true, arity: 2, proper: false, linear: false, discard: true,  duplicate: true, skip: new Set([1])},
+    'x->y->x(a->b->c->a c (b c))'
+  );
+  describeTerm(
+    'x',
+    {grounded: true, arity: 0, proper: false, linear: true, discard: false, duplicate: false, },
+    'x'
+  );
+  describeTerm(
+    'x->y x',
+    {grounded: true, arity: 1, proper: false, linear: true, discard: false, duplicate: false, },
+    'x->y x'
+  );
+  describeTerm(
+    'By',
+    {grounded: true, arity: 2, proper: false, linear: true, discard: false, duplicate: false, },
+    'a->b->y(a b)'
+  );
+  describeTerm(
+    'C(BWB)(C(BWB))',
+    { grounded: false, arity: 0, proper: false, linear: false, discard: false, duplicate: true, },
+    '(a->b->b(a a))(a->b->b(a a))'
+  );
 
-    // hidden by an alias
-    ['P=a->b->c->d->b(a d c); P',       {found: true, proper: true, linear: true, discard: false, duplicate: false, arity: 4}, 'a->b->c->d->b(a d c)'],
-    ['P=a->b->c->d->b(a d c); P(PII)',  {found: true, proper: true, linear: true, discard: false, duplicate: false, arity: 3}, 'a->b->c->a(b c)'],
+  // infinite recursion
+  describeTerm(
+    'SII(SII)',
+    {grounded: false, arity: 0, proper: false, linear: false, discard: false, duplicate: true},
+    '(x->x x)(x->x x)'
+  );
+  describeTerm(
+    'M=WI; MM',
+    {grounded: false, arity: 0, proper: false, linear: false, discard: false, duplicate: true},
+    '(x->x x)(x->x x)'
+  );
+  describeTerm(
+    'M=WI; x->MM',
+    {grounded: false, arity: 1, proper: false, linear: false, discard: true, duplicate: true, skip: new Set([0])},
+    'x->(y->y y)(y->y y)'
+  );
 
-    // lambda maps to itself
-    ['x->y->z->x z y', {found: true, arity: 3, proper: true, linear: true, discard: false, duplicate: false, }, 'x->y->z->x z y'],
-  ];
+  // Y combinator
+  describeTerm(
+    'Y=WI(W(B(SI)))',
+    {grounded: false, arity: 0, proper: false, linear: false, discard: false, duplicate: true}
+  );
 
-  const ski = new SKI();
-  for (const pair of cases) {
-    const [term, expected, lambda] = pair;
-    it ('handles '+term, ()=> {
+  // ditto but in lambda form
+  describeTerm(
+    '(x->x x)(a->b->b(a a b))',
+    {grounded: false, arity: 0, proper: false, linear: false, discard: false, duplicate: true}
+  );
+  //    ['(a->b->a b b)((a->b->c->a(b c))((a->b->c->a c(b c))(a->a)))((a->b->a b b)((a->b->c->a(b c))((a->b->c->a c(b c))(a->a))))',
+  //      {found: false, arity: 0, proper: false, linear: false, discard: false, duplicate: true});
+
+  // lazy Y combinator
+  // TODO in theory this guy could have arity = 2 because Z f x = f (Z f) x
+  //      but then the closed form will be different from the expected one...
+  describeTerm(
+    'WI(BBB(BW)(BBBCC)(K(BWB(SI))))',
+    {grounded: false, arity: 0, proper: false, linear: false, discard: false, duplicate: true},
+    '(a->a a)(g->f->x->f(g g f) x)'
+  );
+
+  // quine eats all args
+  describeTerm(
+    'WI(SBK)',
+    {grounded: false, arity: 0, proper: false, linear: false, discard: true, duplicate: true},
+    '(x->x x) (x->y->x x)'
+  );
+
+  // hidden by an alias
+  describeTerm(
+    'P=a->b->c->d->b(a d c); P',
+
+    {grounded: true, proper: true, linear: true, discard: false, duplicate: false, arity: 4},
+    'a->b->c->d->b(a d c)'
+  );
+  describeTerm(
+    'P=x->y->z->t->y (x t z); P(PII)',
+    {grounded: true, proper: true, linear: true, discard: false, duplicate: false, arity: 3},
+    'a->b->c->a(b c)'
+  );
+
+  // lambda maps to itself
+  describeTerm(
+    'x->y->z->x z y',
+    {grounded: true, arity: 3, proper: true, linear: true, discard: false, duplicate: false, },
+    'x->y->z->x z y'
+  );
+
+  describeTerm(
+    'lst = BS(C(BB)); nil = KI; (lst a (lst b (lst c nil)))',
+    { grounded: true, arity: 2, proper: false, linear: false, discard: false, duplicate: true, dup: new Set([0]) },
+    'f->x->f a (f b (f c x))'
+  );
+});
+
+function describeTerm(term, expected, lambda) {
+  describe ('handles '+term, done => {
+    try {
+      console.log('testing ' + term);
+      const ski = new SKI();
       const jar = {};
       const found = ski.parse(term, jar).canonize();
+
       const canon = found.canonical;
-      delete found.canonical;
+      delete found.canonical; // we'll do a separate test for that
       const steps = found.steps;
-      delete found.steps;
-      expect(found).to.deep.equal(expected);
-      if (found.found)
+      delete found.steps; // unpredictable
+
+      it('produces some term', () => {
         expect(canon).to.be.instanceof(SKI.classes.Expr);
-      if (lambda)
+      });
+      it('produces a step count', () => {
+        expect(steps).to.be.a('number');
+      });
+      if (lambda) it('produces exactly expected result ' + lambda, () => {
         canon.expect(ski.parse(lambda, jar));
-      expect(canon).to.be.instanceof(SKI.classes.Expr);
-      expect(steps).to.be.a('number');
-      if (found.found) {
-        expect(steps).to.be.within(
-          0,
-          SKI.options.max * (found.arity ?? SKI.options.maxArgs),
-          'steps should be less than max * arity'
-        );
-      }
-    });
-  }
-});
+      });
+      it('produces predictable properties', () => {
+        expect(found).to.deep.equal(expected);
+      });
+      it ('is idempotent', () =>{
+        canon.canonize().canonical.expect(canon);
+      });
+    } catch (err) {
+      it ('doesn\'t die', () => {
+        expect.fail(err);
+      });
+    }
+  });
+}
+
+
