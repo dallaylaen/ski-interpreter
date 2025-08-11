@@ -7,14 +7,17 @@ describe('Expr.canonize', () => {
   describeTerm(
     'I',
     { grounded: true, arity: 1, proper: true, linear: true, discard: false, duplicate: false },
-    'x->x'
+    'x->x',
+    { steps: [1, 2]},
   );
 
   describeTerm(
-    'I',
-    {grounded: true, arity: 1, proper: true, linear: true,  discard: false, duplicate: false, },
-    'x->x'
+    'SKK',
+    { grounded: true, arity: 1, proper: true, linear: true, discard: false, duplicate: false },
+    'x->x',
+    { steps: [1, 5]},
   );
+
   describeTerm(
     'K',
     {grounded: true, arity: 2, proper: true, linear: false, discard: true , duplicate: false, skip: new Set([1])},
@@ -23,11 +26,14 @@ describe('Expr.canonize', () => {
   describeTerm(
     'S',
     {grounded: true, arity: 3, proper: true, linear: false, discard: false, duplicate: true , dup: new Set([2])},
-    'x->y->z->x z (y z)'
+    'x->y->z->x z (y z)',
+    {steps: [1, 1]},
   );
   describeTerm(
     'SK',
-    {grounded: true, arity: 2, proper: true, linear: false, discard: true , duplicate: false, skip: new Set([0])}
+    {grounded: true, arity: 2, proper: true, linear: false, discard: true , duplicate: false, skip: new Set([0])},
+    'x->y->y',
+    {steps: [2, 2]},
   );
   describeTerm(
     'CI',
@@ -91,7 +97,8 @@ describe('Expr.canonize', () => {
   describeTerm(
     'SII(SII)',
     {grounded: false, arity: 0, proper: false, linear: false, discard: false, duplicate: true},
-    '(x->x x)(x->x x)'
+    '(x->x x)(x->x x)',
+    {steps: [1000, 1020]},
   );
   describeTerm(
     'M=WI; MM',
@@ -161,7 +168,7 @@ describe('Expr.canonize', () => {
   );
 });
 
-function describeTerm(term, expected, lambda) {
+function describeTerm(term, expected, lambda, options={}) {
   describe ('handles '+term, done => {
     try {
       console.log('testing ' + term);
@@ -177,8 +184,11 @@ function describeTerm(term, expected, lambda) {
       it('produces some term', () => {
         expect(canon).to.be.instanceof(SKI.classes.Expr);
       });
-      it('produces a step count', () => {
+      it('produces a step count (' + steps + ')', () => {
         expect(steps).to.be.a('number');
+        const limits = options.steps;
+        if (limits)
+          expect(steps).to.be.within(limits[0], limits[1]);
       });
       if (lambda) it('produces exactly expected result ' + lambda, () => {
         canon.expect(ski.parse(lambda, jar));

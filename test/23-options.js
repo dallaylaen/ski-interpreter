@@ -28,10 +28,10 @@ describe('SKI.options (global)', () => {
 
   it ('can control maxArgs in canonical form search', () =>{
     const ski = new SKI();
-    ski.add('c2', 'C');
-    expect(ski.getTerms().c2.proper).to.equal(true);
+    const expr = ski.parse('BCC');
+    expect(expr.canonize().grounded).to.equal(true);
     SKI.options.maxArgs = 2;
-    ski.add('c3', 'C');
-    expect(ski.getTerms().c3.proper).to.equal(false);
+    expect(expr.canonize().grounded).to.equal(false);
   });
+
 });
