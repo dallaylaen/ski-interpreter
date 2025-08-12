@@ -164,19 +164,24 @@ describe('Expr.guess', () => {
   describeTerm(
     'M=WI; x->MM',
     {grounded: false, proper: false, discard: true, duplicate: true, skip: new Set([0])},
-    'x->(y->y y)(y->y y)'
+    'x->(y->y y)(y->y y)',
+    {max: 100},
   );
 
   // Y combinator
   describeTerm(
     'Y=WI(W(B(SI)))',
-    {grounded: false, proper: false, discard: false, duplicate: true, }
+    {grounded: false, proper: false, discard: false, duplicate: true,},
+    undefined,
+    { max: 100, maxArgs: 10 },
   );
 
   // ditto but in lambda form
   describeTerm(
     '(x->x x)(a->b->b(a a b))',
-    {grounded: false, proper: false, discard: false, duplicate: true, }
+    {grounded: false, proper: false, discard: false, duplicate: true,},
+    undefined,
+    { max: 100, maxArgs: 10 },
   );
   //    ['(a->b->a b b)((a->b->c->a(b c))((a->b->c->a c(b c))(a->a)))((a->b->a b b)((a->b->c->a(b c))((a->b->c->a c(b c))(a->a))))',
   //      {found: false, arity: 0, });
@@ -194,7 +199,8 @@ describe('Expr.guess', () => {
   describeTerm(
     'WI(SBK)',
     {grounded: false, proper: false, discard: true, duplicate: true, },
-    '(x->x x) (x->y->x x)'
+    '(x->x x) (x->y->x x)',
+    { maxArgs: 10, max: 100 }
   );
 
   // hidden by an alias
@@ -222,14 +228,22 @@ function describeTerm(term, expected, lambda, options={}) {
   describe ('handles '+term, done => {
     try {
       // console.log('testing ' + term);
+
+      const runOptions = {
+        max: options.max,
+        maxArgs: options.maxArgs,
+      };
+
       const ski = new SKI();
       const jar = {};
-      const found = ski.parse(term, jar).guess();
+      const found = ski.parse(term, jar).guess( runOptions );
 
       const canon = found.expr;
       delete found.expr; // we'll do a separate test for that
       const steps = found.steps;
       delete found.steps; // unpredictable
+
+
 
       it('produces some term', () => {
         expect(canon).to.be.instanceof(SKI.classes.Expr);
