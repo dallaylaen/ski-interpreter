@@ -47,9 +47,11 @@ describe('Expr.lambdify', () => {
       let i = 0;
       let steps = 0;
       let weight = Infinity;
+      const trace = [];
       for (const step of seq) {
+        trace.push(step.expr);
         expect(done).to.equal(false, 'we didn\'t iterate past the final step');
-        expect(i++).to.be.lessThanOrEqual(30, 'no runaway sequence');
+        expect(i++).to.be.lessThanOrEqual(30, 'no runaway sequences');
 
         expect(step.steps).to.be.a('number');
         expect(step.steps).to.be.greaterThanOrEqual(steps);
@@ -60,7 +62,7 @@ describe('Expr.lambdify', () => {
         expect(expr.weight()).to.be.lessThan(weight, 'term weight must strictly diminish');
         weight = expr.weight();
 
-        console.log('[' + step.steps + '] ' + expr.toString({terse:true}) + ' // ' + step.comment);
+        console.log('[' + step.steps + '] ' + expr.toString({terse:true}) + ' // ' + step.comment + '; weight: ' + expr.weight());
 
         const sym = expr.getSymbols();
         const nonFree = [...sym.keys()].filter(s => !(s instanceof SKI.classes.FreeVar) && s !== SKI.classes.Expr.lambdaPlaceholder);
@@ -74,9 +76,7 @@ describe('Expr.lambdify', () => {
         }
       }
 
-      expect(done).to.equal(true, 'we reached ' + expected + ' the final step');
+      expect(done).to.equal(true, 'we reached ' + expected + ' in the final step of '+trace.join('; '));
     });
   }
-
-
 });

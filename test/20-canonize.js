@@ -52,6 +52,12 @@ describe('Expr.canonize', () => {
     'x->y->x(x(x(x(x y))))'
   );
 
+  describeTerm(
+    '(a->a y) x',
+    {grounded: true, arity: 0, proper: false, linear: true, discard: false, duplicate: false, },
+    'x y',
+  );
+
   // improper
   describeTerm(
     'CIS',
@@ -75,7 +81,14 @@ describe('Expr.canonize', () => {
   describeTerm(
     'x',
     {grounded: true, arity: 0, proper: false, linear: true, discard: false, duplicate: false, },
-    'x'
+    'x',
+    { steps: [0, 0]},
+  );
+  describeTerm(
+    'x y',
+    {grounded: true, arity: 0, proper: false, linear: true, discard: false, duplicate: false, },
+    'x y',
+    { steps: [0, 0]},
   );
   describeTerm(
     'x->y x',
@@ -165,6 +178,12 @@ describe('Expr.canonize', () => {
     'lst = BS(C(BB)); nil = KI; (lst a (lst b (lst c nil)))',
     { grounded: true, arity: 2, proper: false, linear: false, discard: false, duplicate: true, dup: new Set([0]) },
     'f->x->f a (f b (f c x))'
+  );
+
+  describeTerm(
+    'x (SK) (KI) (CK) (a->b->b)',
+    { grounded: true, arity: 0, proper: false, linear: true, discard: true, duplicate: false, },
+    'x(a->b->b)(a->b->b)(a->b->b)(a->b->b)',
   );
 });
 
