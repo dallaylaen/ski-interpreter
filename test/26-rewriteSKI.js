@@ -43,12 +43,12 @@ describe('Expr.rewriteSKI()', () => {
   }
 
   for (const src of canonical) {
-    const canon = ski.parse(src).canonize().canonical;
+    const canon = ski.parse(src).guess().expr;
     it(`round trips on every step for ${src} aka ${canon}`, () => {
       const expr = ski.parse(src);
       const seq = expr.rewriteSKI();
       for (const step of seq) {
-        canon.expect(step.expr.canonize().canonical);
+        canon.expect(step.expr.guess().expr);
       }
     });
   }
