@@ -78,6 +78,12 @@ describe('Expr.guess', () => {
     {grounded: true, arity: 1, proper: false, duplicate: true, discard: true }
   );
   describeTerm(
+    'x->x(a->b->c->d->e->y->z->y)(a->b->c->a c b)(a->b->c->a(b c))',
+    {grounded: true, arity: 1, proper: false, discard: true, duplicate: false },
+    'x->x(a->b->c->d->e->y->z->y)(a->b->c->a c b)(a->b->c->a(b c))',
+  );
+
+  describeTerm(
     'x->K(xS)',
     {grounded: true, arity: 2, proper: false, discard: true, duplicate: true, skip: new Set([1])},
     'x->y->x(a->b->c->a c (b c))'
@@ -154,7 +160,7 @@ describe('Expr.guess', () => {
     'SII(SII)',
     {grounded: false, proper: false, discard: false, duplicate: true, },
     '(x->x x)(x->x x)',
-    {steps: [1000, 1020]},
+    {steps: [100, 1020]},
   );
   describeTerm(
     'M=WI; MM',
@@ -265,7 +271,7 @@ function describeTerm(term, expected, lambda, options={}) {
       });
     } catch (err) {
       it ('doesn\'t die', () => {
-        expect.fail(err);
+        throw err;
       });
     }
   });
