@@ -9,6 +9,15 @@ export type CaseResult = {
     args: typeof import("./expr").Expr[];
     case: Case;
 };
+export type Capability = {
+    linear: boolean | null;
+    affine: boolean | null;
+    grounded: boolean | null;
+    proper: boolean | null;
+    discard: boolean | null;
+    duplicate: boolean | null;
+    arity: number | null;
+};
 /**
  * @typedef {{
  *   pass: boolean,
@@ -22,6 +31,24 @@ export type CaseResult = {
  *   case: Case
  * }} CaseResult
  */
+/**
+ * @typedef {{
+ *   linear: boolean?,
+ *   affine: boolean?,
+ *   grounded: boolean?,
+ *   proper: boolean?,
+ *   discard: boolean?,
+ *   duplicate: boolean?,
+ *   arity: number?,
+ * }} Capability
+ */
+/**
+ * @typedef {
+ *   [string, string]
+ *   | [{max: number?}, string, string]
+ *   | [{caps: Capability, max: number?}, string]
+ * } TestCase
+ */
 export class Quest {
     /**
      * @description A combinator problem with a set of test cases for the proposed solution.
@@ -34,7 +61,7 @@ export class Quest {
      *    vars: string[]?,
      *    engine: SKI?,
      *    engineFull: SKI?,
-     *    cases: [{max: number?, note: string?, feedInput: boolean, lambdas: boolean?}|string[], ...string[][]]?
+     *    cases: TestCase[],
      * }} options
      */
     constructor(options?: {
@@ -46,12 +73,7 @@ export class Quest {
         vars: string[] | null;
         engine: SKI | null;
         engineFull: SKI | null;
-        cases: [{
-            max: number | null;
-            note: string | null;
-            feedInput: boolean;
-            lambdas: boolean | null;
-        } | string[], ...string[][]] | null;
+        cases: TestCase[];
     });
     engine: SKI;
     engineFull: SKI;
