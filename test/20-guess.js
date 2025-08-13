@@ -137,9 +137,15 @@ describe('Expr.guess', () => {
   );
 
   describeTerm(
-    'lst = BS(C(BB)); nil = KI; (lst a (lst b (lst c nil)))',
+    'x->x(y->x y)(y->y x)',
+    {grounded: true, arity: 1, proper: false, discard: false, duplicate: true, dup: new Set([0])},
+    'x->x(y->x y)(y->y x)',
+  );
+
+  describeTerm(
+    'lst = BS(C(BB)); nil = KI; (lst x1 (lst x2 (lst x3 nil)))',
     { grounded: true, arity: 2, proper: false, duplicate: true, discard: false, dup: new Set([0])},
-    'f->x->f a (f b (f c x))'
+    'f->z->f x1 (f x2 (f x3 z))'
   );
 
   describeTerm(
@@ -268,6 +274,9 @@ function describeTerm(term, expected, lambda, options={}) {
       });
       it ('is idempotent', () =>{
         canon.guess().expr.expect(canon);
+      });
+      it ('is back parseable', () => {
+        ski.parse('' + canon, jar).expect(canon);
       });
     } catch (err) {
       it ('doesn\'t die', () => {
