@@ -126,7 +126,7 @@ describe('Quest', () => {
     const quest = new Quest({
       input: 't',
       cases: [
-        [{linear: true}, 't'],
+        [{caps: {linear: true}}, 't'],
         [ 't x y', 'y x'],
       ],
     });
@@ -136,7 +136,7 @@ describe('Quest', () => {
 
     const fail = quest.check('KI');
     const details = fail.details;
-    expect(details[0].reason).to.match(/linear/);
+    expect(details[0].reason).to.match(/expected/);
     expect(details[1].reason).to.match(/expected/);
     expect(details[0].pass).to.equal(false);
     expect(details[1].pass).to.equal(false);
@@ -152,7 +152,7 @@ describe('Quest', () => {
         {name: 'T'},
       ],
       cases: [
-        [{linear: true}, 'P'],
+        [{caps: {linear: true}}, 'P'],
         ['B a b c', 'a (b c)'],
         ['T a b', 'b a'],
       ],
