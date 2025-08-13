@@ -122,7 +122,7 @@
         }
       ],
       "cases": [
-        [ { "linear": true }, "P" ],
+        [ { "caps": { "linear": true } }, "P" ],
         [ "B a b c", "a (b c)" ],
         [ "T a b", "b a" ]
       ]

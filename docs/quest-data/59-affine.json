@@ -38,7 +38,8 @@
       "input": [
         {
           "name": "X",
-          "allow": "BCKIVT",
+          "allow": "I-I",
+          "lambdas": true,
           "note": "Declare your own combinator <code>X</code>. It should not duplicate variables."
         },
         {
@@ -58,6 +59,7 @@
         }
       ],
       "cases": [
+        [ {"caps": { "affine" : true}}, "X"],
         [ "b x y z", "x (y z)" ],
         [ "k x y", "x" ],
         [ "t x y", "y x" ]
