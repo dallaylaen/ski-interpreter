@@ -50,37 +50,45 @@ export class Expr {
      */
     weight(): number;
     /**
+     * @desc Try to find an equivalent lambda term for the expression,
+     *       returning also the term's arity and some other properties.
      *
-     * @param {{max: number?, maxArgs: number?, bestGuess?: Expr}} options
+     *       This is used internally when declaring a Native term,
+     *       unless {canonize: false} is used.
+     *
+     *       Groundedness is a loosely defined concept similar to 'proper',
+     *       it means that all applications within a term start with a variable
+     *       (whether free or bound). There should be a term for this...
+     *
+     * @param {{max: number?, maxArgs: number?}} options
      * @return {{
-     *    found: boolean,
-     *    proper: boolean,
+     *    grounded: boolean,
+     *    steps: number,
+     *    expr: Expr?,
      *    arity: number?,
-     *    linear: boolean?,
-     *    canonical?: Expr,
-     *    steps: number?,
-     *    skip: Set<number>?,
-     *    dup: Set<number>?,
+     *    proper: boolean?,
      *    discard: boolean?,
      *    duplicate: boolean?,
+     *    skip: Set<number>?,
+     *    dup: Set<number>?
      * }}
      */
-    canonize(options?: {
+    guess(options?: {
         max: number | null;
         maxArgs: number | null;
-        bestGuess?: Expr;
     }): {
-        found: boolean;
-        proper: boolean;
+        grounded: boolean;
+        steps: number;
+        expr: Expr | null;
         arity: number | null;
-        linear: boolean | null;
-        canonical?: Expr;
-        steps: number | null;
-        skip: Set<number> | null;
-        dup: Set<number> | null;
+        proper: boolean | null;
         discard: boolean | null;
         duplicate: boolean | null;
+        skip: Set<number> | null;
+        dup: Set<number> | null;
     };
+    _guess(options: any, preArgs?: any[], steps?: number): any;
+    _firstVar(): boolean;
     /**
      * @desc Returns a series of lambda terms equivalent to the given expression,
      *       up to the provided computation steps limit,
@@ -129,13 +137,6 @@ export class Expr {
      */
     renameVars(seq: IterableIterator<string>): Expr;
     _rski(options: any): this;
-    /**
-     * @desc Whether the term will reduce further if given more arguments.
-     *       In practice, equivalent to "starts with a FreeVar"
-     *       Used by canonize (duh...)
-     * @return {boolean}
-     */
-    wantsArgs(): boolean;
     /**
        * Apply self to list of given args.
        * Normally, only native combinators know how to do it.
@@ -234,7 +235,7 @@ export class App extends Expr {
     final: boolean;
     arity: any;
     weight(): any;
-    wantsArgs(): any;
+    _firstVar(): any;
     apply(...args: any[]): App;
     expand(): any;
     renameVars(seq: any): any;
@@ -325,18 +326,6 @@ export class Alias extends Named {
     proper: any;
     terminal: any;
     canonical: any;
-    canonize(options?: {}): {
-        found: boolean;
-        proper: boolean;
-        arity: number | null;
-        linear: boolean | null;
-        canonical?: Expr;
-        steps: number | null;
-        skip: Set<number> | null;
-        dup: Set<number> | null;
-        discard: boolean | null;
-        duplicate: boolean | null;
-    };
     subst(plug: any, value: any): Expr;
     /**
      *
