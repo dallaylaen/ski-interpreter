@@ -88,6 +88,7 @@ export class Expr {
         dup: Set<number> | null;
     };
     _guess(options: any, preArgs?: any[], steps?: number): any;
+    _aslist(): this[];
     _firstVar(): boolean;
     /**
      * @desc Returns a series of lambda terms equivalent to the given expression,
@@ -254,6 +255,7 @@ export class App extends Expr {
     };
     reduce(args: any): any;
     split(): any[];
+    _aslist(): any[];
     equals(other: any): any;
     contains(other: any): any;
     needsParens(first: any): boolean;
