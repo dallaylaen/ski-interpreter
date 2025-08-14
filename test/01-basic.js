@@ -77,4 +77,20 @@ describe( 'SKI', () => {
 
     done();
   });
+
+  it ('makes at least one step on any calculation', () => {
+    const ski = new SKI;
+    const expr = ski.parseLine('SK x y ');
+
+    for (const max of [0, 0.99, -1.5]) {
+      const result = expr.run({max});
+      expect(result.steps).to.equal(1);
+      expect('' + result.expr).to.match(/^K *\(?y\)? *\(x *\(?y\)?\)$/);
+    }
+
+    // make sure continued calculation does the same, too
+    const result = expr.run({max: 1, steps: 100});
+    expect(result.steps).to.equal(101);
+    expect('' + result.expr).to.match(/^K *\(?y\)? *\(x *\(?y\)?\)$/);
+  });
 });
