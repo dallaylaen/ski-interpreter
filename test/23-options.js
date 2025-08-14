@@ -29,9 +29,9 @@ describe('SKI.options (global)', () => {
   it ('can control maxArgs in canonical form search', () =>{
     const ski = new SKI();
     const expr = ski.parse('BCC');
-    expect(expr.guess().grounded).to.equal(true);
+    expect(expr.guess().normal).to.equal(true);
     SKI.options.maxArgs = 2;
-    expect(expr.guess().grounded).to.equal(false);
+    expect(expr.guess().normal).to.equal(false);
   });
 
 });
