@@ -70,9 +70,9 @@ function checkTerm(startSrc, endSrc, options = {}) {
       }
       it ('terminates', () => {
         expect(finished).to.equal(true, 'did not finish in 30 steps');
+        expect(expr).to.be.instanceOf(SKI.classes.Expr, 'found at least one expression');
       });
       it ('is idempotent', () => {
-        expect(expr).to.be.instanceOf(SKI.classes.Expr);
         expr.expect(drain(expr.lambdify(options)).expr);
       });
     }

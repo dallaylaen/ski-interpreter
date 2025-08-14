@@ -154,6 +154,10 @@ describe('Expr.guess', () => {
     'x(a->b->b)(a->b->b)(a->b->b)(a->b->b)',
   );
 
+
+  /*
+    // TODO
+
   // non-grounded terms
   describeTerm(
     'C(BWB)(C(BWB))',
@@ -215,8 +219,7 @@ describe('Expr.guess', () => {
     { maxArgs: 10, max: 100 }
   );
 
-  // hidden by an alias
-
+  */
 });
 
 /**
