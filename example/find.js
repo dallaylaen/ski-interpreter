@@ -5,6 +5,8 @@
  *   using a set of known terms.
  */
 
+// TODO not working with [C, S, K, I] because of bugs in guess(), retest after fix Expr.
+
 const { SKI } = require('../index');
 
 const [node, self, ...args] = process.argv;
@@ -16,15 +18,18 @@ const ski = new SKI();
 const jar = {};
 const [target, ...seed] = args.map(s => ski.parse(s, jar));
 
-const canon = target.canonize().canonical;
+const {expr, grounded } = target.guess();
 
-for (const entry of findAll(seed, {})) {
-  console.log(`Trying ${entry.expr}... (${entry.canonical})`);
-  if (canon.equals(entry.canonical)) {
+for (const entry of findAll(seed, {grounded})) {
+  // console.log(`Trying ${entry.expr}... (${entry.canonical})`);
+  if (expr.equals(entry.canonical)) {
     console.log(`Found ${entry.expr} after ${entry.tries} tries.`);
     process.exit(0);
   }
 }
+
+console.error(`No equivalent expression found for ${target}`);
+process.exit(1);
 
 /**
  * @desc Find all expressions that can be built from the ones in the seed.
@@ -41,7 +46,7 @@ for (const entry of findAll(seed, {})) {
  * @yields {{expr: Expr?, tries: number, gen: number, canonical: Expr}}
  */
 function * findAll (seed, options) {
-  const canonOpt = { max: options.max, maxArgs: options.maxArgs };
+  const canonOpt = { max: options.max, maxArgs: options.maxArgs, grounded: options.grounded };
   const seen = {};
 
   const store = [[...seed]];
@@ -49,7 +54,7 @@ function * findAll (seed, options) {
   let gen = 1;
 
   for (const expr of seed) {
-    const canon = expr.canonize(canonOpt).canonical;
+    const canon = expr.guess(canonOpt).expr;
     yield { expr, tries, gen, canonical: canon };
     tries++;
     seen[canon.toString()] = true;
@@ -63,17 +68,24 @@ function * findAll (seed, options) {
         for (const g of store[i]) {
           tries++;
           const expr = f.apply(g);
+          // console.log('Trying ' + expr);
+
           const normal = expr.run();
           if (!normal.final)
             continue;
-          const canon = normal.expr.canonize(canonOpt);
-          if (!canon.canonical)
+
+          // console.log('Normalized ' + expr + ' -> ' + normal.expr);
+
+          const canon = normal.expr.guess(canonOpt);
+          if (!canon.expr)
             continue;
 
-          yield { expr, tries, gen, canonical: canon.canonical };
-          if (seen[canon.canonical])
+          // console.log('Canonized' + normal.expr + ' -> ' + canon.expr);
+
+          yield { expr, tries, gen, canonical: canon.expr };
+          if (seen[canon.expr])
             continue; // already seen
-          seen[canon.canonical] = true;
+          seen[canon.expr] = true;
 
           // push improper and duplicating expressions further away
           const effGen = gen + !canon.proper + (canon.dup ? 1 : 0);
