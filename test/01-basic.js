@@ -94,3 +94,38 @@ describe( 'SKI', () => {
     expect('' + result.expr).to.match(/^K *\(?y\)? *\(x *\(?y\)?\)$/);
   });
 });
+
+describe('Expr.expect', () => {
+  it ('throws on non-equal expressions', () => {
+    const ski = new SKI;
+    const expr1 = ski.parse('S');
+    const expr2 = ski.parse('K');
+    expect(() => expr1.expect(expr2)).to.throw(/found.*S.*expected.*K/);
+  });
+  it ('provides a diff', () => {
+    const ski = new SKI;
+    const expr1 = ski.parse('S');
+    const expr2 = ski.parse('K');
+    try {
+      expr1.expect(expr2);
+    }
+    catch (e) {
+      expect(e.expected).to.equal('K');
+      expect(e.actual).to.equal('S');
+      return;
+    }
+    throw new Error('Expected an exception to be thrown');
+  });
+  it ('adheres comments', () => {
+    const ski = new SKI;
+    const expr1 = ski.parse('S');
+    const expr2 = ski.parse('K');
+    expect(() => expr1.expect(expr2, 'foobared')).to.throw(/foobared: .*found.*S.*expected.*K/);
+  });
+  it ('lives for equal expressions', () => {
+    const ski = new SKI;
+    const expr1 = ski.parse('a->a a');
+    const expr2 = ski.parse('x->x x');
+    expr1.expect(expr2);
+  });
+});
