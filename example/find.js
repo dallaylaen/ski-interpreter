@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S node --stack-size=20600
 
 /**
  *   This script finds and expression equivalent to a target expression
@@ -18,9 +18,11 @@ const ski = new SKI();
 const jar = {};
 const [target, ...seed] = args.map(s => ski.parse(s, jar));
 
-const {expr, grounded } = target.guess();
+const { expr } = target.guess();
+if (!expr)
+  throw new Error('target expression is not normalizable: ' + target);
 
-for (const entry of findAll(seed, {grounded})) {
+for (const entry of findAll(seed)) {
   // console.log(`Trying ${entry.expr}... (${entry.canonical})`);
   if (expr.equals(entry.canonical)) {
     console.log(`Found ${entry.expr} after ${entry.tries} tries.`);
@@ -45,8 +47,8 @@ process.exit(1);
  * @param {function(expr: Expr, canonical: Expr): boolean} criteria
  * @yields {{expr: Expr?, tries: number, gen: number, canonical: Expr}}
  */
-function * findAll (seed, options) {
-  const canonOpt = { max: options.max, maxArgs: options.maxArgs, grounded: options.grounded };
+function * findAll (seed, options={}) {
+  const canonOpt = { max: options.max, maxArgs: options.maxArgs };
   const seen = {};
 
   const store = [[...seed]];
@@ -70,22 +72,16 @@ function * findAll (seed, options) {
           const expr = f.apply(g);
           // console.log('Trying ' + expr);
 
-          const normal = expr.run();
-          if (!normal.final)
-            continue;
-
-          // console.log('Normalized ' + expr + ' -> ' + normal.expr);
-
-          const canon = normal.expr.guess(canonOpt);
+          const canon = expr.guess(canonOpt);
           if (!canon.expr)
             continue;
 
           // console.log('Canonized' + normal.expr + ' -> ' + canon.expr);
-
-          yield { expr, tries, gen, canonical: canon.expr };
           if (seen[canon.expr])
             continue; // already seen
           seen[canon.expr] = true;
+
+          yield { expr, tries, gen, canonical: canon.expr };
 
           // push improper and duplicating expressions further away
           const effGen = gen + !canon.proper + (canon.dup ? 1 : 0);
