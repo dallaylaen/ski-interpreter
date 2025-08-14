@@ -56,13 +56,14 @@ export class Expr {
      *       This is used internally when declaring a Native term,
      *       unless {canonize: false} is used.
      *
-     *       Groundedness is a loosely defined concept similar to 'proper',
-     *       it means that all applications within a term start with a variable
-     *       (whether free or bound). There should be a term for this...
+     *       As of current it only recognizes terms that have a normal form,
+     *       perhaps after adding some variables. This may change in the future.
+     *
+     *       Use lambdify() if you want to get a lambda term in any case.
      *
      * @param {{max: number?, maxArgs: number?}} options
      * @return {{
-     *    grounded: boolean,
+     *    normal: boolean,
      *    steps: number,
      *    expr: Expr?,
      *    arity: number?,
@@ -77,7 +78,7 @@ export class Expr {
         max: number | null;
         maxArgs: number | null;
     }): {
-        grounded: boolean;
+        normal: boolean;
         steps: number;
         expr: Expr | null;
         arity: number | null;

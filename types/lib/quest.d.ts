@@ -12,7 +12,7 @@ export type CaseResult = {
 export type Capability = {
     linear: boolean | null;
     affine: boolean | null;
-    grounded: boolean | null;
+    normal: boolean | null;
     proper: boolean | null;
     discard: boolean | null;
     duplicate: boolean | null;
@@ -35,7 +35,7 @@ export type Capability = {
  * @typedef {{
  *   linear: boolean?,
  *   affine: boolean?,
- *   grounded: boolean?,
+ *   normal: boolean?,
  *   proper: boolean?,
  *   discard: boolean?,
  *   duplicate: boolean?,
