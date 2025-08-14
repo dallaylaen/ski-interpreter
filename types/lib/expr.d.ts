@@ -198,7 +198,12 @@ export class Expr {
        */
     equals(other: Expr): boolean;
     contains(other: any): boolean;
-    expect(other: any): void;
+    /**
+     * @desc Assert expression equality. Can be used in tests.
+     * @param {Expr} expected
+     * @param {string} comment
+     */
+    expect(expected: Expr, comment?: string): void;
     /**
      * @param {{terse: boolean?, html: boolean?}} [options]
      * @return {string} string representation of the expression
