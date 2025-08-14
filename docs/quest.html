@@ -256,18 +256,22 @@
 
           for (const item of spec) {
 
-            const input = append(element, 'input');
+
+            if (multi) {
+              const label = append(element, 'div', {class: ['label']});
+              append(label, 'b', {content: item.name });
+              if (item.note)
+                append(label, 'span', {content: ' // '+item.note, class: ['comment']});
+            }
+            const input = append(element, 'textarea');
             input.onkeydown = e => {
-              if (e.key === 'Enter')
+              if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
                 this.check();
+              }
             };
             this.input.push(input);
-            if (multi) {
-              append(element, 'span', {content: ' &rarr; '+item.name});
-              if (item.note)
-                append(element, 'span', {content: ' // '+item.note, class: ['comment']});
-              append(element, 'br');
-            }
+            append(element, 'br');
           }
 
           const btn = append(element, 'button', {content: 'solve!'});
