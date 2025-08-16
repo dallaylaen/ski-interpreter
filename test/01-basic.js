@@ -25,10 +25,9 @@ describe( 'SKI', () => {
     const s0 = ski.parseLine('S x y z');
     expect(''+s0).to.equal('Sx y z');
     const s1 = s0.step();
-    expect(''+s1.expr).to.equal('x z(y z)');
-    const s2 = s1.expr.step();
-    expect(s2.steps).to.equal(0);
-    expect(s2.expr).to.equal(s1.expr);
+    expect(''+s1).to.equal('x z(y z)');
+    const s2 = s1.step();
+    expect(s2).to.equal(null);
     done();
   });
 
@@ -54,7 +53,7 @@ describe( 'SKI', () => {
     const ski = new SKI;
     const expr = ski.parseLine("food bard");
     expect(''+expr).to.equal("food bard");
-    expect(expr.step()).to.deep.equal({expr, steps: 0, changed: false});
+    expect(expr.step()).to.equal(null);
     done();
   });
 
@@ -128,4 +127,22 @@ describe('Expr.expect', () => {
     const expr2 = ski.parse('x->x x');
     expr1.expect(expr2);
   });
+});
+
+describe('normal reduction order', () => {
+  const check = (src, dst, max) => {
+    it ('calculates ' + src + ' to the end', () => {
+      const ski = new SKI();
+      const jar = {};
+      const start = ski.parse(src, jar);
+      const end = ski.parse(dst, jar);
+
+      start.run({max, throw: 1}).expr.expect(end);
+    });
+  };
+
+  check( 'S K _ x', 'x', 10);
+  check( 'WI(W(B(SI))) (KI)', 'I', 50);
+  check( 'CI(WWW)Kx', 'x', 50);
+  check( 'KI(WWW)', 'I', 2);
 });

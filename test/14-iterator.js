@@ -41,7 +41,7 @@ describe ('Expr.walk', () => {
         n = state.steps + 1;
         expect(typeof state.final).to.equal('boolean');
         expect('' + state.expr).to.equal('' + expr);
-        expr = expr.step().expr; // keep up with the execution
+        expr = expr.step() ?? expr; // keep up with the execution
         if (state.final) {
           end = true;
           expr.expect(ski.parse(result, jar));
