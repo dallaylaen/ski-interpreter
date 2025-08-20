@@ -15,7 +15,8 @@ describe('Quest', () => {
     });
 
     const pass = quest.check('SKK');
-    expect(pass.exception).to.equal(undefined);
+    if (pass.exception)
+      throw pass.exception;
     expect(pass.pass).to.equal(true);
     expect(pass.weight).to.equal(3);
 
@@ -102,6 +103,8 @@ describe('Quest', () => {
 
     const fail = quest.check('SII');
     expect(fail.pass).to.equal(false);
+    if (fail.exception)
+      throw fail.exception;
     expect(fail.details[0].steps).to.be.within(20, 100);
     expect(fail.details[0].pass).to.equal(false);
     expect(fail.details[0].reason).to.match(/in 20 steps/);

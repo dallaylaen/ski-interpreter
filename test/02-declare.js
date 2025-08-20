@@ -76,4 +76,20 @@ describe( 'SKI', () => {
       .to.equal('a->b->c->d->d a b c');
   });
 
+  it ('delays proper term computation', () => {
+    const ski = new SKI();
+    ski.add('T', 'CI');
+    const jar = {};
+
+    const hang = ski.parse('Tx', jar);
+    const y = ski.parse('y', jar);
+
+    const run1 = hang.run();
+    expect(run1.expr.toString()).to.match(/^T *x$/);
+    expect(run1.steps).to.equal(0);
+
+    const run2 = hang.run(y);
+    expect(run2.expr.toString()).to.match(/^y  *x/);
+    expect(run2.steps).to.be.greaterThanOrEqual(1);
+  });
 });

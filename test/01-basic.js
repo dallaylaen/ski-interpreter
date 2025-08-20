@@ -129,3 +129,21 @@ describe('Expr.expect', () => {
     expr1.expect(expr2);
   });
 });
+
+describe('normal reduction order', () => {
+  const check = (src, dst, max) => {
+    it ('calculates ' + src + ' to the end', () => {
+      const ski = new SKI();
+      const jar = {};
+      const start = ski.parse(src, jar);
+      const end = ski.parse(dst, jar);
+
+      start.run({max, throw: 1}).expr.expect(end);
+    });
+  };
+
+  check( 'S K _ x', 'x', 10);
+  check( 'WI(W(B(SI))) (KI)', 'I', 50);
+  check( 'CI(WWW)(Kx)', 'x', 50);
+  check( 'KI(WWW)', 'I', 2);
+});
