@@ -1,0 +1,17 @@
+{
+  "content": [
+    {
+      "id": "Bqiwe3nT",
+      "created_at": "2025-08-21T20:19:43",
+      "title": "Extraction",
+      "descr": [
+        "<p>Given a function <code>f</code> and a linked list (V a (V b (V c ...))), return <code>f b c</code>.</p>"
+      ],
+      "input": "phi",
+      "allow": "BCKIVT",
+      "cases": [
+        [ "V=BC(CI); phi f (V a (V b (V c (V d (KI)))))", "f b c" ]
+      ]
+    }
+  ]
+}

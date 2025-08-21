@@ -26,6 +26,7 @@
         [ "phi x", "x" ]
       ]
     },
+
     {
       "id": "BWom23jE",
       "created_at": "2025-08-01T00:52:21",
@@ -64,7 +65,40 @@
         [ "k x y", "x" ],
         [ "t x y", "y x" ]
       ]
+    },
+    {
+      "id": "9AOyLk8v",
+      "created_at": "2025-07-23T00:08:30",
+      "title": "Triple trouble",
+      "descr": [
+        "<p>Think making <code>W</code> from <code>M</code> was hard?",
+        "This time you are given <code>triple x = x x x</code> instead of <code>M</code>. Find <code>M</code>.</p>",
+        "<p><i>(Can you also build <code>W</code>?)</i></p>",
+        "<p>Of course you can't use any duplicating combinators except <code>triple</code>.</p>"
+      ],
+      "vars": ["triple=WW"],
+      "allow": "BCVIKT",
+      "input": "phi",
+      "cases": [
+        [ "phi x", "x x" ]
+      ]
+    },
+    {
+      "id": "Ci0vMhSM",
+      "created_at": "2025-08-22T01:14:01",
+      "title": "Taming the infinity",
+      "descr": [
+        "<p>You are given a non-terminating fixed-point combinator, <code>Y</code>: ",
+        "<code>Y f = f(Y f) = f(f(Y f)) = ...</code>.",
+        "No other duplicating terms are allowed.</p>",
+        "<p>Build <code>M x = x x</code>.</p>"
+      ],
+      "vars": ["Y=WI(BWB(SI))"],
+      "allow": "BCVIKT",
+      "input": "phi",
+      "cases": [
+        [ "phi x", "x x" ]
+      ]
     }
-
   ]
 }

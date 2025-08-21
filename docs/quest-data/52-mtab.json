@@ -67,22 +67,6 @@
       "cases": [
           [ "phi x y", "x y y" ]
       ]
-    },
-    {
-      "id": "9AOyLk8v",
-      "created_at": "2025-07-23T00:08:30",
-      "title": "Triple trouble",
-      "descr": [
-        "<p>Think <code>M</code> &rarr; <code>W</code> was hard?",
-        "This time you are given <code>triple x = x x x</code> instead of <code>M</code>. Find <code>M</code>.</p>",
-        "<p>You can use other combinators here, just none of the duplicating ones.</p>"
-      ],
-      "vars": ["triple=WW", "A=KI", "T=CI"],
-      "allow": "BCVIK",
-      "input": "phi",
-      "cases": [
-        [ "phi x", "x x" ]
-      ]
     }
   ]
 }
