@@ -85,6 +85,23 @@
           [ "q4 a b c", "c (b a)" ]
       ]
     },
+    {
+      "id": "M3mOh0CW",
+      "created_at": "2025-08-22T01:42:18",
+      "title": "Wait four it",
+      "descr": [
+        "<p>Build a combinator that takes its first argument to the fourth position:",
+        "<code>R<sub>4</sub> a b c d = b c d a</code>.</p>",
+        "<p><i>(See also the Robin quest).</i></p>"
+      ],
+      "input": {
+        "name": "r4",
+        "fancy": "R<sub>4</sub>"
+      },
+      "cases": [
+        [ "r4 a b c d", "b c d a"]
+      ]
+    },
 
     {
       "id": "tfcVL6CR",
