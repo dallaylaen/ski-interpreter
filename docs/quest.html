@@ -263,9 +263,10 @@
               if (item.note)
                 append(label, 'span', {content: ' // '+item.note, class: ['comment']});
             }
-            const input = append(element, 'textarea');
+            const input = append(element, 'input');
+            input.type = 'text';
             input.onkeydown = e => {
-              if (e.ctrlKey && e.key === 'Enter') {
+              if (e.key === 'Enter') {
                 e.preventDefault();
                 this.check();
               }
