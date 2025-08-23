@@ -97,27 +97,19 @@
       "created_at": "2025-02-23T13:17:56",
       "title": "Plan first, execute later",
       "descr": [
-        "<p>The naive if statement derived above will evaluate both branches before choosing the right one.",
-        "This is not an issue from the logical standpoint - if a normal form exists, it will be reached -",
-        "but actually seeing the computation terminate is more fun!</p>",
-        "<p>So, you are given functions <code>cond</code>, <code>then</code>, and <code>else</code>,",
-        "as well as a value <code>val</code>.</p>",
-        "<p>Return <code>then val</code> if <code>cond val</code> is true,",
-        "and <code>else val</code> otherwise.</p>"
+        "<p>Implement a function of four arguments: <code>check</code>, <code>then</code>, <code>else</code>,",
+        "and <code>x</code>. It should return <code>then x</code> if <code>check x</code> returns <code>K</code>,",
+        "and <code>else x</code> if <code>check x</code> returns <code>KI</code>.</p>"
       ],
       "unlock": "if",
       "input": "if",
-      "comment": [
-        "Note to future maintainer (or me):",
-        "The cases with limited steps produce a never-terminating alternative branch",
-        "to filter out non-solutions like (a d)(b d)(c d).",
-        "BC(CI)CK n tells whether n is even in ~n steps."
-      ],
       "cases": [
         ["if (K(KI)) b c d", "c d"],
         ["if (KK) b c d", "b d"],
-        [{"max": 140}, "if (BC(CI)CK) (S(K(WI))(K(WI))) I 71", "71"],
-        [{"max": 140}, "if (BC(CI)CK) I (S(K(WI))(K(WI))) 72", "72"]
+        ["if I b c K", "b K"],
+        ["if I b c (KI)", "c (KI)"],
+        ["V=BC(CI); if (VCK) f g 6", "f 6"],
+        ["V=BC(CI); if (VCK) f g 7", "g 7"]
       ]
     }
   ]
