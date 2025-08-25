@@ -114,6 +114,19 @@
       "cases": [
         [ "iot=z->zSK; iot x a b c d e f", "x a b c d e f" ]
       ]
+    },
+    {
+      "id": "iUn7wg3l",
+      "created_at": "2025-08-26T00:02:06",
+      "title": "Physician, heal thyself",
+      "descr": [
+        "<p>Oddly enough, the fixed point combinator itself has a terminating fixed point.",
+        "Find one!</p>"
+      ],
+      "input": "x",
+      "cases": [
+        [ "Y=WI(BWB(SI)); Y x", "x" ]
+      ]
     }
   ]
 }
