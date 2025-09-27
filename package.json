@@ -15,7 +15,11 @@
     "ski": "bin/ski.js"
   },
   "scripts": {
-    "test": "nyc mocha"
+    "lint": "npx eslint lib --ext .js,.ts",
+    "types": "npx -p typescript tsc index.js --declaration --allowJs --emitDeclarationOnly --outDir types",
+    "test": "npx nyc mocha",
+    "minify": "npx esbuild --bundle ./index.js --outfile=docs/build/js/ski-interpreter.min.js --minify --sourcemap",
+    "build": "npm run lint && npm run types && npm run test && npm run minify"
   },
   "files": [
     "package.json",
@@ -36,12 +40,13 @@
   "homepage": "https://dallaylaen.github.io/ski-interpreter/index.html",
   "devDependencies": {
     "chai": "^4.3.7",
+    "esbuild": "^0.25.10",
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-align-assignments": "^1.1.2",
     "eslint-plugin-import": "^2.29.1",
-    "typescript": "^5.8.2",
     "mocha": "^10.2.0",
-    "nyc": "^15.1.0"
+    "nyc": "^15.1.0",
+    "typescript": "^5.8.2"
   }
 }
