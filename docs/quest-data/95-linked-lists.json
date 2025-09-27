@@ -35,7 +35,7 @@
         "<p>Extracting the tail from a linked list is as simple as <code>T(KI)</code>.",
         "However, applying it to an already empty list will lead to alternating",
         "<code>I</code> and <code>KI</code>. Not too convenient.</p>",
-        "<p>Instead, create an idempotent tail function that returns",
+        "<p>Instead, create a looping tail function that returns",
         "the second element of a pair when given a pair, and an empty list given an empty list.</p>",
         "<p>That is <code>tail (V a b) = b</code>, and <code>tail (KI) = KI</code>.</p>"
       ],
