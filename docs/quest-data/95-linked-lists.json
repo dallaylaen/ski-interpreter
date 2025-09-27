@@ -28,6 +28,24 @@
       ]
     },
     {
+      "id": "5yxwDzNg",
+      "created_at": "2025-09-27T00:38:44",
+      "title": "Failsafe tail",
+      "descr": [
+        "<p>Extracting the tail from a linked list is as simple as <code>T(KI)</code>.",
+        "However, applying it to an already empty list will lead to alternating",
+        "<code>I</code> and <code>KI</code>. Not too convenient.</p>",
+        "<p>Instead, create an idempotent tail function that returns",
+        "the second element of a pair when given a pair, and an empty list given an empty list.</p>",
+        "<p>That is <code>tail (V a b) = b</code>, and <code>tail (KI) = KI</code>.</p>"
+      ],
+      "input": "tail",
+      "cases": [
+        [ "tail (KI) x y", "y" ],
+        [ "V=BC(CI); tail (V a b)", "b" ]
+      ]
+    },
+    {
       "id": "VvbGJqE1",
       "created_at": "2025-03-16T03:10:08",
       "title": "Fold",
