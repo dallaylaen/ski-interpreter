@@ -38,12 +38,12 @@
         "<p>Note that is you reuse <code>lst</code> and <code>nil</code> from the previous chapter,",
         "you could care less about what <code>f</code> and <code>x</code> are.</p>"
       ],
+      "vars": ["lst=BS(C(BB))", "nil=KI"],
       "input": "fold",
       "unlock": "fold",
       "cases": [
         ["fold (KI) f x", "x"],
         ["V=BC(CI); fold (V a (KI)) f x", "f a x"],
-        ["V=BC(CI); fold (V a b) f x", "f a (fold b f x)"],
         ["V=BC(CI); fold (Va (Vb (Vc (KI)))) f x", "f a (f b (f c x))"]
       ]
     },
