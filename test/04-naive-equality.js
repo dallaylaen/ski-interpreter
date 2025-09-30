@@ -64,4 +64,46 @@ describe('SKI.equals', () => {
     expect( () => SKI.S.expect(SKI.I) ).to.throw( /ound.*\bS\b.*expected.*\bI\b/ );
     // TODO add test for expected/actual being present
   });
+
+  const eqCases = [
+    ["x", "x"],
+    ["S", "S"],
+    ["SKK", "SKK"],
+    ["5", "5"],
+    ["x->xS", "y->yS"],
+    ["T=CI", "CI"],
+    ["CI", "T=CI"],
+    ["x=SK", "y=SK"],
+  ];
+
+  const ineqCases = [
+    ["S", "K"],
+    ["S", "SK"],
+    ["x", "y"],
+    ["5", "6"],
+    ["K", "x->y->x"],
+    ["T=CI", "T=SK"],
+  ];
+
+  const ski = new SKI();
+
+  for (const [term1, term2] of eqCases) {
+    it (`equates ${term1} to ${term2}`, () => {
+      const jar = {};
+      const t1 = ski.parse(term1, jar);
+      const t2 = ski.parse(term2, jar);
+      expect(t1.equals(t2)).to.equal(true);
+      expect(t2.equals(t1)).to.equal(true);
+    });
+  }
+
+  for (const [term1, term2] of ineqCases) {
+    it(`distinguishes ${term1} from ${term2}`, () => {
+      const jar = {};
+      const t1 = ski.parse(term1, jar);
+      const t2 = ski.parse(term2, jar);
+      expect(t1.equals(t2)).to.equal(false);
+      expect(t2.equals(t1)).to.equal(false);
+    });
+  }
 });
