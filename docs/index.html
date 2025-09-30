@@ -117,7 +117,7 @@
 
     let ski = new SKI({numbers: true, allow: 'SKIBCKW', lambdas: true});
     let autosave = false;
-    let greet = new EvalBox(view.teletype);
+    let greet = new EvalBox(view.teletype, {headless: true});
     let currentBox = null;
     const evalOptions = {
         delay: 300,

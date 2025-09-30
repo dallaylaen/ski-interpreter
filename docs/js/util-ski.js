@@ -50,6 +50,7 @@ class EvalBox {
 
     this.engine = options.engine ?? new SKI();
 
+    // TODO should be draw() or something
     // view setup
     this.parent = parent;
     this.view = {};
@@ -57,15 +58,6 @@ class EvalBox {
     this.view.head = append(this.view.content, 'div', { class: ['con-header'] });
     this.view.main = append(this.view.content, 'div', { class: ['eval-box'] });
     this.view.foot = append(this.view.content, 'div', { class: ['con-footer'] });
-  }
-
-  /**
-   * @desc Takes a string and a iterator containing expr: Expr, steps: number, and final: boolean
-   * @param {string} src
-   * @param {function(e:Expr): IterableIterator<{final: boolean, expr: Expr, steps: number}>} [generator]
-   */
-  run (src, generator = e => e.walk()) {
-    // scr is required because we need to start with the actual user input, not with the parsed expr
 
     if (!this.options.headless) {
       // TODO demolish content beforehand
@@ -73,10 +65,29 @@ class EvalBox {
       this.view.permalink.target = '_blank';
       this.view.permalink.innerHTML = '#' + this.id;
       this.view.src = append(this.view.head, 'span', {class: ['con-source']});
-      this.view.src.innerHTML = sanitize(src);
       this.view.counter = append(this.view.head, 'span', {class: ['con-number', 'float-right']});
       this.view.counter.innerHTML = '-';
+
+      // TODO start/stop button dependent on state
+
+      // please add unicode restart symbol here
+      const rerun = append(this.view.foot, 'button', {class: ['con-rerun'], content: '&#x21bb;'});
+      rerun.onclick = () => this.rerun();
+      rerun.title = 'Redo calculation from scratch';
     }
+  }
+
+  /**
+   * @desc Takes a string and a iterator containing expr: Expr, steps: number, and final: boolean
+   * @param {string|Expr} src
+   * @param {function(e:Expr): IterableIterator<{final: boolean, expr: Expr, steps: number}>} [generator]
+   */
+  run (src, generator = e => e.walk()) {
+    // src is required because we need to start with the actual user input, not with the parsed expr
+    this.src = '' + src;
+
+    if (this.view.src)
+      this.view.src.innerHTML = sanitize(src);
 
     try {
       this.expr = typeof src === 'string'
@@ -132,6 +143,11 @@ class EvalBox {
     if (reason)
       this.print(reason, { class: ['error'], line: '' });
     this.onStop();
+  }
+
+  rerun() {
+    this.view.main.innerHTML = '';
+    this.run(this.src);
   }
 
   remove() {
