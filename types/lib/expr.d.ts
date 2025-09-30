@@ -194,10 +194,10 @@ export class Expr {
         steps: number;
     }>;
     /**
-       *
-       * @param {Expr} other
-       * @return {boolean}
-       */
+     *
+     * @param {Expr} other
+     * @return {boolean}
+     */
     equals(other: Expr): boolean;
     contains(other: any): boolean;
     /**
