@@ -108,10 +108,7 @@ class EvalBox {
 
   restart () {
     // separated from setup() to avoid restarting a stopped evaluation
-    if (this.running) return;
-    this.running = true;
-    this.onStart();
-    this.tick();
+    this.startStop(true);
   }
 
   tick () {
@@ -135,17 +132,30 @@ class EvalBox {
 
     if (value.steps >= this.maxSteps)
       return this.stop('Max steps reached: '+ this.maxSteps);
-    setTimeout(() => this.tick(), this.delay);
+    this.timer = setTimeout(() => this.tick(), this.delay);
   }
 
-  stop (reason) {
-    this.running = false;
-    if (reason)
-      this.print(reason, { class: ['error'], line: '' });
-    this.onStop();
+  stop(reason) {
+    this.startStop(false, reason);
+  }
+
+  startStop(start, reason) {
+    if (start) {
+      if (this.running) return;
+      this.running = true;
+      this.onStart();
+      this.tick();
+    } else {
+      this.running = false;
+      this.timer && clearTimeout(this.timer);
+      if (reason)
+        this.print(reason, { class: ['error'], line: '' });
+      this.onStop();
+    }
   }
 
   rerun() {
+    this.startStop(false); // stop previous calculations, if any
     this.view.main.innerHTML = '';
     this.run(this.src);
   }
