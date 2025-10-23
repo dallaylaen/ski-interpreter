@@ -70,8 +70,10 @@ class EvalBox {
 
       // TODO start/stop button dependent on state
 
+      this.view.reason = append(this.view.foot, 'span', {class: ['con-reason', 'error']});
+
       // please add unicode restart symbol here
-      const rerun = append(this.view.foot, 'button', {class: ['con-rerun'], content: '&#x21bb;'});
+      const rerun = append(this.view.foot, 'button', {class: ['con-rerun', 'float-right'], content: '&#x21bb;'});
       rerun.onclick = () => this.rerun();
       rerun.title = 'Redo calculation from scratch';
     }
@@ -144,12 +146,19 @@ class EvalBox {
       if (this.running) return;
       this.running = true;
       this.onStart();
+      if (this.view.reason)
+        this.view.reason.innerHTML = '';
       this.tick();
     } else {
       this.running = false;
       this.timer && clearTimeout(this.timer);
-      if (reason)
-        this.print(reason, { class: ['error'], line: '' });
+      if (reason) {
+        if (this.view.reason) {
+          this.view.reason.innerHTML = sanitize(reason);
+        } else {
+          this.print(reason, {class: ['error'], line: ''});
+        }
+      }
       this.onStop();
     }
   }
