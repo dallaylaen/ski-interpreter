@@ -216,7 +216,8 @@ class Store {
   }
 
   load (key) {
-    return JSON.parse(window.localStorage.getItem(this.ns + key));
+    const raw = window.localStorage.getItem(this.ns + key);
+    return raw ? JSON.parse(raw) : undefined;
   }
 
   scan () {
@@ -234,3 +235,67 @@ class Store {
     window.localStorage.removeItem(this.ns + key);
   }
 }
+
+class History {
+  // uses storage so multiple windows can use
+  // entries in separate items
+  constructor(options) {
+    this.store = new Store( options.namespace );
+    this.max = options.max ?? this.store.load('max') ?? 1000;
+    this.start = this.store.load('start') ?? 0;
+    this.end = this.store.load('end') ?? 0;
+  }
+
+  get(n) {
+    return this.store.load( this.end - n);
+  }
+
+  getAll() {
+    const out = [];
+    for (let i = this.start; i < this.end; i++) {
+      const entry = this.store.load(i);
+      if (entry)
+        out.push(entry);
+    }
+    return out;
+  }
+
+  set(n, entry) {
+    if (n >= this.max || n < 0)
+      return;
+    this.store.save(this.end - n, entry);
+  }
+
+  push(entry) {
+    this.store.save(this.end++, entry);
+    this.store.save('end', this.end);
+    if (this.end - this.start > this.max) {
+      this.store.delete(this.start++);
+      this.store.save('start', this.start);
+    }
+  }
+
+  fixup() {
+    this.end = this.store.load('end') ?? 0;
+    this.max = this.store.load('max') ?? this.max;
+    this.start = this.store.load('start') ?? 0;
+    if (this.end - this.start > this.max) {
+      this.start = this.end - this.max;
+      this.store.save('start', this.start);
+    }
+    for (const key of this.store.scan()) {
+      const n = Number.parseInt(key);
+      if (Number.isNaN(key))
+        continue;
+      if (n >= this.start && n <= this.end)
+        continut;
+      this.store.delete(key);
+    }
+  }
+
+  clear() {
+    for (const key of this.store.scan())
+      this.store.delete(key);
+  }
+}
+
