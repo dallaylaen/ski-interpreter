@@ -102,7 +102,24 @@
         [ "r4 a b c d", "b c d a"]
       ]
     },
-
+    {
+      "id": "BzhFzwua",
+      "created_at": "2025-10-27T21:20:31",
+      "title": "Identity but later",
+      "descr": [
+        "<p>Provide a combinator that takes 3 arguments and returns them applied in the same order:</p>",
+        "<p><code>I<sup>**</sup>a b c = a b c</code>.</p>",
+        "The catch is: <code>a</code> and <code>b</code> shall not be merged until <code>c</code> arrives."
+      ],
+      "input": {
+        "name": "i",
+        "fancy": "I<sup>**</sup>"
+      },
+      "cases": [
+        [ "i a b c", "a b c" ],
+        [ { "max": 40}, "i (WI) (WI)", "i (WI) (WI)" ]
+      ]
+    },
     {
       "id": "tfcVL6CR",
       "created_at": "2025-03-24T20:55:56",
