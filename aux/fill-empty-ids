@@ -20,6 +20,7 @@ This felt less ugly than random UUIDs at the time of this writing.
 
 =cut
 
+use 5.016;
 use strict;
 use warnings;
 use File::Find;
