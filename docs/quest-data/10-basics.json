@@ -2,16 +2,15 @@
   "id": "swBY7gpD",
   "name": "Baby steps",
   "intro": [
-    "<p>Welcome to the world of combinators!</p>",
-    "<p>See the <a href=\"intro.html\">introduction</a> for how stuff works here.</p>",
-    "<p>A short reminder of the rules:</p>",
-    "<ul><li><code>I x</code> evaluates to <code>x</code>;</li>",
-    "<li><code>K x y</code> evaluates to <code>x</code>;</li>",
-    "<li><code>S f g x</code> evaluates to <code>f x (g x)</code>;</li>",
-    "<li>and all of the above only happens <i>at the beginning</i> of a (sub-)expression.</li></ul>",
-    "<p>On the right you can see a list of available terms and their definitions,",
-    "it will be slowly extending as more quests are being completed.</p>",
-    "<p>Let's dive right in!</p>"
+    "<p>Welcome! This page contains a collection of",
+    "<a href=\"https://en.wikipedia.org/wiki/Combinatory_logic\" target=\"_blank\">combinatory logic</a>",
+    "exercises of increasing difficulty.</p>",
+    "<p>As you progress along the way, more combinators are unlocked.",
+    "The term inventory can be seen on the right.</p>",
+    "<p>See the <a href=\"intro.html\" target=\"_blank\">introduction</a> for how computations are performed,",
+    "expression syntax, and the like.",
+    "Refer to the <a href=\"index.html\" target=\"_blank\">playground</a> to evaluate arbitrary expressions.</p>",
+    "<p>Good luck!</p>"
   ],
   "content": [
     {
