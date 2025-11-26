@@ -94,6 +94,28 @@
     </div>
 
     <div class="chapter">
+        <h2>On the notation</h2>
+
+        <p>
+            Uppercase terms such as <b>S</b>, <b>K</b>, <b>T</b>, <b>M</b>, <b>C</b>
+            are always assumed to be one-letter, and can thus be lumped together.
+        </p>
+        <p>
+            On the contrary, lowercase terms such as <i>x</i>, <i>y</i>, <i>succ</i>, <i>pred</i>, <i>list</i>
+            are words (or identifiers) and must be separated with spaces.
+        </p>
+        <p>
+            Hopefully, this compromise equally annoys people from the academia and the industry.
+        </p>
+        <p>
+            Parentheses are omitted where possible, although it may not be beginner friendly.
+            Perhaps in some future version it will be possible to cycle between lisp-like, C-like, and terse notation.
+            Of course, the parser accepts as many parentheses as one wishes:
+            <code>(((( ((((x)))) ((((y)))) ))))</code> is still a valid expression and is still equal to <code>x y</code>.
+        </p>
+    </div>
+
+    <div class="chapter">
         <h2>The SKI system</h2>
 
         <p>
@@ -136,14 +158,6 @@
         </p>
 
         <p>
-            <i>On the notation: we assume that uppercase terms are always one-letter
-                and can be lumped together,
-                whereas lowercase terms are identifiers and should be spaced.
-                Consider this as a way to offend programmers and mathematicians more or less equally.
-            </i>
-        </p>
-
-        <p>
             <code><b>S</b>(K(SI))K x y</code><br>
             <code><b>K</b>(SI)x(K x)y</code><br>
             <code><b>S</b>I(K x)y</code><br>
@@ -151,6 +165,12 @@
             <code>y(<b>K</b> x y)</code><br>
             <code>y x</code><br>
             The terms x and y just got swapped!
+        </p>
+
+        <p>
+            Incidentally, the above expression is called the <b>T</b> combinator: <code>T x y = y x</code>.
+            Just like with <code>K x</code>, the term <code>T x</code> can be viewed as
+            a promise waiting for a callback (y).
         </p>
 
         <p>
