@@ -94,28 +94,6 @@
     </div>
 
     <div class="chapter">
-        <h2>On the notation</h2>
-
-        <p>
-            Uppercase terms such as <b>S</b>, <b>K</b>, <b>T</b>, <b>M</b>, <b>C</b>
-            are always assumed to be one-letter, and can thus be lumped together.
-        </p>
-        <p>
-            On the contrary, lowercase terms such as <i>x</i>, <i>y</i>, <i>succ</i>, <i>pred</i>, <i>list</i>
-            are words (or identifiers) and must be separated with spaces.
-        </p>
-        <p>
-            Hopefully, this compromise equally annoys people from the academia and the industry.
-        </p>
-        <p>
-            Parentheses are omitted where possible, although it may not be beginner friendly.
-            Perhaps in some future version it will be possible to cycle between lisp-like, C-like, and terse notation.
-            Of course, the parser accepts as many parentheses as one wishes:
-            <code>(((( ((((x)))) ((((y)))) ))))</code> is still a valid expression and is still equal to <code>x y</code>.
-        </p>
-    </div>
-
-    <div class="chapter">
         <h2>The SKI system</h2>
 
         <p>
@@ -179,6 +157,101 @@
             <code>x</code><br>
             And we just emulated <b>I</b> using S and K.
         </p>
+    </div>
+
+    <div class="chapter">
+        <h2>An attempt at a better definition</h2>
+
+        <p>
+            Just like <code>T</code> and <code>K</code>, any combinator of arity n plus a variable
+            is a combinator of arity n-1, per definition (it applies its arguments to themselves and
+            possible some previously defined terms).
+            So a combinator may be thought of as a one-argument function returning a combinator or
+            an application thereof.
+        </p>
+
+        <p>
+            Similarly, since application is left-associative, we might as well say it's a binary operation.
+            The expression tree then becomes a binary tree, and the root value becomes the leftmost leaf value.
+            <i>(Picture pending).</i> So, these rules can be formally summarized as
+        </p>
+
+        <p>
+            <code>expr ::= var | expr expr | &lambda; var . expr </code>
+        </p>
+
+        <p>
+            which is, not quite surprisingly, the definition of lambda calculus.
+        </p>
+
+        <p>
+            So in fact any combinatory logic expression may be expressed via lambda calculus.
+            The opposite, however, is only true for specific set of starting terms, or bases.
+            In particular, <code>{S, K}</code> is such base.
+        </p>
+    </div>
+
+    <div class="chapter">
+        <h2>The interpreter</h2>
+
+        <p>
+            This interpreter's syntax is as follows:
+        </p>
+
+        <ul>
+            <li>
+                Unknown terms are assumed to be free variables.
+            </li>
+            <li>
+                Uppercase terms like <code>S</code>, <code>K</code>, <code>B</code> are always one-letter
+                and can be lumped together.
+            </li>
+            <li>
+                Lowercase terms like <code>x</code>, <code>y</code>, <code>pred</code>, <code>list</code>, <code>foo_42</code>
+                are considered words/identifiers and must be spaced from one another.
+
+                Hopefully this convention is equally annoying to both programmers and mathematicians.
+            </li>
+            <li>
+                When displaying expressions, parentheses are omitted where possible, although it may not be beginner friendly.
+                Perhaps in some future version it will be possible to cycle between lisp-like, C-like, and terse notation.
+                Of course, the parser accepts as many parentheses as one wishes:
+                <code>(((( ((((x)))) ((((y)))) ))))</code> is still a valid expression and is still equal to <code>x y</code>.
+            </li>
+            <li>
+                New terms may be defined as <code>name = impl</code>, where impl is a valid expression.
+                Multiple definitions may be given, separated by semicolon; in this case only the last one
+                will be executed and/or added to the term inventory.
+                The preceding definitions will be localized to the last expression.
+            </li>
+            <li>
+                Lambdas are written as <code>var -&lt; impl</code> and are left associative:
+                <code>T = x->y->y x</code>.
+
+                Lambdas are lazy: the implementation will not be reduced whatsoever until the (last)
+                variable is substituted.
+            </li>
+            <li>
+                A nonnegative integer is assumed to be a Church numeral: <code>n f x = f(f(... {n times} ...f(x)...))</code>.
+                Church numerals must be separated by spaces from both uppercase and lowercase terms.
+
+                A special <code>+</code> operator increases the next term by 1 if it happens to be a Church numeral:
+                <code>7 + 0 = +(+(+(+(+(+(+(0))))))) = +(+(+(+(+(+(1)))))) = ... = 7</code>.
+
+                This can thus be used to convert calculated numbers to canonical form.
+            </li>
+            <li>
+                By default, the following terms are available:
+                <ul>
+                    <li><code>B x y z = x (y z)</code>;</li>
+                    <li><code>C x y z = x z y</code>;</li>
+                    <li><code>I x = x</code>;</li>
+                    <li><code>K x y = x</code>;</li>
+                    <li><code>S f g x = f x (g x)</code>;</li>
+                    <li><code>W f x = f x x</code>;</li>
+                </ul>
+            </li>
+        </ul>
     </div>
 
     <div class="chapter">
