@@ -16,12 +16,14 @@
     <div class="chapter">
         <h2>A bit of history</h2>
         <p>
-            Combinatory logic is a minimalistic functional programming language.
+            <A href="https://en.wikipedia.org/wiki/Combinatory_logic" target="_blank">Combinatory logic</a>
+            is a minimalistic functional programming language.
         </p>
 
         <p>
-            It was discovered in 1920 by Moses Schönfinkel as a way to drive lexical variables
-            out of logical expressions (hence "logic").
+            It was discovered in 1920 by
+            <a href="https://en.wikipedia.org/wiki/Moses_Sch%C3%B6nfinkel" target="_blank">Moses Schönfinkel</a>
+            as a way to drive lexical variables out of logical expressions (hence "logic").
         </p>
 
         <p>
@@ -56,14 +58,16 @@
         </p>
 
         <p>
-            By this definition, application is left-associative: <code>(a b) c</code> is the same as
-            <code>a b c</code> or <code>a(b)(c)</code>, but not <code>a (b c)</code>.
+            By this definition, application is
+            <a href="https://en.wikipedia.org/wiki/Operator_associativity" target="_blank">left-associative</a>:
+            <code>(a b) c</code> is the same as
+            <code>a b c</code> or <code>a(b)(c)</code>, but <i>not</i> <code>a (b c)</code>.
         </p>
 
         <p>
             Similarly, applying <code>a b</code> to <code>c d</code> yields <code>a b (c d)</code> -
             or equivalently <code>a(b)(c(d))</code> -
-            but not <code>a b c d</code> or <code>a(b(c(d)))</code>.
+            but <i>not</i> <code>a b c d</code> or <code>a(b(c(d)))</code>.
         </p>
 
         <p>
@@ -133,6 +137,9 @@
             <code>...</code><br>
             Oops... We've reached the starting expression!
             So here is an infinite loop.
+            Note that we had to deviate from normal reduction strategy on step 3:
+            otherwise this expression also loops but also generates a lot of nested <code>I</code>
+            combinators that, as we already know, do nothing.
         </p>
 
         <p>
@@ -156,6 +163,20 @@
             <code><b>K</b>x(Kx)</code><br>
             <code>x</code><br>
             And we just emulated <b>I</b> using S and K.
+        </p>
+
+        <p>
+            One more example:<br>
+            <code><b>S</b>(KS)K f g x</code><br>
+            <code><b>K</b>Sf(Kf) g x</code><br>
+            <code><b>S</b>(Kf) g x</code><br>
+            <code><b>K</b>f x(g x)</code><br>
+            <code>f(g x)</code><br>
+            This is the <b>B</b> combinator: <code>B f g x = f(g x)</code>, which represents function composition.
+            <code>B f g</code> is a function in and of itself, regardless of what the last argument is.
+            Unlike application, composition is fully
+            <a href="https://en.wikipedia.org/wiki/Associative_property">associative</a>:
+            <code>B (B f g) h (x) = B f (B g h) (x)</code>.
         </p>
     </div>
 
@@ -181,12 +202,13 @@
         </p>
 
         <p>
-            which is, not quite surprisingly, the definition of lambda calculus.
+            which is, not quite surprisingly, the definition of
+            <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">lambda calculus</a>.
         </p>
 
         <p>
             So in fact any combinatory logic expression may be expressed via lambda calculus.
-            The opposite, however, is only true for specific set of starting terms, or bases.
+            The reverse, however, is only true for specific set of starting terms, or bases.
             In particular, <code>{S, K}</code> is such base.
         </p>
     </div>
@@ -254,26 +276,6 @@
         </ul>
     </div>
 
-    <div class="chapter">
-        <h2>Connection to lambda calculus</h2>
-
-        <p>An arbitrary lambda expression can be converted to SKI via the following rules:</p>
-        <ul>
-            <li><code>x &mapsto; x</code> becomes <code>I</code>;</li>
-            <li><code>x &mapsto; f(x)</code> (where f is independent of x) becomes <code>f</code>;</li>
-            <li><code>x &mapsto; y</code> (where y does not depend on x) becomes <code>K y</code>;</li>
-            <li><code>x &mapsto; y(z)</code> becomes <code>S(x &mapsto; y)(x &mapsto; z)</code>,
-                where <code>y</code> and <code>z</code> may or may not depend on <code>x</code>.
-            </li>
-            <li>The process is repeated from the innermost lambda expression outwards and
-                is guaranteed to terminate. <i>(proof?..)</i></li>
-        </ul>
-
-        <p>
-            As a matter of fact, <code>I</code> can be derived from <code>S</code> and <code>K</code>
-            and those two thus form a basis together.
-        </p>
-    </div>
     <div class="chapter">
         <h2>In place of a conclusion</h2>
 
