@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8"/>
-    <title>Introduction - Simple Kombinator Interpreter</title>
+    <title>Introduction &ndash; Simple Kombinator Interpreter</title>
     <link rel="shortcut icon" type="image/png" href="img/ski-64.png">
     <script src="build/js/ski-interpreter.min.js"></script>
     <script src="js/util-html.js"></script>
@@ -32,8 +32,11 @@
         </p>
 
         <p>
-            The research was continued by Haskell Curry, Alonzo Church, and others, influencing
-            the development of lambda calculus and functional programming languages such as Lisp and Haskell.
+            The research was continued by
+            <a href="https://en.wikipedia.org/wiki/Haskell_Curry" target="_blank">Haskell Curry</a>,
+            <a href="https://en.wikipedia.org/wiki/Alonzo_Church" target="_blank">Alonzo Church</a>,
+            and others, influencing the development of lambda calculus
+            and functional programming languages such as Lisp and Haskell.
         </p>
 
         <p>
@@ -65,8 +68,8 @@
         </p>
 
         <p>
-            Similarly, applying <code>a b</code> to <code>c d</code> yields <code>a b (c d)</code> -
-            or equivalently <code>a(b)(c(d))</code> -
+            Similarly, applying <code>a b</code> to <code>c d</code> yields <code>a b (c d)</code> &ndash;
+            or equivalently <code>a(b)(c(d))</code> &ndash;
             but <i>not</i> <code>a b c d</code> or <code>a(b(c(d)))</code>.
         </p>
 
@@ -74,7 +77,7 @@
             A <b><i>combinator</i></b> is a function with fixed number of arguments
             that uses only application on said arguments and possibly some other previously defined terms.
             Arguments may be combined, reordered, duplicated, or discarded in doing so.
-            Combinators are closed under application (this requires proving).
+            Combinators are closed under application.
         </p>
 
         <p>
@@ -88,10 +91,11 @@
 
         <p>
             If an expression has no possible reductions, it is said to be in <b><i>normal form</i></b>.
-            If multiple sub-expressions may be reduced at the same time - which is common for complex expressions, -
+            If multiple sub-expressions may be reduced at the same time &ndash;
+            which is common for complex expressions, &ndash;
             not all reduction orders may lead to termination.
             However, if two different orders lead to <i>some</i> normal form,
-            it is always the <i>same</i> normal form. (That's Church - Rosser's theorem).
+            it is always the <i>same</i> normal form. (That's Church&ndash;Rosser's theorem).
             In particular, always going for the leftmost eligible term guarantees reaching the normal form
             (if it exists at all) and is called the <b><i>normal reduction strategy</i></b>.
         </p>
@@ -184,8 +188,8 @@
         <h2>An attempt at a better definition</h2>
 
         <p>
-            Just like <code>T</code> and <code>K</code>, any combinator of arity n plus a variable
-            is a combinator of arity n-1, per definition (it applies its arguments to themselves and
+            Just like <code>T</code> and <code>K</code>, any combinator of arity <i>n</i> plus a variable
+            is a combinator of arity <i>n-1</i>, per definition (it applies its arguments to themselves and
             possible some previously defined terms).
             So a combinator may be thought of as a one-argument function returning a combinator or
             an application thereof.
@@ -247,7 +251,7 @@
                 The preceding definitions will be localized to the last expression.
             </li>
             <li>
-                Lambdas are written as <code>var -&lt; impl</code> and are left associative:
+                Lambdas are written as <code>var -&gt; impl</code> and are left associative:
                 <code>T = x->y->y x</code>.
 
                 Lambdas are lazy: the implementation will not be reduced whatsoever until the (last)
