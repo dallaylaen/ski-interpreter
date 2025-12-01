@@ -88,7 +88,7 @@
 
         <p>
             If an expression has no possible reductions, it is said to be in <b><i>normal form</i></b>.
-            If multiple terms may be reduced at the same time - which is common for complex expressions, -
+            If multiple sub-expressions may be reduced at the same time - which is common for complex expressions, -
             not all reduction orders may lead to termination.
             However, if two different orders lead to <i>some</i> normal form,
             it is always the <i>same</i> normal form. (That's Church - Rosser's theorem).
@@ -122,7 +122,7 @@
             The <b>S</b> combinator has three arguments: <code>S f g x = f(x)(g(x))</code>.
             Mind boggling!
             It can perhaps be broken down a bit:<br>
-            <code>S x y z = {<br>&nbsp;&nbsp;let y = f(x);<br>&nbsp;&nbsp;let z = g(x);<br>&nbsp;&nbsp;return y(z);<br>}</code>
+            <code>S f g x = {<br>&nbsp;&nbsp;let y = f(x);<br>&nbsp;&nbsp;let z = g(x);<br>&nbsp;&nbsp;return y(z);<br>}</code>
         </p>
 
         <p>
