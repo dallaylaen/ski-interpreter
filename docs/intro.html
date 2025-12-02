@@ -157,7 +157,8 @@
         </p>
 
         <p>
-            Incidentally, the above expression is called the <b>T</b> combinator: <code>T x y = y x</code>.
+            Incidentally, the term implemented above is called the <b>T</b> combinator:
+            <code>T x y = y x</code>.
             Just like with <code>K x</code>, the term <code>T x</code> can be viewed as
             a promise waiting for a callback (y).
         </p>
@@ -178,21 +179,23 @@
             <code>f(g x)</code><br>
             This is the <b>B</b> combinator: <code>B f g x = f(g x)</code>, which represents function composition.
             <code>B f g</code> is a function in and of itself, regardless of what the last argument is.
-            Unlike application, composition is fully
+            Unlike application, composition is
             <a href="https://en.wikipedia.org/wiki/Associative_property">associative</a>:
             <code>B (B f g) h (x) = B f (B g h) (x)</code>.
         </p>
     </div>
 
     <div class="chapter">
-        <h2>An attempt at a better definition</h2>
+        <h2>Refining the definition</h2>
 
         <p>
             Just like <code>T</code> and <code>K</code>, any combinator of arity <i>n</i> plus a variable
-            is a combinator of arity <i>n-1</i>, per definition (it applies its arguments to themselves and
+            is a combinator of arity <i>n &minus; 1</i>, per definition (it applies its arguments to themselves and
             possible some previously defined terms).
             So a combinator may be thought of as a one-argument function returning a combinator or
             an application thereof.
+            This technique is known as
+            <a href="https://en.wikipedia.org/wiki/Currying" target="_blank">currying</a>.
         </p>
 
         <p>
