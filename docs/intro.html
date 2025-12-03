@@ -47,7 +47,7 @@
         <p>
             A <b><i>combinator</i></b> itself is a higher-order function that returns
             an <b><i>application</i></b> of its arguments and possibly some previously defined terms.
-            Said arguments may be omitter, swapped, composed, and duplicated in doing so.
+            Said arguments may be omitted, swapped, composed, and duplicated in doing so.
         </p>
     </div>
 
@@ -65,13 +65,11 @@
             </li>
             <li>
                 Uppercase terms like <code>S</code>, <code>K</code>, <code>B</code> are always one-letter
-                and can be lumped together.
+                and can be lumped together, without whitespaces in between.
             </li>
             <li>
                 Lowercase terms like <code>x</code>, <code>y</code>, <code>pred</code>, <code>list</code>, <code>foo_42</code>
                 are considered words/identifiers and must be spaced from one another.
-
-                Hopefully this convention is equally annoying to both programmers and mathematicians.
             </li>
             <li>
                 Unknown terms are assumed to be variables. They are just moved around as is.
@@ -90,42 +88,7 @@
                 Of course, the parser accepts as many parentheses as one wishes:
                 <code>(((( ((((x)))) ((((y)))) ))))</code> is still a valid expression and is still equal to <code>x y</code>.
             </li>
-            <li>
-                New terms may be defined as <code>name = impl</code>, where impl is some valid expression.
-                Multiple definitions may be given, separated by semicolon; in this case only the last one
-                will be executed and/or added to the term inventory.
-                Intermediate definitions are local to one computation and may override previoursly defined terms.
-            </li>
-            <li>
-                <p>
-                    The interpreter supports anonymous functions, aka
-                    <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">lambdas</a>,
-                    in form of <code>var -&gt; impl</code>.
-                    This operation is called an <b><i>abstraction</i></b>.
-                    Lambdas are left associative: <code>x->y->z</code> is the same as <code>x->(y->z)</code>,
-                    whereas <code>(x->y)->z</code> simply makes no sense and causes a syntax error.
-                </p>
 
-                <p>
-                    Application has higher precedence than abstraction.
-                    So if lambda expression is applied to something else, it must be parenthesized:
-                    <code>(x->x x)(y->y y)</code>.
-                </p>
-
-                <p>
-                    Variables are local to the lambda's right hand part and will temporarily override
-                    any previously defined terms with the same name.
-                </p>
-            </li>
-            <li>
-                A nonnegative integer is assumed to be a Church numeral: <code>n f x = f(f(... {n times} ...f(x)...))</code>.
-                Church numerals must be separated by spaces from both uppercase and lowercase terms.
-
-                A special <code>+</code> operator increases the next term by 1 if it happens to be a Church numeral:
-                <code>7 + 0 = +(+(+(+(+(+(+(0))))))) = +(+(+(+(+(+(1)))))) = ... = 7</code>.
-
-                This can thus be used to convert calculated numbers to a human readable form.
-            </li>
             <li>
                 By default, the following terms are available:
                 <ul>
@@ -136,6 +99,47 @@
                     <li><code>S f g x = f x (g x)</code>;</li>
                     <li><code>W f x = f x x</code>;</li>
                 </ul>
+            </li>
+
+            <li>
+                A nonnegative integer is assumed to be a Church numeral: <code>n f x = f(f(... {n times} ...f(x)...))</code>.
+                Church numerals must be separated by spaces from both uppercase and lowercase terms.
+
+                A special <code>+</code> operator increases the next term by 1 if it happens to be a Church numeral:
+                <code>7 + 0 = +(+(+(+(+(+(+(0))))))) = +(+(+(+(+(+(1)))))) = ... = 7</code>.
+
+                This can thus be used to convert calculated numbers to a human readable form.
+            </li>
+
+            <li>
+                New terms may be declared as <code>name = impl</code>, where impl is some expression.
+                Multiple definitions may be given, separated by semicolon; in this case only the last one
+                will be executed and/or added to the term inventory.
+                Intermediate definitions are local to one computation and may
+                <a href="https://en.wikipedia.org/wiki/Variable_shadowing" target="_blank">shadow</a>
+                (i.e., temporarily override) previoursly defined terms.
+            </li>
+
+            <li>
+                The interpreter also supports
+                <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">anonymous functions</a>,
+                written as <code>var -&gt; impl</code>.
+                Such operation is called an <b><i>abstraction</i></b>.
+                Abstraction is right-associative: <code>x->y->z</code> is the same as <code>x->(y->z)</code>,
+                whereas <code>(x->y)->z</code> simply makes no sense and causes a syntax error.
+                <br><br>
+
+                Application has higher precedence than abstraction.
+                So if a lambda expression is applied to something else, it must be parenthesized:
+                <code>(x->x x)(y->y y)</code>.
+                <br><br>
+
+                Variables are local to the abstraction's right hand part and will shadow
+                any previously defined terms with the same name.
+                <br><br>
+
+                <i>Lambda expressions (as defined above) are out of scope of combinatory logic per se,
+                but are still available as an extension and behave consistently with combinators.</i>
             </li>
         </ul>
     </div>
