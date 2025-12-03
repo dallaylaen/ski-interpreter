@@ -43,66 +43,146 @@
             Although combinators turned out to be too cumbersome for direct use in practical programming,
             they do appear here and there, sometimes in disguise.
         </p>
+
+        <p>
+            A <b><i>combinator</i></b> itself is a higher-order function that returns
+            an <b><i>application</i></b> of its arguments and possibly some previously defined terms.
+            Said arguments may be omitter, swapped, composed, and duplicated in doing so.
+        </p>
+    </div>
+
+    <div class="chapter">
+        <h2>The interpreter syntax</h2>
+
+        <p>
+            This interpreter's syntax works as follows:
+        </p>
+
+        <ul>
+            <li>
+                A <b><i>term</i></b> is either un uppercase letter, a lowercase identifier, a nonnegative integer,
+                or a parenthesized expression.
+            </li>
+            <li>
+                Uppercase terms like <code>S</code>, <code>K</code>, <code>B</code> are always one-letter
+                and can be lumped together.
+            </li>
+            <li>
+                Lowercase terms like <code>x</code>, <code>y</code>, <code>pred</code>, <code>list</code>, <code>foo_42</code>
+                are considered words/identifiers and must be spaced from one another.
+
+                Hopefully this convention is equally annoying to both programmers and mathematicians.
+            </li>
+            <li>
+                Unknown terms are assumed to be variables. They are just moved around as is.
+                Terms with known semantics may be reduced when given enough arguments
+                (other terms or subexpressions).
+            </li>
+            <li>
+                A term followed by one or more terms is called an <b><i>application</i></b>.
+                Application is
+                <a href="https://en.wikipedia.org/wiki/Operator_associativity" target="_blank">left-associative</a>:
+                <code>a b c</code>, <code>a (b) (c)</code>, and <code>(a b) c</code>
+                all mean the same but <code>a (b c)</code> doesn't.
+            </li>
+            <li>
+                When displaying expressions, parentheses are omitted where possible.
+                Of course, the parser accepts as many parentheses as one wishes:
+                <code>(((( ((((x)))) ((((y)))) ))))</code> is still a valid expression and is still equal to <code>x y</code>.
+            </li>
+            <li>
+                New terms may be defined as <code>name = impl</code>, where impl is some valid expression.
+                Multiple definitions may be given, separated by semicolon; in this case only the last one
+                will be executed and/or added to the term inventory.
+                Intermediate definitions are local to one computation and may override previoursly defined terms.
+            </li>
+            <li>
+                <p>
+                    The interpreter supports anonymous functions, aka
+                    <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">lambdas</a>,
+                    in form of <code>var -&gt; impl</code>.
+                    This operation is called an <b><i>abstraction</i></b>.
+                    Lambdas are left associative: <code>x->y->z</code> is the same as <code>x->(y->z)</code>,
+                    whereas <code>(x->y)->z</code> simply makes no sense and causes a syntax error.
+                </p>
+
+                <p>
+                    Application has higher precedence than abstraction.
+                    So if lambda expression is applied to something else, it must be parenthesized:
+                    <code>(x->x x)(y->y y)</code>.
+                </p>
+
+                <p>
+                    Variables are local to the lambda's right hand part and will temporarily override
+                    any previously defined terms with the same name.
+                </p>
+            </li>
+            <li>
+                A nonnegative integer is assumed to be a Church numeral: <code>n f x = f(f(... {n times} ...f(x)...))</code>.
+                Church numerals must be separated by spaces from both uppercase and lowercase terms.
+
+                A special <code>+</code> operator increases the next term by 1 if it happens to be a Church numeral:
+                <code>7 + 0 = +(+(+(+(+(+(+(0))))))) = +(+(+(+(+(+(1)))))) = ... = 7</code>.
+
+                This can thus be used to convert calculated numbers to a human readable form.
+            </li>
+            <li>
+                By default, the following terms are available:
+                <ul>
+                    <li><code>B x y z = x (y z)</code>;</li>
+                    <li><code>C x y z = x z y</code>;</li>
+                    <li><code>I x = x</code>;</li>
+                    <li><code>K x y = x</code>;</li>
+                    <li><code>S f g x = f x (g x)</code>;</li>
+                    <li><code>W f x = f x x</code>;</li>
+                </ul>
+            </li>
+        </ul>
     </div>
 
     <div>
         <h2>How computations work</h2>
 
         <p>
-            The following definitions are informal and lack rigor,
-            but hopefully are good enough to provide some insights.
+            If the starting term in an expression is followed by enough arguments,
+            it may be replaced by its returned value, with the extra arguments (if any)
+            simply applied at the end as is.
+            This is called <b><i>reduction</i></b>, and the replaced term is called a <b><i>redex</i></b>
         </p>
 
         <p>
-            A combinatory logic <b><i>expression</i></b> consists of a starting <b><i>term</i></b>,
-            followed by zero or more expressions (arguments).
-            An <b><i>application</i></b> of two expressions is performed by simply appending the latter
-            in its entirety (in parentheses, if needed) to the former's argument list.
+            For example, given the expression <code>K x y z</code>, the term <code>K x y</code> is a redex,
+            and will be reduced to <code>x</code>, yielding <code>x z</code> for the whole expression.
+            However, the expression <code>x K y z</code> cannot be reduced,
+            provided of course that <code>x</code> has no previous definition.
         </p>
 
         <p>
-            By this definition, application is
-            <a href="https://en.wikipedia.org/wiki/Operator_associativity" target="_blank">left-associative</a>:
-            <code>(a b) c</code> is the same as
-            <code>a b c</code> or <code>a(b)(c)</code>, but <i>not</i> <code>a (b c)</code>.
+            This process may be repeated until there are no terms eligible for reduction.
+            Such form, if it exists, is called the <b><i>normal form</i></b> of the expression.
+            If there are multiple redexes at the same time, different reduction strategies may be picked,
+            and not all of them may lead to termination.
+            However, if to strategies do terminate, the normal form will always be the same.
         </p>
 
         <p>
-            Similarly, applying <code>a b</code> to <code>c d</code> yields <code>a b (c d)</code> &ndash;
-            or equivalently <code>a(b)(c(d))</code> &ndash;
-            but <i>not</i> <code>a b c d</code> or <code>a(b(c(d)))</code>.
+            The reduction strategy that always picks the leftmost outermost redex is called
+            <a href="https://en.wikipedia.org/wiki/Normal_order" target="_blank">normal order</a>.
+            This strategy has the property of always reaching normal form if it exists,
+            hecne the name.
+            It's not the only such strategy but probably the easiest to implement.
+            This interpreter also uses normal reduction strategy.
         </p>
 
         <p>
-            A <b><i>combinator</i></b> is a function with fixed number of arguments
-            that uses only application on said arguments and possibly some other previously defined terms.
-            Arguments may be combined, reordered, duplicated, or discarded in doing so.
-            Combinators are closed under application.
-        </p>
-
-        <p>
-            If the starting term of a (sub-)expression is a combinator and is followed by enough arguments,
-            it can be <b><i>reduced</i></b>, that is, the starting term and its arguments are replaced by
-            whatever expression it produces, and the rest of the expressions (if any) are simply applied
-            at the end as is.
-            This process can be iterated as long as a reduction can be made,
-            and that's how computations actually work.
-        </p>
-
-        <p>
-            If an expression has no possible reductions, it is said to be in <b><i>normal form</i></b>.
-            If multiple sub-expressions may be reduced at the same time &ndash;
-            which is common for complex expressions, &ndash;
-            not all reduction orders may lead to termination.
-            However, if two different orders lead to <i>some</i> normal form,
-            it is always the <i>same</i> normal form. (That's Church&ndash;Rosser's theorem).
-            In particular, always going for the leftmost eligible term guarantees reaching the normal form
-            (if it exists at all) and is called the <b><i>normal reduction strategy</i></b>.
+            Note on lambdas. They are lazy, that is, no reductions to the right of a <code>-&gt;</code>
+            will be performed until all required arguments are supplied.
+            This behavior is consistent with partial applications of combinators.
         </p>
     </div>
 
     <div class="chapter">
-        <h2>The SKI system</h2>
+        <h2>Example computations</h2>
 
         <p>
             Now with this bit of theory, let's define some combinators and fool around.
@@ -116,6 +196,12 @@
         </p>
 
         <p>
+            Some real-life examples of identity combinator include no-op functions/transforms/filters,
+            the Unix <code>cat</code> command, and <code>continue</code> operator in C-like languages
+            (as in: leave the program's state alone and proceed with the next iteration).
+        </p>
+
+        <p>
             The <b>K</b> combinator, or constant, has two arguments: <code>K x y = x</code>.
             As you can see, it discards the second argument.
             Note that <code>K x</code> is itself a combinator with just one argument
@@ -124,9 +210,16 @@
 
         <p>
             The <b>S</b> combinator has three arguments: <code>S f g x = f(x)(g(x))</code>.
-            Mind boggling!
             It can perhaps be broken down a bit:<br>
-            <code>S f g x = {<br>&nbsp;&nbsp;let y = f(x);<br>&nbsp;&nbsp;let z = g(x);<br>&nbsp;&nbsp;return y(z);<br>}</code>
+            <code>S f g x = {<br>&nbsp;&nbsp;let y = f(x);<br>&nbsp;&nbsp;let z = g(x);<br>&nbsp;&nbsp;return y(z);<br>}</code>.
+        </p>
+
+        <p>
+            This may seem like a completely counterintuitive construct,
+            but it's quite powerful, not to say universal.
+            It combines the operations of composition, duplication, and swapping.
+            It can be perhaps compared to NAND/NOR gates in boolean logic
+            (except that it's not enough to produce all combinators on its own, lacking discarding).
         </p>
 
         <p>
@@ -186,7 +279,7 @@
     </div>
 
     <div class="chapter">
-        <h2>Refining the definition</h2>
+        <h2>????</h2>
 
         <p>
             Just like <code>T</code> and <code>K</code>, any combinator of arity <i>n</i> plus a variable
@@ -201,92 +294,21 @@
         <p>
             Similarly, since application is left-associative, we might as well say it's a binary operation.
             The expression tree then becomes a binary tree, and the root value becomes the leftmost leaf value.
-            <i>(Picture pending).</i> So, these rules can be formally summarized as
+            <i>(Picture pending).</i>
         </p>
 
         <p>
-            <code>expr ::= var | expr expr | &lambda; var . expr </code>
+            With this, any combinatory logic expression may be expressed via a lambda term.
+            The reverse, however, is only true for specific sets of starting terms, or bases.
+            In particular, <code>{S, K}</code> and <code>{B, C, K, W}</code>
+            are such bases.
         </p>
-
-        <p>
-            which is, not quite surprisingly, the definition of
-            <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">lambda calculus</a>.
-        </p>
-
-        <p>
-            So in fact any combinatory logic expression may be expressed via lambda calculus.
-            The reverse, however, is only true for specific set of starting terms, or bases.
-            In particular, <code>{S, K}</code> is such base.
-        </p>
-    </div>
-
-    <div class="chapter">
-        <h2>The interpreter</h2>
-
-        <p>
-            This interpreter's syntax is as follows:
-        </p>
-
-        <ul>
-            <li>
-                Unknown terms are assumed to be free variables.
-            </li>
-            <li>
-                Uppercase terms like <code>S</code>, <code>K</code>, <code>B</code> are always one-letter
-                and can be lumped together.
-            </li>
-            <li>
-                Lowercase terms like <code>x</code>, <code>y</code>, <code>pred</code>, <code>list</code>, <code>foo_42</code>
-                are considered words/identifiers and must be spaced from one another.
-
-                Hopefully this convention is equally annoying to both programmers and mathematicians.
-            </li>
-            <li>
-                When displaying expressions, parentheses are omitted where possible, although it may not be beginner friendly.
-                Perhaps in some future version it will be possible to cycle between lisp-like, C-like, and terse notation.
-                Of course, the parser accepts as many parentheses as one wishes:
-                <code>(((( ((((x)))) ((((y)))) ))))</code> is still a valid expression and is still equal to <code>x y</code>.
-            </li>
-            <li>
-                New terms may be defined as <code>name = impl</code>, where impl is a valid expression.
-                Multiple definitions may be given, separated by semicolon; in this case only the last one
-                will be executed and/or added to the term inventory.
-                The preceding definitions will be localized to the last expression.
-            </li>
-            <li>
-                Lambdas are written as <code>var -&gt; impl</code> and are left associative:
-                <code>T = x->y->y x</code>.
-
-                Lambdas are lazy: the implementation will not be reduced whatsoever until the (last)
-                variable is substituted.
-            </li>
-            <li>
-                A nonnegative integer is assumed to be a Church numeral: <code>n f x = f(f(... {n times} ...f(x)...))</code>.
-                Church numerals must be separated by spaces from both uppercase and lowercase terms.
-
-                A special <code>+</code> operator increases the next term by 1 if it happens to be a Church numeral:
-                <code>7 + 0 = +(+(+(+(+(+(+(0))))))) = +(+(+(+(+(+(1)))))) = ... = 7</code>.
-
-                This can thus be used to convert calculated numbers to canonical form.
-            </li>
-            <li>
-                By default, the following terms are available:
-                <ul>
-                    <li><code>B x y z = x (y z)</code>;</li>
-                    <li><code>C x y z = x z y</code>;</li>
-                    <li><code>I x = x</code>;</li>
-                    <li><code>K x y = x</code>;</li>
-                    <li><code>S f g x = f x (g x)</code>;</li>
-                    <li><code>W f x = f x x</code>;</li>
-                </ul>
-            </li>
-        </ul>
     </div>
 
     <div class="chapter">
         <h2>In place of a conclusion</h2>
 
-        What next?
+        <p>What next?</p>
         <ul class="menu">
             <li><a href="index.html">The interpreter</a></li>
             <li><a href="quest.html">Solve some quests</a></li>
