@@ -68,7 +68,7 @@
                 are considered words/identifiers and must be spaced from one another.
             </li>
             <li>
-                Unknown terms are assumed to be variables. They are just moved around as is.
+                Unknown terms are just moved around as is.
                 Terms with known semantics may be reduced when given enough arguments
                 (other terms or subexpressions), see below.
             </li>
@@ -86,7 +86,7 @@
             </li>
 
             <li>
-                By default, the following terms are available:
+                The following combinators are predefined:
                 <ul>
                     <li><code>B x y z = x (y z)</code>;</li>
                     <li><code>C x y z = x z y</code>;</li>
@@ -94,17 +94,20 @@
                     <li><code>K x y = x</code>;</li>
                     <li><code>S f g x = f x (g x)</code>;</li>
                     <li><code>W f x = f x x</code>;</li>
+                    <li><code>0 f x = x</code>;</li>
+                    <li><code>1 f x = f (x)</code>;</li>
+                    <li><code>2 f x = f (f (x))</code>;</li>
+                    <li><code>3 f x = f (f (f (x)))</code>;</li>
+                    <li><code>n f x = f (f ... { n times }... f (x)...))</code> - this is called
+                        <a href="https://en.wikipedia.org/wiki/Church_encoding#Church_numerals" target="_blank">Church numerals</a>;
+                    </li>
+                    <li>
+                        <code>+ n f x = f(n f x)</code>
+                        is a special operator that behaves as described for arbitrary terms,
+                        but when followed by a Church numeral <i>n</i>, it simply replaces it with <i>n+1</i>.
+                        This allows to convert results of computations back to human-readable form.
+                    </li>
                 </ul>
-            </li>
-
-            <li>
-                A nonnegative integer is assumed to be a Church numeral: <code>n f x = f(f(... {n times} ...f(x)...))</code>.
-                Church numerals must be separated by spaces from both uppercase and lowercase terms.
-
-                A special <code>+</code> operator increases the next term by 1 if it happens to be a Church numeral:
-                <code>7 + 0 = +(+(+(+(+(+(+(0))))))) = +(+(+(+(+(+(1)))))) = ... = 7</code>.
-
-                This can thus be used to convert calculated numbers to a human readable form.
             </li>
 
             <li>
@@ -279,10 +282,10 @@
     </div>
 
     <div class="chapter">
-        <h2>????</h2>
+        <h2>Combinators and lambdas</h2>
 
         <p>
-            Just like <code>T</code> and <code>K</code>, any combinator of arity <i>n</i> plus a variable
+            Just like <code>T</code> and <code>K</code>, any combinator of arity <i>n</i> plus an argument
             is a combinator of arity <i>n &minus; 1</i>, per definition (it applies its arguments to themselves and
             possible some previously defined terms).
             So a combinator may be thought of as a one-argument function returning a combinator or
@@ -298,10 +301,19 @@
         </p>
 
         <p>
+            These observations lead us to a somewhat formal definition of what a term or expression is:<br>
+            <code>expr ::= ident | expr expr | ident -> expr</code><br>
+            &mdash; which is of course the definition of lambda calculus.
+        </p>
+
+        <p>
             Any combinatory logic expression may be expressed in terms of lambdas.
-            The reverse, however, is only true for specific sets of starting terms, or bases.
+            The reverse, however, is only true for specific sets of starting terms called <b><i>bases</i></b>.
             In particular, <code>{S, K}</code> and <code>{B, C, K, W}</code>
             are such bases.
+            <a href="https://en.wikipedia.org/wiki/Iota_and_Jot" target="_blank">Single combinator</a>
+            bases as well as bases not requiring parentheses exist, too,
+            but are out of scope of this document.
         </p>
     </div>
 
