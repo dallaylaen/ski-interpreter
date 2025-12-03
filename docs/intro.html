@@ -14,7 +14,7 @@
 
 <div id="intro" style="padding: 1ex; max-width: 60em;">
     <div class="chapter">
-        <h2>A bit of history</h2>
+        <h2>Foreword</h2>
         <p>
             <A href="https://en.wikipedia.org/wiki/Combinatory_logic" target="_blank">Combinatory logic</a>
             is a minimalistic functional programming language.
@@ -54,13 +54,9 @@
     <div class="chapter">
         <h2>The interpreter syntax</h2>
 
-        <p>
-            This interpreter's syntax works as follows:
-        </p>
-
         <ul>
             <li>
-                A <b><i>term</i></b> is either un uppercase letter, a lowercase identifier, a nonnegative integer,
+                A <b><i>term</i></b> is either an uppercase letter, a lowercase identifier, a nonnegative integer,
                 or a parenthesized expression.
             </li>
             <li>
@@ -74,7 +70,7 @@
             <li>
                 Unknown terms are assumed to be variables. They are just moved around as is.
                 Terms with known semantics may be reduced when given enough arguments
-                (other terms or subexpressions).
+                (other terms or subexpressions), see below.
             </li>
             <li>
                 A term followed by one or more terms is called an <b><i>application</i></b>.
@@ -302,7 +298,7 @@
         </p>
 
         <p>
-            With this, any combinatory logic expression may be expressed via a lambda term.
+            Any combinatory logic expression may be expressed in terms of lambdas.
             The reverse, however, is only true for specific sets of starting terms, or bases.
             In particular, <code>{S, K}</code> and <code>{B, C, K, W}</code>
             are such bases.
