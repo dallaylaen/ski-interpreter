@@ -1,0 +1,57 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.1.0] - 2025-12-07
+
+### BREAKING CHANGES
+
+- Expr: canonize() renamed to guess(), output semantics changed
+  & returns nothing for non-normalizable terms.
+  Always check `result.normal` to be true.
+- Expr: wantsArgs() removed.
+- Quest: LinearCase class replaced with PropertyCase
+  supporting boolean properties `normal`, `proper`, `discard`, `duplicate`,
+  `linear`, and `affine`, and numeric `arity`.
+
+### Added
+- Expr: guess() method to normalize terms.
+  Returns an object with `normal`: boolean and `steps`:
+  number properties, as well as optional `expr`: Expr -
+  equivalent lambda expression; `arity`: number, 
+  and other properties.
+- Expr: replace(terms: Expr[], options: {}) replaces
+  subtrees with matching canonical form (if they have one).
+- Expr: expect(expr: Expr, comment: string?) now handles coments like proper assertion.
+- Quest: PropertyCase class for matching based on term properties.
+- Proper changelog
+- Lots of new quests at https://dallaylaen.github.io/ski-interpreter/quest.html
+
+### Fixed
+- Expr: equals() and expect() handle aliases correctly.
+- Expr: run() always executes at least 1 step.
+- Quest: improve typedefs
+- package.json: rely on `npx` instead of handwritten scripts, improve dev dependencies.
+
+## [1.0.1] - 2025-07-18
+
+### Fixed
+
+- README.md
+
+## [1.0.0] - 2025-07-18
+
+### Added
+
+- Parser
+    - B, C, I, K, S, W
+    - Church numerals
+    - Lambdas as `x -> expr`
+    - Declare new terms `foo = expr`
+- Quest engine
+- Basically everything
+
+

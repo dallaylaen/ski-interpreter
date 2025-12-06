@@ -1,6 +1,6 @@
 {
   "name": "@dallaylaen/ski-interpreter",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Simple Kombinator Interpreter - a combinatory logic & lambda calculus parser and interpreter. Supports SKI, BCKW, Church numerals, and setting up assertions ('quests') involving all of the above.",
   "keywords": [
     "combinatory logic",
@@ -25,6 +25,7 @@
     "package.json",
     "README.md",
     "LICENSE",
+    "CHANGELOG.md",
     "lib",
     "types"
   ],
