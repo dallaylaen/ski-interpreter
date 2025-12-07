@@ -21,6 +21,19 @@ function showTerm(term) {
       .replaceAll(/\s*->\s*/g, '&rarr;');
 }
 
+let displayOptions = {
+  html: true,
+};
+
+function setDisplay(options) {
+  for (const key of Object.keys(options)) {
+    if (options[key] === undefined)
+      delete displayOptions[key];
+    else
+      displayOptions[key] = options[key];
+  }
+}
+
 let nextId = 0;
 
 class EvalBox {
@@ -108,14 +121,7 @@ class EvalBox {
     const { value, done } = this.seq.next();
 
     if (value) {
-      this.print(
-        value.expr.format({
-          terse: true,
-          html: true,
-          brackets: ['<span class="bracket">(</span>', '<span class="bracket">)</span>'],
-        }),
-        {line: value.steps}
-      );
+      this.print(value.expr.format(displayOptions),{line: value.steps});
 
       if (this.view.counter)
         this.view.counter.innerHTML = '' + value.steps;
