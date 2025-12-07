@@ -59,6 +59,42 @@ function rubberDesign (mainId) {
   return resize;
 }
 
+class SMCtl {
+  constructor(options = {}) {
+    this.onchange = [];
+    this.check = options.check ?? (any => true);
+    if (options.onchange)
+      this.onchange.push(options.onchange);
+    if (options.storage) {
+      const [engine, key] = options.storage;
+      this.save = () => engine.save(key, this.value);
+      this.load = () => this.set(engine.load(key) ?? options.default, true);
+    } else {
+      this.save = () => {};
+      this.load = () => { this.set( options.default ); };
+    }
+    this.load(); // set without saving
+  }
+
+  set(value, nosave=false) {
+    if (!this.check(value))
+      throw new Error('SMCtl: invalid value ' + value);
+    for (const cb of this.onchange)
+      cb(value, this.value);
+    this.value = value;
+    if (!nosave)
+      this.save(value);
+  }
+
+  get() {
+    return this.value;
+  }
+
+  addAction(cb) {
+    this.onchange.push(cb);
+  }
+}
+
 let currentHamburger = null;
 
 class Hamburger {
@@ -116,26 +152,47 @@ class Hamburger {
      * @param choices
      * @return {Hamburger}
      */
-  addChoice (label, action, choices, startAt = null) {
-    let current = startAt;
+  addChoice (label, smctl, choices ) {
     const li = this.appendLi();
-    const span = append(li, 'span', { content: label });
-    const entries = [];
-    for (let i = 0; i < choices.length; i++) {
-      const pick = Array.isArray(choices[i]) ? choices[i][1] : choices[i];
-      const display = Array.isArray(choices[i]) ? choices[i][0] : choices[i];
-      const entry = append(li, 'a', { content: display, class: ['hamburger-choice'] });
-      entries.push(entry);
-      if (i === startAt)
-        entry.classList.add('hamburger-current');
-      entry.onclick = () => {
-        if (current !== null)
-          entries[current].classList.remove('hamburger-current');
-        current = i;
-        entries[i].classList.add('hamburger-current');
-        action(pick);
+    append(li, 'span', { content: label });
+    const buttons = {}; // option value -> element
+    for (const entry of choices) {
+      const value = Array.isArray(entry) ? entry[1] : entry;
+      const display = Array.isArray(entry) ? entry[0] : entry;
+      const button = append(li, 'a', { content: display, class: ['hamburger-choice'] });
+      buttons[value] = button;
+      button.onclick = () => {
+        smctl.set(value);
         this.hide();
       };
+    }
+    const action = (val, old) => {
+      if (old !== undefined && buttons[old])
+        buttons[old].classList.remove('hamburger-current');
+      if (buttons[val])
+        buttons[val].classList.add('hamburger-current');
+    };
+    smctl.addAction(action);
+    action(smctl.get(), undefined);
+    return this; // for chaining
+  }
+
+  // flags: [ [label, callback, selected?], ... ]
+  addFlags(label, flags) {
+    const state = {};
+    const li = this.appendLi();
+    append(li, 'span', { content: label });
+    for (const [label, smctl] of flags) {
+      const button = append(li, 'a', { content: label, class: ['hamburger-choice'] });
+      button.onclick = () => {
+        smctl.set(!smctl.get());
+        this.hide();
+      };
+      const action = (val, old) => {
+        button.classList.toggle('hamburger-current', val);
+      };
+      smctl.addAction(action);
+      action(smctl.get());
     }
     return this; // for chaining
   }

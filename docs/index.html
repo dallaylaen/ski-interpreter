@@ -172,18 +172,63 @@
 
     function setupMenu() {
         const menu = new Hamburger(view.menu);
-        menu.addChoice('speed (ms)', val => {
-            evalOptions.delay = val;
-            if(currentBox)
-                currentBox.delay = val;
-            store.save('delay', val);
-        }, [0, 50, 100, 200, 300, 500, 1000], 4);
-        menu.addChoice('history lines', val => {
-            evalOptions.height = val;
-            if(currentBox)
-                currentBox.setHeight(val);
-            store.save('height', val);
-        }, [3, 5, 7, 10, 20, ['&infin;', Infinity]], 2);
+        const ctlSpeed = new SMCtl({
+          onchange: val => { evalOptions.delay = val; if (currentBox) currentBox.delay = val; },
+          storage: [store, 'eval-delay'],
+          default: 300,
+          check: val => val >= 0,
+        })
+        menu.addChoice('speed (ms)', ctlSpeed, [0, 50, 100, 200, 300, 500, 1000]);
+        const ctlHeight = new SMCtl({
+          onchange: val => { evalOptions.height = val; if (currentBox) currentBox.setHeight(val); },
+          storage: [store, 'eval-height'],
+          default: 7,
+          check: val => val >= 1,
+        })
+        menu.addChoice('history lines', ctlHeight, [3, 5, 7, 10, 20, ['&infin;', Infinity]]);
+        menu.addFlags('display', [
+          [
+            'terse',
+            new SMCtl({
+              storage: [store, 'display-terse'],
+              default: true,
+              check: val => typeof val === 'boolean',
+              onchange: on => { setDisplay({terse: on}); },
+            })
+          ],
+          [
+            'fancy',
+            new SMCtl({
+                storage: [store, 'display-fancy'],
+                default: true,
+                check: val => typeof val === 'boolean',
+                onchange: on => {
+                  setDisplay(on ? {
+                    redex: ['<b>', '</b>'],
+                    brackets: ['<span class="bracket">(</span>', '<span class="bracket">)</span>'],
+                    var: ['<var>', '</var>'],
+                  } : {
+                    redex: ['',''],
+                    brackets: ['(', ')'],
+                    var: ['',''],
+                  });
+                },
+            })
+          ],
+          [
+            'outline',
+            new SMCtl({
+                storage: [store, 'display-outline'],
+                default: false,
+                check: val => typeof val === 'boolean',
+                onchange: on => { setDisplay( on ? {
+                  around: ['<span class="outline">', '</span>'],
+                } : {
+                  around: ['', ''],
+                });},
+            })
+          ]
+        ]);
         menu.addAction('reset terms', () => {
             if (!window.confirm('Really erase all terms?'))
                 return;
