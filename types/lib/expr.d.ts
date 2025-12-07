@@ -223,17 +223,29 @@ export class Expr {
     _spaced(arg: any): boolean;
     /**
      * @desc    Stringify the expression with fancy formatting options.
+     *          Said options mostly include wrappers around various constructs in form of ['(', ')'],
+     *          as well as terse and html flags that set up the defaults.
+     *          Format without options is equivalent to toString() and can be parsed back.
+     *
      * @param   {{
+     *    terse:  boolean?,
      *    html: boolean?,
      *    brackets: [string, string]?,
-     *    var:    [string, string]?,
+     *    var:      [string, string]?,
+     *    lambda:   [string, string, string]?,
+     *    around:   [string, string]?,
+     *    redex:    [string, string]?,
      * }} options
      * @returns {string}
      */
     format(options?: {
+        terse: boolean | null;
         html: boolean | null;
         brackets: [string, string] | null;
         var: [string, string] | null;
+        lambda: [string, string, string] | null;
+        around: [string, string] | null;
+        redex: [string, string] | null;
     }): string;
     _format(options: any, nargs: any): void;
     /**
