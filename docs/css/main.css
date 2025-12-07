@@ -61,6 +61,13 @@
     opacity: 30%;
 }
 
+.outline {
+    border: solid 1px blue;
+    padding: 3px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
 /* teletype */
 
 #teletype {
