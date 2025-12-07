@@ -220,6 +220,22 @@ export class Expr {
      * @return {boolean}
      */
     needsParens(first?: boolean): boolean;
+    _spaced(arg: any): boolean;
+    /**
+     * @desc    Stringify the expression with fancy formatting options.
+     * @param   {{
+     *    html: boolean?,
+     *    brackets: [string, string]?,
+     *    var:    [string, string]?,
+     * }} options
+     * @returns {string}
+     */
+    format(options?: {
+        html: boolean | null;
+        brackets: [string, string] | null;
+        var: [string, string] | null;
+    }): string;
+    _format(options: any, nargs: any): void;
     /**
      *
      * @return {string}
@@ -261,12 +277,15 @@ export class App extends Expr {
     contains(other: any): any;
     needsParens(first: any): boolean;
     toString(opt?: {}): string;
+    _format(options: any, nargs: any): any;
+    _spaced(arg: any): any;
 }
 export class FreeVar extends Named {
     constructor(name: any);
     id: number;
     subst(plug: any, value: any): any;
     toString(opt?: {}): string;
+    _format(options: any, nargs: any): string;
 }
 export class Lambda extends Expr {
     /**
@@ -284,6 +303,7 @@ export class Lambda extends Expr {
     _rski(options: any): any;
     equals(other: any): boolean;
     toString(opt?: {}): string;
+    _format(options: any, nargs: any): string;
     needsParens(first: any): boolean;
 }
 /**
@@ -313,6 +333,7 @@ export class Native extends Named {
     apply(...args: any[]): Expr;
     _rski(options: any): any;
     reduce(args: any): any;
+    _format(options: any, nargs: any): string;
 }
 export class Alias extends Named {
     /**
@@ -348,6 +369,7 @@ export class Alias extends Named {
     _rski(options: any): Expr;
     toString(opt: any): string;
     needsParens(first: any): boolean;
+    _format(options: any, nargs: any): string | void;
 }
 export class Church extends Native {
     constructor(n: any);
