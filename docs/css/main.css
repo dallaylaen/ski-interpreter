@@ -57,6 +57,10 @@
     cursor: pointer;
 }
 
+.bracket {
+    opacity: 30%;
+}
+
 /* teletype */
 
 #teletype {

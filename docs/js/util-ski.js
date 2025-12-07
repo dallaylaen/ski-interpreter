@@ -108,7 +108,14 @@ class EvalBox {
     const { value, done } = this.seq.next();
 
     if (value) {
-      this.print(value.expr.toString({terse: true}), {line: value.steps});
+      this.print(
+        value.expr.format({
+          terse: true,
+          html: true,
+          brackets: ['<span class="bracket">(</span>', '<span class="bracket">)</span>'],
+        }),
+        {line: value.steps}
+      );
 
       if (this.view.counter)
         this.view.counter.innerHTML = '' + value.steps;
@@ -156,7 +163,7 @@ class EvalBox {
       append(line, 'span', {
         class: options.class ?? ['line-text'],
         color: options.color,
-        content: sanitize(text),
+        content: (text),
       });
 
       while (this.view.main.children.length > this.height)
