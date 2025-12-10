@@ -65,13 +65,13 @@ export class Expr {
      * @return {{
      *    normal: boolean,
      *    steps: number,
-     *    expr: Expr?,
-     *    arity: number?,
-     *    proper: boolean?,
-     *    discard: boolean?,
-     *    duplicate: boolean?,
-     *    skip: Set<number>?,
-     *    dup: Set<number>?
+     *    expr?: Expr,
+     *    arity?: number,
+     *    proper?: boolean,
+     *    discard?: boolean,
+     *    duplicate?: boolean,
+     *    skip?: Set<number>,
+     *    dup?: Set<number>,
      * }}
      */
     guess(options?: {
@@ -80,13 +80,13 @@ export class Expr {
     }): {
         normal: boolean;
         steps: number;
-        expr: Expr | null;
-        arity: number | null;
-        proper: boolean | null;
-        discard: boolean | null;
-        duplicate: boolean | null;
-        skip: Set<number> | null;
-        dup: Set<number> | null;
+        expr?: Expr;
+        arity?: number;
+        proper?: boolean;
+        discard?: boolean;
+        duplicate?: boolean;
+        skip?: Set<number>;
+        dup?: Set<number>;
     };
     _guess(options: any, preArgs?: any[], steps?: number): any;
     _aslist(): this[];
@@ -96,23 +96,23 @@ export class Expr {
      *       up to the provided computation steps limit,
      *       in decreasing weight order.
      * @param {{
-     *   max: number?,
-     *   maxArgs: number?,
-     *   varGen: function(void): FreeVar?,
-     *   steps: number?,
-     *   html: boolean?,
-     *   latin: number?,
+     *   max?: number,
+     *   maxArgs?: number,
+     *   varGen?: function(void): FreeVar,
+     *   steps?: number,
+     *   html?: boolean,
+     *   latin?: number,
      * }} options
      * @param {number} [maxWeight] - maximum allowed weight of terms in the sequence
      * @return {IterableIterator<{expr: Expr, steps: number?, comment: string?}>}
      */
     lambdify(options?: {
-        max: number | null;
-        maxArgs: number | null;
-        varGen: (arg0: void) => FreeVar | null;
-        steps: number | null;
-        html: boolean | null;
-        latin: number | null;
+        max?: number;
+        maxArgs?: number;
+        varGen?: (arg0: void) => FreeVar;
+        steps?: number;
+        html?: boolean;
+        latin?: number;
     }): IterableIterator<{
         expr: Expr;
         steps: number | null;
@@ -220,7 +220,7 @@ export class Expr {
      * @return {boolean}
      */
     needsParens(first?: boolean): boolean;
-    _spaced(arg: any): boolean;
+    _unspaced(arg: any): boolean;
     /**
      * @desc    Stringify the expression with fancy formatting options.
      *          Said options mostly include wrappers around various constructs in form of ['(', ')'],
@@ -228,24 +228,24 @@ export class Expr {
      *          Format without options is equivalent to toString() and can be parsed back.
      *
      * @param   {{
-     *    terse:  boolean?,
-     *    html: boolean?,
-     *    brackets: [string, string]?,
-     *    var:      [string, string]?,
-     *    lambda:   [string, string, string]?,
-     *    around:   [string, string]?,
-     *    redex:    [string, string]?,
+     *    terse?:  boolean,
+     *    html?: boolean,
+     *    brackets?: [string, string],
+     *    var?:      [string, string],
+     *    lambda?:   [string, string, string],
+     *    around?:   [string, string],
+     *    redex?:    [string, string],
      * }} options
      * @returns {string}
      */
     format(options?: {
-        terse: boolean | null;
-        html: boolean | null;
-        brackets: [string, string] | null;
-        var: [string, string] | null;
-        lambda: [string, string, string] | null;
-        around: [string, string] | null;
-        redex: [string, string] | null;
+        terse?: boolean;
+        html?: boolean;
+        brackets?: [string, string];
+        var?: [string, string];
+        lambda?: [string, string, string];
+        around?: [string, string];
+        redex?: [string, string];
     }): string;
     _format(options: any, nargs: any): void;
     /**
@@ -290,7 +290,7 @@ export class App extends Expr {
     needsParens(first: any): boolean;
     toString(opt?: {}): string;
     _format(options: any, nargs: any): any;
-    _spaced(arg: any): any;
+    _unspaced(arg: any): any;
 }
 export class FreeVar extends Named {
     constructor(name: any);
