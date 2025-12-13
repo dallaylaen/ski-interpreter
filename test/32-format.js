@@ -35,6 +35,35 @@ describe('Expr.format: round-trip', () => {
   roundTrip('x(y(z t))')
 });
 
+describe ('Expr.format: aliases behavior', () => {
+  it ('honors alias deletion and restriction', () =>{
+    const ski2 = new SKI();
+    ski2.add('T', 'CI');
+    ski2.add('M', 'SII');
+    ski2.add('x', '42');
+
+    const T = ski2.getTerms()['T'];
+
+    const foo = ski2.parse('T(Mx)');
+
+    expect(foo.format({ terse: false })).to.equal('T(M(x))');
+
+    expect(foo.format({ terse: false, inventory: {} })).to.equal('C(I)(S(I)(I)(42))');
+
+    expect(foo.format({
+      terse: false,
+      inventory:  { T, M: ski2.parse('a->a a')},
+    })).to.equal('T(S(I)(I)(42))');
+
+    ski2.add('M', 'a->a a');
+    const oldt = ski2.getTerms()['T'];
+    ski2.remove('T');
+
+    expect(foo.format({terse: false})).to.equal('C(I)(S(I)(I)(x))');
+    expect(foo.format({terse: false, inventory: { T }})).to.equal('T(S(I)(I)(42))');
+  });
+});
+
 function check (src, options, result, comment) {
   describe(src, () => {
     const jar = {};
