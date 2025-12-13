@@ -2,7 +2,7 @@ const { expect } = require('chai');
 
 const { SKI } = require('../index');
 
-const ski = new SKI();
+const mainParser = new SKI();
 
 describe('Expr.format: literal', () => {
   check('SKK', {}, 'SKK');
@@ -37,14 +37,14 @@ describe('Expr.format: round-trip', () => {
 
 describe ('Expr.format: aliases behavior', () => {
   it ('honors alias deletion and restriction', () =>{
-    const ski2 = new SKI();
-    ski2.add('T', 'CI');
-    ski2.add('M', 'SII');
-    ski2.add('x', '42');
+    const ski = new SKI();
+    ski.add('T', 'CI');
+    ski.add('M', 'SII');
+    ski.add('x', '42');
 
-    const T = ski2.getTerms()['T'];
+    const T = ski.getTerms()['T'];
 
-    const foo = ski2.parse('T(Mx)');
+    const foo = ski.parse('T(Mx)');
 
     expect(foo.format({ terse: false })).to.equal('T(M(x))');
 
@@ -52,12 +52,11 @@ describe ('Expr.format: aliases behavior', () => {
 
     expect(foo.format({
       terse: false,
-      inventory:  { T, M: ski2.parse('a->a a')},
+      inventory:  { T, M: ski.parse('a->a a')},
     })).to.equal('T(S(I)(I)(42))');
 
-    ski2.add('M', 'a->a a');
-    const oldt = ski2.getTerms()['T'];
-    ski2.remove('T');
+    ski.add('M', 'a->a a');
+    ski.remove('T');
 
     expect(foo.format({terse: false})).to.equal('C(I)(S(I)(I)(x))');
     expect(foo.format({terse: false, inventory: { T }})).to.equal('T(S(I)(I)(42))');
@@ -67,7 +66,7 @@ describe ('Expr.format: aliases behavior', () => {
 function check (src, options, result, comment) {
   describe(src, () => {
     const jar = {};
-    const expr = ski.parse(src, jar);
+    const expr = mainParser.parse(src, jar);
     const formatted = expr.format(options);
     it (`formats to ${result}`, () => {
       expect(formatted).to.equal(result, comment);
@@ -77,7 +76,7 @@ function check (src, options, result, comment) {
       const stripped = options.html
         ? formatted.replace(/<[^>]+>/g, '').replace(/&gt;/g, '>')
         : formatted;
-      const expr2 = ski.parse(stripped, jar);
+      const expr2 = mainParser.parse(stripped, jar);
       expr.expect(expr2);
     });
 
@@ -88,7 +87,7 @@ function check (src, options, result, comment) {
 function roundTrip (src) {
   describe(src + ' round trips', () => {
     const jar = {};
-    const expr = ski.parse(src, jar);
+    const expr = mainParser.parse(src, jar);
 
     it ('format w/o options coincides with toString', () => {
       expect(expr.format()).to.equal(expr.toString());
@@ -111,7 +110,7 @@ function roundTrip (src) {
     it ('round-trips with html:true', () => {
       const formatted = expr.format({html: true});
       const stripped = formatted.replace(/<[^>]+>/g, '').replace(/&gt;/g, '>');
-      const expr2 = ski.parse(stripped, jar);
+      const expr2 = mainParser.parse(stripped, jar);
       expr.expect(expr2);
     });
 
@@ -126,7 +125,7 @@ function roundTrip (src) {
 
 function sameAs (src, jar, expr, comment) {
   it (`${comment}: evaluates ${src} as ${expr}`, () => {
-    const expr2 = ski.parse(src, jar);
+    const expr2 = mainParser.parse(src, jar);
     expr.expect(expr2, comment);
   });
 }
