@@ -3,7 +3,7 @@
 const { expect } = require('chai');
 
 const { SKI } = require('../index');
-const { emitDeclarations } = require('../lib/expr');
+const { declare } = require('../lib/expr');
 
 describe('SKI.bulkAdd', () => {
   it ('can add and remove terms', () => {
@@ -47,7 +47,7 @@ describe('SKI.emitDeclaration', () => {
     ski.add('R', 'BBT');
     ski.add('V', 'BCT');
 
-    expect(emitDeclarations(ski.getTerms())).to.deep.equal(
+    expect(declare(ski.getTerms())).to.deep.equal(
       ['T=CI', 'R=BBT', 'V=BCT']
     );
   });
@@ -68,7 +68,7 @@ describe('SKI.emitDeclaration', () => {
 
     const inventory = ski.getTerms();
 
-    const decl = emitDeclarations(inventory);
+    const decl = declare(inventory);
 
     const ski2 = new SKI();
     ski2.bulkAdd(decl);
@@ -91,7 +91,7 @@ describe('SKI.emitDeclaration', () => {
     const inventory = ski.getTerms();
 
     // TODO this fails miserably, will fix later
-    const decl = emitDeclarations(inventory);
+    const decl = declare(inventory);
 
     const ski2 = new SKI({numbers: false, lambdas: false, allow: 'SK'});
 
