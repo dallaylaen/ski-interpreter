@@ -37,35 +37,59 @@ describe('SKI.emitDeclaration', () => {
     const decl = emitDeclarations(inventory);
 
     const ski2 = new SKI();
-    for (const d of decl) {
-      const [name, exprStr] = d.split('=');
-      ski2.add(name, exprStr);
-    }
-    ;
+    ski2.bulkAdd(decl);
 
-    const inventory2 = ski2.getTerms();
-
-    for (const name of Object.keys(inventory)) {
-      expect(inventory2).to.have.property(name);
-      inventory[name].expect(inventory2[name]);
-    }
+    compareInventories(ski2.getTerms(), ski.getTerms());
   });
 
   it('declares terms (with native overrides', () => {
-    const ski = new SKI();
+    const ski = new SKI({numbers: false, lambdas: false, allow: 'SK'});
 
-    ski.restrict('SK')
     ski.add('tmp', 'S');
     ski.add('S', 'K');
     ski.add('K', 'tmp');
     ski.remove('tmp');
 
-    expect(ski.parse('K(SK)S a b c').run().expr + '').to.equal('a(b c)');
+    const jar = {};
+    const expr1 = ski.parse('K(SK)S a b c', jar);
+    expect(expr1.run().expr + '').to.equal('a(b c)');
 
     const inventory = ski.getTerms();
 
     // TODO this fails miserably, will fix later
     const decl = emitDeclarations(inventory);
-    console.log(decl);
+
+    const ski2 = new SKI({numbers: false, lambdas: false, allow: 'SK'});
+    ski2.bulkAdd(decl);
+
+    return ; // TODO
+
+    compareInventories(ski2.getTerms(), ski.getTerms());
+
+    const expr2 = ski2.parse('K(SK)S a b c', jar);
+    expect(expr2.run().expr + '').to.equal('a(b c)');
+    expr1.expect(expr2);
   });
 });
+
+function compareInventories (got, exp) {
+  const keys = new Set([...Object.keys(got), ...Object.keys(exp)]);
+  const green = {};
+  const red = {};
+  for (const k of keys) {
+    if (!got.hasOwnProperty(k))
+      green[k] = exp[k];
+    else if (!exp.hasOwnProperty(k))
+      red[k] = got[k];
+    else if (!got[k].equals(exp[k])) {
+      green[k] = exp[k];
+      red[k] = got[k];
+    }
+  }
+  if (Object.keys(green).length || Object.keys(red).length) {
+    const err = new Error('Inventories differ');
+    err.actual = red;
+    err.expected = green;
+    throw err;
+  }
+}
