@@ -2,21 +2,21 @@ export class SKI {
     /**
      *
      * @param {{
-     *    allow: string?,
-     *    numbers: boolean?,
-     *    lambdas: boolean?,
-     *    terms: { [key: string]: Expr|string}?,
-     *    annotate: boolean?,
+     *    allow?: string,
+     *    numbers?: boolean,
+     *    lambdas?: boolean,
+     *    terms?: { [key: string]: Expr|string} | string[],
+     *    annotate?: boolean,
      * }} [options]
      */
     constructor(options?: {
-        allow: string | null;
-        numbers: boolean | null;
-        lambdas: boolean | null;
-        terms: {
+        allow?: string;
+        numbers?: boolean;
+        lambdas?: boolean;
+        terms?: {
             [key: string]: Expr | string;
-        } | null;
-        annotate: boolean | null;
+        } | string[];
+        annotate?: boolean;
     });
     annotate: boolean;
     known: {};
@@ -35,6 +35,14 @@ export class SKI {
         fast: boolean | null;
     }], note?: string): SKI;
     maybeAdd(name: any, impl: any): this;
+    /**
+     * @desc Declare and remove multiple terms at once
+     *       term=impl adds term
+     *       term= removes term
+     * @param {string[]]} list
+     * @return {SKI} chainable
+     */
+    bulkAdd(list: any): SKI;
     /**
      * Restrict the interpreter to given terms. Terms prepended with '+' will be added
      * and terms preceeded with '-' will be removed.
@@ -66,6 +74,11 @@ export class SKI {
         [key: string]: Native | Alias;
     };
     /**
+     * Export term declarations for use in bulkAdd().
+     * @returns {string[]}
+     */
+    declare(): string[];
+    /**
      *
      * @param {string} source
      * @param {{[keys: string]: Expr}} vars
@@ -94,13 +107,12 @@ export class SKI {
         allow: string | null;
     }): Expr;
     toJSON(): {
+        version: string;
         allow: string;
         numbers: boolean;
         lambdas: boolean;
-        terms: {
-            [key: string]: Native | Alias;
-        };
         annotate: boolean;
+        terms: string[];
     };
 }
 export namespace SKI {

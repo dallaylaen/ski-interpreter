@@ -147,13 +147,17 @@ export class Expr {
        */
     reduce(args: Expr[]): Expr | null;
     /**
-       * Replace all instances of free vars with corresponding values and return the resulting expression.
-       * return null if no changes could be made.
-       * @param {FreeVar} plug
-       * @param {Expr} value
-       * @return {Expr|null}
-       */
-    subst(plug: FreeVar, value: Expr): Expr | null;
+     * Replace all instances of plug in the expression with value and return the resulting expression,
+     * or null if no changes could be made.
+     * Lambda terms and applications will never match if used as plug
+     * as they are impossible co compare without extensive computations.
+     * Typically used on variables but can also be applied to other terms, e.g. aliases.
+     * See also Expr.replace().
+     * @param {Expr} search
+     * @param {Expr} replace
+     * @return {Expr|null}
+     */
+    subst(search: Expr, replace: Expr): Expr | null;
     /**
        * @desc iterate one step of calculation in accordance with known rules.
        * @return {{expr: Expr, steps: number, changed: boolean}}
@@ -227,16 +231,31 @@ export class Expr {
      *          as well as terse and html flags that set up the defaults.
      *          Format without options is equivalent to toString() and can be parsed back.
      *
-     * @param   {{
-     *    terse?:  boolean,
-     *    html?: boolean,
-     *    brackets?: [string, string],
-     *    var?:      [string, string],
-     *    lambda?:   [string, string, string],
-     *    around?:   [string, string],
-     *    redex?:    [string, string],
-     * }} options
+     * @param   {Object} [options]  - formatting options
+     * @param   {boolean} [options.terse]   - whether to use terse formatting (omitting unnecessary spaces and parentheses)
+     * @param   {boolean} [options.html]    - whether to default to HTML tags & entities
+     * @param   {[string, string]} [options.brackets]  - wrappers for application arguments, typically ['(', ')']
+     * @param   {[string, string]} [options.var]       - wrappers for variable names
+     *                                (will default to &lt;var&gt; and &lt;/var&gt; in html mode)
+     * @param   {[string, string, string]} [options.lambda]    - wrappers for lambda abstractions, e.g. ['&lambda;', '.', '']
+     *                                where the middle string is placed between argument and body
+     *                                default is ['', '->', ''] or ['', '-&gt;', ''] for html
+     * @param   {[string, string]} [options.around]    - wrappers around (sub-)expressions.
+     *                                individual applications will not be wrapped, i.e. (a b c) but not ((a b) c)
+     * @param   {[string, string]} [options.redex]     - wrappers around the starting term(s) that have enough arguments to be reduced
+     * @param   {Object<string, Expr>} [options.inventory]     - if given, output aliases in the set as their names
+     *                                and any other aliases as the expansion of their definitions.
+     *                                The default is a cryptic and fragile mechanism dependent on a hidden mutable property.
      * @returns {string}
+     *
+     * @example foo.format() // equivalent to foo.toString()
+     * @example foo.format({terse: false}) // spell out all parentheses
+     * @example foo.format({html: true}) // use HTML tags and entities
+     * @example foo.format({ around: ['(', ')'], brackets: ['', ''], lambda: ['(', '->', ')'] }) // lisp style, still back-parsable
+     * @exapmle foo.format({ lambda: ['&lambda;', '.', ''] }) // pretty-print for the math department
+     * @example foo.format({ lambda: ['', '=>', ''], terse: false }) // make it javascript
+     * @example foo.format({ inventory: { T } }) // use T as a named term, expand all others
+     *
      */
     format(options?: {
         terse?: boolean;
@@ -246,8 +265,12 @@ export class Expr {
         lambda?: [string, string, string];
         around?: [string, string];
         redex?: [string, string];
+        inventory?: {
+            [x: string]: Expr;
+        };
     }): string;
     _format(options: any, nargs: any): void;
+    _declare(output: any, inventory: any, seen: any): void;
     /**
      *
      * @return {string}
@@ -274,7 +297,7 @@ export class App extends Expr {
     apply(...args: any[]): App;
     expand(): any;
     renameVars(seq: any): any;
-    subst(plug: any, value: any): any;
+    subst(search: any, replace: any): any;
     /**
      * @return {{expr: Expr, steps: number}}
      */
@@ -295,9 +318,7 @@ export class App extends Expr {
 export class FreeVar extends Named {
     constructor(name: any);
     id: number;
-    subst(plug: any, value: any): any;
     toString(opt?: {}): string;
-    _format(options: any, nargs: any): string;
 }
 export class Lambda extends Expr {
     /**
@@ -309,7 +330,7 @@ export class Lambda extends Expr {
     impl: Expr;
     arity: number;
     reduce(input: any): Expr;
-    subst(plug: any, value: any): Lambda;
+    subst(search: any, replace: any): Lambda;
     expand(): Lambda;
     renameVars(seq: any): Lambda;
     _rski(options: any): any;
@@ -345,7 +366,6 @@ export class Native extends Named {
     apply(...args: any[]): Expr;
     _rski(options: any): any;
     reduce(args: any): any;
-    _format(options: any, nargs: any): string;
 }
 export class Alias extends Named {
     /**
@@ -367,7 +387,7 @@ export class Alias extends Named {
     proper: any;
     terminal: any;
     canonical: any;
-    subst(plug: any, value: any): Expr;
+    subst(search: any, replace: any): any;
     /**
      *
      * @return {{expr: Expr, steps: number}}
@@ -395,6 +415,12 @@ export namespace globalOptions {
     let maxArgs: number;
 }
 export const native: {};
+/**
+ *
+ * @param {Expr[]} inventory
+ * @return {string[]}
+ */
+export function declare(inventory: Expr[]): string[];
 declare class Named extends Expr {
     /**
        * @desc a constant named 'name'
@@ -403,5 +429,6 @@ declare class Named extends Expr {
     constructor(name: string);
     name: string;
     toString(): string;
+    _format(options: any, nargs: any): string;
 }
 export {};
