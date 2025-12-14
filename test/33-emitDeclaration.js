@@ -5,6 +5,40 @@ const { expect } = require('chai');
 const { SKI } = require('../index');
 const { emitDeclarations } = require('../lib/expr');
 
+describe('SKI.bulkAdd', () => {
+  it ('can add and remove terms', () => {
+    const ski = new SKI();
+
+    ski.bulkAdd([
+      'T=CI',
+      'R=BBT',
+      'V=BCT',
+      'T=',
+    ]);
+
+
+    const terms = ski.getTerms();
+    expect(terms).to.not.have.property('T');
+
+    ski.parse('BB(CI)').expect(terms['R']);
+    ski.parse('BC(CI)').expect(terms['V']);
+  });
+
+  it ('throws on invalid declarations', () => {
+    const ski = new SKI();
+
+    expect( () => ski.bulkAdd([
+      'T=CI',
+      'bad declaration',
+    ])).to.throw(/invalid/i);
+
+    /*
+    // TODO verify that terms remain unchanged
+    expect(ski.getTerms()['T']).to.equal(undefined);
+     */
+  });
+});
+
 describe('SKI.emitDeclaration', () => {
   it('declares terms (no overrides)', () => {
     const ski = new SKI();
@@ -60,9 +94,8 @@ describe('SKI.emitDeclaration', () => {
     const decl = emitDeclarations(inventory);
 
     const ski2 = new SKI({numbers: false, lambdas: false, allow: 'SK'});
-    ski2.bulkAdd(decl);
 
-    return ; // TODO
+    ski2.bulkAdd(decl);
 
     compareInventories(ski2.getTerms(), ski.getTerms());
 
