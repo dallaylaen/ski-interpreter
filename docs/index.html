@@ -118,7 +118,7 @@
      *   Global state of the interpreter
      */
 
-    let ski = new SKI({numbers: true, allow: 'SKIBCKW', lambdas: true});
+    let ski; // @type {SKI}
     let autosave = false;
     let greet = new EvalBox(view.teletype);
     let currentBox = null;
@@ -134,18 +134,10 @@
         view.entryField.addEventListener('keydown', onKey);
         view.entryField.addEventListener('input', saveInput);
 
-        const params = getParams();
-
-        if (params.code) {
-            view.entryField.value = params.code;
-        } else if (!view.entryField.value.match(/\S/))
-            view.entryField.value = loadInput() ?? 'S K I x';
-
-        if (params.terms) {
-            for (let pair of params.terms.split(',')) {
-                const [name, impl] = pair.split(':');
-                ski.add(name, impl);
-            }
+        if (window.location.hash.match(/^#run:/)) {
+            ski = new SKI();
+            const expr = readlink(ski, window.location.hash);
+            view.entryField.value = expr;
         } else {
             ski = new SKI(store.load('engine') ?? {} );
             autosave = true;

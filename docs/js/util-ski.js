@@ -2,12 +2,17 @@
  *  Common functions related to SKI and not to just HTML.
  */
 
-function permalink (engine, sample) {
-  const terms = engine.getTerms();
-  const saved = Object.keys(terms)
-    .filter(name => !(terms[name] instanceof SKI.classes.Native))
-    .map(name => name + ':' + terms[name].expand()).join(',');
-  return '?code=' + encode(sample) + '&terms=' + encode(saved);
+function permalink (engine, code) {
+  return '#run:' + encode(code) + '?' + engine.declare().map(s => encode(s)).join(';');
+}
+function readlink (engine, hash) {
+  const match = hash.match(/^#run:(.*?)\?(.*)/);
+  if (!match) return null;
+  const [code, decls] = [match[1], match[2]];
+  if (decls) {
+    engine.bulkAdd(decls.split(';').map(s => decode(s)));
+  }
+  return decode(code);
 }
 
 /**
