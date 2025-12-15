@@ -1,18 +1,49 @@
 /*
  *  Common functions related to SKI and not to just HTML.
  */
+'use strict';
+const linkprefix = '#expr:';
 
+/**
+ * @desc   Creates a permalink for the given engine and code snippet.
+ * @param engine
+ * @param code
+ * @returns {string}
+ */
 function permalink (engine, code) {
-  return '#run:' + encode(code) + '?' + engine.declare().map(s => encode(s)).join(';');
+  // TODO tree shaking but LATER
+  return linkprefix + encode(code) + '?' + engine.declare()
+    .map(s => s.split('=').map(part => encode(part)).join('=')).join(';');
 }
-function readlink (engine, hash) {
-  const match = hash.match(/^#run:(.*?)\?(.*)/);
+
+/**
+ * @desc  Reads a permalink() hash and returns code and declarations.
+ * @param hash
+ * @returns {{code: string, decls: string[]}|null}
+ */
+function readlink (hash) {
+  const match = hash.match(new RegExp('^' + linkprefix + '([^?]+)\\??(.*)$'));
   if (!match) return null;
-  const [code, decls] = [match[1], match[2]];
-  if (decls) {
-    engine.bulkAdd(decls.split(';').map(s => decode(s)));
+  const expr = decode(match[1]);
+  const decls = match[2]
+    ? match[2].split(';').map(s => decode(s))
+    : [];
+  return { expr, decls };
+}
+
+function readOldLink(location) {
+// recover old style links via ?code=...&terms=...
+// via redirect to hash consumable by readlink()
+  const params = new URLSearchParams(location);
+  if (params.has('code') || params.has('terms')) {
+    const code = params.get('code') ?? '';
+    const terms = params.get('terms').split(',');
+    console.log("Migrating old-style link to new-style hash, code =", code, "terms =", terms);
+    const reworkTerms = terms
+      .map(s => s.split(':').map(decodeURIComponent).join('='))
+      .join(';');
+    return '#expr:' + encodeURIComponent(code) + '?' + reworkTerms;
   }
-  return decode(code);
 }
 
 /**
