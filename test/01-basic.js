@@ -6,13 +6,13 @@ describe( 'SKI', () => {
   it ('can handle pedestrian free var application', () => {
     const [a, b, c] = SKI.free('a', 'b', 'c');
     const app = a.apply(c, b.apply(c));
-    expect(app.toString({terse: false})).to.equal('a(c)(b(c))');
+    expect(app.format({terse: false})).to.equal('a(c)(b(c))');
   });
 
   it ('Can parse basic applications', () => {
     const ski = new SKI;
     const expr = ski.parseLine('x z (y z)');
-    console.log(expr.toString({terse: false}));
+    console.log(expr.format({terse: false}));
   });
 
   it ('Installed the basic terms correctly', () => {

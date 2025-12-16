@@ -11,7 +11,7 @@ describe( 'SKI.*', () => {
 
   it('provides free vars & Church numbers', done => {
     expect (
-      SKI.church(5).apply(...SKI.free('x', 'y')).run().expr.toString({terse: false})
+      SKI.church(5).apply(...SKI.free('x', 'y')).run().expr.format({terse: false})
     ).to.equal('x(x(x(x(x(y)))))');
     done();
   });

@@ -227,7 +227,7 @@ function flattenExpr(obj) {
   if (typeof obj !== 'object')
     return obj;
   if (obj instanceof SKI.classes.Expr)
-    return obj.toString({terse: true});
+    return obj.format({terse: true});
 
   const out = {};
   for (const key in obj)

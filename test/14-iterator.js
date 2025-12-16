@@ -5,7 +5,7 @@ describe ('Expr.walk', () => {
   it ('works exactly for very simple example', () => {
     const ski = new SKI();
     const expr = ski.parse('KI x y');
-    const frames = [ ... expr.walk() ].map( entry => [entry.expr.toString({terse: false}), entry.steps, entry.final]);
+    const frames = [ ... expr.walk() ].map( entry => [entry.expr.format({terse: false}), entry.steps, entry.final]);
 
     expect (frames).to.deep.equal([
       [ 'K(I)(x)(y)', 0, false ],
@@ -34,7 +34,7 @@ describe ('Expr.walk', () => {
       for (const state of expr.walk()) {
         expect(end).to.equal(false, 'make sure we never run past last iteration');
 
-        console.log("step", state.steps, ":", state.expr.toString({terse: true}));
+        console.log("step", state.steps, ":", state.expr.format({terse: true}));
 
         // steps must be ascending
         expect(state.steps).to.be.within(n, Infinity);
