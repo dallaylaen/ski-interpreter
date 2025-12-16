@@ -333,16 +333,16 @@
                 content: name,
             });
             append(entrySpan, 'dd', {
-                content: '= '+(entry.note ?? entry.impl.toString({terse: true, html: true}))
+                content: '= '+(entry.note ?? entry.impl.format({terse: true, html: true, lambda: ['', ' &mapsto; ', '']}))
             });
             const placeholder = append(entryDiv, 'span', {class: [ 'float-right' ], content: '&Xi;'});
             const menu = new Hamburger(placeholder, {right: true});
             menu.addLabel('manage ' + name);
             if (entry instanceof SKI.classes.Alias) {
                 menu.addAction('copy definition', () => navigator.clipboard.writeText(
-                    `${name} = ${entry.impl.toString({terse: true})}`));
+                    `${name} = ${entry.impl}`));
                 menu.addAction('play in terminal', () => {
-                    run({src: entry.name + ' = ' + entry.impl.toString({terse: true})});
+                    run({src: entry.name + ' = ' + entry.impl});
                 });
             }
             menu.addAction('&cross; remove', () => removeInventoryEntry(name));

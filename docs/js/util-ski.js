@@ -53,8 +53,7 @@ function readOldLink(location) {
  */
 function showTerm(term) {
   // TODO terser name
-  return (term.note ?? term.impl?.toString({terse:true}) ?? term.toString({terse: true}))
-      .replaceAll(/\s*->\s*/g, '&rarr;');
+  return term.note ?? (term.impl ?? term).format({html: true, lambda: ['', ' &mapsto; ', '']});
 }
 
 let displayOptions = {
