@@ -130,14 +130,6 @@ export class Expr {
         expr: Expr;
         steps: number;
     }>;
-    /**
-     * @desc Rename free variables in the expression using the given sequence
-     *       This is for eye-candy only, as the interpreter knows darn well hot to distinguish vars,
-     *       regardless of names.
-     * @param {IterableIterator<string>} seq
-     * @return {Expr}
-     */
-    renameVars(seq: IterableIterator<string>): Expr;
     _rski(options: any): this;
     /**
        * Apply self to list of given args.
@@ -211,12 +203,11 @@ export class Expr {
      */
     expect(expected: Expr, comment?: string): void;
     /**
-     * @param {{terse: boolean?, html: boolean?}} [options]
+     * @param {{terse?: boolean}} [options]
      * @return {string} string representation of the expression
      */
     toString(options?: {
-        terse: boolean | null;
-        html: boolean | null;
+        terse?: boolean;
     }): string;
     /**
      * @desc Whether the expression needs parentheses when printed.
@@ -271,11 +262,6 @@ export class Expr {
     }): string;
     _format(options: any, nargs: any): void;
     _declare(output: any, inventory: any, seen: any): void;
-    /**
-     *
-     * @return {string}
-     */
-    toJSON(): string;
 }
 export namespace Expr {
     let lambdaPlaceholder: Native;
@@ -296,7 +282,6 @@ export class App extends Expr {
     _firstVar(): any;
     apply(...args: any[]): App;
     expand(): any;
-    renameVars(seq: any): any;
     subst(search: any, replace: any): any;
     /**
      * @return {{expr: Expr, steps: number}}
@@ -311,14 +296,12 @@ export class App extends Expr {
     equals(other: any): any;
     contains(other: any): any;
     needsParens(first: any): boolean;
-    toString(opt?: {}): string;
     _format(options: any, nargs: any): any;
     _unspaced(arg: any): any;
 }
 export class FreeVar extends Named {
     constructor(name: any);
     id: number;
-    toString(opt?: {}): string;
 }
 export class Lambda extends Expr {
     /**
@@ -332,10 +315,8 @@ export class Lambda extends Expr {
     reduce(input: any): Expr;
     subst(search: any, replace: any): Lambda;
     expand(): Lambda;
-    renameVars(seq: any): Lambda;
     _rski(options: any): any;
     equals(other: any): boolean;
-    toString(opt?: {}): string;
     _format(options: any, nargs: any): string;
     needsParens(first: any): boolean;
 }
@@ -399,7 +380,6 @@ export class Alias extends Named {
     reduce(args: any): Expr;
     equals(other: any): any;
     _rski(options: any): Expr;
-    toString(opt: any): string;
     needsParens(first: any): boolean;
     _format(options: any, nargs: any): string | void;
 }
@@ -428,7 +408,6 @@ declare class Named extends Expr {
        */
     constructor(name: string);
     name: string;
-    toString(): string;
     _format(options: any, nargs: any): string;
 }
 export {};
