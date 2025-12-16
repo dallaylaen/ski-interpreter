@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-12-14
+
+### BREAKING CHANGES
+
+- Remove `toString()` options, use `format()` instead.
+- Make `needsParens()` private (should've been to begin with)
+- Remove unused `renameVars()` method.
+- Remove Expr.`toJSON()`
+
+### Added
+
+- SKI: `toJSON()` now recreates declarations exactly, preserving named subexpressions.
+- SKI: `declare()` / `bulkAdd()` methods to export/import term definitions.
+- Expr: `format(options?)` method for pretty-printing expressions with various options: html, verbosity, custom lambdas, custom brackets etc.
+- Expr: `subst(find, replace)` now works for any type of find  except application and lambdas.
+- Playground: permalinks now use #hash instead of a ?query string. (Old links still supported).
+- Playground: togglable frames around subexpressions & variable/redex highlighting.
+
 ## [1.1.0] - 2025-12-07
 
 ### BREAKING CHANGES
@@ -21,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Expr: guess() method to normalize terms.
   Returns an object with `normal`: boolean and `steps`:
   number properties, as well as optional `expr`: Expr -
-  equivalent lambda expression; `arity`: number, 
+  equivalent lambda expression; `arity`: number,
   and other properties.
 - Expr: replace(terms: Expr[], options: {}) replaces
   subtrees with matching canonical form (if they have one).
