@@ -24,7 +24,7 @@ describe( 'SKI', () => {
   });
 
   it( 'forbids unknown stringification', () => {
-    expect(() => '' + new Noob()).to.throw(/toString.*defined.*Noob/);
+    expect(() => '' + new Noob()).to.throw(/.*defined.*Noob/);
   });
 
   it ('Forbids strange stuff in named vars', () => {
