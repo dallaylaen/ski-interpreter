@@ -33,7 +33,7 @@ describe('Expr <-> string', () => {
       const expr   = ski.parse(source, jar);
       const before = expr.format({terse: true});
       const expr2  = ski.parse(before, jar);
-      const after  = expr2.toString(({terse: true}));
+      const after  = expr2.toString();
 
       expect(after).to.equal(before);
       expr.expect(expr2);
