@@ -69,7 +69,7 @@ function runLine(onErr) {
                 if (state.final && !options.q)
                     console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
                 if (options.v || state.final)
-                    console.log('' + state.expr.toString({terse: options.t}));
+                    console.log('' + state.expr.format({terse: options.t}));
                 if (state.final && expr instanceof SKI.classes.Alias)
                     ski.add(expr.name, state.expr);
             }
