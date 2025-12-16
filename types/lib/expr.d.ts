@@ -203,18 +203,17 @@ export class Expr {
      */
     expect(expected: Expr, comment?: string): void;
     /**
-     * @param {{terse?: boolean}} [options]
-     * @return {string} string representation of the expression
+     * @desc Returns string representation of the expression.
+     *       Same as format() without options.
+     * @return {string}
      */
-    toString(options?: {
-        terse?: boolean;
-    }): string;
+    toString(): string;
     /**
      * @desc Whether the expression needs parentheses when printed.
      * @param {boolean} [first] - whether this is the first term in a sequence
      * @return {boolean}
      */
-    needsParens(first?: boolean): boolean;
+    _braced(first?: boolean): boolean;
     _unspaced(arg: any): boolean;
     /**
      * @desc    Stringify the expression with fancy formatting options.
@@ -295,7 +294,7 @@ export class App extends Expr {
     _aslist(): any[];
     equals(other: any): any;
     contains(other: any): any;
-    needsParens(first: any): boolean;
+    _braced(first: any): boolean;
     _format(options: any, nargs: any): any;
     _unspaced(arg: any): any;
 }
@@ -318,7 +317,7 @@ export class Lambda extends Expr {
     _rski(options: any): any;
     equals(other: any): boolean;
     _format(options: any, nargs: any): string;
-    needsParens(first: any): boolean;
+    _braced(first: any): boolean;
 }
 /**
  * @typedef {function(Expr): Expr | AnyArity} AnyArity
@@ -380,7 +379,7 @@ export class Alias extends Named {
     reduce(args: any): Expr;
     equals(other: any): any;
     _rski(options: any): Expr;
-    needsParens(first: any): boolean;
+    _braced(first: any): boolean;
     _format(options: any, nargs: any): string | void;
 }
 export class Church extends Native {
