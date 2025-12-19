@@ -23,12 +23,14 @@
         <p>
             It was discovered in 1920 by
             <a href="https://en.wikipedia.org/wiki/Moses_Sch%C3%B6nfinkel" target="_blank">Moses Schönfinkel</a>
-            as a way to drive lexical variables out of logical expressions (hence "logic").
+            as a way to <a href="https://en.wikipedia.org/wiki/Predicate_functor_logic" target="_blank">drive
+            lexical variables out of logical expressions</a> (hence "logic").
         </p>
 
         <p>
-            Little did he know that the tool is in fact <i>too powerful</i> for the task.
-            Neither Gödel's incompleteness theorem, nor the halting problem were known at the time.
+            Little did he know that the tool is in fact 
+            <a href="https://en.wikipedia.org/wiki/Kleene%E2%80%93Rosser_paradox" target="_blank"><i>too powerful</i></a>
+            for the task. Neither Gödel's incompleteness theorem, nor the halting problem were known at the time.
         </p>
 
         <p>
@@ -57,20 +59,15 @@
         <ul>
             <li>
                 A <b><i>term</i></b> is either an uppercase letter, a lowercase identifier, a nonnegative integer,
-                or a parenthesized expression.
+                the `+` operator, or a parenthesized expression.
             </li>
             <li>
-                Uppercase terms like <code>S</code>, <code>K</code>, <code>B</code> are always one-letter
+                Uppercase identifiers like <code>S</code>, <code>K</code>, <code>B</code> are always one-letter
                 and can be lumped together, without whitespaces in between.
             </li>
             <li>
-                Lowercase terms like <code>x</code>, <code>y</code>, <code>pred</code>, <code>list</code>, <code>foo_42</code>
-                are considered words/identifiers and must be spaced from one another.
-            </li>
-            <li>
-                Unknown terms are just moved around as is.
-                Terms with known semantics may be reduced when given enough arguments
-                (other terms or subexpressions), see below.
+                Lowercase identifiers like <code>x</code>, <code>y</code>, <code>pred</code>, <code>list</code>, <code>foo_42</code>
+                must be spaced from one another.
             </li>
             <li>
                 A term followed by one or more terms is called an <b><i>application</i></b>.
@@ -80,11 +77,9 @@
                 all mean the same but <code>a (b c)</code> doesn't.
             </li>
             <li>
-                When displaying expressions, parentheses are omitted where possible.
-                Of course, the parser accepts as many parentheses as one wishes:
-                <code>(((( ((((x)))) ((((y)))) ))))</code> is still a valid expression and is still equal to <code>x y</code>.
+                Unknown terms are just moved around as is.
+                Terms with known semantics may be reduced when applied to enough arguments, see below.
             </li>
-
             <li>
                 The following combinators are predefined:
                 <ul>
@@ -98,20 +93,21 @@
                     <li><code>1 f x = f (x)</code>;</li>
                     <li><code>2 f x = f (f (x))</code>;</li>
                     <li><code>3 f x = f (f (f (x)))</code>;</li>
-                    <li><code>n f x = f (f ... { n times }... f (x)...))</code> - this is called
+                    <li><code>n f x = f (f ... { n times }... f (x)...))</code> — this is called
                         <a href="https://en.wikipedia.org/wiki/Church_encoding#Church_numerals" target="_blank">Church numerals</a>;
                     </li>
                     <li>
-                        <code>+ n f x = f(n f x)</code>
-                        is a special operator that behaves as described for arbitrary terms,
-                        but when followed by a Church numeral <i>n</i>, it simply replaces it with <i>n+1</i>.
-                        This allows to convert results of computations back to human-readable form.
+                        <code>+ n f x = f(n f x)</code> — this is called increment combinator: when applied to a Church numeral <i>n</i>,
+                        this combinator produces an expression equivalent to the next numeral. In this case our interpreter would replace
+                        that expression by the combinator <i>n&nbsp;+&nbsp;1</i> to keep computations human-readable.
+                        To compute a sum <i>n&nbsp;+&nbsp;m</i> of two numerals, one can apply increment combinator <i>n</i> times to <i>m</i>, written <code>(n +) m</code> or simply
+                        <code>n + m</code>.
                     </li>
                 </ul>
             </li>
 
             <li>
-                New terms may be declared as <code>name = impl</code>, where impl is some expression.
+                New terms may be declared as <code>name = impl</code>, where <code>impl</code> is some expression.
                 Multiple definitions may be given, separated by semicolon; in this case only the last one
                 will be executed and/or added to the term inventory.
                 Intermediate definitions are local to one computation and may
@@ -276,7 +272,7 @@
             This is the <b>B</b> combinator: <code>B f g x = f(g x)</code>, which represents function composition.
             <code>B f g</code> is a function in and of itself, regardless of what the last argument is.
             Unlike application, composition is
-            <a href="https://en.wikipedia.org/wiki/Associative_property">associative</a>:
+            <a href="https://en.wikipedia.org/wiki/Associative_property" target="_blank">associative</a>:
             <code>B (B f g) h (x) = B f (B g h) (x)</code>.
         </p>
     </div>
@@ -286,7 +282,7 @@
 
         <p>
             Just like <code>T</code> and <code>K</code>, any combinator of arity <i>n</i> plus an argument
-            is a combinator of arity <i>n &minus; 1</i>, per definition (it applies its arguments to themselves and
+            is a combinator of arity <i>n&nbsp;&minus;&nbsp;1</i>, per definition (it applies its arguments to themselves and
             possible some previously defined terms).
             So a combinator may be thought of as a one-argument function returning a combinator or
             an application thereof.
@@ -307,12 +303,12 @@
         </p>
 
         <p>
-            Any combinatory logic expression may be expressed in terms of lambdas.
+            Any combinatory logic expression <a href="https://okmij.org/ftp/tagless-final/ski.pdf" target="_blank">may be expressed in terms of lambdas</a>.
             The reverse, however, is only true for specific sets of starting terms called <b><i>bases</i></b>.
             In particular, <code>{S, K}</code> and <code>{B, C, K, W}</code>
             are such bases.
             <a href="https://en.wikipedia.org/wiki/Iota_and_Jot" target="_blank">Single combinator</a>
-            bases as well as bases not requiring parentheses exist, too,
+            bases as well as <a href="https://dl.acm.org/doi/10.1017/S0956796802004483" target="_blank">bases not requiring parentheses</a> exist, too,
             but are out of scope of this document.
         </p>
     </div>
