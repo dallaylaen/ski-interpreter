@@ -120,6 +120,16 @@ code {
     line-height: calc(1lh + .5px);
 }
 
+code > code {
+    background: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    line-height: normal;
+    font-family: serif;
+    font-size: 0.99rem;
+}
+
 /* hamburger menu */
 
 .hamburger-button {
