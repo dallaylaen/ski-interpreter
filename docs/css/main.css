@@ -33,7 +33,11 @@
     font-family: "Computer Modern Serif", serif;
     font-size: 1rem;
     line-height: 0;
-}xf
+}
+
+.term-list dd var {
+  font-style: normal;
+}
 
 .term-list a.term-def[href] {
     color: inherit;
