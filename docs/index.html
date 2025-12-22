@@ -349,12 +349,12 @@
         }
         if (ski.hasLambdas) {
             append(view.inventory, 'div', {
-                content: '<span class="term-def ellipsis"><dt><a class="note" href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">λ-terms</a> x-&gt;f(x)</dt></span>'
+                content: '<span class="term-def ellipsis"><dt><a class="note" href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">λ-terms</a> x-&gt;y-&gt;z-><expression></dt></span>'
             });
         }
         if (ski.hasNumbers) {
             append(view.inventory, 'div', {
-                content: '<a class=term-def><dt><a class="note" href="https://en.wikipedia.org/wiki/Church_encoding#Church_numerals">Church numerals</a> 0, 1,…</dt><dd>= <var>f</var> &mapsto; <var>x</var> &mapsto; f(…(f(x))…)</dd></a>'
+                content: '<a class=term-def><dt><a class="note" href="https://en.wikipedia.org/wiki/Church_encoding#Church_numerals">Church numerals</a> &lt;n&gt;</dt><dd>= <var>f</var> &mapsto; <var>x</var> &mapsto; f(…(f(x))…)</dd></a>'
             });
         }
     }
