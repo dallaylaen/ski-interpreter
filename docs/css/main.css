@@ -1,13 +1,5 @@
 /* ski-specific */
 
-@font-face {
-  font-family: "Computer Modern Serif";
-  font-style: italic;
-  font-weight: normal;
-  font-display: swap;
-  src: url("CMUSerif-Italic.woff2");
-}
-
 .term-list {
     margin: .5ex;
 }
@@ -30,7 +22,7 @@
     font-weight: bold;
 }
 .term-list .note, .term-list dd i {
-    font-family: "Computer Modern Serif", serif;
+    font-family: serif;
     font-weight: normal;
     font-size: 1rem;
     line-height: 0;
