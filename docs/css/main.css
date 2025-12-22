@@ -30,6 +30,7 @@
 
 .term-list dd var {
   font-style: normal;
+  font-weight: normal;
 }
 
 .term-list a.term-def[href] {
