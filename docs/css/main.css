@@ -29,7 +29,7 @@
 .term-list dt {
     font-weight: bold;
 }
-.term-list dd.note, .term-list dd i {
+.term-list .note, .term-list dd i {
     font-family: "Computer Modern Serif", serif;
     font-size: 1rem;
     line-height: 0;
