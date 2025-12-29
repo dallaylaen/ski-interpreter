@@ -2,17 +2,22 @@
 <html xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8"/>
-    <title>Simple Kombinator Interpreter – online combinatory logic and lambda calculus playground</title>
+    <title>Simple Kombinator Interpreter</title>
+    <meta name="description" content="Online combinatory logic and lambda calculus playground">
+    <meta name="author" content="Konstantin S. Uvarin">
+    <link rel="canonical" href="http://dallaylaen.github.io/ski-interpreter/">
     <link rel="shortcut icon" type="image/png" href="img/ski-64.png">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="prefetch" href="img/mock1.png">
+    <link rel="prefetch" href="img/mock2.png">
     <script src="build/js/ski-interpreter.min.js"></script>
     <script src="js/util-html.js"></script>
     <script src="js/util-ski.js"></script>
-    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
     <header>
         <div class="float-left"><span id="menu" class="big">&#9776;</span></div>
-        <h1><img src="img/mock1.png"> Simple Kombinator <nobr>Interpreter <img src="img/mock2.png"></nobr></h1>
+        <h1><img src="img/mock1.png" alt=""> Simple Kombinator <nobr>Interpreter <img src="img/mock2.png" alt=""></nobr></h1>
     </header>
     <div id="teletype">
         <div>
@@ -42,7 +47,7 @@
             </p>
         </div>
         <div id="help" hidden>
-            <img src="img/mock2.png" style="height: 5em; float: right;">
+            <img src="img/mock2.png" alt="" style="height: 5em; margin: 1ex; float: right;">
             <p>The interpreter honors the following rules:</p>
             <ul>
                 <li>
@@ -74,7 +79,7 @@
                     <s>Please use Haskell instead</s>.
                 </li>
                 <li>
-                    A non-negative integer is assumed to be a church number, i.e. a term with
+                    A non-negative integer is assumed to be a Church numeral, i.e. a term with
                     two arguments <code>x</code> and <code>y</code>
                     returning <code>x(...{n times}...(x(y)...)</code>.
                 </li>
@@ -349,12 +354,12 @@
         }
         if (ski.hasLambdas) {
             append(view.inventory, 'div', {
-                content: '<span class="term-def ellipsis"><dt>x-&gt;y-&gt;y(x)</dt><dd class="note">–&numsp;a generic <a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">λ-term</a></dd></span>'
+                content: '<span class="term-def ellipsis"><dt><span class="note"><a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">λ-terms</a> </span><var>x-&gt;y-&gt;z-&gt;&lt;expression&gt;</var></dt></span>'
             });
         }
         if (ski.hasNumbers) {
             append(view.inventory, 'div', {
-                content: '<a class=term-def><dt>&lt;n&gt;</dt><dd><i>x</i> <i>y</i> = <i>x</i>(…(<i>x</i>(<i>y</i>))…)</dd></a>'
+                content: '<span class="term-def ellipsis"><dt><span class="note"><a href="https://en.wikipedia.org/wiki/Church_encoding#Church_numerals">Church</a> </span><var>&lt;numerals&gt;</var></dt><dd>= <var>f</var> &mapsto; <var>x</var> &mapsto; f(…(f(x))…)</dd></span>'
             });
         }
     }
