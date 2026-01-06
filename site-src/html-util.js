@@ -38,6 +38,45 @@ function append (parent, type, options = {}) {
   return child;
 }
 
+/**
+ * Traverse a node tree and call func on each node.
+ * @param node
+ * @param func
+ */
+function traverse (node, func) {
+  func(node);
+  for (const child of node.childNodes)
+    traverse(child, func);
+}
+
+function custom(html) {
+  const gantry = document.createElement('div');
+  gantry.innerHTML = html.replace(/^\s+|\s+$/gs, '');
+  if (gantry.childNodes.length !== 1)
+    throw new Error('Custom HTML element must have exactly one root node');
+  const elem = gantry.childNodes[0];
+
+  const out = {};
+  traverse(elem, node => {
+    // extract data-handle attributes
+    const handle = node.getAttribute && node.getAttribute('data-handle');
+    if (!handle)
+      return;
+    if (out[handle])
+      throw new Error(`Duplicate data-handle attribute: ${handle}`);
+    out[handle] = node;
+  });
+  return { ...out, elem };
+}
+
+function tpl(name) {
+  // read <script type="text/template" id="name">
+  const script = document.getElementById(name);
+  if (!script)
+    throw new Error(`Template not found: ${name}`);
+  return script.innerHTML;
+}
+
 function sanitize (text) {
   if (typeof text !== 'string')
     text = '' + text;
@@ -71,4 +110,4 @@ function decode (s) {
   return decodeURIComponent(('' + s).replace(/\+/g, ' '));
 }
 
-module.exports = { append, decode, encode, grabView, sanitize, };
+module.exports = { append, custom, decode, encode, grabView, sanitize, tpl, traverse, };

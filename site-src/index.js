@@ -6,12 +6,9 @@
 
 'use strict';
 
-const { grabView, append, sanitize, decode, encode } = require ('./html-util');
-
+const util = require ('./html-util');
 const { EvalBox } = require ('./eval-box');
-
 const { permalink, readlink, readOldLink } = require ('./permalink');
-
 const { Store } = require ('./store');
 const { SMCtl } = require('./smctl');
 const { Hamburger } = require('./hamburger');
@@ -23,13 +20,12 @@ window.EvalBox     = EvalBox;
 window.Store       = Store;
 
 // append is used so much that it's worth being global
-window.append      = append;
+window.append      = util.append;
 
-// TODO namespace these into window.util or such
-window.grabView    = grabView;
-window.sanitize    = sanitize;
-window.permalink   = permalink;
-window.readlink    = readlink;
-window.readOldLink = readOldLink;
-window.decode      = decode;
-window.encode      = encode;
+// namespace all other utilities
+window.util = {
+  ...util,
+  permalink,
+  readlink,
+  readOldLink,
+};

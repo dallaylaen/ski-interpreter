@@ -115,7 +115,7 @@
     /**
      *   References to static page elements
      */
-    const view = grabView('inventory', 'teletype', 'help', 'menu',
+    const view = util.grabView('inventory', 'teletype', 'help', 'menu',
       'entryField', 'runstopBtn', 'rewriteSKI', 'lambdify');
     const store = new Store('playground');
 
@@ -135,6 +135,7 @@
     let format = {
       html: true,
     };
+    let evalId = 0;
 
     setupMenu();
     setupMain();
@@ -143,13 +144,13 @@
         view.entryField.addEventListener('keydown', onKey);
         view.entryField.addEventListener('input', saveInput);
 
-        const oldHash = readOldLink(window.location.search);
+        const oldHash = util.readOldLink(window.location.search);
         if (oldHash) {
             window.location.hash = oldHash;
             window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
         }
 
-        const hotlink = readlink(window.location.hash);
+        const hotlink = util.readlink(window.location.hash);
         if (hotlink && hotlink.expr) {
             ski = new SKI();
             autosave = false;
@@ -178,6 +179,8 @@
             "Emulator ready. Your output goes here. ",
             {color: "green"}
         );
+
+       // TODO window.addEventListener('hashchange', onHashChange);
     }
 
     function setupMenu() {
@@ -203,7 +206,7 @@
               storage: [store, 'display-terse'],
               default: true,
               check: val => typeof val === 'boolean',
-              onchange: on => { setDisplay({terse: on}); },
+              onchange: on => { setFormat({terse: on}); },
             })
           ],
           [
@@ -213,7 +216,7 @@
                 default: true,
                 check: val => typeof val === 'boolean',
                 onchange: on => {
-                  setDisplay(on ? {
+                  setFormat(on ? {
                     redex: ['<b>', '</b>'],
                     brackets: ['<span class="bracket">(</span>', '<span class="bracket">)</span>'],
                     var: ['<var>', '</var>'],
@@ -231,7 +234,7 @@
                 storage: [store, 'display-outline'],
                 default: false,
                 check: val => typeof val === 'boolean',
-                onchange: on => { setDisplay( on ? {
+                onchange: on => { setFormat( on ? {
                   around: ['<span class="outline">', '</span>'],
                 } : {
                   around: ['', ''],
@@ -258,7 +261,7 @@
      * Page-specific functions
      */
 
-    function setDisplay(options) {
+    function setFormat(options) {
       for (const key of Object.keys(options)) {
         if (options[key] === undefined)
           delete format[key];
@@ -304,9 +307,16 @@
 
         if (currentBox)
             currentBox.stop("interrupted by a different command");
-      
+
+        const container = util.custom(util.tpl('tpl-eval-box'));
+        view.teletype.appendChild(container.elem);
+
+        container.src.innerHTML = util.sanitize(src);
+        container.permalink.innerHTML = util.sanitize('#' + ++evalId);
+        container.permalink.href = util.permalink(ski, src);
+
         const runner = new EvalBox({
-            parent:  view.teletype,
+            parent:  container.main,
             height:  evalOptions.height,
             delay:   evalOptions.delay,
             engine:  ski,
@@ -324,6 +334,9 @@
             onStop:  function () {
                 view.runstopBtn.classList.remove('running');
                 currentBox = null;
+            },
+            onStep:  function(value) {
+              container.steps.innerHTML = value.steps;
             }
         });
 
@@ -401,6 +414,20 @@
         return false;
     }
 
+</script>
+
+<script language="text/html" id="tpl-eval-box">
+    <div class="console">
+        <div class="con-header">
+            <a data-handle="permalink" href="#" target="_blank"></a>
+            <span data-handle="src"></span>
+            <span data-handle="steps" class="float-right">-</span>
+        </div>
+        <div data-handle="main" class="eval-box">
+        </div>
+        <div class="con-footer">
+        </div>
+    </div>
 </script>
 
 </body>
