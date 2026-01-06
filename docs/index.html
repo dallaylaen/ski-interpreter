@@ -254,7 +254,7 @@
         menu.addLink('combinator cheat sheet', 'https://angelfire.com/tx4/cus/combinator/birds.html', '_blank');
         menu.addLink('ski calculus', 'https://en.wikipedia.org/wiki/SKI_combinator_calculus', '_blank');
         menu.addSeparator();
-        menu.addAction('help', () => new EvalBox(view.teletype).print(view.help.innerHTML, {raw: true}));
+        menu.addAction('help', () => new EvalBox({ parent: view.teletype }).print(view.help.innerHTML, {raw: true}));
     }
 
     /**
@@ -317,6 +317,7 @@
 
         const runner = new EvalBox({
             parent:  container.main,
+            scroll:  view.teletype,
             height:  evalOptions.height,
             delay:   evalOptions.delay,
             engine:  ski,

@@ -39,6 +39,7 @@ class EvalBox {
     // view setup
     this.view = {};
     this.view.parent  = options.parent;
+    this.view.scroll  = options.scroll ?? options.parent; // containing scrollable element, may != parent
     this.view.main    = append(options.parent, 'div', { class: ['eval-box'] });
   }
 
@@ -128,8 +129,8 @@ class EvalBox {
         this.view.main.removeChild(this.view.main.firstChild);
     }
 
-    if (this.view.parent)
-      this.view.parent.scrollTop = line.offsetTop;
+    if (this.view.scroll)
+      this.view.scroll.scrollTop = line.offsetTop;
 
     return line;
   }
