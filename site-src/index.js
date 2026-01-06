@@ -12,12 +12,14 @@ const { permalink, readlink, readOldLink } = require ('./permalink');
 const { Store } = require ('./store');
 const { SMCtl } = require('./smctl');
 const { Hamburger } = require('./hamburger');
+const { History } = require('./history');
 
 // Expose classes to global context
 window.SMCtl       = SMCtl;
 window.Hamburger   = Hamburger;
 window.EvalBox     = EvalBox;
 window.Store       = Store;
+window.History     = History;
 
 // append is used so much that it's worth being global
 window.append      = util.append;
