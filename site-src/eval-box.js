@@ -137,6 +137,11 @@ class EvalBox {
     }
   }
 
+  clear() {
+    this.stop();
+    this.view.main.innerHTML = '';
+  }
+
   setHeight (height) {
     this.height = height;
   }
