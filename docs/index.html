@@ -136,9 +136,19 @@
       html: true,
     };
     let evalId = 0;
+    let history;
 
-    setupMenu();
-    setupMain();
+    // Initialization
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+    function init() {
+        setupMenu();
+        setupMain();
+    }
 
     function setupMain() {
         view.entryField.addEventListener('keydown', onKey);
@@ -159,7 +169,11 @@
         } else {
             ski = new SKI(store.load('engine') ?? {} );
             autosave = true;
-            view.entryField.value = loadInput() ?? 'SKIx';
+            view.entryField.value = loadInput() ?? 'S(K(SI))K x y';
+            history = new History({store: new Store('playground-history')});
+            for (const item of history.list()) {
+              createRunner(item.expr, {action: item.action, id: ++evalId});
+            }
         }
         showInventory();
 
@@ -289,10 +303,6 @@
 
     // page functions
     function runStop() {
-        if (currentBox) {
-            currentBox.stop("interrupted by user");
-            return false;
-        }
         return run();
     }
 
@@ -301,19 +311,35 @@
         toLambda: e => e.lambdify(),
     }
 
-    function run(options={}) {
+    function run(options = {}) {
         greet.remove();
         const src = options.src ?? view.entryField.value;
 
-        if (currentBox)
-            currentBox.stop("interrupted by a different command");
+        if (src.match(/^\s*\?[\s?]*$/)) {
+            const helpdiv = append(view.teletype, 'div', {class: ['console']});
+            helpdiv.innerHTML = view.help.innerHTML; // no escape because HTML as planned
+            helpdiv.scrollIntoView();
+            return false;
+        }
 
+        if (history) {
+            history.push({expr: src, action: options.action});
+        }
+
+        createRunner(src, {action: options.action, id: ++evalId}).start();
+        return false;
+    }
+
+    /**
+     *
+     * @param {string} src
+     * @param {Object} options
+     * @returns {EvalBox}
+     */
+    function createRunner(src, options={}) {
         const container = util.custom(util.tpl('tpl-eval-box'));
         view.teletype.appendChild(container.elem);
 
-        container.src.innerHTML = util.sanitize(src);
-        container.permalink.innerHTML = util.sanitize('#' + ++evalId);
-        container.permalink.href = util.permalink(ski, src);
 
         const runner = new EvalBox({
             parent:  container.main,
@@ -324,6 +350,8 @@
             generator: generator[options.action],
             format:  format,
             onStart: function() {
+                if (currentBox)
+                    currentBox.stop('Interrupted by a different command'); // only one box runnning at a time
                 currentBox = this;
                 view.runstopBtn.classList.add('running');
                 if (this.expr instanceof SKI.classes.Alias) {
@@ -337,18 +365,33 @@
                 currentBox = null;
             },
             onStep:  function(value) {
-              container.steps.innerHTML = value.steps;
+              if (value && value.steps !== undefined)
+                container.steps.innerHTML = '' + value.steps;
             }
         });
 
-        if (src.match(/^\s*\?[\s?]*$/)) {
-            runner.print(view.help.innerHTML, {raw: true});
+        container.src.innerHTML = util.sanitize(src);
+        container.permalink.innerHTML = util.sanitize('#' + options.id);
+        container.permalink.href = util.permalink(ski, src);
+
+        container.rerun.onclick = event => {
+            event.preventDefault();
+            runner.start();
             return false;
+        };
+        container.hide.onclick = event => {
+            event.preventDefault();
+            runner.clear();
+            return false;
+        };
+
+        try {
+            runner.set(src);
+        } catch (e) {
+            runner.stop('Error: ' + util.sanitize(e.message));
         }
 
-        runner.start(src);
-
-        return false;
+        return runner;
     }
 
     function showInventory() {
@@ -427,6 +470,8 @@
         <div data-handle="main" class="eval-box">
         </div>
         <div class="con-footer">
+            <a href="$" data-handle="rerun">rerun</a>
+            <a href="#" data-handle="hide">hide</a>
         </div>
     </div>
 </script>
