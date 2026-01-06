@@ -8,7 +8,7 @@ class EvalBox {
    * @desc  Create a visual container that can run SKI code step by step and display the results.
    *
    * @param {{
-   *      src: string,
+   *      expr: string | Expr | [string, Expr],
    *      engine: SKI,
    *      generator?: function(e:Expr): IterableIterator<{final: boolean, expr: Expr, steps: number}>,
    *      max?: number,
@@ -23,6 +23,7 @@ class EvalBox {
    */
   constructor (options={}) {
     // logic setup
+    // TODO if expr is given, store it (= was parsed eslewhere)
     this.options    = options;
     this.height     = options.height ?? 5;
     this.running    = false;
@@ -32,15 +33,44 @@ class EvalBox {
     this.onStop     = options.onStop ?? (() => {});
     this.onStep     = options.onStep ?? (() => {});
     this.engine     = options.engine;
-    this.src        = options.src;
     this.format     = options.format ?? { html: true };
     this.generator  = options.generator ?? (e => e.walk());
+
+    // if given an expr, normalize it
+    this.set(options.expr);
 
     // view setup
     this.view = {};
     this.view.parent  = options.parent;
     this.view.scroll  = options.scroll ?? options.parent; // containing scrollable element, may != parent
     this.view.main    = append(options.parent, 'div', { class: ['eval-box'] });
+  }
+
+  /**
+   * @descr   set this.src and this.expr according to arg, which may be:
+   *          - string: set this.src to arg, this.expr to this.engine.parse(arg)
+   *          - Expr: set this.expr to arg, this.src to arg.format()
+   *          - [src: string, expr: Expr]: set both directly
+   * @param {string|Expr|[src: string, expr: Expr]} arg
+   * @return this
+   */
+  set(arg) {
+    if (typeof arg === 'string') {
+      this.src = arg;
+      this.expr = this.engine.parse(arg);
+    } else if (Array.isArray(arg) && arg.length === 2) {
+      this.src = arg[0];
+      this.expr = arg[1];
+    } else if (!arg) {
+      this.expr = null;
+      this.src = null;
+    } else if (typeof arg === 'object' && typeof arg.format === 'function') {
+      this.expr = arg;
+      this.src = arg.format();
+    } else {
+      throw new Error('EvalBox.set() expects a string, Expr, or [string, Expr]');
+    }
+    return this;
   }
 
   /**
@@ -51,16 +81,16 @@ class EvalBox {
   start(src){
     if (this.running)
       this.stop();
-    if (src !== undefined)
-      this.src = src;
+
     try {
-      this.expr = typeof src === 'string'
-        ? this.engine.parse(src)
-        : src;
+      if (src !== undefined)
+        this.set(src);
       this.seq = this.generator(this.expr);
     } catch (e) {
+      console.error(e);
       return this.stop(e.message);
     }
+    this.view.main.innerHTML = '';
     this.onStart();
     this.running = true;
     this.tick();
