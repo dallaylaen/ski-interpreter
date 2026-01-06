@@ -19,7 +19,8 @@
     "types": "npx -p typescript tsc index.js --declaration --allowJs --emitDeclarationOnly --outDir types",
     "test": "npx nyc mocha",
     "minify": "npx esbuild --bundle ./index.js --outfile=docs/build/js/ski-interpreter.min.js --minify --sourcemap",
-    "build": "npm run lint && npm run types && npm run test && npm run minify"
+    "build-site": "npx esbuild --bundle ./site-src/index.js --outfile=docs/build/js/util.min.js --minify --sourcemap",
+    "build": "npm run lint && npm run types && npm run test && npm run minify && npm run build-site"
   },
   "files": [
     "package.json",
