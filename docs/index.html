@@ -11,8 +11,7 @@
     <link rel="prefetch" href="img/mock1.png">
     <link rel="prefetch" href="img/mock2.png">
     <script src="build/js/ski-interpreter.min.js"></script>
-    <script src="js/util-html.js"></script>
-    <script src="js/util-ski.js"></script>
+    <script src="build/js/util.min.js"></script>
 </head>
 <body>
     <header>
@@ -125,11 +124,15 @@
 
     let ski; // @type {SKI}
     let autosave = false;
-    let greet = new EvalBox(view.teletype);
+    let greet = new EvalBox({parent: view.teletype});
     let currentBox = null;
     const evalOptions = {
         delay: 300,
         height: 7,
+    };
+    // Display options compatible with Expr.format()
+    let format = {
+      html: true,
     };
 
     setupMenu();
@@ -254,6 +257,15 @@
      * Page-specific functions
      */
 
+    function setDisplay(options) {
+      for (const key of Object.keys(options)) {
+        if (options[key] === undefined)
+          delete format[key];
+        else
+          format[key] = options[key];
+      }
+    }
+
     function onKey (event) {
         if (event.keyCode === 13) {
             event.preventDefault();
@@ -292,10 +304,15 @@
         if (currentBox)
             currentBox.stop("interrupted by a different command");
 
-        const runner = new EvalBox(view.teletype, {
+        console.log("here");
+
+        const runner = new EvalBox({
+            parent:  view.teletype,
             height:  evalOptions.height,
             delay:   evalOptions.delay,
             engine:  ski,
+            generator: generator[options.action],
+            format:  format,
             onStart: function() {
                 currentBox = this;
                 view.runstopBtn.classList.add('running');
@@ -316,7 +333,7 @@
             return false;
         }
 
-        runner.run(src, generator[options.action]);
+        runner.start(src);
 
         return false;
     }
@@ -328,7 +345,7 @@
 
         view.inventory.innerHTML = '';
         const list = ski.getTerms();
-        for (let name of Object.keys(list).sort()) {
+        for (let name of Object.keys(list).filter(s => s.match(/^[a-z_]/i)).sort()) {
             const entry = list[name];
             const entryDiv = append(view.inventory, 'div');
             const entrySpan = append(entryDiv, 'a', {class: ['term-def', 'ellipsis']} );
@@ -359,7 +376,7 @@
         }
         if (ski.hasNumbers) {
             append(view.inventory, 'div', {
-                content: '<span class="term-def ellipsis"><dt><span class="note"><a href="https://en.wikipedia.org/wiki/Church_encoding#Church_numerals">Church</a> </span><var>&lt;numerals&gt;</var></dt><dd>= <var>f</var> &mapsto; <var>x</var> &mapsto; f(…(f(x))…)</dd></span>'
+                content: '<span class="term-def ellipsis"><dt><var>&lt;n&gt;</var></dt><dd> = <var>f</var> &mapsto; <var>x</var> &mapsto; f(…{n times}…(f(x))…) <i>>// aka <a href="https://en.wikipedia.org/wiki/Church_encoding#Church_numerals">Church numerals</a></i></dd></span>'
             });
         }
     }
