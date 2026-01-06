@@ -1,0 +1,77 @@
+body {
+    display: grid;
+    grid-template:
+             "header header" min-content
+             "teletype info" auto
+             "prompt prompt" min-content
+             "footer footer" min-content
+            / fit-content(69%) auto;
+}
+
+header, #teletype, #prompt {
+    padding: 0 .5em;
+}
+
+footer {
+    padding: 1px .5em;
+    margin-top: 1ex;
+    background: #F3F3F3;
+    grid-area: footer;
+}
+
+footer::first-letter {
+    padding: 0pt 1pt;
+}
+
+header {
+    grid-area: header;
+}
+
+#teletype {
+    overflow: auto;
+    grid-area: teletype;
+    min-width: 25vw;
+}
+
+#info {
+    overflow: auto;
+    grid-area: info;
+}
+
+#prompt {
+    display: flex;
+    grid-area: prompt;
+    font-size: 1rem;
+}
+
+#entryField {
+    flex: 1 auto;
+}
+
+#runstopBtn {
+    flex: 0 auto;
+    font-family: monospace;
+    font-size: 120%;
+    line-height: 80%;
+    height: 100%;
+    width: 2em;
+    padding: 0;
+}
+
+#runstopBtn::before {
+    display: inline-block;
+    vertical-align: 20%;
+
+    content: '\25B6\FE0E';
+    color: darkGreen;
+}
+
+#runstopBtn.running::before {
+    content: '\25A0\FE0E';
+    color: darkRed;
+}
+
+p.caption {
+    font-weight: bold;
+    margin: 0;
+}
