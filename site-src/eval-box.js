@@ -99,6 +99,10 @@ class EvalBox {
 
   stop (reason) {
     this.running = false;
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
     if (reason)
       this.print(reason, { class: ['error'], line: '' });
     this.onStop();
@@ -127,7 +131,7 @@ class EvalBox {
 
     if (value.steps >= this.maxSteps)
       return this.stop('Max steps reached: ' + this.maxSteps);
-    setTimeout(() => this.tick(), this.delay);
+    this.timer = setTimeout(() => this.tick(), this.delay);
   }
 
   remove() {
