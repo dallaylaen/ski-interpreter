@@ -51,7 +51,7 @@ function traverse (node, func) {
 
 function custom(html) {
   const gantry = document.createElement('div');
-  gantry.innerHTML = html.replace(/^\s+|\s+$/gs, '');
+  gantry.innerHTML = html.replace(/^[^<]*|[^>]*$/gs, ''); // omit text outside root element
   if (gantry.childNodes.length !== 1)
     throw new Error('Custom HTML element must have exactly one root node');
   const elem = gantry.childNodes[0];
