@@ -125,7 +125,7 @@
 
     let ski; // @type {SKI}
     let autosave = false;
-    let greet = new EvalBox({parent: view.teletype});
+    let greet;
     let currentBox = null;
     const evalOptions = {
         delay: 300,
@@ -189,8 +189,9 @@
             return false;
         });
 
+        greet = new EvalBox({parent: view.teletype})
         greet.print(
-            "Emulator ready. Your output goes here. ",
+            "Interpreter ready. Your output goes here. ",
             {color: "green"}
         );
 
@@ -312,7 +313,8 @@
     }
 
     function run(options = {}) {
-        greet.remove();
+        if (greet)
+          greet.remove();
         const src = options.src ?? view.entryField.value;
 
         if (src.match(/^\s*\?[\s?]*$/)) {
