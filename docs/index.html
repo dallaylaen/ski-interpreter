@@ -100,7 +100,7 @@
         <p class="caption">Term inventory:</p>
         <dl id="inventory" class="term-list"></dl>
     </div>
-    <form id="prompt" onsubmit="return runStop()">
+    <form id="prompt" onsubmit="return run()">
         <input id="entryField">
         <button id="runstopBtn" type="submit"></button>
         <button id="rewriteSKI" title="Convert to SKI basis">&rarr;SK</button>
@@ -136,7 +136,6 @@
       html: true,
     };
     let evalId = 0;
-    let history;
 
     // Initialization
     if (document.readyState === 'loading') {
@@ -170,10 +169,6 @@
             ski = new SKI(store.load('engine') ?? {} );
             autosave = true;
             view.entryField.value = loadInput() ?? 'S(K(SI))K x y';
-            history = new History({store: new Store('playground-history')});
-            for (const item of history.list()) {
-              createRunner(item.expr, {action: item.action, id: ++evalId});
-            }
         }
         showInventory();
 
@@ -302,10 +297,7 @@
         return store.load('current-input');
     }
 
-    // page functions
-    function runStop() {
-        return run();
-    }
+    // ---- page functions ----
 
     const generator = {
         toSKI: e => e.rewriteSKI(),
@@ -313,19 +305,25 @@
     }
 
     function run(options = {}) {
+        if (currentBox) {
+          if (!options.src && !options.action) {
+            currentBox.stop('Stopped by the user');
+            return false; // already running + nothing special to run = stop
+          }
+          currentBox.stop('Interrupted by a different command');
+        }
+
         if (greet)
-          greet.remove();
+            greet.remove();
+
         const src = options.src ?? view.entryField.value;
+
 
         if (src.match(/^\s*\?[\s?]*$/)) {
             const helpdiv = append(view.teletype, 'div', {class: ['console']});
             helpdiv.innerHTML = view.help.innerHTML; // no escape because HTML as planned
             helpdiv.scrollIntoView();
             return false;
-        }
-
-        if (history) {
-            history.push({expr: src, action: options.action});
         }
 
         createRunner(src, {action: options.action, id: ++evalId}).start();
@@ -341,7 +339,6 @@
     function createRunner(src, options={}) {
         const container = util.custom(util.tpl('tpl-eval-box'));
         view.teletype.appendChild(container.elem);
-
 
         const runner = new EvalBox({
             parent:  container.main,
@@ -375,17 +372,6 @@
         container.src.innerHTML = util.sanitize(src);
         container.permalink.innerHTML = util.sanitize('#' + options.id);
         container.permalink.href = util.permalink(ski, src);
-
-        container.rerun.onclick = event => {
-            event.preventDefault();
-            runner.start();
-            return false;
-        };
-        container.hide.onclick = event => {
-            event.preventDefault();
-            runner.clear();
-            return false;
-        };
 
         try {
             runner.set(src);
@@ -473,8 +459,6 @@
         <div data-handle="main" class="eval-box">
         </div>
         <div class="con-footer">
-            <a href="$" data-handle="rerun">rerun</a>
-            <a href="#" data-handle="hide">hide</a>
         </div>
     </div>
     */
