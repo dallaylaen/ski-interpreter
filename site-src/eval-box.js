@@ -43,7 +43,7 @@ class EvalBox {
     this.view = {};
     this.view.parent  = options.parent;
     this.view.scroll  = options.scroll ?? options.parent; // containing scrollable element, may != parent
-    this.view.main    = append(options.parent, 'div', { class: ['eval-box'] });
+    this.view.main    = append(options.parent, 'ol', { class: ['eval-box'] });
   }
 
   /**
@@ -151,13 +151,18 @@ class EvalBox {
   }
 
   print(text, options = {}) {
-    const line = append(this.view.main, 'div', options);
+    const line = append(this.view.main, 'li', options);
+    if (options.line !== 0 && !options.line)
+      line.style['list-style'] = 'none';
+    else {
+      this.view.main.style['padding-left'] = ('' + options.line).length + 2.5 + 'ch';
+      line.value = options.line;
+    }
     this.view.last = line;
 
     if (options.raw)
       line.innerHTML = text;
     else {
-      append(line, 'span', {class: ['line-number'], content: options.line});
       append(line, 'span', {
         class: options.class ?? ['line-text'],
         color: options.color,
