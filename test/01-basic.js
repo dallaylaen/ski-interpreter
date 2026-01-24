@@ -131,19 +131,26 @@ describe('Expr.expect', () => {
 });
 
 describe('normal reduction order', () => {
-  const check = (src, dst, max) => {
-    it ('calculates ' + src + ' to the end', () => {
+  const descend = (src, ...path) => {
+    it ('reduces ' + src + ' via ' + path.join(", "), () => {
       const ski = new SKI();
       const jar = {};
-      const start = ski.parse(src, jar);
-      const end = ski.parse(dst, jar);
-
-      start.run({max, throw: 1}).expr.expect(end);
+      let expr = ski.parse(src, jar);
+      for (const step of path) {
+        expr = expr.step().expr;
+        ski.parse(step, jar).expect(expr);
+      }
     });
   };
 
-  check( 'S K _ x', 'x', 10);
-  check( 'WI(W(B(SI))) (KI)', 'I', 50);
-  check( 'CI(WWW)(Kx)', 'x', 50);
-  check( 'KI(WWW)', 'I', 2);
+  descend( 'S K _ x', 'K x (_ x)', 'x');
+  descend( 'CK(Ix)', 'CKx', 'CKx');
+  descend( 'CK(Ix)y', 'Ky(Ix)', 'y');
+  descend( 'C(IK)(Ix)', 'CK(Ix)', 'CKx', 'CKx');
+  descend( 'C(IK)(Ix)y', 'IKy(Ix)', 'Ky(Ix)', 'y');
+  descend( 'WI(WI)', 'I(WI)(WI)', 'WI(WI)');
+  descend( 'S(K(SI))K x y', 'K(SI)x(Kx)y', 'SI(Kx)y', 'Iy(Kx y)', 'y(Kx y)', 'y x');
+  descend( 'a->Ix', 'a->Ix');
+  descend( '(a->Ix) y', 'Ix', 'x' );
+
 });
