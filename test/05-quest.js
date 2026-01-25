@@ -34,6 +34,22 @@ describe('Quest', () => {
     expect(violate.details).to.deep.equal([]);
   });
 
+  it ('cannot be fooled by passing free variables with the same name as case placeholders', () => {
+    const quest = new Quest({
+      subst: '&phi;',
+      allow: 'SK',
+      input: 'phi',
+      cases: [
+        [ 'phi x', 'x']
+      ]
+    });
+
+    const fail = quest.check('K x');
+
+    expect(fail.pass).to.equal(false);
+    expect(reduct(fail.details[0])).to.equal('&phi; x -> x vs x');
+  });
+
   it ('can validate quine', () => {
     const quest = new Quest({
       subst: '&phi;',
