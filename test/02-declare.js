@@ -83,6 +83,7 @@ describe( 'SKI', () => {
 
     const hang = ski.parse('Tx', jar);
     const y = ski.parse('y', jar);
+    const x = ski.parse('x', jar);
 
     const run1 = hang.run();
     expect(run1.expr.toString()).to.match(/^T *x$/);
@@ -91,6 +92,26 @@ describe( 'SKI', () => {
     const run2 = hang.run(y);
     expect(run2.expr.toString()).to.match(/^y  *x/);
     expect(run2.steps).to.be.greaterThanOrEqual(1);
+
+    const T = ski.getTerms().T;
+    expect(T.step().expr.toString()).to.equal('T');
+    expect(T.apply(x).step().expr.toString()).to.equal('Tx');
+    expect(T.apply(x, y).step().expr.toString()).to.equal('CIx y');
+  });
+
+  it ('honors alias arity if added via one-arg form', () => {
+    const ski = new SKI();
+    const alias = ski.parse('T=CI');
+    ski.add(alias);
+
+    const jar = {};
+    const y = ski.parse('y', jar);
+    const x = ski.parse('x', jar);
+
+    const T = ski.getTerms().T;
+    expect(T.step().expr.toString()).to.equal('T');
+    expect(T.apply(x).step().expr.toString()).to.equal('Tx');
+    expect(T.apply(x, y).step().expr.toString()).to.equal('CIx y');
   });
 
   it ('can handle self-referential terms', () => {
