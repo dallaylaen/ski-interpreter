@@ -11,7 +11,8 @@ describe('Expr.format: literal', () => {
   check('foo (bar quux)', {}, 'foo(bar quux)');
   check('(foo bar) quux', {}, 'foo bar quux');
   check('foo bar', { html: true, terse: false }, '<var>foo</var>(<var>bar</var>)');
-  check('IIx', {html: true}, '<b>I</b>I<var>x</var>');
+  check('IIx', {html: true}, 'II<var>x</var>');
+  check('IIx', {html: true, redex: ['<b>', '</b>']}, '<b>I</b>I<var>x</var>');
   check('a->a a', {html: true}, '<var>a</var>-&gt;<var>a</var> <var>a</var>');
   check('(x->y->y x)(foo)', {}, '(x->y->y x)foo');
   check('K 2 S', {}, 'K 2 S');
