@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-01-25
+
+### BREAKING CHANGES
+
+- Remove `Expr.reduce()` method for good (too ambiguous). See also `Expr.invoke()` below.
+- Remove `onApply` hook from `Native` combinators.
+
+### Added
+
+- Expr: Add `invoke(arg: Expr)` method implementing actual rewriting rules.
+- SKI: `add(term, impl, note?)` method now accepts a function as `impl` to define native combinators directly.
+- Improved jsdoc somewhat.
+
 ## [1.2.0] - 2025-12-14
 
 ### BREAKING CHANGES
