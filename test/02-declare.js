@@ -92,4 +92,16 @@ describe( 'SKI', () => {
     expect(run2.expr.toString()).to.match(/^y  *x/);
     expect(run2.steps).to.be.greaterThanOrEqual(1);
   });
+
+  it ('can handle self-referential terms', () => {
+    const ski = new SKI();
+    ski.add('Y', function (f) { return f.apply(this.apply(f)); });
+
+    const jar = {};
+    const expr = ski.parse('Y f', jar);
+    const eval = expr.walk();
+    for (let i=0; i<5; i++) {
+      ski.parse(i + ' f (Y f)', jar).step().expr.expect(eval.next().value.expr);
+    }
+  });
 });

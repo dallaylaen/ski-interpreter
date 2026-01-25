@@ -40,7 +40,7 @@ describe( 'SKI', () => {
 
   it ('forbids adding garbage to known terms', () => {
     const ski = new SKI();
-    expect(() => ski.add('foobar', {foo: 42})).to.throw(/Expr or\b.* string/);
+    expect(() => ski.add('foobar', {foo: 42})).to.throw(/Expr\b.*\bstring/);
   });
 });
 
