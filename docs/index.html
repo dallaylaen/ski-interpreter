@@ -326,7 +326,7 @@
             return false;
         }
 
-        createRunner(src, {action: options.action, id: ++evalId}).start();
+        createRunner(src, {action: options.action, id: ++evalId})?.start();
         return false;
     }
 
@@ -375,11 +375,11 @@
 
         try {
             runner.set(src);
+            return runner;
         } catch (e) {
             runner.stop('Error: ' + util.sanitize(e.message));
         }
-
-        return runner;
+        return null;
     }
 
     function showInventory() {
