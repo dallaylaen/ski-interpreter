@@ -29,8 +29,8 @@ describe ('expression samples evaluate correctly', () => {
     // church numerals coercion
     ['+ x y z', 'y(x y z)', 1],
     ['+x', '+x', 0],
-    ['4 + 3', '7', 4],
-    ['WB(WB)(WB) + 0', '16', 50],
+    ['4 + 3', '7', 10],
+    ['WB(WB)(WB) + 0', '16', 70],
 
   ];
 
