@@ -46,6 +46,25 @@ that has enough arguments is executed and the step ends there.
 Lambda terms are lazy, i.e. the body is not touched until
 all free variables are bound.
 
+# Playground
+
+https://dallaylaen.github.io/ski-interpreter/
+
+* all of the above features (except comparison and JS-native terms) in your browser
+* expressions have permalinks
+* can configure verbosity & executeion speed
+
+# Quests
+
+https://dallaylaen.github.io/ski-interpreter/quest.html
+
+This page contains small tasks of increasing complexity.
+Each task requires the user to build a combinator with specific properties.
+
+# CLI
+
+REPL comes with the package as [bin/ski.js](bin/ski.js).
+
 # Installation
 
 ```bash
@@ -100,24 +119,6 @@ const [x, y] = SKI.free('x', 'y'); // free variables
 SKI.church(5).apply(x, y).run().expr + ''; // 'x(x(x(x(x y))))'
 ```
 
-# Playground
-
-https://dallaylaen.github.io/ski-interpreter/
-
-* all of the above features (except comparison and JS-native terms) in your browser
-* expressions have permalinks
-* can configure verbosity & executeion speed
-
-# Quests
-
-https://dallaylaen.github.io/ski-interpreter/quest.html
-
-This page contains small tasks of increasing complexity. 
-Each task requires the user to build a combinator with specific properties.
-
-# CLI
-
-REPL comes with the package as [bin/ski.js](bin/ski.js).
 
 
 
