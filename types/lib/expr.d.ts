@@ -1,4 +1,7 @@
-export type AnyArity = (arg0: Expr) => Expr | AnyArity;
+export type Partial = Expr | ((arg0: Expr) => Partial);
+/**
+ * @typedef {Expr | function(Expr): Partial} Partial
+ */
 export class Expr {
     /**
        * postprocess term after parsing. typically return self but may return other term or die
@@ -132,13 +135,6 @@ export class Expr {
     }>;
     _rski(options: any): this;
     /**
-       * Apply self to list of given args.
-       * Normally, only native combinators know how to do it.
-       * @param {Expr[]} args
-       * @return {Expr|null}
-       */
-    reduce(args: Expr[]): Expr | null;
-    /**
      * Replace all instances of plug in the expression with value and return the resulting expression,
      * or null if no changes could be made.
      * Lambda terms and applications will never match if used as plug
@@ -151,7 +147,27 @@ export class Expr {
      */
     subst(search: Expr, replace: Expr): Expr | null;
     /**
-       * @desc iterate one step of calculation in accordance with known rules.
+     * @desc Apply term reduction rules, if any, to the given argument.
+     * A returned value of null means no reduction is possible.
+     * A returned value of Expr means the reduction is complete and the application
+     *     of this and arg can be replaced with the result.
+     * A returned value of a function means that further arguments are needed,
+     *     and can be cached for when they arrive.
+     *
+     * This method is between apply() which merely glues terms together,
+     *     and step() which reduces the whole expression.
+     *
+     * foo.invoke(bar) is what happens inside foo.apply(bar).step() before
+     *     reduction of either foo or bar is attempted.
+     *
+     * The name 'invoke' was chosen to avoid confusion with either 'apply' or 'reduce'.
+     *
+     * @param {Expr} arg
+     * @returns {Partial | null}
+     */
+    invoke(arg: Expr): Partial | null;
+    /**
+       * @desc iterate one step of a calculation.
        * @return {{expr: Expr, steps: number, changed: boolean}}
        */
     step(): {
@@ -279,7 +295,6 @@ export class App extends Expr {
     arity: any;
     weight(): any;
     _firstVar(): any;
-    apply(...args: any[]): App;
     expand(): any;
     subst(search: any, replace: any): any;
     /**
@@ -289,7 +304,7 @@ export class App extends Expr {
         expr: Expr;
         steps: number;
     };
-    reduce(args: any): any;
+    invoke(arg: any): any;
     split(): any[];
     _aslist(): any[];
     equals(other: any): any;
@@ -304,14 +319,25 @@ export class FreeVar extends Named {
 }
 export class Lambda extends Expr {
     /**
-       * @param {FreeVar|FreeVar[]} arg
-       * @param {Expr} impl
-       */
-    constructor(arg: FreeVar | FreeVar[], impl: Expr);
+     * @desc Lambda abstraction of arg over impl.
+     *     Upon evaluation, all occurrences of 'arg' within 'impl' will be replaced
+     *     with the provided argument.
+     *
+     * Note that 'arg' will be replaced by a localized placeholder, so the original
+     * variable can be used elsewhere without interference.
+     * Listing symbols contained in the lambda will omit such placeholder.
+     *
+     * Legacy ([FreeVar], impl) constructor is supported but deprecated.
+     * It will create a nested lambda expression.
+     *
+     * @param {FreeVar} arg
+     * @param {Expr} impl
+     */
+    constructor(arg: FreeVar, impl: Expr);
     arg: FreeVar;
     impl: Expr;
     arity: number;
-    reduce(input: any): Expr;
+    invoke(arg: any): Expr;
     subst(search: any, replace: any): Lambda;
     expand(): Lambda;
     _rski(options: any): any;
@@ -319,37 +345,47 @@ export class Lambda extends Expr {
     _format(options: any, nargs: any): string;
     _braced(first: any): boolean;
 }
-/**
- * @typedef {function(Expr): Expr | AnyArity} AnyArity
- */
 export class Native extends Named {
     /**
-     * @desc A term named 'name' that converts next 'arity' arguments into
-     *       an expression returned by 'impl' function
-     *       If an apply: Expr=>Expr|null function is given, it will be attempted upon application
-     *       before building an App object. This allows to plug in argument coercions,
-     *       e.g. instantly perform a numeric operation natively if the next term is a number.
+     * @desc A named term with a known rewriting rule.
+     *       'impl' is a function with signature Expr => Expr => ... => Expr
+     *       (see typedef Partial).
+     *       This is how S, K, I, and company are implemented.
+     *
+     *       Note that as of current something like a=>b=>b(a) is not possible,
+     *       use full form instead: a=>b=>b.apply(a).
+     *
+     * @example new Native('K', x => y => x); // constant
+     * @example new Native('Y', function(f) { return f.apply(this.apply(f)); }); // self-application
+     *
      * @param {String} name
-     * @param {AnyArity} impl
-     * @param {{note: string?, arity: number?, canonize: boolean?, apply: function(Expr):(Expr|null) }} [opt]
+     * @param {Partial} impl
+     * @param {{note?: string, arity?: number, canonize?: boolean, apply?: function(Expr):(Expr|null) }} [opt]
      */
-    constructor(name: string, impl: AnyArity, opt?: {
-        note: string | null;
-        arity: number | null;
-        canonize: boolean | null;
-        apply: (arg0: Expr) => (Expr | null);
+    constructor(name: string, impl: Partial, opt?: {
+        note?: string;
+        arity?: number;
+        canonize?: boolean;
+        apply?: (arg0: Expr) => (Expr | null);
     });
-    impl: AnyArity;
-    onApply: (arg0: Expr) => (Expr | null);
+    invoke: Partial;
     arity: any;
     note: any;
-    apply(...args: any[]): Expr;
     _rski(options: any): any;
-    reduce(args: any): any;
 }
 export class Alias extends Named {
     /**
-     * @desc An existing expression under a different name.
+     * @desc A named alias for an existing expression.
+     *
+     *     Upon evaluation, the alias expands into the original expression,
+     *     unless it has a known arity > 0 and is marked terminal,
+     *     in which case it waits for enough arguments before expanding.
+     *
+     *     A hidden mutable property 'outdated' is used to silently
+     *     replace the alias with its definition in all contexts.
+     *     This is used when declaring named terms in an interpreter,
+     *     to avoid confusion between old and new terms with the same name.
+     *
      * @param {String} name
      * @param {Expr} impl
      * @param {{canonize: boolean?, max: number?, maxArgs: number?, note: string?, terminal: boolean?}} [options]
@@ -367,6 +403,7 @@ export class Alias extends Named {
     proper: any;
     terminal: any;
     canonical: any;
+    invoke: (arg: any) => any;
     subst(search: any, replace: any): any;
     /**
      *
@@ -376,14 +413,18 @@ export class Alias extends Named {
         expr: Expr;
         steps: number;
     };
-    reduce(args: any): Expr;
     equals(other: any): any;
     _rski(options: any): Expr;
     _braced(first: any): boolean;
     _format(options: any, nargs: any): string | void;
 }
 export class Church extends Native {
-    constructor(n: any);
+    /**
+     * @desc Church numeral representing non-negative integer n:
+     *      n f x = f(f(...(f x)...)) with f applied n times.
+     * @param {number} n
+     */
+    constructor(n: number);
     n: any;
     arity: number;
     equals(other: any): boolean;

@@ -24,16 +24,26 @@ export class SKI {
     hasLambdas: boolean;
     allow: any;
     /**
+     * @desc Declare a new term
+     * If the first argument is an Alias, it is added as is.
+     * Otherwise, a new Alias or Native term (depending on impl type) is created.
+     * If note is not provided and this.annotate is true, an automatic note is generated.
+     *
+     * If impl is a function, it should have signature (Expr) => ... => Expr
+     * (see typedef Partial at top of expr.js)
+     *
+     * @example ski.add('T', 'S(K(SI))K', 'swap combinator')
+     * @example ski.add( ski.parse('T = S(K(SI))K') ) // ditto but one-arg form
+     * @example ski.add('T', x => y => y.apply(x), 'swap combinator') // heavy artillery
+     * @example ski.add('Y', function (f) { return f.apply(this.apply(f)); }, 'Y combinator')
      *
      * @param {Alias|String} term
-     * @param {Expr|String|[number, function(...Expr): Expr, {note: string?, fast: boolean?}]} [impl]
+     * @param {String|Expr|function(Expr):Partial} [impl]
      * @param {String} [note]
      * @return {SKI} chainable
      */
-    add(term: Alias | string, impl?: Expr | string | [number, (...args: Expr[]) => Expr, {
-        note: string | null;
-        fast: boolean | null;
-    }], note?: string): SKI;
+    add(term: Alias | string, impl?: string | Expr | ((arg0: Expr) => Partial), note?: string): SKI;
+    _named(term: any, impl: any): Native | Alias;
     maybeAdd(name: any, impl: any): this;
     /**
      * @desc Declare and remove multiple terms at once

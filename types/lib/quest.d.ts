@@ -144,13 +144,31 @@ export class Quest {
     show(): TestCase[];
 }
 declare class Case {
-    constructor(input: any, options: any);
-    max: any;
-    note: any;
-    vars: any;
-    input: any;
-    engine: any;
-    parse(src: any): import("./expr").Lambda;
+    /**
+     * @param {FreeVar[]} input
+     * @param {{
+     *   max?: number,
+     *   note?: string,
+     *   vars?: {string: Expr},
+     *   engine: SKI
+     * }} options
+     */
+    constructor(input: typeof import("./expr").FreeVar[], options: {
+        max?: number;
+        note?: string;
+        vars?: {
+            string: typeof import("./expr").Expr;
+        };
+        engine: SKI;
+    });
+    max: number;
+    note: string;
+    vars: {
+        string?: typeof import("./expr").Expr;
+    };
+    input: typeof import("./expr").FreeVar[];
+    engine: SKI;
+    parse(src: any): Subst;
     /**
      * @param {Expr} expr
      * @return {CaseResult}
@@ -158,4 +176,15 @@ declare class Case {
     check(...expr: typeof import("./expr").Expr): CaseResult;
 }
 import { SKI } from "./parser";
+declare class Subst {
+    /**
+     * @descr A placeholder object with exactly n free variables to be substituted later.
+     * @param {Expr} expr
+     * @param {FreeVar[]} vars
+     */
+    constructor(expr: typeof import("./expr").Expr, vars: typeof import("./expr").FreeVar[]);
+    expr: typeof import("./expr").Expr;
+    vars: typeof import("./expr").FreeVar[];
+    apply(list: any): typeof import("./expr").Expr;
+}
 export {};
