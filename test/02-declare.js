@@ -114,6 +114,15 @@ describe( 'SKI', () => {
     expect(T.apply(x, y).step().expr.toString()).to.equal('CIx y');
   });
 
+  it ('can declare native terms', () => {
+    const ski = new SKI();
+    ski.add('T', a => b => b.apply(a));
+    ski.add('S', a => b => c => a.apply(c, b.apply(c)));
+
+    expect(ski.parse('T x y').run().expr.toString()).to.equal('y x');
+    expect(ski.parse('S T x y').run().expr.toString()).to.equal('x y y');
+  })
+
   it ('can handle self-referential terms', () => {
     const ski = new SKI();
     ski.add('Y', function (f) { return f.apply(this.apply(f)); });

@@ -64,6 +64,28 @@ describe ('Expr.format: aliases behavior', () => {
   });
 });
 
+describe('Expr.format: fancy names', () => {
+  it ('handles fancy variable/native term names', () => {
+    const ski = new SKI();
+    ski.add('S', a => b => c => a.apply(c, b.apply(c)) );
+    ski.getTerms().S.fancyName = '&Sigma;';
+    ski.add('K', a => b => a);
+    ski.getTerms().K.fancyName = '&Kappa;';
+
+    const [x] = SKI.free('x');
+    x.fancyName = '&chi;';
+
+    const expr = ski.parse('S(KS)K'); // B
+    expect(expr.format({ html: true })).to.equal('&Sigma;(&Kappa;&Sigma;)&Kappa;');
+    expect(expr.format()).to.equal('S(KS)K');
+
+    const expr2 = expr.apply(x, x, x).run().expr;
+    expect(expr2.format()).to.equal('x(x x)');
+    expect(expr2.format({ html: true }))
+      .to.equal('<var>&chi;</var>(<var>&chi;</var> <var>&chi;</var>)');
+  })
+});
+
 function check (src, options, result, comment) {
   describe(src, () => {
     const jar = {};
