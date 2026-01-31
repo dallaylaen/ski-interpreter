@@ -314,7 +314,14 @@
 
                 if (!item.pass) {
                     append(line, 'br');
-                    append(line, 'span', {content: '&nbsp;&nbsp;' + (item.reason ?? 'expected '+item.expected)});
+                    if (item.expected !== undefined) {
+                        append(line, 'span', {content: '&nbsp;&nbsp;' + 'expected: ' + item.expected});
+                        append(line, 'br');
+                    }
+                    if (item.reason) {
+                        append(line, 'span', {content: '&nbsp;&nbsp;' + item.reason});
+                        append(line, 'br');
+                    }
                 }
                 // replay specific test case via EvalBox
                 const termDiv = append(line, 'div', {});
