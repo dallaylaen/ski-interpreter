@@ -61,7 +61,7 @@ describe('SKI.equals', () => {
   });
 
   it('can throw on term mismatch if needed', () => {
-    expect( () => SKI.S.expect(SKI.I) ).to.throw( /ound.*\bS\b.*expected.*\bI\b/ );
+    expect( () => SKI.S.expect(SKI.I) ).to.throw( /\bS\b *!= *\bI\b/ );
     // TODO add test for expected/actual being present
   });
 

@@ -155,8 +155,8 @@ describe('Quest', () => {
 
     const fail = quest.check('KI');
     const details = fail.details;
-    expect(details[0].reason).to.match(/expected/);
-    expect(details[1].reason).to.match(/expected/);
+    expect(details[0].reason).to.match(/expected property.*false/);
+    expect(details[1].reason).to.match(/!=/);
     expect(details[0].pass).to.equal(false);
     expect(details[1].pass).to.equal(false);
     expect(fail.pass).to.equal(false);
@@ -230,7 +230,7 @@ describe('Quest', () => {
     expect(passing.pass).to.equal(true, 'should pass with named constant');
 
     const failing = quest.check('K(x arg)').details[0];
-    expect(failing.reason).to.match(/expected.*arg/);
+    expect(failing.reason).to.match(/!=/);
     expect(failing.pass).to.equal(false, 'var with the same name but not in the list = no go');
 
   });
