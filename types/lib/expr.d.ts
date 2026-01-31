@@ -206,11 +206,39 @@ export class Expr {
         steps: number;
     }>;
     /**
+     * @desc True is the expressions are identical, false otherwise.
+     *       Aliases are expanded.
+     *       Bound variables in lambda terms are renamed consistently.
+     *       However, no reductions are attempted.
+     *
+     *       E.g. a->b->a == x->y->x is true, but a->b->a == K is false.
      *
      * @param {Expr} other
      * @return {boolean}
      */
     equals(other: Expr): boolean;
+    /**
+     * @desc Recursively compare two expressions and return a string
+     *       describing the first point of difference.
+     *       Returns null if expressions are identical.
+     *
+     *       Aliases are expanded.
+     *       Bound variables in lambda terms are renamed consistently.
+     *       However, no reductions are attempted.
+     *
+     *       Members of the FreeVar class are considered different
+     *       even if they have the same name, unless they are the same object.
+     *       To somewhat alleviate confusion, the output will include
+     *       the internal id of the variable in square brackets.
+     *
+     * @example  "K(S != I)" is the result of comparing "KS" and "KI"
+     * @example  "S(K([x[13] != x[14]]))K"
+     *
+     * @param {Expr} other
+     * @param {boolean} [swap]  If true, the order of expressions is reversed in the output.
+     * @returns {string|null}
+     */
+    diff(other: Expr, swap?: boolean): string | null;
     contains(other: any): boolean;
     /**
      * @desc Assert expression equality. Can be used in tests.
@@ -239,10 +267,11 @@ export class Expr {
      *
      * @param   {Object} [options]  - formatting options
      * @param   {boolean} [options.terse]   - whether to use terse formatting (omitting unnecessary spaces and parentheses)
-     * @param   {boolean} [options.html]    - whether to default to HTML tags & entities
+     * @param   {boolean} [options.html]    - whether to default to HTML tags & entities.
+     *                                If a named term has fancyName property set, it will be used instead of name in this mode.
      * @param   {[string, string]} [options.brackets]  - wrappers for application arguments, typically ['(', ')']
      * @param   {[string, string]} [options.var]       - wrappers for variable names
-     *                                (will default to &lt;var&gt; and &lt;/var&gt; in html mode)
+     *                                (will default to &lt;var&gt; and &lt;/var&gt; in html mode).
      * @param   {[string, string, string]} [options.lambda]    - wrappers for lambda abstractions, e.g. ['&lambda;', '.', '']
      *                                where the middle string is placed between argument and body
      *                                default is ['', '->', ''] or ['', '-&gt;', ''] for html
@@ -307,7 +336,7 @@ export class App extends Expr {
     invoke(arg: any): any;
     split(): any[];
     _aslist(): any[];
-    equals(other: any): any;
+    diff(other: any, swap?: boolean): string;
     contains(other: any): any;
     _braced(first: any): boolean;
     _format(options: any, nargs: any): any;
@@ -316,6 +345,7 @@ export class App extends Expr {
 export class FreeVar extends Named {
     constructor(name: any);
     id: number;
+    diff(other: any, swap?: boolean): string;
 }
 export class Lambda extends Expr {
     /**
@@ -341,8 +371,8 @@ export class Lambda extends Expr {
     subst(search: any, replace: any): Lambda;
     expand(): Lambda;
     _rski(options: any): any;
-    equals(other: any): boolean;
-    _format(options: any, nargs: any): string;
+    diff(other: any, swap?: boolean): string;
+    _format(options: any, nargs: any): any;
     _braced(first: any): boolean;
 }
 export class Native extends Named {
@@ -413,10 +443,9 @@ export class Alias extends Named {
         expr: Expr;
         steps: number;
     };
-    equals(other: any): any;
+    diff(other: any, swap?: boolean): any;
     _rski(options: any): Expr;
     _braced(first: any): boolean;
-    _format(options: any, nargs: any): string | void;
 }
 export class Church extends Native {
     /**
@@ -427,7 +456,7 @@ export class Church extends Native {
     constructor(n: number);
     n: any;
     arity: number;
-    equals(other: any): boolean;
+    diff(other: any, swap?: boolean): string;
 }
 export namespace globalOptions {
     let terse: boolean;
@@ -448,6 +477,6 @@ declare class Named extends Expr {
        */
     constructor(name: string);
     name: string;
-    _format(options: any, nargs: any): string;
+    _format(options: any, nargs: any): any;
 }
 export {};

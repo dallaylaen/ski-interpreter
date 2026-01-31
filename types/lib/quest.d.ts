@@ -18,6 +18,15 @@ export type Capability = {
     duplicate: boolean | null;
     arity: number | null;
 };
+export type QuestResult = {
+    pass: boolean;
+    details: CaseResult[];
+    expr?: typeof import("./expr").Expr;
+    input: typeof import("./expr").Expr[] | string[];
+    exception?: Error;
+    steps: number;
+    weight?: number;
+};
 /**
  * @typedef {{
  *   pass: boolean,
@@ -48,6 +57,17 @@ export type Capability = {
  *   | [{max: number?}, string, string]
  *   | [{caps: Capability, max: number?}, string]
  * } TestCase
+ */
+/**
+ * @typedef {{
+ *   pass: boolean,
+ *   details: CaseResult[],
+ *   expr?: Expr,
+ *   input: Expr[]|string[],
+ *   exception?: Error,
+ *   steps: number,
+ *   weight?: number
+ * }} QuestResult
  */
 export class Quest {
     /**
@@ -118,25 +138,9 @@ export class Quest {
     /**
      *
      * @param {string} input
-     * @return {{
-     *             expr: Expr?,
-     *             pass: boolean,
-     *             details: CaseResult[],
-     *             exception: Error?,
-     *             steps: number,
-     *             input: Expr[]|string[],
-     *             weight: number?
-     *         }}
+     * @return {QuestResult}
      */
-    check(...input: string): {
-        expr: typeof import("./expr").Expr | null;
-        pass: boolean;
-        details: CaseResult[];
-        exception: Error | null;
-        steps: number;
-        input: typeof import("./expr").Expr[] | string[];
-        weight: number | null;
-    };
+    check(...input: string): QuestResult;
     /**
        *
        * @return {TestCase[]}
