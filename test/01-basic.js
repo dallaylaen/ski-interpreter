@@ -1,10 +1,52 @@
+/**
+ *  Smoke test the interpreter and also the facilities used by other tests.
+ *  Ideally we should bail out if these tests fail.
+ */
+
+'use strict';
 const { expect } = require('chai');
 const { SKI } = require('../index');
 const { Expr } = SKI.classes;
 
+describe( 'SKI.vars', () => {
+  it ('can create named variables with unforeknown names', () => {
+    const {x, y, z} = SKI.vars();
+
+    expect(x).to.be.instanceOf(SKI.classes.FreeVar);
+    expect(y).to.be.instanceOf(SKI.classes.FreeVar);
+    expect(z).to.be.instanceOf(SKI.classes.FreeVar);
+
+    expect(x.name).to.equal('x');
+    expect(y.name).to.equal('y');
+    expect(z.name).to.equal('z');
+
+    expect(x.apply(z, y.apply(z)) + '').to.equal('x z(y z)');
+  });
+
+  it ('distinguishes different invocations', () => {
+    const first = SKI.vars();
+    const second = SKI.vars();
+
+    const a0 = first.a;
+    const a1 = first.a;
+    const a2 = second.a;
+
+    expect(a1.equals(a0)).to.equal(true);
+    expect(a1.equals(a1)).to.equal(true);
+    expect(a1.equals(a2)).to.equal(false);
+
+    const b1 = first.b;
+    const b2 = second.b;
+
+    expect(b1.equals(b2)).to.equal(false);
+    expect(a1.equals(b1)).to.equal(false);
+  });
+});
+
+
 describe( 'SKI', () => {
   it ('can handle pedestrian free var application', () => {
-    const [a, b, c] = SKI.free('a', 'b', 'c');
+    const {a, b, c} = SKI.vars();
     const app = a.apply(c, b.apply(c));
     expect(app.format({terse: false})).to.equal('a(c)(b(c))');
   });
