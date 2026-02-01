@@ -6,7 +6,7 @@ const {Alias} = SKI.classes;
 const ski = new SKI();
 
 describe('Expr.subst', () => {
-  const [x, y, z] = SKI.free('x', 'y', 'z');
+  const {x, y, z} = SKI.vars()
 
   it('handles simple variable cases', () => {
     check(x.subst(y, z), null);

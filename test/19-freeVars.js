@@ -5,17 +5,17 @@ describe('Expr.freeVars', () => {
   const ski = new SKI();
   const set2list = set => [...set].sort().join(', ');
   it('holds for free vars themselves', () => {
-    const [x] = SKI.free('x');
+    const {x} = SKI.vars()
     expect(x.freeVars()).to.deep.equal(new Set([x]));
   });
 
   it ('holds for application', () => {
-    const [x, y] = SKI.free('x', 'y');
+    const {x, y} = SKI.vars()
     expect(x.apply(SKI.K.apply(y)).freeVars()).to.deep.equal(new Set([x, y]));
   });
 
   it ('holds for lambdas', () => {
-    const [y] = SKI.free('y');
+    const {y} = SKI.vars()
     const ty = ski.parse('x->y(x)', {y});
     expect(ty.freeVars()).to.deep.equal(new Set([y]));
   });

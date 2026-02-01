@@ -72,7 +72,7 @@ describe('Expr.format: fancy names', () => {
     ski.add('K', a => b => a);
     ski.getTerms().K.fancyName = '&Kappa;';
 
-    const [x] = SKI.free('x');
+    const {x} = SKI.vars()
     x.fancyName = '&chi;';
 
     const expr = ski.parse('S(KS)K'); // B

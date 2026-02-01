@@ -11,7 +11,7 @@ describe('native combinators', () => {
     W: 'x(y)(y)(z)',
   };
 
-  const [x, y, z] = SKI.free('x', 'y', 'z');
+  const {x, y, z} = SKI.vars()
 
   for (const comb in list) {
     it ('contains combinator '+comb, () => {

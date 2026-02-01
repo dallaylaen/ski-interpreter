@@ -4,7 +4,7 @@ const { SKI } = require('../index');
 const { Lambda } = SKI.classes;
 
 describe('Lambda', function () {
-  const [x, y, z, t1, t2] = SKI.free('x', 'y', 'z', 't1', 't2');
+  const {x, y, z, t1, t2} = SKI.vars()
 
   it ('is indeed a lambda expression', () => {
     const expr = new Lambda([x, y], y.apply(x));
@@ -68,7 +68,7 @@ describe('Lambda', function () {
 
 describe ('Lambda parsing', () => {
   const ski = new SKI({lambdas: true});
-  const [x, y, z, t1, t2] = SKI.free('x', 'y', 'z', 't1', 't2');
+  const {x, y, z, t1, t2} = SKI.vars()
 
   it('can parse simple expressions', () => {
     const expr = ski.parseLine('x->y->x');

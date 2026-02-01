@@ -5,7 +5,7 @@ const { SKI } = require('../index');
 
 describe ('Expr.weight', () => {
   it('should return 0 for FreeVar', () => {
-    const [expr] = SKI.free('x');
+    const {expr} = SKI.vars()
     expect(expr.weight()).to.equal(0);
   });
 

@@ -20,13 +20,15 @@ describe('Expr.diff', () => {
   });
 
   it('cannot be fooled by homonymic vars', () => {
-    const [x1, x2] = SKI.free('x', 'x');
+    const x1 = new SKI.classes.FreeVar('x');
+    const x2 = new SKI.classes.FreeVar('x');
 
     expect(x1.toString()).to.equal('x');
     expect(x2.toString()).to.equal('x');
 
     // buuut...
     expect(x1.diff(x2)).to.match(/x\[\d+] *!= *x\[\d+]/);
+    expect(x2.diff(x1)).to.match(/x\[\d+] *!= *x\[\d+]/);
 
     expect(SKI.K.apply(x1).diff(SKI.K.apply(x2))).to.match(/^K\([^A-Za-z]*x\[\d+] *!= *x\[\d+]/);
   });

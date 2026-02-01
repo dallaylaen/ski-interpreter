@@ -30,7 +30,7 @@ describe( 'SKI.parse', () => {
   it ('makes last expr an alias if = given', done => {
     const ski = new SKI();
     const expr = ski.parse('foo = SKK');
-    const [x] = SKI.free('x');
+    const {x} = SKI.vars()
 
     expect( expr.name ).to.equal ("foo");
     expect( expr.run(x).expr).to.equal(x);
@@ -40,7 +40,7 @@ describe( 'SKI.parse', () => {
 
   it ('does not leak intermediate terms', done => {
     const ski = new SKI;
-    const [x] = SKI.free('x');
+    const {x} = SKI.vars()
     const jar = { x };
     const intact = { ... jar };
     // console.log(jar);
@@ -57,7 +57,7 @@ describe( 'SKI.parse', () => {
 
     // setup some vars in the interpreter itself
     ski.add('V', 'BC(CI)'); // x->y->z->z x y'
-    const [x, y] = SKI.free('x', 'y');
+    const {x, y} = SKI.vars()
     ski.add('pair', ski.getTerms().V.apply(x, y));
     ski.add('which', SKI.K);
 
