@@ -45,7 +45,9 @@ describe('Lambda', function () {
     expect( () => new Lambda([], x)).to.throw(/empty.*argument/i);
   });
   it ('forbids duplicate vars', () => {
-    expect(() => new Lambda(SKI.free('x', 'x'), x)).to.throw(/duplicate/i);
+    const x1 = new SKI.classes.FreeVar('x');
+    const x2 = new SKI.classes.FreeVar('x');
+    expect(() => new Lambda([x1, x2], x1)).to.throw(/duplicate/i);
   });
 
   it ('another stupid use case', () => {

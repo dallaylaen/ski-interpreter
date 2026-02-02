@@ -98,9 +98,9 @@ describe( 'SKI.parse', () => {
 
     expect(''+expr.impl).to.match(/^[SKI()]*$/, "no traces of b() and w()");
 
+    const {x, y, z} = SKI.vars();
     // just check the expr to work
-    expect(expr.run(...SKI.free('x', 'y', 'z')).expr.toString()
-      ).to.equal('x y z z');
+    expect(expr.run(x, y, z).expr.toString()).to.equal('x y z z');
 
     done();
   });

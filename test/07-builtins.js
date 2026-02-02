@@ -9,10 +9,25 @@ describe( 'SKI.*', () => {
     done();
   });
 
-  it('provides free vars & Church numbers', done => {
+  it('provides Church numbers', done => {
+    const {x, y} = SKI.vars();
+    expect(SKI.church(0).apply(x, y).run().expr.format({terse: false})).to.equal('y');
+    expect(SKI.church(1).apply(x, y).run().expr.format({terse: false})).to.equal('x(y)');
     expect (
-      SKI.church(5).apply(...SKI.free('x', 'y')).run().expr.format({terse: false})
+      SKI.church(5).apply(x, y).run().expr.format({terse: false})
     ).to.equal('x(x(x(x(x(y)))))');
+
+    // ditto but with strings in place of numbers
+    expect(SKI.church('0').apply(x, y).run().expr.format({terse: false})).to.equal('y');
+    expect(SKI.church('1').apply(x, y).run().expr.format({terse: false})).to.equal('x(y)');
+    expect (
+      SKI.church('5').apply(x, y).run().expr.format({terse: false})
+    ).to.equal('x(x(x(x(x(y)))))');
+
+    // invalid numbers
+    expect( () => SKI.church(-1) ).to.throw(/must be a non-?negative/);
+    expect( () => SKI.church('foo') ).to.throw(/must be a non-?negative/);
+
     done();
   });
-})
+});
