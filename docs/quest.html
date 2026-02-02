@@ -37,7 +37,6 @@
 </div>
 <script>
     const { Expr } = SKI.classes; // just for type annotations
-    SKI.options.terse = true;
 
     const store = new Store('quest-page');
     const skiopt = store.load('engine') ?? {lambdas: false, numbers: false, allow: 'SKI'};
