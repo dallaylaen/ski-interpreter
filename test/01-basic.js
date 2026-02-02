@@ -19,6 +19,18 @@ describe ('SKI.classes', () => {
   });
 });
 
+describe( 'SKI.classes.FreeVar', () => {
+  it ('creates global free vars identical to one another', () => {
+    const x0 = new SKI.classes.FreeVar('x', null);
+    const x1 = new SKI.classes.FreeVar('x', null);
+    const y = new SKI.classes.FreeVar('y', null);
+
+    expect(x1.equals(x0)).to.equal(true);
+    expect(x1.equals(y)).to.equal(false);
+    expect(x1.subst(x0, y).equals(y)).to.equal(true);
+  });
+});
+
 describe( 'SKI.vars', () => {
   it ('can create named variables with unforeknown names', () => {
     const {x, y, z} = SKI.vars();
