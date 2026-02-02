@@ -40,8 +40,8 @@ function checkTerm(startSrc, endSrc, options = {}) {
   describe (`Expr.lambdify ${startSrc} -> ${endSrc}`, () => {
     try {
       const jar = {};
-      const start = ski.parse(startSrc, jar);
-      const end = ski.parse(endSrc, jar);
+      const start = ski.parse(startSrc, { vars: jar });
+      const end = ski.parse(endSrc, { vars: jar });
       const seq = start.lambdify(options);
       let weight = Infinity;
       let steps = 0;
@@ -65,7 +65,7 @@ function checkTerm(startSrc, endSrc, options = {}) {
           const nonFree = [...sym.keys()].filter(s => !(s instanceof SKI.classes.FreeVar) && s !== SKI.classes.Expr.lambdaPlaceholder);
           expect(nonFree).to.be.deep.equal([], 'expr must only have free variables and ->');
 
-          expr.expect(ski.parse(''+expr, jar), 'expression parses to itself when stringified');
+          expr.expect(ski.parse(''+expr, { vars: jar }), 'expression parses to itself when stringified');
         });
       }
       it ('terminates', () => {

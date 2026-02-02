@@ -16,7 +16,7 @@ if (args.length < 2)
 
 const ski = new SKI();
 const jar = {};
-const [target, ...seed] = args.map(s => ski.parse(s, jar));
+const [target, ...seed] = args.map(s => ski.parse(s, { vars: jar }));
 
 const { expr } = target.guess();
 if (!expr)

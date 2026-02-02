@@ -19,9 +19,9 @@ describe('Expr <-> string', () => {
     const [ name, source ] = c;
     it (name + ' (canonical)', () => {
       const jar    = {}; // keep track of common free vars
-      const expr   = ski.parse(source, jar);
+      const expr   = ski.parse(source, { vars: jar });
       const before = expr.format({terse: false});
-      const expr2  = ski.parse(before, jar);
+      const expr2  = ski.parse(before, { vars: jar });
       const after  = expr2.format({ terse: false });
 
       expect(after).to.equal(before);
@@ -30,9 +30,9 @@ describe('Expr <-> string', () => {
 
     it (name + ' (terse)', () => {
       const jar    = {}; // keep track of common free vars
-      const expr   = ski.parse(source, jar);
+      const expr   = ski.parse(source, { vars: jar });
       const before = expr.format({terse: true});
-      const expr2  = ski.parse(before, jar);
+      const expr2  = ski.parse(before, { vars: jar });
       const after  = expr2.toString();
 
       expect(after).to.equal(before);

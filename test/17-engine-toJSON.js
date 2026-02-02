@@ -16,7 +16,8 @@ describe ('SKI.toJSON', () => {
     expect(copy.showRestrict('+')).to.equal(ski.showRestrict('+'));
 
     const jar = {}; // share variables with the same names
-    copy.parse('y x', jar).expect( copy.parse('swap x y', jar).run().expr);
+    copy.parse('y x', { vars: jar })
+      .expect( copy.parse('swap x y', { vars: jar }).run().expr);
 
   });
 

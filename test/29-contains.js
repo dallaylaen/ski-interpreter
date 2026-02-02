@@ -23,8 +23,8 @@ describe('Expr.contains', () => {
     it(`contains ${inner} in ${outer}`, () => {
       const ski = new SKI();
       const jar = {};
-      const expr = ski.parse(outer, jar);
-      const innerExpr = ski.parse(inner, jar);
+      const expr = ski.parse(outer, { vars: jar });
+      const innerExpr = ski.parse(inner, { vars: jar });
       expect(expr.contains(innerExpr)).to.equal(true);
     });
   }
@@ -33,8 +33,8 @@ describe('Expr.contains', () => {
     it(`does not contain ${inner} in ${outer}`, () => {
       const ski = new SKI();
       const jar = {};
-      const expr = ski.parse(outer, jar);
-      const innerExpr = ski.parse(inner, jar);
+      const expr = ski.parse(outer, { vars: jar });
+      const innerExpr = ski.parse(inner, { vars: jar });
       expect(expr.contains(innerExpr)).to.equal(false);
     });
   }

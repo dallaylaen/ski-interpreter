@@ -27,8 +27,8 @@ if (args.length < 2)
 
 const ski = new SKI();
 const jar = {};
-const expr = ski.parse(args.pop(), jar);
-const terms = args.map(s => ski.parse(s, jar));
+const expr = ski.parse(args.pop(), { vars: jar });
+const terms = args.map(s => ski.parse(s, { vars: jar }));
 
 const rework = expr.replace(terms);
 if (rework === null)

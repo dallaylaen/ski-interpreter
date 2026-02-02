@@ -85,7 +85,7 @@ describe('SKI.emitDeclaration', () => {
     ski.remove('tmp');
 
     const jar = {};
-    const expr1 = ski.parse('K(SK)S a b c', jar);
+    const expr1 = ski.parse('K(SK)S a b c', { vars: jar });
     expect(expr1.run().expr + '').to.equal('a(b c)');
 
     const inventory = ski.getTerms();
@@ -99,7 +99,7 @@ describe('SKI.emitDeclaration', () => {
 
     compareInventories(ski2.getTerms(), ski.getTerms());
 
-    const expr2 = ski2.parse('K(SK)S a b c', jar);
+    const expr2 = ski2.parse('K(SK)S a b c', { vars: jar });
     expect(expr2.run().expr + '').to.equal('a(b c)');
     expr1.expect(expr2);
   });

@@ -45,7 +45,7 @@ describe( 'SKI.parse', () => {
     const intact = { ... jar };
     // console.log(jar);
 
-    const expr = ski.parse('y = SK; z=KI; K', jar);
+    const expr = ski.parse('y = SK; z=KI; K', { vars: jar });
 
     expect(jar).to.deep.equal(intact);
 
@@ -78,11 +78,11 @@ describe( 'SKI.parse', () => {
   it('can co-parseLine terms with same free vars', done => {
     const ski = new SKI;
     const jar = {};
-    const xy = ski.parse('x(y)', jar);
-    const yx = ski.parse('y(x)', jar);
+    const xy = ski.parse('x(y)', { vars: jar });
+    const yx = ski.parse('y(x)', { vars: jar });
     const cake = xy.apply(yx);
 
-    expect(cake.equals(ski.parse('x y (y x)', jar))).to.equal(true);
+    expect(cake.equals(ski.parse('x y (y x)', { vars: jar }))).to.equal(true);
     expect(cake.equals(ski.parse('x y (y x)', {}))).to.equal(false);
 
     done();

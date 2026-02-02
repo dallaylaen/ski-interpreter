@@ -188,10 +188,10 @@ describe('normal reduction order', () => {
     it ('reduces ' + src + ' via ' + path.join(", "), () => {
       const ski = new SKI();
       const jar = {};
-      let expr = ski.parse(src, jar);
+      let expr = ski.parse(src, { vars: jar });
       for (const step of path) {
         expr = expr.step().expr;
-        ski.parse(step, jar).expect(expr);
+        ski.parse(step, { vars: jar }).expect(expr);
       }
     });
   };

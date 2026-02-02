@@ -89,7 +89,7 @@ describe('Expr.format: fancy names', () => {
 function check (src, options, result, comment) {
   describe(src, () => {
     const jar = {};
-    const expr = mainParser.parse(src, jar);
+    const expr = mainParser.parse(src, { vars: jar });
     const formatted = expr.format(options);
     it (`formats to ${result}`, () => {
       expect(formatted).to.equal(result, comment);
@@ -99,7 +99,7 @@ function check (src, options, result, comment) {
       const stripped = options.html
         ? formatted.replace(/<[^>]+>/g, '').replace(/&gt;/g, '>')
         : formatted;
-      const expr2 = mainParser.parse(stripped, jar);
+      const expr2 = mainParser.parse(stripped, { vars: jar });
       expr.expect(expr2);
     });
 
@@ -110,7 +110,7 @@ function check (src, options, result, comment) {
 function roundTrip (src) {
   describe(src + ' round trips', () => {
     const jar = {};
-    const expr = mainParser.parse(src, jar);
+    const expr = mainParser.parse(src, { vars: jar });
 
     it ('format w/o options coincides with toString', () => {
       expect(expr.format()).to.equal(expr.toString());
@@ -133,7 +133,7 @@ function roundTrip (src) {
     it ('round-trips with html:true', () => {
       const formatted = expr.format({html: true});
       const stripped = formatted.replace(/<[^>]+>/g, '').replace(/&gt;/g, '>');
-      const expr2 = mainParser.parse(stripped, jar);
+      const expr2 = mainParser.parse(stripped, { vars: jar });
       expr.expect(expr2);
     });
 
@@ -148,7 +148,7 @@ function roundTrip (src) {
 
 function sameAs (src, jar, expr, comment) {
   it (`${comment}: evaluates ${src} as ${expr}`, () => {
-    const expr2 = mainParser.parse(src, jar);
+    const expr2 = mainParser.parse(src, { vars: jar });
     expr.expect(expr2, comment);
   });
 }

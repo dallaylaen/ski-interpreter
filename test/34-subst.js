@@ -30,10 +30,10 @@ describe('Expr.subst', () => {
     const runcase = (comment, input, plug, replacement, result) => {
       it(`${comment}: ${input} [${plug} := ${replacement}] == ${result}`, () => {
         const jar = {};
-        const expr = ski.parse(input, jar);
-        const plugExpr = ski.parse(plug, jar);
-        const replExpr = ski.parse(replacement, jar);
-        const expected = result ? ski.parse(result, jar) : null;
+        const expr = ski.parse(input, { vars: jar });
+        const plugExpr = ski.parse(plug, { vars: jar });
+        const replExpr = ski.parse(replacement, { vars: jar });
+        const expected = result ? ski.parse(result, { vars: jar }) : null;
 
         const got = expr.subst(plugExpr, replExpr);
 
@@ -59,7 +59,7 @@ function check (got, expected, jar) {
   if (expected === null) {
     expect(got).to.equal(null);
   } else if (typeof expected === 'string') {
-    ski.parse(expected, jar).expect(got);
+    ski.parse(expected, { vars: jar }).expect(got);
   } else {
     expected.expect(got);
   }

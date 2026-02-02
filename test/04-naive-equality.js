@@ -90,8 +90,8 @@ describe('SKI.equals', () => {
   for (const [term1, term2] of eqCases) {
     it (`equates ${term1} to ${term2}`, () => {
       const jar = {};
-      const t1 = ski.parse(term1, jar);
-      const t2 = ski.parse(term2, jar);
+      const t1 = ski.parse(term1, { vars: jar });
+      const t2 = ski.parse(term2, { vars: jar });
       expect(t1.equals(t2)).to.equal(true);
       expect(t2.equals(t1)).to.equal(true);
     });
@@ -100,8 +100,8 @@ describe('SKI.equals', () => {
   for (const [term1, term2] of ineqCases) {
     it(`distinguishes ${term1} from ${term2}`, () => {
       const jar = {};
-      const t1 = ski.parse(term1, jar);
-      const t2 = ski.parse(term2, jar);
+      const t1 = ski.parse(term1, { vars: jar });
+      const t2 = ski.parse(term2, { vars: jar });
       expect(t1.equals(t2)).to.equal(false);
       expect(t2.equals(t1)).to.equal(false);
     });

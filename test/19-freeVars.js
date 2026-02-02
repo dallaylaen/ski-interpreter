@@ -16,7 +16,7 @@ describe('Expr.freeVars', () => {
 
   it ('holds for lambdas', () => {
     const {y} = SKI.vars()
-    const ty = ski.parse('x->y(x)', {y});
+    const ty = ski.parse('x->y(x)', { vars: {y}});
     expect(ty.freeVars()).to.deep.equal(new Set([y]));
   });
 

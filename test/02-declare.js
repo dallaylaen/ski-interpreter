@@ -65,8 +65,8 @@ describe( 'SKI', () => {
     expect(alias).to.be.instanceof(SKI.classes.Alias);
     ski.add(alias);
     const jar = {};
-    const expr = ski.parse('T x y', jar).run().expr;
-    expr.expect( ski.parse('y x', jar));
+    const expr = ski.parse('T x y', { vars: jar }).run().expr;
+    expr.expect( ski.parse('y x', { vars: jar }));
   });
 
   it ('can auto-annotate proper terms', () => {
@@ -81,9 +81,9 @@ describe( 'SKI', () => {
     ski.add('T', 'CI');
     const jar = {};
 
-    const hang = ski.parse('Tx', jar);
-    const y = ski.parse('y', jar);
-    const x = ski.parse('x', jar);
+    const hang = ski.parse('Tx', { vars: jar });
+    const y = ski.parse('y', { vars: jar });
+    const x = ski.parse('x', { vars: jar });
 
     const run1 = hang.run();
     expect(run1.expr.toString()).to.match(/^T *x$/);
@@ -105,8 +105,8 @@ describe( 'SKI', () => {
     ski.add(alias);
 
     const jar = {};
-    const y = ski.parse('y', jar);
-    const x = ski.parse('x', jar);
+    const y = ski.parse('y', { vars: jar });
+    const x = ski.parse('x', { vars: jar });
 
     const T = ski.getTerms().T;
     expect(T.step().expr.toString()).to.equal('T');
@@ -128,10 +128,10 @@ describe( 'SKI', () => {
     ski.add('Y', function (f) { return f.apply(this.apply(f)); });
 
     const jar = {};
-    const expr = ski.parse('Y f', jar);
+    const expr = ski.parse('Y f', { vars: jar });
     const eval = expr.walk();
     for (let i=0; i<5; i++) {
-      ski.parse(i + ' f (Y f)', jar).step().expr.expect(eval.next().value.expr);
+      ski.parse(i + ' f (Y f)', { vars: jar }).step().expr.expect(eval.next().value.expr);
     }
   });
 });
