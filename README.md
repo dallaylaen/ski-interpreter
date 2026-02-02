@@ -115,7 +115,7 @@ ski.add('J', jay);
 
 // access predefined terms directly
 SKI.C.apply(SKI.S); // a term
-const [x, y] = SKI.free('x', 'y'); // free variables
+const {x, y} = SKI.vars(); // create on-demand variables
 SKI.church(5).apply(x, y).run().expr + ''; // 'x(x(x(x(x y))))'
 ```
 
