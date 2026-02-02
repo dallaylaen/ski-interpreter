@@ -3,7 +3,7 @@
 const { expect } = require('chai');
 
 const { SKI } = require('../index');
-const { declare } = require('../lib/expr');
+const { declare } = SKI;
 
 describe('SKI.bulkAdd', () => {
   it ('can add and remove terms', () => {
