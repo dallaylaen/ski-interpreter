@@ -97,6 +97,24 @@ describe( 'SKI', () => {
     done();
   });
 
+  it('can parse with respect to context', () => {
+    const ski = new SKI();
+    const ctx = {};
+    const expr1 = ski.parse('foo', { context: ctx });
+    expect(expr1.context).to.equal(ctx);
+    expect(expr1.name).to.equal('foo');
+
+    const expr2 = ski.parse('foo', { context: ctx });
+
+    expect(expr1.equals(expr2)).to.equal(true);
+
+    const expr3 = ski.parse('foo');
+    expect(expr1.equals(expr3)).to.equal(false);
+
+    const expr4 = ski.parse('bar', { context: ctx });
+    expect(expr1.equals(expr4)).to.equal(false);
+  });
+
   it ('can execute simple expr: S K I x', done => {
     const ski = new SKI;
     const expr = ski.parseLine("SKIx");
