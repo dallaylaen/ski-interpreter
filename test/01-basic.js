@@ -6,7 +6,18 @@
 'use strict';
 const { expect } = require('chai');
 const { SKI } = require('../index');
-const { Expr } = SKI.classes;
+
+describe ('SKI.classes', () => {
+  it ('exposes the core classes', () => {
+    // expect to be object
+    expect(SKI.classes).to.be.an('object');
+
+    // expect some core classes to be present & be constructors
+    for (const cls of ['Expr', 'FreeVar', 'Lambda', 'Native', 'Alias']) {
+      expect(SKI.classes[cls]).to.be.a('function', 'Expected SKI.classes.' + cls + ' to be a constructor');
+    }
+  });
+});
 
 describe( 'SKI.vars', () => {
   it ('can create named variables with unforeknown names', () => {
