@@ -10,10 +10,10 @@ describe('SKI.equals', () => {
     done();
   });
 
-  it ('is not fooled my similar free terms', done => {
+  it ('works for global free variables', done => {
     const ski = new SKI;
-    expect( ski.parse('x').equals(ski.parse('x'))).to.equal(false);
-    expect( ski.parse('Ix').equals(ski.parse('Ix'))).to.equal(false);
+    expect( ski.parse('x').equals(ski.parse('x'))).to.equal(true);
+    expect( ski.parse('Ix').equals(ski.parse('Ix'))).to.equal(true);
     done();
   });
 
