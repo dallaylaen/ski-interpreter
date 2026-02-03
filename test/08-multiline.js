@@ -78,11 +78,11 @@ describe( 'SKI.parse', () => {
   it('can co-parseLine terms with same free vars', done => {
     const ski = new SKI;
     const jar = {};
-    const xy = ski.parse('x(y)', { context: jar });
-    const yx = ski.parse('y(x)', { context: jar });
+    const xy = ski.parse('x(y)', { scope: jar });
+    const yx = ski.parse('y(x)', { scope: jar });
     const cake = xy.apply(yx);
 
-    expect(cake.equals(ski.parse('x y (y x)', { context: jar }))).to.equal(true);
+    expect(cake.equals(ski.parse('x y (y x)', { scope: jar }))).to.equal(true);
     expect(cake.equals(ski.parse('x y (y x)', {}))).to.equal(false);
 
     done();
