@@ -61,9 +61,12 @@ function checkTerm(startSrc, endSrc, options = {}) {
           expect(value.steps).to.be.greaterThanOrEqual(steps, 'steps must not decrease');
           steps = value.steps;
 
-          const sym = expr.getSymbols();
-          const nonFree = [...sym.keys()].filter(s => !(s instanceof SKI.classes.FreeVar) && s !== SKI.classes.Expr.lambdaPlaceholder);
-          expect(nonFree).to.be.deep.equal([], 'expr must only have free variables and ->');
+          const unwanted = [];
+          expr.traverse(e => {
+            if (!(e instanceof SKI.classes.FreeVar || e instanceof SKI.classes.App || e instanceof SKI.classes.Lambda))
+              unwanted.push(e);
+          });
+          expect(unwanted).to.be.deep.equal([], 'expr must only have free variables and ->');
 
           expr.expect(ski.parse(''+expr, { vars: jar }), 'expression parses to itself when stringified');
         });
