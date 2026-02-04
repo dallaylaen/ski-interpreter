@@ -1,8 +1,8 @@
 # Simple Kombinator Interpreter
 
-This package contains a 
-[combinatory logic](https://en.wikipedia.org/wiki/Combinatory_logic) 
-and [lambda calculus](https://en.wikipedia.org/wiki/Lambda_calculus) 
+This package contains a
+[combinatory logic](https://en.wikipedia.org/wiki/Combinatory_logic)
+and [lambda calculus](https://en.wikipedia.org/wiki/Lambda_calculus)
 parser and interpreter focused on traceability and inspectability.
 
 It is written in plain JavaScript (with bolted on TypeScript support)
@@ -25,7 +25,7 @@ and can be used in Node.js or in the browser.
 * Whole non-negative numbers are interpreted as Church numerals, e.g. `5 x y` evaluates to `x(x(x(x(x y))))`. They must also be space-separated from other terms;
 * `x y z` is the same as `(x y) z` or `x(y)(z)` but **not** `x (y z)`;
 * Unknown terms are assumed to be free variables;
-* Lambda terms are written as `x->y->z->expr`, which is equivalent to 
+* Lambda terms are written as `x->y->z->expr`, which is equivalent to
 `x->(y->(z->expr))` (aka right associative). Free variables in a lambda expression ~~stay in Vegas~~ are isolated from terms with the same name outside it;
 * X = y z defines a new term.
 
@@ -38,6 +38,15 @@ and can be used in Node.js or in the browser.
 * <code>C x y z &mapsto; x z y</code> _// swapping_;
 * <code>W x y &mapsto; x y y</code> _//duplication_;
 
+The special combinator `+` will increment Church numerals, if they happen to come after it:
+
+* `+ 0` // 1
+* `2 + 3` // -> `+(+(3))` -> `+(4)` -> `5`
+
+The `term + 0` idiom may be used to convert
+numbers obtained via computation (e.g. factorials)
+back to human readable form.
+
 # Execution strategy
 
 Applications and native terms use normal strategy, i.e. the first term in the tree
@@ -48,15 +57,13 @@ all free variables are bound.
 
 # Playground
 
-https://dallaylaen.github.io/ski-interpreter/
+* [Interactive interpreter](https://dallaylaen.github.io/ski-interpreter/)
 
-* all of the above features (except comparison and JS-native terms) in your browser
-* expressions have permalinks
-* can configure verbosity & executeion speed
+  * all of the above features (except comparison and JS-native terms) in your browser
+  * expressions have permalinks
+  * can configure verbosity and execution speed
 
-# Quests
-
-https://dallaylaen.github.io/ski-interpreter/quest.html
+* [Quests](https://dallaylaen.github.io/ski-interpreter/quest.html)
 
 This page contains small tasks of increasing complexity.
 Each task requires the user to build a combinator with specific properties.
@@ -73,54 +80,135 @@ npm install @dallaylaen/ski-interpreter
 
 # Usage
 
+## A minimal example
+
 ```javascript
-const {SKI} = require('@dallaylaen/ski-interpreter');
-const ski = new SKI(); // the parser
+#!node
 
-// parse an expression
-const expr = ski.parse('S(K(SI))K x y');
+const { SKI } = require('@dallaylaen/ski-interpreter');
 
-// run the expression
-const result = expr.run({max: 100, throw: true});
-console.log('reached '+ result.expr + ' after ' + result.steps + ' steps.');
+// Create a parser instance
+const ski = new SKI();
 
-// inspect the steps taken to reach the result
-for (const step of expr.walk())
-  console.log(step.expr.toString());
+// Parse an expression
+const expr = ski.parse(process.argv[2]);
 
-// convert lambda to SKI
-const lambda = ski.parse('x->y->z->x z y');
-for (const step of lambda.rewriteSKI())
-  console.log(step.steps + ': ' + step.expr);
-
-// convert combinators to lambda
-const combinator = ski.parse('BSC');
-for (const step of combinator.lambdify())
-  console.log(step.steps + ': ' + step.expr);
-
-// compare expressions
-ski.parse('a->b->a').equals(ski.parse('x->y->x')); // true!
-
-const jar = {}; // share free variables with the same names between parser runs
-ski.parse('a->b->f a').equals(ski.parse('x->y->f x')); // false
-ski.parse('a->b->f a', jar).equals(ski.parse('x->y->f x', jar)); // true 
-
-// define new terms
-ski.add('T', 'S(K(SI))K');
-console.log(ski.parse('T x y').run().expr); // prints 'x(y)'
-
-// define terms with JS implementation
-const jay = new SKI.classes.Native('J', a=>b=>c=>d=>a.apply(b).apply(a.apply(d).apply(c)));
-ski.add('J', jay);
-
-// access predefined terms directly
-SKI.C.apply(SKI.S); // a term
-const {x, y} = SKI.vars(); // create on-demand variables
-SKI.church(5).apply(x, y).run().expr + ''; // 'x(x(x(x(x y))))'
+// Evaluate it step by step
+for (const step of expr.walk({max: 100})) {
+  console.log(`[${step.steps}] ${step.expr}`);
+}
 ```
 
+## Main features
 
+```javascript
+const { SKI } = require('@dallaylaen/ski-interpreter');
+const ski = new SKI();
 
+const expr = ski.parse(src);
+
+// evaluating expressions
+const next = expr.step(); // { steps: 1, expr: '...' }
+const final = expr.run({max: 1000}); // { steps: 42, expr: '...' }
+const iterator = expr.walk();
+
+// applying expressions
+const result = expr.run({max: 1000}, arg1, arg2 ...);
+// same sa
+expr.apply(arg1).apply(arg2).run();
+// or simply
+expr.apply(arg1, arg2).run();
+
+// equality check
+ski.parse('x->y->x').equals(ski.parse('a->b->a')); // true
+ski.parse('S').equals(SKI.S); // true
+ski.parse('x').apply(ski.parse('y')).equals(ski.parse('x y')); // also true
+
+// defining new terms
+ski.add('T', 'CI'); // T x y = C I x y = I y x = y
+ski.add('M', 'x->x x'); // M x = x x
+
+// also with native JavaScript implementations:
+ski.add('V', x=>y=>f=>f.apply(x, y), 'pair constructor');
+ski.add('Y', function(f) { return f.apply(this.apply(f))}, 'y combinator');
+
+ski.getTerms(); // all of the above as an object
+
+// converting lambda expressions to SKI
+const lambdaExpr = ski.parse('x->y->x y');
+const steps = [...lambdaExpr.toSKI()];
+// steps[steps.length - 1].expr only contains S, K, I, and free variables, if any
+
+// converting SKI expressions to lambda
+const skiExpr = ski.parse('S K K');
+const lambdaSteps = [...skiExpr.toLambda()];
+// lambdaSteps[lambdaSteps.length - 1].expr only contains lambda abstractions and applications
+```
+
+## Fancy formatting
+
+The `format` methods of the `Expr` class supports
+a number of options, see [the source code](lib/expr.js) for details.
+
+## Variable scoping
+
+By default, parsed free variables are global and equal to any other variable with the same name.
+Variables inside lambdas are local to said lambda and will not be equal to anything except themselves.
+
+A special `scope` argument may be given to parse to limit the scope. It can be any object.
+
+```javascript
+const scope1 = {};
+const scope2 = {};
+const expr1 = ski.parse('x y', {scope: scope1});
+const expr2 = ski.parse('x y', {scope: scope2}); // not equal
+const expr3 = ski.parse('x y'); // equal to neither
+const expr4 = ski.parse('x', {scope: scope1}).apply(ski.parse('y', {scope: scope1})); // equal to expr1
+```
+
+Variables can also be created using magic `SKI.vars(scope)` method:
+
+```javascript
+const scope = {};
+const {x, y, z} = SKI.vars(scope); // no need to specify names
+```
+
+## Querying the expressions
+
+Expressions are trees, so they can be traversed.
+
+```javascript
+expr.any(e => e.equals(SKI.S)); // true if any subexpression is S
+
+expr.traverse(e => e.equals(SKI.I) ? SKI.S.apply(SKI.K, SKI.K) : null);
+// replaces all I's with S K K
+// here a returned `Expr` object replaces the subexpression,
+// whereas `null` means "leave it alone and descend if possible"
+```
+
+## Test cases
+
+The `Quest` class may be used to build and execute test cases for combinators.
+
+```javascript
+const { Quest } = require('@dallaylaen/ski-interpreter');
+
+const q = new Quest({
+    name: 'Test combinator T',
+    description: 'T x y should equal y x',
+    input: 'T',
+    cases: [
+        ['T x y', 'y x'],
+    ],
+});
+
+q.check('CI'); // pass
+q.check('a->b->b a'); // ditto
+q.check('K'); // fail
+q.check('K(K(y x))') // nope! the variable scopes won't match
+```
+
+See [quest page data](docs/quest-data/) for more examples.
 
 # Thanks
 
