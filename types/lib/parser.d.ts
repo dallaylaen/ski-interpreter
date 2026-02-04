@@ -14,12 +14,14 @@ export class SKI {
         numbers?: boolean;
         lambdas?: boolean;
         terms?: {
-            [key: string]: Expr | string;
+            [key: string]: typeof classes.Expr | string;
         } | string[];
         annotate?: boolean;
     });
     annotate: boolean;
-    known: {};
+    known: {
+        [key: string]: classes.Native;
+    };
     hasNumbers: boolean;
     hasLambdas: boolean;
     allow: any;
@@ -42,8 +44,8 @@ export class SKI {
      * @param {String} [note]
      * @return {SKI} chainable
      */
-    add(term: Alias | string, impl?: string | Expr | ((arg0: Expr) => Partial), note?: string): SKI;
-    _named(term: any, impl: any): Native | Alias;
+    add(term: typeof classes.Alias | string, impl?: string | typeof classes.Expr | ((arg0: typeof classes.Expr) => Partial), note?: string): SKI;
+    _named(term: any, impl: any): classes.Alias | classes.Native;
     maybeAdd(name: any, impl: any): this;
     /**
      * @desc Declare and remove multiple terms at once
@@ -81,7 +83,7 @@ export class SKI {
      * @return {{[key:string]: Native|Alias}}
      */
     getTerms(): {
-        [key: string]: Native | Alias;
+        [key: string]: typeof classes.Native | typeof classes.Alias;
     };
     /**
      * Export term declarations for use in bulkAdd().
@@ -91,31 +93,46 @@ export class SKI {
     /**
      *
      * @param {string} source
-     * @param {{[keys: string]: Expr}} vars
-     * @param {{numbers: boolean?, lambdas: boolean?, allow: string?}} options
+     * @param {Object} [options]
+     * @param {{[keys: string]: Expr}} [options.env]
+     * @param {any} [options.scope]
+     * @param {boolean} [options.numbers]
+     * @param {boolean} [options.lambdas]
+     * @param {string} [options.allow]
      * @return {Expr}
      */
-    parse(source: string, vars?: {
-        [keys: string]: Expr;
-    }, options?: {
-        numbers: boolean | null;
-        lambdas: boolean | null;
-        allow: string | null;
-    }): Expr;
+    parse(source: string, options?: {
+        env?: {
+            [keys: string]: typeof classes.Expr;
+        };
+        scope?: any;
+        numbers?: boolean;
+        lambdas?: boolean;
+        allow?: string;
+    }): typeof classes.Expr;
     /**
      *
      * @param {String} source S(KI)I
-     * @param {{[keys: string]: Expr}} vars
-     * @param {{numbers: boolean?, lambdas: boolean?, allow: string?}} options
+     * @param {{[keys: string]: Expr}} env
+     * @param {Object} [options]
+     * @param {{[keys: string]: Expr}} [options.env] - unused, see 'env' argument
+     * @param {any} [options.scope]
+     * @param {boolean} [options.numbers]
+     * @param {boolean} [options.lambdas]
+     * @param {string} [options.allow]
      * @return {Expr} parsed expression
      */
-    parseLine(source: string, vars?: {
-        [keys: string]: Expr;
+    parseLine(source: string, env?: {
+        [keys: string]: typeof classes.Expr;
     }, options?: {
-        numbers: boolean | null;
-        lambdas: boolean | null;
-        allow: string | null;
-    }): Expr;
+        env?: {
+            [keys: string]: typeof classes.Expr;
+        };
+        scope?: any;
+        numbers?: boolean;
+        lambdas?: boolean;
+        allow?: string;
+    }): typeof classes.Expr;
     toJSON(): {
         version: string;
         allow: string;
@@ -126,35 +143,36 @@ export class SKI {
     };
 }
 export namespace SKI {
+    export { classes };
     /**
-     * Create free var(s) for subsequent use
-     * @param {String} names
-     * @return {FreeVar[]}
+     * @desc Create a proxy object that generates variables on demand,
+     *       with names corresponding to the property accessed.
+     *       Different invocations will return distinct variables,
+     *       even if with the same name.
+     *
+     *
+     * @example const {x, y, z} = SKI.vars();
+     *          x.name; // 'x'
+     *          x instanceof FreeVar; // true
+     *          x.apply(y).apply(z); // x(y)(z)
+     *
+     * @return {{[key: string]: FreeVar}}
      */
-    export function free(...names: string): FreeVar[];
+    export function vars(context?: {}): {
+        [key: string]: typeof import("./expr").FreeVar;
+    };
     /**
      * Convert a number to Church encoding
      * @param {number} n
      * @return {Church}
      */
-    export function church(n: number): Church;
-    export namespace classes {
-        export { Expr };
-        export { Native };
-        export { Alias };
-        export { FreeVar };
-        export { Lambda };
-        export { Church };
-    }
+    export function church(n: number): typeof import("./expr").Church;
     export { native };
-    export { globalOptions as options };
-    export let lambdaPlaceholder: Native;
+    export { declare };
 }
-import { Alias } from "./expr";
-import { Expr } from "./expr";
-import { Native } from "./expr";
-import { FreeVar } from "./expr";
-import { Church } from "./expr";
-import { Lambda } from "./expr";
-import { native } from "./expr";
-import { globalOptions } from "./expr";
+import classes = require("./expr");
+declare const native: {
+    [key: string]: classes.Native;
+};
+declare const declare: (inventory: Expr[]) => string[];
+export {};

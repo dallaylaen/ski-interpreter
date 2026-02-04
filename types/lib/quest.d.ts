@@ -153,7 +153,7 @@ declare class Case {
      * @param {{
      *   max?: number,
      *   note?: string,
-     *   vars?: {string: Expr},
+     *   vars?: {[key:string]: Expr},
      *   engine: SKI
      * }} options
      */
@@ -161,14 +161,14 @@ declare class Case {
         max?: number;
         note?: string;
         vars?: {
-            string: typeof import("./expr").Expr;
+            [key: string]: typeof import("./expr").Expr;
         };
         engine: SKI;
     });
     max: number;
     note: string;
     vars: {
-        string?: typeof import("./expr").Expr;
+        [key: string]: typeof import("./expr").Expr;
     };
     input: typeof import("./expr").FreeVar[];
     engine: SKI;

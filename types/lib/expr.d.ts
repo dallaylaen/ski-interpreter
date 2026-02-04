@@ -4,11 +4,6 @@ export type Partial = Expr | ((arg0: Expr) => Partial);
  */
 export class Expr {
     /**
-       * postprocess term after parsing. typically return self but may return other term or die
-       * @return {Expr}
-       */
-    postParse(): Expr;
-    /**
        * @desc apply self to zero or more terms and return the resulting term,
        * without performing any calculations whatsoever
        * @param {Expr} args
@@ -20,19 +15,7 @@ export class Expr {
        * @return {Expr}
        */
     expand(): Expr;
-    /**
-     * @desc return all free variables within the term
-     * @return {Set<FreeVar>}
-     */
-    freeVars(): Set<FreeVar>;
-    hasLambda(): any;
     freeOnly(): boolean;
-    /**
-     * @desc return all terminal values within the term, that is, values not
-     * composed of other terms. For example, in S(KI)K, the terminals are S, K, I.
-     * @return {Map<Expr, number>}
-     */
-    getSymbols(): Map<Expr, number>;
     /**
      *   @desc Given a list of pairs of term, replaces every subtree
      *         that is equivalent to the first term in pair with the second one.
@@ -46,6 +29,25 @@ export class Expr {
      *   @return {Expr}
      */
     replace(terms: (Expr | [find: Expr, replace: Expr])[], opt?: any): Expr;
+    /**
+     * @desc Traverse the expression tree, applying change() to each node.
+     *       If change() returns an Expr, the node is replaced with that value.
+     *       Otherwise, the node is left descended further (if applicable)
+     *       or left unchanged.
+     *
+     *       Returns null if no changes were made, or the new expression otherwise.
+     *
+     * @param {(e:Expr) => (Expr|null)} change
+     * @returns {Expr|null}
+     */
+    traverse(change: (e: Expr) => (Expr | null)): Expr | null;
+    /**
+     * @desc Returns true if predicate() is true for any subterm of the expression, false otherwise.
+     *
+     * @param {(e: Expr) => boolean} predicate
+     * @returns {boolean}
+     */
+    any(predicate: (e: Expr) => boolean): boolean;
     _replace(pairs: any, opt: any): any;
     /**
      * @desc rought estimate of the complexity of the term
@@ -239,7 +241,6 @@ export class Expr {
      * @returns {string|null}
      */
     diff(other: Expr, swap?: boolean): string | null;
-    contains(other: any): boolean;
     /**
      * @desc Assert expression equality. Can be used in tests.
      * @param {Expr} expected
@@ -308,7 +309,8 @@ export class Expr {
     _declare(output: any, inventory: any, seen: any): void;
 }
 export namespace Expr {
-    let lambdaPlaceholder: Native;
+    export { declare };
+    export { native };
 }
 export class App extends Expr {
     /**
@@ -325,6 +327,8 @@ export class App extends Expr {
     weight(): any;
     _firstVar(): any;
     expand(): any;
+    traverse(change: any): any;
+    any(predicate: any): any;
     subst(search: any, replace: any): any;
     /**
      * @return {{expr: Expr, steps: number}}
@@ -337,15 +341,31 @@ export class App extends Expr {
     split(): any[];
     _aslist(): any[];
     diff(other: any, swap?: boolean): string;
-    contains(other: any): any;
     _braced(first: any): boolean;
     _format(options: any, nargs: any): any;
     _unspaced(arg: any): any;
 }
 export class FreeVar extends Named {
-    constructor(name: any);
+    /**
+     * @desc A named variable.
+     *
+     * Given the functional nature of combinatory logic, variables are treated
+     * as functions that we don't know how to evaluate just yet.
+     *
+     * By default, two different variables even with the same name are considered different.
+     * They display it via a hidden id property.
+     *
+     * If a scope object is given, however, two variables with the same name and scope
+     * are considered identical.
+     *
+     * @param {string} name - name of the variable
+     * @param {any} scope - an object representing where the variable belongs to.
+     */
+    constructor(name: string, scope: any);
     id: number;
+    scope: any;
     diff(other: any, swap?: boolean): string;
+    subst(search: any, replace: any): any;
 }
 export class Lambda extends Expr {
     /**
@@ -368,6 +388,8 @@ export class Lambda extends Expr {
     impl: Expr;
     arity: number;
     invoke(arg: any): Expr;
+    traverse(change: any): Expr | Lambda;
+    any(predicate: any): any;
     subst(search: any, replace: any): Lambda;
     expand(): Lambda;
     _rski(options: any): any;
@@ -434,6 +456,8 @@ export class Alias extends Named {
     terminal: any;
     canonical: any;
     invoke: (arg: any) => any;
+    traverse(change: any): any;
+    any(predicate: any): any;
     subst(search: any, replace: any): any;
     /**
      *
@@ -458,18 +482,18 @@ export class Church extends Native {
     arity: number;
     diff(other: any, swap?: boolean): string;
 }
-export namespace globalOptions {
-    let terse: boolean;
-    let max: number;
-    let maxArgs: number;
-}
-export const native: {};
 /**
  *
  * @param {Expr[]} inventory
  * @return {string[]}
  */
-export function declare(inventory: Expr[]): string[];
+declare function declare(inventory: Expr[]): string[];
+/**
+ * @type {{[key: string]: Native}}
+ */
+declare const native: {
+    [key: string]: Native;
+};
 declare class Named extends Expr {
     /**
        * @desc a constant named 'name'
