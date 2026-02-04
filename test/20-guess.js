@@ -273,7 +273,14 @@ function describeTerm(term, expected, lambda, options={}) {
         canon.expect(ski.parse(lambda, { vars: jar }));
       });
       it('produces predictable properties', () => {
-        expect(found).to.deep.equal(expected);
+        try {
+          expect(found).to.deep.equal(expected);
+        } catch (err) {
+          console.log('Term    :', term);
+          console.log('Expected:', expected);
+          console.log('Found   :', found);
+          throw err;
+        }
       });
       it ('is idempotent', () =>{
         canon.guess().expr.expect(canon);
