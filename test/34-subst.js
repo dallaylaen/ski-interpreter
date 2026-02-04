@@ -58,7 +58,7 @@ function check (got, expected, jar) {
   if (expected === null) {
     expect(got).to.equal(null);
   } else if (typeof expected === 'string') {
-    ski.parse(expected, { vars: jar }).expect(got);
+    ski.parse(expected, { env: jar }).expect(got);
   } else {
     expected.expect(got);
   }
