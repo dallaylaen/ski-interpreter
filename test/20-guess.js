@@ -250,8 +250,7 @@ function describeTerm(term, expected, lambda, options={}) {
       };
 
       const ski = new SKI();
-      const jar = {};
-      const found = ski.parse(term, { vars: jar }).guess( runOptions );
+      const found = ski.parse(term).guess( runOptions );
 
       const canon = found.expr;
       delete found.expr; // we'll do a separate test for that
@@ -270,7 +269,7 @@ function describeTerm(term, expected, lambda, options={}) {
           expect(steps).to.be.within(limits[0], limits[1]);
       });
       if (lambda) it('produces exactly expected result ' + lambda, () => {
-        canon.expect(ski.parse(lambda, { vars: jar }));
+        canon.expect(ski.parse(lambda));
       });
       it('produces predictable properties', () => {
         try {
@@ -286,7 +285,7 @@ function describeTerm(term, expected, lambda, options={}) {
         canon.guess().expr.expect(canon);
       });
       it ('is back parseable', () => {
-        ski.parse('' + canon, { vars: jar }).expect(canon);
+        ski.parse('' + canon).expect(canon);
       });
     } catch (err) {
       it ('doesn\'t die', () => {

@@ -17,10 +17,10 @@ describe('Expr.replace', () => {
   for (const [initial, terms, result] of cases) {
     it(`rewrites ${initial} using ${terms}`, () => {
       const jar = {};
-      const expr = ski.parse(initial, { vars: jar });
-      const rework = expr.replace(deepMap(terms, t => ski.parse(t, { vars: jar })));
+      const expr = ski.parse(initial, { to_be_deleted: jar });
+      const rework = expr.replace(deepMap(terms, t => ski.parse(t, { to_be_deleted: jar })));
       expect(rework).to.be.instanceof(SKI.classes.Expr);
-      ski.parse(result, { vars: jar }).expect(rework);
+      ski.parse(result, { to_be_deleted: jar }).expect(rework);
     });
   }
 });

@@ -39,9 +39,8 @@ describe('Expr.lambdify', () => {
 function checkTerm(startSrc, endSrc, options = {}) {
   describe (`Expr.lambdify ${startSrc} -> ${endSrc}`, () => {
     try {
-      const jar = {};
-      const start = ski.parse(startSrc, { vars: jar });
-      const end = ski.parse(endSrc, { vars: jar });
+      const start = ski.parse(startSrc);
+      const end = ski.parse(endSrc);
       const seq = start.lambdify(options);
       let weight = Infinity;
       let steps = 0;
@@ -68,7 +67,7 @@ function checkTerm(startSrc, endSrc, options = {}) {
           });
           expect(unwanted).to.be.deep.equal([], 'expr must only have free variables and ->');
 
-          expr.expect(ski.parse(''+expr, { vars: jar }), 'expression parses to itself when stringified');
+          expr.expect(ski.parse(''+expr), 'expression parses to itself when stringified');
         });
       }
       it ('terminates', () => {

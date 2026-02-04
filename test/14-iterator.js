@@ -26,8 +26,7 @@ describe ('Expr.walk', () => {
     it('iterates correctly over '+start, () => {
       const ski = new SKI();
 
-      const jar = {};
-      let expr = ski.parse(start, { vars: jar });
+      let expr = ski.parse(start);
 
       let n = 0;
       let end = false;
@@ -44,7 +43,7 @@ describe ('Expr.walk', () => {
         expr = expr.step().expr; // keep up with the execution
         if (state.final) {
           end = true;
-          expr.expect(ski.parse(result, { vars: jar }));
+          expr.expect(ski.parse(result));
         }
       }
     });

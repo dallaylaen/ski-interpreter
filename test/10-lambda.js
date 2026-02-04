@@ -108,13 +108,13 @@ describe ('Lambda parsing', () => {
   // TODO: this requires parser overhaul - make everything immutable
   it ('doesn\'t pollute the vars hash with intermittent vars', () => {
     const jar = {};
-    const expr = ski.parseLine('x(y->z)', { vars: jar });
+    const expr = ski.parseLine('x(y->z)', { to_be_deleted: jar });
     expect(Object.keys(jar).sort()).to.deep.equal(['x', 'z']);
   });
 
   it ('doesn\'t pollute the vars hash with intermittent vars II', () => {
     const jar = {};
-    const expr = ski.parseLine('(x->y->x x)x', { vars: jar });
+    const expr = ski.parseLine('(x->y->x x)x', { to_be_deleted: jar });
     expect(expr.run(SKI.I).expr.toString()).to.equal('x x');
     expect(Object.keys(jar).sort()).to.deep.equal(['x']);
   });

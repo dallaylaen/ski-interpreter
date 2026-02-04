@@ -29,11 +29,10 @@ describe('Expr.subst', () => {
   describe('handles arbitrary expressions', () => {
     const runcase = (comment, input, plug, replacement, result) => {
       it(`${comment}: ${input} [${plug} := ${replacement}] == ${result}`, () => {
-        const jar = {};
-        const expr = ski.parse(input, { vars: jar });
-        const plugExpr = ski.parse(plug, { vars: jar });
-        const replExpr = ski.parse(replacement, { vars: jar });
-        const expected = result ? ski.parse(result, { vars: jar }) : null;
+        const expr = ski.parse(input);
+        const plugExpr = ski.parse(plug);
+        const replExpr = ski.parse(replacement);
+        const expected = result ? ski.parse(result) : null;
 
         const got = expr.subst(plugExpr, replExpr);
 

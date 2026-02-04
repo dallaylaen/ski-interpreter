@@ -5,9 +5,8 @@ describe( 'Church numbers', () => {
   it ('represent numbers', done => {
     const ski = new SKI({numbers: true});
 
-    const jar = {};
     for (let i = 0; i < 5; i++) {
-      const found = ski.parse(i+' x y', { vars: jar }).run().expr;
+      const found = ski.parse(i+' x y').run().expr;
       const expected = ski.parse( 'x('.repeat(i)+'y'+')'.repeat(i));
 
       expect('' + found).to.equal('' + expected);

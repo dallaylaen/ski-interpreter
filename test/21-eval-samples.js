@@ -38,13 +38,13 @@ describe ('expression samples evaluate correctly', () => {
     const [start, end, steps] = entry;
     const jar = {};
     it ('evaluates ' + start + ' in at most ' + steps + ' steps', () => {
-      const expr = ski.parse(start, { vars: jar });
+      const expr = ski.parse(start, { to_be_deleted: jar });
       if (expr instanceof SKI.classes.Alias)
         ski.add(expr.name, expr.impl);
       const got = expr.run({max: steps ? steps+1 : undefined}); // 1 extra step for the "final" badge
       if (end !== undefined) {
         try {
-          got.expr.expect(ski.parse(end, { vars: jar }));
+          got.expr.expect(ski.parse(end, { to_be_deleted: jar }));
         } catch (e) {
           recheck(start, end, steps);
           throw e;
@@ -60,8 +60,8 @@ describe ('expression samples evaluate correctly', () => {
 
 function recheck (start, end, steps) {
   const jar = {};
-  const expr = ski.parse(start, { vars: jar });
-  const target = ski.parse(end, { vars: jar });
+  const expr = ski.parse(start, { to_be_deleted: jar });
+  const target = ski.parse(end, { to_be_deleted: jar });
 
   console.log('rechecking '+start+ ' vs '+end);
 
