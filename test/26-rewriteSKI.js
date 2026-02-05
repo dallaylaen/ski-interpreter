@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { SKI } = require('../index');
 
-describe('Expr.rewriteSKI()', () => {
+describe('Expr.toSKI()', () => {
   const predictable = [
     ['x->y->x', 'K'],
     ['x->y->z->x z (y z)', 'S'],
@@ -26,7 +26,7 @@ describe('Expr.rewriteSKI()', () => {
     it(`${got} -> ${expected}`, () => {
       const expr = ski.parse(got);
       const exp = ski.parse(expected);
-      const seq = expr.rewriteSKI();
+      const seq = expr.toSKI();
       let done = false;
       for (const step of seq) {
         expect(step.expr).to.be.instanceOf(SKI.classes.Expr);
@@ -46,7 +46,7 @@ describe('Expr.rewriteSKI()', () => {
     const canon = ski.parse(src).infer().expr;
     it(`round trips on every step for ${src} aka ${canon}`, () => {
       const expr = ski.parse(src);
-      const seq = expr.rewriteSKI();
+      const seq = expr.toSKI();
       for (const step of seq) {
         canon.expect(step.expr.infer().expr);
       }

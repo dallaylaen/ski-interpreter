@@ -3,7 +3,7 @@ const { SKI } = require('../index');
 
 const ski = new SKI();
 
-describe('Expr.lambdify', () => {
+describe('Expr.toLambda', () => {
 
     // basic types
     checkTerm("x", "x");
@@ -37,11 +37,11 @@ describe('Expr.lambdify', () => {
 });
 
 function checkTerm(startSrc, endSrc, options = {}) {
-  describe (`Expr.lambdify ${startSrc} -> ${endSrc}`, () => {
+  describe (`Expr.toLambda ${startSrc} -> ${endSrc}`, () => {
     try {
       const start = ski.parse(startSrc);
       const end = ski.parse(endSrc);
-      const seq = start.lambdify(options);
+      const seq = start.toLambda(options);
       let weight = Infinity;
       let steps = 0;
       let expr;
@@ -75,7 +75,7 @@ function checkTerm(startSrc, endSrc, options = {}) {
         expect(expr).to.be.instanceOf(SKI.classes.Expr, 'found at least one expression');
       });
       it ('is idempotent', () => {
-        expr.expect(drain(expr.lambdify(options)).expr);
+        expr.expect(drain(expr.toLambda(options)).expr);
       });
     }
     catch (e) {
