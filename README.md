@@ -130,7 +130,6 @@ ski.add('M', 'x->x x'); // M x = x x
 
 // also with native JavaScript implementations:
 ski.add('V', x=>y=>f=>f.apply(x, y), 'pair constructor');
-ski.add('Y', function(f) { return f.apply(this.apply(f))}, 'y combinator');
 
 ski.getTerms(); // all of the above as an object
 
@@ -226,4 +225,4 @@ See [quest page data](docs/quest-data/) for more examples.
 
 This software is free and available under the MIT license.
 
-&copy; Konstantin Uvarin 2024-2025
+&copy; Konstantin Uvarin 2024&ndash;2026
