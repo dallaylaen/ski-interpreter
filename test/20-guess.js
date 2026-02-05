@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { SKI } = require('../index');
 
-describe('Expr.guess', () => {
+describe('Expr.infer', () => {
 
   // proper terms
   describeTerm(
@@ -250,7 +250,7 @@ function describeTerm(term, expected, lambda, options={}) {
       };
 
       const ski = new SKI();
-      const found = ski.parse(term).guess( runOptions );
+      const found = ski.parse(term).infer( runOptions );
 
       const canon = found.expr;
       delete found.expr; // we'll do a separate test for that
@@ -282,7 +282,7 @@ function describeTerm(term, expected, lambda, options={}) {
         }
       });
       it ('is idempotent', () =>{
-        canon.guess().expr.expect(canon);
+        canon.infer().expr.expect(canon);
       });
       it ('is back parseable', () => {
         ski.parse('' + canon).expect(canon);

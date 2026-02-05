@@ -29,7 +29,7 @@ const ski = new SKI();
 const expr = ski.parse(args.pop());
 const pairs = args
   .map(s => ski.parse(s))
-  .map(e => [ e.guess().expr, e ]);
+  .map(e => [ e.infer().expr, e ]);
 
 const uncanonical = pairs.filter( pair => !pair[0]);
 if (uncanonical.length) {
@@ -38,7 +38,7 @@ if (uncanonical.length) {
 }
 
 const replaced = expr.traverse(e => {
-  const canon = e.guess().expr;
+  const canon = e.infer().expr;
   for (const [lambda, term] of pairs) {
     if (canon.equals(lambda)) {
       return term;

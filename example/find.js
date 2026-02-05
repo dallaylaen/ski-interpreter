@@ -5,7 +5,7 @@
  *   using a set of known terms.
  */
 
-// TODO not working with [C, S, K, I] because of bugs in guess(), retest after fix Expr.
+// TODO not working with [C, S, K, I] because of bugs in infer(), retest after fix Expr.
 
 const { SKI } = require('../index');
 
@@ -18,7 +18,7 @@ const ski = new SKI();
 const jar = {};
 const [target, ...seed] = args.map(s => ski.parse(s, { vars: jar }));
 
-const { expr } = target.guess();
+const { expr } = target.infer();
 if (!expr)
   throw new Error('target expression is not normalizable: ' + target);
 
@@ -56,7 +56,7 @@ function * findAll (seed, options={}) {
   let gen = 1;
 
   for (const expr of seed) {
-    const canon = expr.guess(canonOpt).expr;
+    const canon = expr.infer(canonOpt).expr;
     yield { expr, tries, gen, canonical: canon };
     tries++;
     seen[canon.toString()] = true;
@@ -72,7 +72,7 @@ function * findAll (seed, options={}) {
           const expr = f.apply(g);
           // console.log('Trying ' + expr);
 
-          const canon = expr.guess(canonOpt);
+          const canon = expr.infer(canonOpt);
           if (!canon.expr)
             continue;
 
