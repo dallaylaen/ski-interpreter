@@ -246,8 +246,10 @@
                 check: val => typeof val === 'boolean',
                 onchange: on => { setFormat( on ? {
                   around: ['<span class="outline">', '</span>'],
+                  lambda: ['<span class="outline">', '-&gt;', '</span>'],
                 } : {
                   around: ['', ''],
+                  lambda: ['', '-&gt;', ''],
                 });},
             })
           ]
@@ -283,7 +285,7 @@
     function onKey (event) {
         if (event.keyCode === 13) {
             event.preventDefault();
-            run();
+            run({src: view.entryField.value});
             return false;
         }
         return true;

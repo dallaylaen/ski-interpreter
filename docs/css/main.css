@@ -52,10 +52,19 @@
 }
 
 .outline {
-    border: solid 1px blue;
-    padding: 3px;
+    border: solid 1px #ccc;
+    margin: 1px;
+    padding: 1px;
     border-radius: 5px;
     display: inline-block;
+}
+
+.outline .bracket {
+    font-size: 0;
+}
+
+li:has(.outline) ~ li:has(.outline) {
+    margin-top: 3px;
 }
 
 /* teletype */
