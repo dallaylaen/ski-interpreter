@@ -103,8 +103,8 @@
     <form id="prompt" onsubmit="return run()">
         <input id="entryField">
         <button id="runstopBtn" type="submit"></button>
-        <button id="rewriteSKI" title="Convert to SKI basis">&rarr;SK</button>
-        <button id="lambdify" title="Attempt to find the shortest equivalent &lambda;-term">&rarr;&lambda;</button>
+        <button id="toSKI" title="Convert to SKI basis">&rarr;SK</button>
+        <button id="toLambda" title="Attempt to find the shortest equivalent &lambda;-term">&rarr;&lambda;</button>
     </form>
     <footer>
         <small>&copy;&thinsp;2024&thinsp;&ndash;&thinsp;2025
@@ -116,7 +116,7 @@
      *   References to static page elements
      */
     const view = util.grabView('inventory', 'teletype', 'help', 'menu',
-      'entryField', 'runstopBtn', 'rewriteSKI', 'lambdify');
+      'entryField', 'runstopBtn', 'toSKI', 'toLambda');
     const store = new Store('playground');
 
     /**
@@ -172,13 +172,13 @@
         }
         showInventory();
 
-        view.rewriteSKI.addEventListener('click', ev => {
+        view.toSKI.addEventListener('click', ev => {
             ev.preventDefault();
             run({src: view.entryField.value, action: 'toSKI'});
             return false;
         });
 
-        view.lambdify.addEventListener('click', ev => {
+        view.toLambda.addEventListener('click', ev => {
             ev.preventDefault();
             run({src: view.entryField.value, action: 'toLambda'});
             return false;
@@ -300,8 +300,8 @@
     // ---- page functions ----
 
     const generator = {
-        toSKI: e => e.rewriteSKI(),
-        toLambda: e => e.lambdify(),
+        toSKI: e => e.toSKI(),
+        toLambda: e => e.toLambda(),
     }
 
     function run(options = {}) {
