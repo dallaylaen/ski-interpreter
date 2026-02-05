@@ -26,11 +26,30 @@ if (args.length < 2)
   throw new Error('a target expression and 1+ known terms are needed');
 
 const ski = new SKI();
-const jar = {};
-const expr = ski.parse(args.pop(), { vars: jar });
-const terms = args.map(s => ski.parse(s, { vars: jar }));
+const expr = ski.parse(args.pop());
+const pairs = args
+  .map(s => ski.parse(s))
+  .map(e => [ e.guess().expr, e ]);
 
-const rework = expr.replace(terms);
-if (rework === null)
-  throw new Error('no equivalent expression found');
-console.log('' + rework);
+const uncanonical = pairs.filter( pair => !pair[0]);
+if (uncanonical.length) {
+  throw new Error('Some expressions could not be canonized: '
+    + uncanonical.map(p => p[1].toString()).join(', '));
+}
+
+const replaced = expr.traverse(e => {
+  const canon = e.guess().expr;
+  for (const [lambda, term] of pairs) {
+    if (canon.equals(lambda)) {
+      return term;
+    }
+  }
+  return null;
+});
+
+if (replaced) {
+  console.log(replaced.toString());
+} else {
+  console.log('// unchanged');
+}
+
