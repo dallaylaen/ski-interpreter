@@ -17,19 +17,6 @@ export class Expr {
     expand(): Expr;
     freeOnly(): boolean;
     /**
-     *   @desc Given a list of pairs of term, replaces every subtree
-     *         that is equivalent to the first term in pair with the second one.
-     *         If a simgle term is given, it is duplicated into a pair.
-     *
-     *   @example  S(SKK)(SKS).replace('I') = SII // we found 2 subtrees equivalent to I
-     *             and replaced them with I
-     *
-     *   @param {(Expr | [find: Expr, replace: Expr])[]} terms
-     *   @param {Object} [opt] - options
-     *   @return {Expr}
-     */
-    replace(terms: (Expr | [find: Expr, replace: Expr])[], opt?: any): Expr;
-    /**
      * @desc Traverse the expression tree, applying change() to each node.
      *       If change() returns an Expr, the node is replaced with that value.
      *       Otherwise, the node is left descended further (if applicable)
@@ -48,7 +35,6 @@ export class Expr {
      * @returns {boolean}
      */
     any(predicate: (e: Expr) => boolean): boolean;
-    _replace(pairs: any, opt: any): any;
     /**
      * @desc rought estimate of the complexity of the term
      * @return {number}
@@ -142,7 +128,7 @@ export class Expr {
      * Lambda terms and applications will never match if used as plug
      * as they are impossible co compare without extensive computations.
      * Typically used on variables but can also be applied to other terms, e.g. aliases.
-     * See also Expr.replace().
+     * See also Expr.traverse().
      * @param {Expr} search
      * @param {Expr} replace
      * @return {Expr|null}
