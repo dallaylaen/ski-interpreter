@@ -4,16 +4,16 @@ export type Partial = Expr | ((arg0: Expr) => Partial);
  */
 export class Expr {
     /**
-       * @desc apply self to zero or more terms and return the resulting term,
-       * without performing any calculations whatsoever
-       * @param {Expr} args
-       * @return {Expr}
-       */
+     * @desc apply self to zero or more terms and return the resulting term,
+     * without performing any calculations whatsoever
+     * @param {Expr} args
+     * @return {Expr}
+     */
     apply(...args: Expr): Expr;
     /**
-       * expand all terms but don't perform any calculations
-       * @return {Expr}
-       */
+     * expand all terms but don't perform any calculations
+     * @return {Expr}
+     */
     expand(): Expr;
     freeOnly(): boolean;
     /**
@@ -166,22 +166,22 @@ export class Expr {
      */
     invoke(arg: Expr): Partial | null;
     /**
-       * @desc iterate one step of a calculation.
-       * @return {{expr: Expr, steps: number, changed: boolean}}
-       */
+     * @desc iterate one step of a calculation.
+     * @return {{expr: Expr, steps: number, changed: boolean}}
+     */
     step(): {
         expr: Expr;
         steps: number;
         changed: boolean;
     };
     /**
-       * @desc Run uninterrupted sequence of step() applications
-       *       until the expression is irreducible, or max number of steps is reached.
-       *       Default number of steps = 1000.
-       * @param {{max: number?, steps: number?, throw: boolean?}|Expr} [opt]
-       * @param {Expr} args
-       * @return {{expr: Expr, steps: number, final: boolean}}
-       */
+     * @desc Run uninterrupted sequence of step() applications
+     *       until the expression is irreducible, or max number of steps is reached.
+     *       Default number of steps = 1000.
+     * @param {{max: number?, steps: number?, throw: boolean?}|Expr} [opt]
+     * @param {Expr} args
+     * @return {{expr: Expr, steps: number, final: boolean}}
+     */
     run(opt?: {
         max: number | null;
         steps: number | null;
@@ -192,11 +192,11 @@ export class Expr {
         final: boolean;
     };
     /**
-       * Execute step() while possible, yielding a brief description of events after each step.
-       * Mnemonics: like run() but slower.
-       * @param {{max: number?}} options
-       * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
-       */
+     * Execute step() while possible, yielding a brief description of events after each step.
+     * Mnemonics: like run() but slower.
+     * @param {{max: number?}} options
+     * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
+     */
     walk(options?: {
         max: number | null;
     }): IterableIterator<{
@@ -493,9 +493,10 @@ declare const native: {
 };
 declare class Named extends Expr {
     /**
-       * @desc a constant named 'name'
-       * @param {String} name
-       */
+     * @desc An abstract class representing a term named 'name'.
+     *
+     * @param {String} name
+     */
     constructor(name: string);
     name: string;
     _format(options: any, nargs: any): any;
