@@ -41,16 +41,16 @@ export class Expr {
      */
     weight(): number;
     /**
-     * @desc Try to find an equivalent lambda term for the expression,
+     * @desc Try to empirically find an equivalent lambda term for the expression,
      *       returning also the term's arity and some other properties.
      *
-     *       This is used internally when declaring a Native term,
+     *       This is used internally when declaring a Native / Alias term,
      *       unless {canonize: false} is used.
      *
      *       As of current it only recognizes terms that have a normal form,
      *       perhaps after adding some variables. This may change in the future.
      *
-     *       Use lambdify() if you want to get a lambda term in any case.
+     *       Use toLambda() if you want to get a lambda term in any case.
      *
      * @param {{max: number?, maxArgs: number?}} options
      * @return {{
@@ -65,7 +65,7 @@ export class Expr {
      *    dup?: Set<number>,
      * }}
      */
-    guess(options?: {
+    infer(options?: {
         max: number | null;
         maxArgs: number | null;
     }): {
@@ -79,13 +79,19 @@ export class Expr {
         skip?: Set<number>;
         dup?: Set<number>;
     };
-    _guess(options: any, preArgs?: any[], steps?: number): any;
+    _infer(options: any, preArgs?: any[], steps?: number): any;
     _aslist(): this[];
     _firstVar(): boolean;
     /**
      * @desc Returns a series of lambda terms equivalent to the given expression,
      *       up to the provided computation steps limit,
      *       in decreasing weight order.
+     *
+     *       Unlike infer(), this method will always return something,
+     *       even if the expression has no normal form.
+     *
+     *       See also Expr.walk() and Expr.toSKI().
+     *
      * @param {{
      *   max?: number,
      *   maxArgs?: number,
@@ -97,7 +103,7 @@ export class Expr {
      * @param {number} [maxWeight] - maximum allowed weight of terms in the sequence
      * @return {IterableIterator<{expr: Expr, steps: number?, comment: string?}>}
      */
-    lambdify(options?: {
+    toLambda(options?: {
         max?: number;
         maxArgs?: number;
         varGen?: (arg0: void) => FreeVar;
@@ -110,11 +116,16 @@ export class Expr {
         comment: string | null;
     }>;
     /**
-     * @desc same semantics as walk() but rewrite step by step instead of computing
+     * @desc Rewrite the expression into S, K, and I combinators step by step.
+     *     Returns an iterator yielding the intermediate expressions,
+     *     along with the number of steps taken to reach them.
+     *
+     *     See also Expr.walk() and Expr.toLambda().
+     *
      * @param {{max: number?}} options
      * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
      */
-    rewriteSKI(options?: {
+    toSKI(options?: {
         max: number | null;
     }): IterableIterator<{
         final: boolean;
