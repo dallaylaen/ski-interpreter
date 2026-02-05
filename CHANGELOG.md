@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### BREAKING CHANGES
+
+- Rename `guess()` to `infer()` for clarity
+- Remove `replace()` method, use `subst()` or `traverse()` instead;
+- Rename `rewriteSKI` to `toSKI`, `lambdify` to `toLambda` for clarity and consistence;
+- Remove `getSymbols()` method. Partially replaced by traverse();
+- Remove `freeVars()` method (enumeration of vars is problematic with current scope impl)
+- Remove `contains()` method, use `any(e=>e.equals(other))` instead;
+- Remove `Expr.hasLambda()`, use `any(e => e instanceof Lambda)` instead;
+- Remove `postParse()` method (did nothing anyway and was only used in the parser)
+- Replace `parse(src, jar, options)` with `parse(src, options = { ..., env: jar })`
+- Remove global `SKI.options`
+- Remove `SKI.free()`, use `const {x, y} = SKI.vars()` instead
+
+### Added
+
+- `expr.traverse(transform: Expr->Expr|null): Expr|null` for term traversal and replacement
+- `expr.any(predicate: Expr->boolean)` method for matching expressions
+- expr.diff(expr2) shows exactly where the terms begin differing (or returns null)
+- Parse now has 2 arguments: `ski.parse(src, options={})`
+  - All `parse()` arguments are now immutable
+  - Passing extra terms: `ski.parse(src, { env: { myterm } })`
+  - Variable scope restriction: `ski.parse('x(y)', { scope: myObject })`
+- `SKI.vars(context)` returns a magic proxy for variable declarations
+- Added semi-official `Named.fancyName` property
+- `@typedef QuestResult` for better type definitions
+
+### Changed
+
+- `guess()` renamed to `infer()` with improved semantics
+- Parsing without context produces global free vars
+- Better variable handling with scope/context distinction
+- Quest system now uses `diff()` instead of `equals()` for more detailed comparisons
+- Improved quest failure details display
+
+### Fixed
+
+- Better display of discrepancies in guess tests
+- Various test fixes and improvements
+- Removed unused freevar mentions from quest.html
+
 ## [1.3.0] - 2026-01-25
 
 ### BREAKING CHANGES
