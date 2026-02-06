@@ -1,8 +1,11 @@
-const ski = require('./lib/parser');
+const main = require('./lib/parser');
 const quest = require('./lib/quest');
+const extras = require('./lib/extras');
 
-module.exports = { ...ski, ...quest };
+main.SKI.Quest = quest.Quest;
+main.SKI.extras = extras;
+
+module.exports = { ...main, ...quest };
 if (typeof window !== 'undefined') {
-  window.SKI = ski.SKI;
-  window.SKI.Quest = quest.Quest;
+  window.SKI = main.SKI;
 }
