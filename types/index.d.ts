@@ -1,7 +1,7 @@
 declare const _exports: {
     Quest: typeof quest.Quest;
-    SKI: typeof ski.SKI;
+    SKI: typeof main.SKI;
 };
 export = _exports;
 import quest = require("./lib/quest");
-import ski = require("./lib/parser");
+import main = require("./lib/parser");

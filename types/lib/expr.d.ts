@@ -52,7 +52,7 @@ export class Expr {
      *
      *       Use toLambda() if you want to get a lambda term in any case.
      *
-     * @param {{max: number?, maxArgs: number?}} options
+     * @param {{max?: number, maxArgs?: number}} options
      * @return {{
      *    normal: boolean,
      *    steps: number,
@@ -66,8 +66,8 @@ export class Expr {
      * }}
      */
     infer(options?: {
-        max: number | null;
-        maxArgs: number | null;
+        max?: number;
+        maxArgs?: number;
     }): {
         normal: boolean;
         steps: number;
@@ -79,8 +79,21 @@ export class Expr {
         skip?: Set<number>;
         dup?: Set<number>;
     };
-    _infer(options: any, preArgs?: any[], steps?: number): any;
-    _aslist(): this[];
+    /**
+     *
+     * @param {{max: number, maxArgs: number, index: number}} options
+     * @param {FreeVar[]} preArgs
+     * @param {number} steps
+     * @returns {{normal: boolean, steps: number}|{normal: boolean, steps: number}|{normal: boolean, steps: number, expr: Lambda|*, arity?: *, skip?: Set<any>, dup?: Set<any>, duplicate, discard, proper: boolean}|*|{normal: boolean, steps: number}}
+     * @private
+     */
+    private _infer;
+    /**
+     * @desc Expand application trees into lists of terms, e.g. ((a b) c) => [a, b, c].
+     * @returns {Expr[]}
+     * @private
+     */
+    private _aslist;
     _firstVar(): boolean;
     /**
      * @desc Returns a series of lambda terms equivalent to the given expression,
@@ -122,17 +135,23 @@ export class Expr {
      *
      *     See also Expr.walk() and Expr.toLambda().
      *
-     * @param {{max: number?}} options
+     * @param {{max?: number}} [options]
      * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
      */
     toSKI(options?: {
-        max: number | null;
+        max?: number;
     }): IterableIterator<{
         final: boolean;
         expr: Expr;
         steps: number;
     }>;
-    _rski(options: any): this;
+    /**
+     * @desc Internal method for toSKI, which performs one step of the conversion.
+     * @param {{max: number, steps: number}} options
+     * @returns {Expr}
+     * @private
+     */
+    private _rski;
     /**
      * Replace all instances of plug in the expression with value and return the resulting expression,
      * or null if no changes could be made.
@@ -256,7 +275,13 @@ export class Expr {
      * @return {boolean}
      */
     _braced(first?: boolean): boolean;
-    _unspaced(arg: any): boolean;
+    /**
+     * @desc Whether the expression can be printed without a space when followed by arg.
+     * @param {Expr} arg
+     * @returns {boolean}
+     * @private
+     */
+    private _unspaced;
     /**
      * @desc    Stringify the expression with fancy formatting options.
      *          Said options mostly include wrappers around various constructs in form of ['(', ')'],
@@ -302,7 +327,14 @@ export class Expr {
             [x: string]: Expr;
         };
     }): string;
-    _format(options: any, nargs: any): void;
+    /**
+     * @desc Internal method for format(), which performs the actual formatting.
+     * @param {Object} options
+     * @param {number} nargs
+     * @returns {string}
+     * @private
+     */
+    private _format;
     _declare(output: any, inventory: any, seen: any): void;
 }
 export namespace Expr {
@@ -322,6 +354,7 @@ export class App extends Expr {
     final: boolean;
     arity: any;
     weight(): any;
+    _infer(options: any, preArgs?: any[], steps?: number): any;
     _firstVar(): any;
     expand(): any;
     traverse(change: any): any;
@@ -337,6 +370,11 @@ export class App extends Expr {
     invoke(arg: any): any;
     split(): any[];
     _aslist(): any[];
+    /**
+     * @desc Convert the expression to SKI combinatory logic
+     * @return {Expr}
+     */
+    _rski(options: any): Expr;
     diff(other: any, swap?: boolean): string;
     _braced(first: any): boolean;
     _format(options: any, nargs: any): any;
@@ -384,6 +422,7 @@ export class Lambda extends Expr {
     arg: FreeVar;
     impl: Expr;
     arity: number;
+    _infer(options: any, preArgs?: any[], steps?: number): any;
     invoke(arg: any): Expr;
     traverse(change: any): Expr | Lambda;
     any(predicate: any): any;
@@ -391,7 +430,7 @@ export class Lambda extends Expr {
     expand(): Lambda;
     _rski(options: any): any;
     diff(other: any, swap?: boolean): string;
-    _format(options: any, nargs: any): any;
+    _format(options: any, nargs: any): string;
     _braced(first: any): boolean;
 }
 export class Native extends Named {
@@ -420,7 +459,7 @@ export class Native extends Named {
     invoke: Partial;
     arity: any;
     note: any;
-    _rski(options: any): any;
+    _rski(options: any): Expr | this;
 }
 export class Alias extends Named {
     /**
@@ -456,6 +495,7 @@ export class Alias extends Named {
     traverse(change: any): any;
     any(predicate: any): any;
     subst(search: any, replace: any): any;
+    _infer(options: any, preArgs?: any[], steps?: number): any;
     /**
      *
      * @return {{expr: Expr, steps: number}}
@@ -499,6 +539,7 @@ declare class Named extends Expr {
      */
     constructor(name: string);
     name: string;
+    _unspaced(arg: any): boolean;
     _format(options: any, nargs: any): any;
 }
 export {};
