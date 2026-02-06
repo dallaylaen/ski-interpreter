@@ -18,8 +18,16 @@
         "curly": [ 2, "multi-or-nest" ],
         "space-in-parens": 0,
         "operator-linebreak": [ 2, "before" ],
-        "no-unused-vars": [ 2, { "args": "none", "varsIgnorePattern": "^_$|^reject$|^unused|^Expr$|^Lambda$|^FreeVar$|^Variable$|^Alias$|^App$" } ],
+        "no-unused-vars": [ 2, { "args": "none", "varsIgnorePattern": "^_$|^reject$|^unused|^Expr$|^Lambda$|^FreeVar$|^Alias$|^App$" } ],
         "comma-dangle": [ 2, "only-multiline" ],
         "key-spacing": [2, {"align":"value"}]
-    }
+    },
+    "overrides": [
+        {
+            "files": ["test/**/*.js"],
+            "env": {
+                "mocha": true
+            }
+        }
+    ]
 }
