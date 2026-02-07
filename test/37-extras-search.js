@@ -18,6 +18,10 @@ describe('SKI.extras.search', () => {
     });
   check('finds B', [SKI.S, SKI.K], {},
     (e, _) => getsto(e, [x, y, z], x.apply(y.apply(z))) ? 1 : 0);
+  check('tries exhausted', [SKI.S, SKI.K], { tries: 10, depth: 5 }, () => 0, (res) => {
+    expect(res.expr).to.equal(undefined);
+    expect(res.total).to.equal(10);
+  });
 });
 
 function check (name, seed, options, predicate, extras) {
