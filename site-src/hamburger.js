@@ -38,7 +38,7 @@ class Hamburger {
     const link = append(li, 'a', { content: label });
     link.href = href;
     link.target = target;
-    link.onclick = () => this.hide();
+    link.onclick = () => { this.hide(); return true };
     return this; // for chaining
   }
 
