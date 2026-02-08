@@ -22,8 +22,7 @@
       "intro": [
         "Provide a term that returns <code>K</code> for <code>I</code> and <code>I</code> for <code>K</code>."
       ],
-      "input": "phi",
-      "subst": "&phi;",
+      "input": { "name": "phi", "fancy": "&phi;" },
       "cases": [
         [ "phi I", "K" ],
         [ "phi K", "I" ]
@@ -37,8 +36,7 @@
         "<p>Provide a term that converts <code>I</code> to <code>S</code>,",
         "<code>S</code> to <code>K</code>, and <code>K</code> to <code>I</code>.</p>"
       ],
-      "input": "phi",
-      "subst": "&phi;",
+      "input": { "name": "phi", "fancy": "&phi;" },
       "cases": [
         [ "phi I", "S" ],
         [ "phi S", "K" ],

@@ -41,8 +41,7 @@
       "env": [
         "f", "g"
       ],
-      "input": "phi",
-      "subst": "&phi;",
+      "input": { "name": "phi", "fancy":"&phi;" },
       "cases": [
         [ "phi x", "f (g x)" ]
       ]
