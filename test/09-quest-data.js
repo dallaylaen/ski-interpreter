@@ -75,11 +75,11 @@ function verifyChapter (entry, n) {
           return;
         console.log(q.meta);
         it('has title', () => {
-          expect(typeof q.title).to.equal('string');
+          expect(typeof q.name).to.equal('string');
         });
         it ('has description', () => {
-          expect(typeof q.descr).to.equal('string');
-          checkHtml(q.descr);
+          expect(typeof q.intro).to.equal('string');
+          checkHtml(q.intro);
         });
         it ('has date', () => {
           const date = q.meta.created_at;
