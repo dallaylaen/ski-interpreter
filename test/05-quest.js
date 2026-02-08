@@ -216,7 +216,7 @@ describe('Quest', () => {
     expect(quest.allowed()).to.equal('AJ');
   });
 
-  it ('allow named constants in input', () =>{
+  it ('allows named constants in input', () =>{
     const quest = new Quest({
       'input': 'phi',
       'vars':  [ 'arg' ],
@@ -234,6 +234,36 @@ describe('Quest', () => {
     expect(failing.pass).to.equal(false, 'var with the same name but not in the list = no go');
 
   });
+  /*
+  describe ('quest with shielded variables in env', () => {
+    const quest = new Quest({
+      title: 'first member of a pair',
+      input: 'fst',
+      env: ["T=CI; V=BCT; pair=V x y"],
+      cases: [
+        ['fst pair', 'x'],
+      ],
+    });
+
+    it ('passes for a solution', () => {
+      const result = quest.check('TK');
+      console.log(result);
+      expect(result.pass).to.equal(true, 'should pass with correct solution');
+    });
+
+    it ('fails obviously wrong solution', () => {
+      const result = quest.check('T(KI)');
+      expect(result.pass).to.equal(true, 'should pass with correct solution');
+      console.log(result.details[0]);
+    });
+
+    it ('fails clever solution', () => {
+      const result = quest.check('K x');
+      expect(result.pass).to.equal(false, 'should fail with wrong solution');
+      console.log(result.details[0]);
+    });
+  });
+   */
 });
 
 
