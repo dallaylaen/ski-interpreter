@@ -73,24 +73,24 @@ export class Quest {
     /**
      * @description A combinator problem with a set of test cases for the proposed solution.
      * @param {{
-     *    title: string?,
-     *    descr: string?,
-     *    subst: string?,
+     *    name: string?,
+     *    intro: string?,
+     *    subst: string?, // default for input[0].fancy, TODO remove
      *    allow: string?,
      *    numbers: boolean?,
-     *    vars: string[]?,
+     *    env: string[]?,
      *    engine: SKI?,
      *    engineFull: SKI?,
      *    cases: TestCase[],
      * }} options
      */
     constructor(options?: {
-        title: string | null;
-        descr: string | null;
+        name: string | null;
+        intro: string | null;
         subst: string | null;
         allow: string | null;
         numbers: boolean | null;
-        vars: string[] | null;
+        env: string[] | null;
         engine: SKI | null;
         engineFull: SKI | null;
         cases: TestCase[];
@@ -102,19 +102,21 @@ export class Quest {
         numbers: boolean;
         lambdas: any;
     };
-    vars: {};
+    env: {};
     subst: string[] | (string & any[]);
     input: any[];
-    varsFull: {};
+    envFull: {};
     cases: any[];
-    title: string;
-    descr: string;
+    name: any;
+    intro: string;
+    id: any;
     meta: {
-        title: string | null;
-        descr: string | null;
+        name: string | null;
+        intro: string | null;
+        env: string[] | null;
     };
     /**
-     *   Display allowed terms based on what engine thinks of this.vars + this.restrict.allow
+     *   Display allowed terms based on what engine thinks of this.env + this.restrict.allow
      *   @return {string}
      */
     allowed(): string;
@@ -153,21 +155,21 @@ declare class Case {
      * @param {{
      *   max?: number,
      *   note?: string,
-     *   vars?: {[key:string]: Expr},
+     *   env?: {[key:string]: Expr},
      *   engine: SKI
      * }} options
      */
     constructor(input: typeof import("./expr").FreeVar[], options: {
         max?: number;
         note?: string;
-        vars?: {
+        env?: {
             [key: string]: typeof import("./expr").Expr;
         };
         engine: SKI;
     });
     max: number;
     note: string;
-    vars: {
+    env: {
         [key: string]: typeof import("./expr").Expr;
     };
     input: typeof import("./expr").FreeVar[];
@@ -184,11 +186,11 @@ declare class Subst {
     /**
      * @descr A placeholder object with exactly n free variables to be substituted later.
      * @param {Expr} expr
-     * @param {FreeVar[]} vars
+     * @param {FreeVar[]} env
      */
-    constructor(expr: typeof import("./expr").Expr, vars: typeof import("./expr").FreeVar[]);
+    constructor(expr: typeof import("./expr").Expr, env: typeof import("./expr").FreeVar[]);
     expr: typeof import("./expr").Expr;
-    vars: typeof import("./expr").FreeVar[];
+    env: typeof import("./expr").FreeVar[];
     apply(list: any): typeof import("./expr").Expr;
 }
 export {};
