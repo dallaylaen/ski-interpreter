@@ -60,11 +60,18 @@
 }
 
 .outline .bracket {
+    /* outline kind of duplicates parentheses, so hide them from view but retain in copied text */
     font-size: 0;
 }
 
 li:has(.outline) ~ li:has(.outline) {
+    /* space lines when in outline mode */
     margin-top: 3px;
+}
+
+.outline:not(:has(.outline:hover)):hover {
+    /* hover over outline highlights the smallest part of expression containing the pointer */
+    border: solid 1px black;
 }
 
 /* teletype */
