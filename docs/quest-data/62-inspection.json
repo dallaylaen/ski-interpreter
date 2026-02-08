@@ -18,8 +18,8 @@
     {
       "id": "BDzyify1",
       "created_at": "2025-03-25T15:59:45",
-      "title": "Warm up",
-      "descr": [
+      "name": "Warm up",
+      "intro": [
         "Provide a term that returns <code>K</code> for <code>I</code> and <code>I</code> for <code>K</code>."
       ],
       "input": "phi",
@@ -32,8 +32,8 @@
     {
       "id": "EkHTaeLW",
       "created_at": "2025-03-25T15:59:45",
-      "title": "Circular",
-      "descr": [
+      "name": "Circular",
+      "intro": [
         "<p>Provide a term that converts <code>I</code> to <code>S</code>,",
         "<code>S</code> to <code>K</code>, and <code>K</code> to <code>I</code>.</p>"
       ],
@@ -48,8 +48,8 @@
     {
       "id": "r84l8LcX",
       "created_at": "2025-03-25T15:59:45",
-      "title": "Bird of pair",
-      "descr": [
+      "name": "Bird of pair",
+      "intro": [
         "<p>You now have enough information to construct and deconstruct pairs of values,",
         "and thus arbitrarily complicated data structures.</p>",
         "<p>Define three functions, <code>pair</code>, <code>first</code>, and <code>second</code>,",

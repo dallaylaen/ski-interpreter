@@ -15,8 +15,8 @@
     {
       "id": "xWDGLJvA",
       "created_at": "2025-07-13T16:44:03",
-      "title": "Enter Jay",
-      "descr": [
+      "name": "Enter Jay",
+      "intro": [
         "<p>Build the J combinator: <code>J a b c d = a b (a d c)</code>.</p>"
       ],
       "unlock": "J",
@@ -28,8 +28,8 @@
     {
       "id": "lphEyMXf",
       "created_at": "2025-07-13T16:44:03",
-      "title": "Swap",
-      "descr": "<p>Easy one first. Implement <code>T x y = y x</code> with just <code>J</code> and <code>I</code>.</p>",
+      "name": "Swap",
+      "intro": "<p>Easy one first. Implement <code>T x y = y x</code> with just <code>J</code> and <code>I</code>.</p>",
       "allow": "JI",
       "input": "phi",
       "cases": [
@@ -39,8 +39,8 @@
     {
       "id": "7gLQo32W",
       "created_at": "2025-07-13T16:44:03",
-      "title": "The missing link",
-      "descr": [
+      "name": "The missing link",
+      "intro": [
         "<p>Implement the Quixotic bird: <code>Q<sub>1</sub> x y z = x (z y)</code>.</p>",
         "<p>While of little interest by itself, it may be helpful as a building block",
         "for subsequent exercises.</p>"
@@ -54,8 +54,8 @@
     {
       "id": "KKFt7eS5",
       "created_at": "2025-07-13T16:44:03",
-      "title": "B patient",
-      "descr": [
+      "name": "B patient",
+      "intro": [
         "<p>Implement <code>B x y z = x (y z)</code> with just <code>J</code> and <code>I</code>.</p>"
       ],
       "allow": "JI",
@@ -67,8 +67,8 @@
     {
       "id": "16TntDIM",
       "created_at": "2025-07-13T16:44:03",
-      "title": "C in J",
-      "descr": [
+      "name": "C in J",
+      "intro": [
         "<p>Now that you have both <code>B</code> and <code>T</code>,",
         "C can be made, for sure. However, maybe you'll find a simpler expression...</p>"
       ],
@@ -81,8 +81,8 @@
     {
       "id": "ZpRyf6k6",
       "created_at": "2025-07-13T16:44:03",
-      "title": "Duplication",
-      "descr": [
+      "name": "Duplication",
+      "intro": [
         "<p>Duplication is somewhat trickier as the only duplicated argument (<code>a</code>) in J",
         "only appears on the left hand side of something else. Still it is possible.</p>",
         "<p>Implement <code>W x y = x y y</code> with just <code>J</code> and <code>I</code>.</p>"
@@ -96,14 +96,14 @@
     {
       "id": "yY4t45l5",
       "created_at": "2025-07-13T16:44:03",
-      "title": "For the sake of completeness",
-      "descr": [
+      "name": "For the sake of completeness",
+      "intro": [
         "<p>It is not possible to generate all combinators from <code>J</code> and <code>K</code>.",
         "<i>(If you know a counterexample, please send it to me.)</i></p>",
         "<p>It is, however, possible to generate everything from <code>J</code> and false, or ",
         "<code>A x y = y</code>.</p>"
       ],
-      "vars": ["A = x->y->y", "J=a->b->c->d->a b (a d c)"],
+      "env": ["A = x->y->y", "J=a->b->c->d->a b (a d c)"],
       "allow": "I-I",
       "input": [
         {

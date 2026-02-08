@@ -26,8 +26,8 @@
     {
       "id": "Z5FPLOrV",
       "created_at": "2024-08-29T09:15:33",
-      "title": "Quine",
-      "descr": [
+      "name": "Quine",
+      "intro": [
         "Technically, every irreducible combinator is a quine, for it returns itself. ",
         "Write a combinator that returns itself when given <i>any</i> argument: <code>f x = f</code>."
       ],
@@ -40,13 +40,13 @@
     {
       "id": "RMSPwloE",
       "created_at": "2024-08-29T09:15:33",
-      "title": "All of the above",
-      "descr": [
+      "name": "All of the above",
+      "intro": [
         "<p>You are given a term <code>expr</code>.",
         "Construct f such that <code>f x = expr f x</code> for any given <code>x</code>.</p>",
         "<p>Bonus points for having <code>expr</code> at the end of your solution.</p>"
       ],
-      "vars": ["expr"],
+      "env": ["expr"],
       "input": "phi",
       "cases": [
         [ "phi x", "expr phi x" ],
@@ -56,8 +56,8 @@
     {
       "id": "azxJgdmk",
       "created_at": "2025-03-12T00:11:39",
-      "title": "Tell me Y",
-      "descr": [
+      "name": "Tell me Y",
+      "intro": [
         "Implement the famous fixed point combinator, <code>Y</code>: <code>Y f = f (Y f)</code>."
       ],
       "input": "Y",
@@ -75,8 +75,8 @@
     {
       "id": "0aFCHGH0",
       "created_at": "2025-03-12T00:11:39",
-      "title": "The lazy fixed point",
-      "descr": [
+      "name": "The lazy fixed point",
+      "intro": [
         "<p>Under a normal reduction strategy, the classical fixed point combinator will terminate",
         "if given the right input. However, it may run indefinitely in <i>absence</i> of input.</p>",
         "<p>Make a variant of <code>Y</code>, <code>Z</code>, that doesn't start until there's some input:",

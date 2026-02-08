@@ -13,8 +13,8 @@
     {
       "id": "HQO9AiXx",
       "created_at": "2024-08-29T09:15:33",
-      "title": "Lost at GoF, found at g&compfn;f",
-      "descr": [
+      "name": "Lost at GoF, found at g&compfn;f",
+      "intro": [
         "<p>The combinator application is not associative, i.e. <code>(x y) z != x (y z)</code>",
         "(find examples!). However, a different operation is: composition. ",
         "And it will be used extensively in the subsequent quests, so buckle up...</p>",
@@ -31,8 +31,8 @@
     {
       "id": "5zTCoMld",
       "created_at": "2025-03-01T02:00:42",
-      "title": "Blackbird singing in the dead of night",
-      "descr": [
+      "name": "Blackbird singing in the dead of night",
+      "intro": [
         "<p>Here comes Bluebird's cousin, Blackbird: <code>B<sub>1</sub> a b c d = a (b c d)</code>.</p>",
         "<p>Unfortunately, this <s>small and simple</s> interpreter does not support indexed terms,",
         "so no shortcut will be unlocked in this quest.</p>"
@@ -46,8 +46,8 @@
     {
       "id": "zhxYRTMO",
       "created_at": "2024-08-29T09:15:33",
-      "title": "Mirror image",
-      "descr": "Make a combinator <code>T</code> that swaps its two arguments, that is, <code>(x, y) &rarr; y x</code>",
+      "name": "Mirror image",
+      "intro": "Make a combinator <code>T</code> that swaps its two arguments, that is, <code>(x, y) &rarr; y x</code>",
       "unlock": "T",
       "input": "phi",
       "cases": [
@@ -57,8 +57,8 @@
     {
       "id": "LAhD47Yg",
       "created_at": "2024-08-29T09:15:33",
-      "title": "What you like, do once more!",
-      "descr": "The <code>W</code> combinator is defined as x &rArr; y &rArr; x(y)(y). Implement it.",
+      "name": "What you like, do once more!",
+      "intro": "The <code>W</code> combinator is defined as x &rArr; y &rArr; x(y)(y). Implement it.",
       "unlock": "W",
       "input": "phi",
       "cases": [
@@ -68,8 +68,8 @@
     {
       "id": "cKg6FHW9",
       "created_at": "2024-08-29T09:15:33",
-      "title": "K forte",
-      "descr": [
+      "name": "K forte",
+      "intro": [
         "<p>Sometimes returning <code>x</code> for any given <code>y</code> is not enough.",
         "Return it twice: <code>(x, y)&rarr;x x</code>.</p>",
         "<p>Note: you should avoid applying <code>x</code> to itself until the next argument is given.</p>"
@@ -86,8 +86,8 @@
     {
       "id": "WiTB9Xy0",
       "created_at": "2025-02-27T20:24:16",
-      "title": "Round Robin",
-      "descr": [
+      "name": "Round Robin",
+      "intro": [
         "The Robin bird, <code>R</code>, puts its first argument after the next two: ",
         "<code>R x y z = y z x</code>."
       ],
@@ -100,8 +100,8 @@
     {
       "id": "Qq7dQfBW",
       "created_at": "2024-08-29T09:15:33",
-      "title": "Éminence grise",
-      "descr": [
+      "name": "Éminence grise",
+      "intro": [
         "<p>The King passes the judgement, but the Cardinal dictates the order of execution.</p>",
         "<p>Derive the <code>C</code> combinator, or Cardinal: <code>C x y z = x z y</code>.</p>"
       ],
@@ -114,9 +114,9 @@
     {
       "id": "glGifOC9",
       "created_at": "2024-10-20T12:27:35",
-      "title": "Double patience",
+      "name": "Double patience",
       "unlock": "V",
-      "descr": [
+      "intro": [
         "The <code>V</code> combinator, aka vireo bird, takes two arguments and waits patiently",
         "for a function to apply them to: <code>V x y z = z x y</code>."
       ],
@@ -128,8 +128,8 @@
     {
       "id": "WhYIkSJR",
       "created_at": "2025-03-01T02:00:42",
-      "title": "The trident of Poseidon",
-      "descr": [
+      "name": "The trident of Poseidon",
+      "intro": [
         "<p>Create a term that takes three arguments and applies the forth to them:",
         "<code>f a b c d = d a b c</code>.</p>",
         "<p>This combinator has no common name, so we'll just call it <code>v3</code>.",

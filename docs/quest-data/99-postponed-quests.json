@@ -3,8 +3,8 @@
     {
       "id": "Bqiwe3nT",
       "created_at": "2025-08-21T20:19:43",
-      "title": "Extraction",
-      "descr": [
+      "name": "Extraction",
+      "intro": [
         "<p>Given a function <code>f</code> and a linked list (V a (V b (V c ...))), return <code>f b c</code>.</p>"
       ],
       "input": "phi",

@@ -11,15 +11,15 @@
     {
       "id": "Jv13RWtU",
       "created_at": "2025-08-01T00:52:21",
-      "title": "Identity",
-      "descr": [
+      "name": "Identity",
+      "intro": [
         "<p>Unlike in linear logic, identity is not required to be present in the initial set. ",
         "This is because discarding is allowed and either <code>K x &lt;something&gt;</code> or",
         "some variant of <code>KI</code> can be built.</p>",
         "<p>Create identity from <code>B</code>, <code>K</code> and <code>T</code> combinators.",
         "<i>(<code>C</code> would've been too easy...)</i></p>"
       ],
-      "vars": ["T=CI"],
+      "env": ["T=CI"],
       "allow": "BK",
       "input": "phi",
       "cases": [
@@ -30,8 +30,8 @@
     {
       "id": "BWom23jE",
       "created_at": "2025-08-01T00:52:21",
-      "title": "To rule them all",
-      "descr": [
+      "name": "To rule them all",
+      "intro": [
         "<p>Create a monobasis for affine logic. ",
         "I made mine by taking <code>x&rarr;x</code>, attaching random affine combinators to the right, ",
         "plugging the resulting function into itself, and shaking it violently.</p>"
@@ -69,14 +69,14 @@
     {
       "id": "9AOyLk8v",
       "created_at": "2025-07-23T00:08:30",
-      "title": "Triple trouble",
-      "descr": [
+      "name": "Triple trouble",
+      "intro": [
         "<p>Think making <code>W</code> from <code>M</code> was hard?",
         "This time you are given <code>triple x = x x x</code> instead of <code>M</code>. Find <code>M</code>.</p>",
         "<p><i>(Can you also build <code>W</code>?)</i></p>",
         "<p>Of course you can't use any duplicating combinators except <code>triple</code>.</p>"
       ],
-      "vars": ["triple=WW"],
+      "env": ["triple=WW"],
       "allow": "BCVIKT",
       "input": "phi",
       "cases": [
@@ -86,14 +86,14 @@
     {
       "id": "Ci0vMhSM",
       "created_at": "2025-08-22T01:14:01",
-      "title": "Taming the infinity",
-      "descr": [
+      "name": "Taming the infinity",
+      "intro": [
         "<p>You are given a non-terminating fixed-point combinator, <code>Y</code>: ",
         "<code>Y f = f(Y f) = f(f(Y f)) = ...</code>.",
         "No other duplicating terms are allowed.</p>",
         "<p>Build <code>M x = x x</code>.</p>"
       ],
-      "vars": ["Y=WI(BWB(SI))"],
+      "env": ["Y=WI(BWB(SI))"],
       "allow": "BCVIKT",
       "input": "phi",
       "cases": [

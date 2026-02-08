@@ -10,8 +10,8 @@
     {
       "id": "YAN4Mxrt",
       "created_at": "2024-08-29T09:15:33",
-      "title": "All you need is",
-      "descr": "Build <code>x &rarr; x(S)(K)</code>",
+      "name": "All you need is",
+      "intro": "Build <code>x &rarr; x(S)(K)</code>",
       "solution": "BC(CI)SK",
       "input": "phi",
       "cases": [
@@ -22,13 +22,13 @@
     {
       "id": "4e3mymsq",
       "created_at": "2024-08-29T09:15:33",
-      "title": "Easy peasy",
-      "descr": [
+      "name": "Easy peasy",
+      "intro": [
         "Now build <code>I</code> from <code>X</code>. ",
         "No other combinators are (hopefully temporarily) available."
       ],
       "allow": "I-I",
-      "vars": ["X=BC(CI)SK"],
+      "env": ["X=BC(CI)SK"],
       "hint": "You might want to go back to the very first chapter...",
       "input": "phi",
       "cases": [
@@ -38,12 +38,12 @@
     {
       "id": "XUVE0eoI",
       "created_at": "2024-08-29T09:15:33",
-      "title": "Ignore all previous instructions II",
-      "descr": [
+      "name": "Ignore all previous instructions II",
+      "intro": [
         "Build a combinator that omits its first argument and returns the second one"
       ],
       "allow": "I-I",
-      "vars": ["X=BC(CI)SK"],
+      "env": ["X=BC(CI)SK"],
       "hint": "XXX... would alternate between I and X. Try parenthesis...",
       "input": "phi",
       "cases": [
@@ -53,13 +53,13 @@
     {
       "id": "63bwJwPZ",
       "created_at": "2024-08-29T09:15:33",
-      "title": "Stay constant, whatever you receive",
-      "descr": [
+      "name": "Stay constant, whatever you receive",
+      "intro": [
         "Build a combinator that omits its second argument and returns the first one",
         "(i.e. <code>K</code>)"
       ],
       "allow": "I-I",
-      "vars": ["X=BC(CI)SK"],
+      "env": ["X=BC(CI)SK"],
       "input": "phi",
       "cases": [
         [ "phi x y", "x"]
@@ -68,12 +68,12 @@
     {
       "id": "QqpxVpZk",
       "created_at": "2024-08-29T09:15:33",
-      "title": "Last but not least",
-      "descr": [
+      "name": "Last but not least",
+      "intro": [
         "How about <code>S</code>?"
       ],
       "allow": "I-I",
-      "vars": ["X=BC(CI)SK"],
+      "env": ["X=BC(CI)SK"],
       "input": "phi",
       "cases": [
         [ "phi x y z", "x z (y z)"]

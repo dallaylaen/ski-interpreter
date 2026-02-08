@@ -14,8 +14,8 @@
     {
       "id": "bMdsUR5U",
       "created_at": "2025-03-16T03:10:08",
-      "title": "Are we there yet?",
-      "descr": [
+      "name": "Are we there yet?",
+      "intro": [
         "<p>Before we start, we'll need a way to tell when a list ends</p>",
         "<p>Find a function <code>is_empty</code> that returns <code>K</code> for <code>nil</code>",
         "and <code>KI</code> for <code>V x y</code>, whatever <code>x</code> and <code>y</code> are.</p>"
@@ -30,8 +30,8 @@
     {
       "id": "5yxwDzNg",
       "created_at": "2025-09-27T00:38:44",
-      "title": "Failsafe tail",
-      "descr": [
+      "name": "Failsafe tail",
+      "intro": [
         "<p>Extracting the tail from a linked list is as simple as <code>T(KI)</code>.",
         "However, applying it to an already empty list will lead to alternating",
         "<code>I</code> and <code>KI</code>. Not too convenient.</p>",
@@ -48,15 +48,15 @@
     {
       "id": "VvbGJqE1",
       "created_at": "2025-03-16T03:10:08",
-      "title": "Fold",
-      "descr": [
+      "name": "Fold",
+      "intro": [
         "<p>Implement fold: <code>fold [a, b, ... z] f x = f a (f b (... (f z x) ...))</code>.",
         "More specifically, <code>fold nil f x = x</code>",
         "and <code>fold (V a b) f x = f a (fold b f x)</code>.</p>",
         "<p>Note that is you reuse <code>lst</code> and <code>nil</code> from the previous chapter,",
         "you could care less about what <code>f</code> and <code>x</code> are.</p>"
       ],
-      "vars": ["lst=BS(C(BB))", "nil=KI"],
+      "env": ["lst=BS(C(BB))", "nil=KI"],
       "input": "fold",
       "unlock": "fold",
       "cases": [
@@ -68,8 +68,8 @@
     {
       "id": "Rpc0i8ff",
       "created_at": "2025-05-31T14:11:17",
-      "title": "It's all just ones and zeros",
-      "descr": [
+      "name": "It's all just ones and zeros",
+      "intro": [
         "<p>Convert a string of booleans (K/KI) starting from low bits (little-endian) to a Church numeral.",
         "Empty list is zero.</p>"
       ],

@@ -14,12 +14,12 @@
     {
       "id": "TNgeTiRp",
       "created_at": "2025-03-13T00:56:13",
-      "title": "Identity, again",
-      "descr": [
+      "name": "Identity, again",
+      "intro": [
         "Build <code>I</code> from M, T, A, and B."
       ],
       "allow": "B",
-      "vars": ["M=WI", "T=CI", "A=KI"],
+      "env": ["M=WI", "T=CI", "A=KI"],
       "input": "phi",
       "cases": [
         [ "phi x", "x" ]
@@ -28,12 +28,12 @@
     {
       "id": "QwHhI1rZ",
       "created_at": "2025-03-13T00:56:13",
-      "title": "Cardinal revisited",
-      "descr": [
+      "name": "Cardinal revisited",
+      "intro": [
         "Build <code>C</code> from M, T, A, and B."
       ],
       "allow": "B",
-      "vars": ["M=WI", "T=CI", "A=KI"],
+      "env": ["M=WI", "T=CI", "A=KI"],
       "hint": "<code>B</code> and <code>T</code> are enough.",
       "input": "phi",
       "cases": [
@@ -43,12 +43,12 @@
     {
       "id": "IJfBd6Wj",
       "created_at": "2025-03-13T00:56:13",
-      "title": "Truth coming out of her well",
-      "descr": [
+      "name": "Truth coming out of her well",
+      "intro": [
         "Build <code>K</code> from M, T, A, and B."
       ],
       "allow": "B",
-      "vars": ["M=WI", "T=CI", "A=KI"],
+      "env": ["M=WI", "T=CI", "A=KI"],
       "input": "phi",
       "cases": [
         [ "phi x y", "x" ]
@@ -57,12 +57,12 @@
     {
       "id": "ZCMoK02Q",
       "created_at": "2025-03-13T00:56:13",
-      "title": "The last step",
-      "descr": [
+      "name": "The last step",
+      "intro": [
           "Build <code>W</code> from M, T, A, and B."
       ],
       "allow": "B",
-      "vars": ["M=WI", "T=CI", "A=KI"],
+      "env": ["M=WI", "T=CI", "A=KI"],
       "input": "phi",
       "cases": [
           [ "phi x y", "x y y" ]

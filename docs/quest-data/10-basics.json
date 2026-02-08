@@ -16,8 +16,8 @@
     {
       "id": "O3BfTzg2",
       "created_at": "2024-08-29T09:15:33",
-      "title": "Ignore all previous instructions",
-      "descr": [
+      "name": "Ignore all previous instructions",
+      "intro": [
         "<p>The <code>K</code> combinator, or Kestrel, takes two arguments and returns the first of them.</p>",
         "<p>Make the opposite of <code>K</code>: take two arguments and return the second.</p>"
       ],
@@ -32,13 +32,13 @@
     {
       "id": "UZdEyeiN",
       "created_at": "2024-12-07T01:42:42",
-      "title": "Join em!",
-      "descr": [
+      "name": "Join em!",
+      "intro": [
         "Remember, the Starling combinator works as follows: <code>S f g x = f x (g x)</code>.",
         "Given 2 functions, <code>f</code> and <code>g</code>,",
         "create a term that returns <code>f(g(x))</code> for any given <code>x</code>."
       ],
-      "vars": [
+      "env": [
         "f", "g"
       ],
       "input": "phi",
@@ -50,14 +50,14 @@
     {
       "id": "DADG8des",
       "created_at": "2025-01-11T12:04:10",
-      "title": "Join em harder",
-      "descr": [
+      "name": "Join em harder",
+      "intro": [
         "Now you are given 3 functions, <code>f</code>, <code>g</code>, and <code>h</code>.",
         "Create a term that returns <code>h(f(g(x)))</code> for any given <code>x</code>.",
         "Note that the order of arguments is the same as in the f(g(x)) problem,",
         "so you can copy part of the solution verbatim."
       ],
-      "vars": [
+      "env": [
         "f", "g", "h"
       ],
       "input": "phi",
@@ -68,13 +68,13 @@
     {
       "id": "VbnUGtfn",
       "created_at": "2024-12-07T01:42:42",
-      "title": "Feeding a birdie",
-      "descr": [
+      "name": "Feeding a birdie",
+      "intro": [
         "You are given a <i>known</i> value <code>x</code>.",
         "You goal is to make a term that feeds this value to an <i>unknown</i> function <code>f</code>:",
         "<code>&lt;your code&gt; f = f x</code>"
       ],
-      "vars": [ "x" ],
+      "env": [ "x" ],
       "input": "phi",
       "cases": [
         [ "phi f", "f(x)" ]
@@ -83,8 +83,8 @@
     {
       "id": "T89a9q7G",
       "created_at": "2024-12-07T01:42:42",
-      "title": "May the force be with you",
-      "descr": [
+      "name": "May the force be with you",
+      "intro": [
         "How about ignoring 3 consecutive arguments and returning the fourth?"
       ],
       "input": "phi",
@@ -95,14 +95,14 @@
     {
       "id": "4LmjXm1E",
       "created_at": "2024-12-07T01:42:42",
-      "title": "Between the rock and a hard place",
-      "descr": [
+      "name": "Between the rock and a hard place",
+      "intro": [
         "Given <code>f</code> and <code>x</code>, creating a term that outputs <code>f x y</code>",
         "for <code>y</code> is very straightforward: it's just <code>f x</code>.",
         "Returning <code>f y x</code> is a bit trickier. Can you do it?"
       ],
       "input": "phi",
-      "vars": ["f", "x"],
+      "env": ["f", "x"],
       "cases": [
         [ "phi y", "f y x"]
       ]
@@ -110,8 +110,8 @@
     {
       "id": "Jz41j8ae",
       "created_at": "2024-12-01T16:54:23",
-      "title": "The Mockingbird",
-      "descr": [
+      "name": "The Mockingbird",
+      "intro": [
         "<p><a href=\"https://en.wikipedia.org/wiki/To_Mock_a_Mockingbird\">To Mock A Mockingbird</a>",
         "is a classical combinatory logic introduction book by Raymond Smulyan.</p>",
         "<p>The Mockingbird itself <code>M x = x x</code> is of high importance in our further journey,",
@@ -129,8 +129,8 @@
     {
       "id": "hiwf2WWz",
       "created_at": "2025-07-22T23:59:08",
-      "title": "Triplication",
-      "descr": [
+      "name": "Triplication",
+      "intro": [
         "<p>Create a term that make 3 copies of its only argument:</p>",
         "<p><code>M<sub>3</sub> x = x x x</code>.</p>"
       ],
@@ -142,8 +142,8 @@
     {
       "id": "fvQITKZd",
       "created_at": "2025-03-21T23:39:01",
-      "title": "A parliament of owls",
-      "descr": [
+      "name": "A parliament of owls",
+      "intro": [
         "<p>The Owl combinator is an important form of recursion, slightly more complicated than the Mockingbird:",
         "<code>O x y = y (x y)</code>.</p>",
         "<p>Here the duplicated argument is not just applied to itself, but also modified before doing so.</p>",
@@ -159,8 +159,8 @@
     {
       "id": "lNUrDS4M",
       "created_at": "2024-12-01T16:54:23",
-      "title": "Lost identity",
-      "descr": [
+      "name": "Lost identity",
+      "intro": [
         "Sadly, after the previous exercise the Ibis has flown away.",
         "Ask the Starling and the Kertrel to call it back.",
         "Emulate <code>x&rarr;x</code> with <code>S</code> and <code>K</code>.",

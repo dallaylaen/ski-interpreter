@@ -14,8 +14,8 @@
     {
       "id": "1WLQktu6",
       "created_at": "2024-08-29T09:15:33",
-      "title": "not",
-      "descr": [
+      "name": "not",
+      "intro": [
         "<p>Implement <code>not x</code>, that is,",
         "return <code>K</code> for <code>KI</code> and <code>KI</code> for <code>K</code>.</p>",
         "<p>How short can you make it?</p>"
@@ -29,8 +29,8 @@
     {
       "id": "ZJQC2K3h",
       "created_at": "2024-08-29T09:15:33",
-      "title": "Postfix if statement",
-      "descr": [
+      "name": "Postfix if statement",
+      "intro": [
         "<p>Before we go further, let's implement a function that picks between two precalculated values.</p>",
         "<p>Make a function of <code>x</code>, <code>y</code>, and <code>z</code>, ",
         "such that it returns <code>x</code> for any true <code>z</code> and <code>y</code> for a false one.</p>"
@@ -45,8 +45,8 @@
     {
       "id": "RQq5xiBV",
       "created_at": "2024-08-29T09:15:33",
-      "title": "or",
-      "descr": [
+      "name": "or",
+      "intro": [
         "<p>The <code>or</code> is true if one of its arguments is true, or false if both are false.</p>"
       ],
       "hint": "Assume <code>or</code> is a function of <i>one</i> argument. What function should it return for true and false?",
@@ -61,8 +61,8 @@
     {
       "id": "QRVhriTN",
       "created_at": "2024-08-29T09:15:33",
-      "title": "and",
-      "descr": [
+      "name": "and",
+      "intro": [
         "make a term that takes 2 arguments and returns true (<code>K</code>)",
         " if and only if both are true"
       ],
@@ -77,8 +77,8 @@
     {
       "id": "Uu9HxTCJ",
       "created_at": "2024-08-29T09:15:33",
-      "title": "nand",
-      "descr": [
+      "name": "nand",
+      "intro": [
         "<p><code>nand</code> (not and) is true unless both ot its inputs are true.</p>",
         "<p>Given the ability to duplicate, swap, compose, and discard arguments, <i>just one</i>",
         "<code>nand</code> term is enough to implement <i>any</i> boolean function.</p>"
@@ -95,8 +95,8 @@
     {
       "id": "uvtknMlN",
       "created_at": "2025-02-23T13:17:56",
-      "title": "Plan first, execute later",
-      "descr": [
+      "name": "Plan first, execute later",
+      "intro": [
         "<p>Implement a function of four arguments: <code>check</code>, <code>then</code>, <code>else</code>,",
         "and <code>x</code>. It should return <code>then x</code> if <code>check x</code> returns <code>K</code>,",
         "and <code>else x</code> if <code>check x</code> returns <code>KI</code>.</p>"
