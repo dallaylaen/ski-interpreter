@@ -158,7 +158,7 @@
     class QuestBox {
         constructor(spec, options) {
             this.impl = new SKI.Quest({...spec, engine: ski});
-            this.name = 'quest-' + this.impl.meta.id;
+            this.name = 'quest-' + this.impl.id;
             this.chapter = options.chapter;
             if (this.chapter && options.number)
                 this.number = this.chapter.number + '.' + options.number;
@@ -207,7 +207,7 @@
                 showKnown();
             }
             if (this.chapter)
-                this.chapter.addSolved(this.impl.meta.id);
+                this.chapter.addSolved(this.impl.id);
         }
 
         check() {
@@ -229,14 +229,14 @@
             expand.href = '#'+this.name;
             expand.onclick = () => showhide(body, true);
 
-            append(title, 'span', {content: ' '+this.impl.title});
+            append(title, 'span', {content: ' '+this.impl.name});
             const allowed = this.impl.allowed();
             if (allowed)
                 append(title, 'span', {content: ' [' + allowed + ']'});
             this.view.stat = append(title, 'span', {class: ['float-right']});
 
             const descr = append(body, 'div');
-            append(descr, 'div', {content: cat(this.impl.descr), class:['note']});
+            append(descr, 'div', {content: cat(this.impl.intro), class:['note']});
             if (this.impl.meta.hint)
                 hint(descr, ' Hint:...', ' Hint: '+this.impl.meta.hint);
 
