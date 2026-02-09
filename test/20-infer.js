@@ -2,55 +2,60 @@ const { expect } = require('chai');
 const { SKI } = require('../index');
 
 describe('Expr.infer', () => {
-
   // proper terms
   describeTerm(
     'I',
-    { normal: true, arity: 1, proper: true, discard: false, duplicate: false, },
+    { normal: true, arity: 1, proper: true, discard: false, duplicate: false },
     'x->x',
-    { steps: [1, 2]},
+    { steps: [1, 2] },
   );
 
   describeTerm(
     'SKK',
-    { normal: true, arity: 1, proper: true, discard: false, duplicate: false, },
+    { normal: true, arity: 1, proper: true, discard: false, duplicate: false },
     'x->x',
-    { steps: [1, 5]},
+    { steps: [1, 5] },
   );
 
   describeTerm(
     'K',
-    {normal: true, arity: 2, proper: true, discard: true, duplicate: false, skip: new Set([1])},
+    { normal: true, arity: 2, proper: true, discard: true, duplicate: false, skip: new Set([1]) },
     'a->b->a'
   );
   describeTerm(
     'S',
-    {normal: true, arity: 3, proper: true, discard: false, duplicate: true, dup: new Set([2])},
+    { normal: true, arity: 3, proper: true, discard: false, duplicate: true, dup: new Set([2]) },
     'x->y->z->x z (y z)',
-    {steps: [1, 1]},
+    { steps: [1, 1] },
   );
   describeTerm(
     'SK',
-    {normal: true, arity: 2, proper: true, discard: true, duplicate: false, skip: new Set([0])},
+    { normal: true, arity: 2, proper: true, discard: true, duplicate: false, skip: new Set([0]) },
     'x->y->y',
-    {steps: [2, 2]},
+    { steps: [2, 2] },
   );
   describeTerm(
     'CI',
-    {normal: true, arity: 2, proper: true, discard: false, duplicate: false, },
+    { normal: true, arity: 2, proper: true, discard: false, duplicate: false },
     'x->y->y x'
   );
 
   describeTerm(
     'x->y->x x',
-    {normal: true, arity: 2, proper: true, discard: true, duplicate: true,
-      skip: new Set([1]), dup: new Set([0])
+    {
+      normal:    true,
+      arity:     2,
+      proper:    true,
+      discard:   true,
+      duplicate: true,
+      skip:      new Set([1]),
+      dup:       new Set([0])
     },
     'x->y->x x'
   );
   describeTerm(
     '5',
-    {normal: true, arity: 2, proper: true, discard: false, duplicate: true, dup: new Set([0])},
+    { normal: true, arity: 2, proper: true, discard: false, duplicate: true, dup: new Set([0]) },
     'x->y->x(x(x(x(x y))))'
   );
 
@@ -58,93 +63,93 @@ describe('Expr.infer', () => {
 
   describeTerm(
     '(a->a y) x',
-    {normal: true, arity: 0, proper: false, discard: false, duplicate: false},
+    { normal: true, arity: 0, proper: false, discard: false, duplicate: false },
     'x y',
   );
 
   // improper
   describeTerm(
     'CIS',
-    {normal: true, arity: 1, proper: false, discard: false, duplicate: true},
+    { normal: true, arity: 1, proper: false, discard: false, duplicate: true },
     'x->x(a->b->c->a c (b c))'
   );
   describeTerm(
     'x->xSK',
-    {normal: true, arity: 1, proper: false, duplicate: true, discard: true },
+    { normal: true, arity: 1, proper: false, duplicate: true, discard: true },
     'x->x(a->b->c->a c (b c))(a->b->a)'
   );
   describeTerm(
     'x->x(a->b->c->a c (b c))(a->b->a)',
-    {normal: true, arity: 1, proper: false, duplicate: true, discard: true }
+    { normal: true, arity: 1, proper: false, duplicate: true, discard: true }
   );
   describeTerm(
     'x->x(a->b->c->d->e->y->z->y)(a->b->c->a c b)(a->b->c->a(b c))',
-    {normal: true, arity: 1, proper: false, discard: true, duplicate: false },
+    { normal: true, arity: 1, proper: false, discard: true, duplicate: false },
     'x->x(a->b->c->d->e->y->z->y)(a->b->c->a c b)(a->b->c->a(b c))',
   );
 
   describeTerm(
     'x->K(xS)',
-    {normal: true, arity: 2, proper: false, discard: true, duplicate: true, skip: new Set([1])},
+    { normal: true, arity: 2, proper: false, discard: true, duplicate: true, skip: new Set([1]) },
     'x->y->x(a->b->c->a c (b c))'
   );
   describeTerm(
     'x',
-    {normal: true, arity: 0, proper: false, discard: false, duplicate: false, },
+    { normal: true, arity: 0, proper: false, discard: false, duplicate: false },
     'x',
-    { steps: [0, 0]},
+    { steps: [0, 0] },
   );
   describeTerm(
     'x y',
-    {normal: true, arity: 0, proper: false, discard: false, duplicate: false,},
+    { normal: true, arity: 0, proper: false, discard: false, duplicate: false },
     'x y',
-    { steps: [0, 0]},
+    { steps: [0, 0] },
   );
   describeTerm(
     'T=CI; 5 (Ty) x',
-    {normal: true, arity: 0, proper: false, discard: false, duplicate: false,},
+    { normal: true, arity: 0, proper: false, discard: false, duplicate: false },
     'x y y y y y',
-    { steps: [5, 30]},
+    { steps: [5, 30] },
   );
   describeTerm(
     'x->y x',
-    {normal: true, arity: 1, proper: false, discard: false, duplicate: false,},
+    { normal: true, arity: 1, proper: false, discard: false, duplicate: false },
     'x->y x'
   );
   describeTerm(
     'By',
-    {normal: true, arity: 2, proper: false, discard: false, duplicate: false,},
+    { normal: true, arity: 2, proper: false, discard: false, duplicate: false },
     'a->b->y(a b)'
   );
 
   describeTerm(
     'P=a->b->c->d->b(a d c); P',
 
-    {normal: true, arity: 4, proper: true, discard: false, duplicate: false, },
+    { normal: true, arity: 4, proper: true, discard: false, duplicate: false },
     'a->b->c->d->b(a d c)'
   );
   describeTerm(
     'P=x->y->z->t->y (x t z); P(PII)',
-    {normal: true, arity: 3, proper: true, discard: false, duplicate: false,},
+    { normal: true, arity: 3, proper: true, discard: false, duplicate: false },
     'a->b->c->a(b c)'
   );
 
   // lambda maps to itself
   describeTerm(
     'x->y->z->x z y',
-    {normal: true, arity: 3, proper: true, discard: false, duplicate: false },
+    { normal: true, arity: 3, proper: true, discard: false, duplicate: false },
     'x->y->z->x z y'
   );
 
   describeTerm(
     'x->x(y->x y)(y->y x)',
-    {normal: true, arity: 1, proper: false, discard: false, duplicate: true, dup: new Set([0])},
+    { normal: true, arity: 1, proper: false, discard: false, duplicate: true, dup: new Set([0]) },
     'x->x(y->x y)(y->y x)',
   );
 
   describeTerm(
     'lst = BS(C(BB)); nil = KI; (lst x1 (lst x2 (lst x3 nil)))',
-    { normal: true, arity: 2, proper: false, duplicate: true, discard: false, dup: new Set([0])},
+    { normal: true, arity: 2, proper: false, duplicate: true, discard: false, dup: new Set([0]) },
     'f->z->f x1 (f x2 (f x3 z))'
   );
 
@@ -153,7 +158,6 @@ describe('Expr.infer', () => {
     { normal: true, arity: 0, proper: false, discard: true, duplicate: false },
     'x(a->b->b)(a->b->b)(a->b->b)(a->b->b)',
   );
-
 
   /*
     // TODO
@@ -239,13 +243,13 @@ describe('Expr.infer', () => {
  *
  * }} options?
  */
-function describeTerm(term, expected, lambda, options={}) {
-  describe ('handles '+term, done => {
+function describeTerm (term, expected, lambda, options = {}) {
+  describe('handles ' + term, done => {
     try {
       // console.log('testing ' + term);
 
       const runOptions = {
-        max: options.max,
+        max:     options.max,
         maxArgs: options.maxArgs,
       };
 
@@ -257,8 +261,6 @@ function describeTerm(term, expected, lambda, options={}) {
       const steps = found.steps;
       delete found.steps; // unpredictable
 
-
-
       it('produces some term', () => {
         expect(canon).to.be.instanceof(SKI.classes.Expr);
       });
@@ -268,9 +270,11 @@ function describeTerm(term, expected, lambda, options={}) {
         if (limits)
           expect(steps).to.be.within(limits[0], limits[1]);
       });
-      if (lambda) it('produces exactly expected result ' + lambda, () => {
-        canon.expect(ski.parse(lambda));
-      });
+      if (lambda) {
+        it('produces exactly expected result ' + lambda, () => {
+          canon.expect(ski.parse(lambda));
+        });
+      }
       it('produces predictable properties', () => {
         try {
           expect(found).to.deep.equal(expected);
@@ -281,18 +285,16 @@ function describeTerm(term, expected, lambda, options={}) {
           throw err;
         }
       });
-      it ('is idempotent', () =>{
+      it('is idempotent', () => {
         canon.infer().expr.expect(canon);
       });
-      it ('is back parseable', () => {
+      it('is back parseable', () => {
         ski.parse('' + canon).expect(canon);
       });
     } catch (err) {
-      it ('doesn\'t die', () => {
+      it('doesn\'t die', () => {
         throw err;
       });
     }
   });
 }
-
-

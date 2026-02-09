@@ -6,7 +6,7 @@ const { SKI } = require('../index');
 const { declare } = SKI;
 
 describe('SKI.bulkAdd', () => {
-  it ('can add and remove terms', () => {
+  it('can add and remove terms', () => {
     const ski = new SKI();
 
     ski.bulkAdd([
@@ -16,15 +16,14 @@ describe('SKI.bulkAdd', () => {
       'T=',
     ]);
 
-
     const terms = ski.getTerms();
     expect(terms).to.not.have.property('T');
 
-    ski.parse('BB(CI)').expect(terms['R']);
-    ski.parse('BC(CI)').expect(terms['V']);
+    ski.parse('BB(CI)').expect(terms.R);
+    ski.parse('BC(CI)').expect(terms.V);
   });
 
-  it ('throws on invalid declarations', () => {
+  it('throws on invalid declarations', () => {
     const ski = new SKI();
 
     expect( () => ski.bulkAdd([
@@ -77,7 +76,7 @@ describe('SKI.emitDeclaration', () => {
   });
 
   it('declares terms (with native overrides', () => {
-    const ski = new SKI({numbers: false, lambdas: false, allow: 'SK'});
+    const ski = new SKI({ numbers: false, lambdas: false, allow: 'SK' });
 
     ski.add('tmp', 'S');
     ski.add('S', 'K');
@@ -93,7 +92,7 @@ describe('SKI.emitDeclaration', () => {
     // TODO this fails miserably, will fix later
     const decl = declare(inventory);
 
-    const ski2 = new SKI({numbers: false, lambdas: false, allow: 'SK'});
+    const ski2 = new SKI({ numbers: false, lambdas: false, allow: 'SK' });
 
     ski2.bulkAdd(decl);
 

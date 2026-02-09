@@ -10,7 +10,7 @@ describe('Quest', () => {
       allow: 'SK',
       input: 'phi',
       cases: [
-        [ 'phi x', 'x']
+        ['phi x', 'x']
       ]
     });
 
@@ -22,7 +22,7 @@ describe('Quest', () => {
 
     const details = pass.details[0];
     expect(details.start + ' -> ' + details.found).to.equal('&phi; x -> x');
-    expect(details.steps).to.be.within(2, 3, "SKK=I takes 2-3 steps to validate");
+    expect(details.steps).to.be.within(2, 3, 'SKK=I takes 2-3 steps to validate');
 
     const fail = quest.check('S(SKK)(SKK)');
     expect(fail.pass).to.equal(false);
@@ -34,13 +34,13 @@ describe('Quest', () => {
     expect(violate.details).to.deep.equal([]);
   });
 
-  it ('cannot be fooled by passing free variables with the same name as case placeholders', () => {
+  it('cannot be fooled by passing free variables with the same name as case placeholders', () => {
     const quest = new Quest({
       subst: '&phi;',
       allow: 'SK',
       input: 'phi',
       cases: [
-        [ 'phi x', 'x']
+        ['phi x', 'x']
       ]
     });
 
@@ -50,7 +50,7 @@ describe('Quest', () => {
     expect(reduct(fail.details[0])).to.equal('&phi; x -> x vs x');
   });
 
-  it ('can validate quine', () => {
+  it('can validate quine', () => {
     const quest = new Quest({
       subst: '&phi;',
       input: 'f',
@@ -63,15 +63,15 @@ describe('Quest', () => {
     expect(reduct(pass.details[0])).to.match(/&phi; *\(?x\)? -> ([SKI()]+) vs \1/);
   });
 
-  it ('can validate truth tables', () => {
+  it('can validate truth tables', () => {
     const quest = new Quest({
       subst: '&phi;',
       input: 'f',
       cases: [
-        [ 'f (KI) (KI)', 'KI' ],
-        [ {max: 10}, 'f (KI) (K )', 'KI' ],
-        [ 'f (K ) (KI)', 'KI' ],
-        [ 'f (K ) (K )', 'K ' ],
+        ['f (KI) (KI)', 'KI'],
+        [{ max: 10 }, 'f (KI) (K )', 'KI'],
+        ['f (K ) (KI)', 'KI'],
+        ['f (K ) (K )', 'K '],
       ],
     });
 
@@ -84,26 +84,25 @@ describe('Quest', () => {
     never.expr.expect(quest.engine.parse('K(K(KI))'));
   });
 
-  it ('rejects bad specs', () => {
-    expect(() => new Quest({input: "foo", cases: [['f->f']]})).to.throw(/exactly 2/);
-    expect(() => new Quest({input: "foo", cases: [['f', 'I', 'I']]})).to.throw(/exactly 2/);
+  it('rejects bad specs', () => {
+    expect(() => new Quest({ input: 'foo', cases: [['f->f']] })).to.throw(/exactly 2/);
+    expect(() => new Quest({ input: 'foo', cases: [['f', 'I', 'I']] })).to.throw(/exactly 2/);
   });
 
-  it ('handles global unlockable engine', () => {
-    const ski = new SKI({allow: 'SK'});
-    const quest = new Quest({engine: ski, input: 'f', cases: [['f x', 'I x']]});
+  it('handles global unlockable engine', () => {
+    const ski = new SKI({ allow: 'SK' });
+    const quest = new Quest({ engine: ski, input: 'f', cases: [['f x', 'I x']] });
     const fail = quest.check('I');
     expect(fail.exception + '').to.match(/restricted/);
 
     ski.restrict('+I'); // oh noes! spooky action at a distance
     const pass = quest.check('I');
-    expect (pass.exception).to.equal(undefined);
-
+    expect(pass.exception).to.equal(undefined);
   });
 
-  it ('honors own restrictions', () => {
+  it('honors own restrictions', () => {
     const ski = new SKI();
-    const quest = new Quest({engine: ski, vars: ['foo'], input: 'f', cases: [['f x', 'x']], allow: 'SK'});
+    const quest = new Quest({ engine: ski, vars: ['foo'], input: 'f', cases: [['f x', 'x']], allow: 'SK' });
     expect(quest.allowed()).to.match(/^KS(?: foo)?$/);
     const fail = quest.check('I');
     expect(fail.exception + '').to.match(/restricted/);
@@ -111,10 +110,10 @@ describe('Quest', () => {
     expect(pass.pass).to.equal(true);
   });
 
-  it ('detects infinite loops', () => {
+  it('detects infinite loops', () => {
     const quest = new Quest({
       input: 'x',
-      cases: [[{max: 20}, 'x x', 'x']],
+      cases: [[{ max: 20 }, 'x x', 'x']],
     });
 
     const fail = quest.check('SII');
@@ -126,27 +125,27 @@ describe('Quest', () => {
     expect(fail.details[0].reason).to.match(/in 20 steps/);
   });
 
-  it ('honors given vars', () => {
+  it('honors given vars', () => {
     const quest = new Quest({
-      "vars": ["nil=KI", "lst=BS(C(BB))"],
-      "input": "rev",
-      "cases": [
-        ["rev nil", "nil"],
-        ["rev (lst a nil)", "lst a nil"],
-        ["rev (lst a(lst b(lst c nil)))", "lst c (lst b (lst a nil))"]
+      vars:  ['nil=KI', 'lst=BS(C(BB))'],
+      input: 'rev',
+      cases: [
+        ['rev nil', 'nil'],
+        ['rev (lst a nil)', 'lst a nil'],
+        ['rev (lst a(lst b(lst c nil)))', 'lst c (lst b (lst a nil))']
       ]
     });
 
-    const result = quest.check("BBBC(BC(CI)) (B(CB)lst) I nil");
+    const result = quest.check('BBBC(BC(CI)) (B(CB)lst) I nil');
     expect(result.pass).to.equal(true, result.details[0].reason);
   });
 
-  it ('supports linear cases', () => {
+  it('supports linear cases', () => {
     const quest = new Quest({
       input: 't',
       cases: [
-        [{caps: {linear: true}}, 't'],
-        [ 't x y', 'y x'],
+        [{ caps: { linear: true } }, 't'],
+        ['t x y', 'y x'],
       ],
     });
 
@@ -162,16 +161,16 @@ describe('Quest', () => {
     expect(fail.pass).to.equal(false);
   });
 
-  it ('supports harder linear cases', () => {
+  it('supports harder linear cases', () => {
     const quest = new Quest({
       allow: 'I',
       input: [
-        {name: 'P', lambdas: true, allow: 'I-I'},
-        {name: 'B'},
-        {name: 'T'},
+        { name: 'P', lambdas: true, allow: 'I-I' },
+        { name: 'B' },
+        { name: 'T' },
       ],
       cases: [
-        [{caps: {linear: true}}, 'P'],
+        [{ caps: { linear: true } }, 'P'],
         ['B a b c', 'a (b c)'],
         ['T a b', 'b a'],
       ],
@@ -181,9 +180,8 @@ describe('Quest', () => {
 
     // console.log(flattenExpr(pass));
 
-
     expect(pass.exception).to.equal(undefined, 'verified without exception');
-    expect(pass.weight).to.equal(4+4+3);
+    expect(pass.weight).to.equal(4 + 4 + 3);
 
     expect(pass.pass).to.equal(true);
 
@@ -205,8 +203,8 @@ describe('Quest', () => {
     expect(nolinear.pass).to.equal(false, 'overall failed');
   });
 
-  it ('displays allowed terms correctly', () =>{
-    const quest = new Quest ({
+  it('displays allowed terms correctly', () => {
+    const quest = new Quest({
       input:  'phi',
       allow:  'J',
       vars:   ['A=a->b->b'],
@@ -216,11 +214,11 @@ describe('Quest', () => {
     expect(quest.allowed()).to.equal('AJ');
   });
 
-  it ('allows named constants in input', () =>{
+  it('allows named constants in input', () => {
     const quest = new Quest({
-      'input': 'phi',
-      'vars':  [ 'arg' ],
-      'cases': [
+      input: 'phi',
+      vars:  ['arg'],
+      cases: [
         ['phi x', 'x arg'],
       ],
     });
@@ -232,7 +230,6 @@ describe('Quest', () => {
     const failing = quest.check('K(x arg)').details[0];
     expect(failing.reason).to.match(/!=/);
     expect(failing.pass).to.equal(false, 'var with the same name but not in the list = no go');
-
   });
   /*
   describe ('quest with shielded variables in env', () => {
@@ -266,14 +263,13 @@ describe('Quest', () => {
    */
 });
 
-
-function flattenExpr(obj) {
+function flattenExpr (obj) {
   if (Array.isArray(obj))
     return obj.map(flattenExpr);
   if (typeof obj !== 'object')
     return obj;
   if (obj instanceof SKI.classes.Expr)
-    return obj.format({terse: true});
+    return obj.format({ terse: true });
 
   const out = {};
   for (const key in obj)

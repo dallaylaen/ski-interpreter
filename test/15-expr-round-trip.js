@@ -1,4 +1,4 @@
-const { expect } = require ('chai');
+const { expect } = require('chai');
 const { SKI } = require('../index');
 
 describe('Expr <-> string', () => {
@@ -16,11 +16,11 @@ describe('Expr <-> string', () => {
 
   const ski = new SKI();
   for (const c of cases) {
-    const [ name, source ] = c;
-    it (name + ' (canonical)', () => {
+    const [name, source] = c;
+    it(name + ' (canonical)', () => {
       const jar    = {}; // keep track of common free vars
       const expr   = ski.parse(source, { to_be_deleted: jar });
-      const before = expr.format({terse: false});
+      const before = expr.format({ terse: false });
       const expr2  = ski.parse(before, { to_be_deleted: jar });
       const after  = expr2.format({ terse: false });
 
@@ -28,10 +28,10 @@ describe('Expr <-> string', () => {
       expr.expect(expr2);
     });
 
-    it (name + ' (terse)', () => {
+    it(name + ' (terse)', () => {
       const jar    = {}; // keep track of common free vars
       const expr   = ski.parse(source, { to_be_deleted: jar });
-      const before = expr.format({terse: true});
+      const before = expr.format({ terse: true });
       const expr2  = ski.parse(before, { to_be_deleted: jar });
       const after  = expr2.toString();
 

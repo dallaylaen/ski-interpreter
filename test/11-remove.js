@@ -1,12 +1,12 @@
-const {expect} = require('chai');
-const {SKI} = require('../index');
+const { expect } = require('chai');
+const { SKI } = require('../index');
 
 describe('SKI.remove', () => {
   it('removes terms from the interpreter', () => {
-    const {x} = SKI.vars();
-    const show = expr => expr.format({terse: false});
+    const { x } = SKI.vars();
+    const show = expr => expr.format({ terse: false });
 
-    const ski = new SKI;
+    const ski = new SKI();
     ski.add('T', 'S(K(SI))K');
     const expr = ski.parse('STT');
     expect(show(expr.run(x).expr)).to.equal('x(x)');

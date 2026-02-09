@@ -13,7 +13,7 @@ describe('SKI.traverse', () => {
     const nodes = [];
     expr.traverse(e => {
       if (!(e instanceof SKI.classes.App))
-        nodes.push(e.format({terse: false}));
+        nodes.push(e.format({ terse: false }));
     });
     expect(nodes).to.deep.equal([
       'S',
@@ -31,5 +31,4 @@ describe('SKI.traverse', () => {
       'f',
     ]);
   });
-
 });

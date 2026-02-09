@@ -11,9 +11,9 @@ describe('Expr.format: literal', () => {
   check('foo (bar quux)', {}, 'foo(bar quux)');
   check('(foo bar) quux', {}, 'foo bar quux');
   check('foo bar', { html: true, terse: false }, '<var>foo</var>(<var>bar</var>)');
-  check('IIx', {html: true}, 'II<var>x</var>');
-  check('IIx', {html: true, redex: ['<b>', '</b>']}, '<b>I</b>I<var>x</var>');
-  check('a->a a', {html: true}, '<var>a</var>-&gt;<var>a</var> <var>a</var>');
+  check('IIx', { html: true }, 'II<var>x</var>');
+  check('IIx', { html: true, redex: ['<b>', '</b>'] }, '<b>I</b>I<var>x</var>');
+  check('a->a a', { html: true }, '<var>a</var>-&gt;<var>a</var> <var>a</var>');
   check('(x->y->y x)(foo)', {}, '(x->y->y x)foo');
   check('K 2 S', {}, 'K 2 S');
   check('5 x y', {}, '5 x y');
@@ -36,14 +36,14 @@ describe('Expr.format: round-trip', () => {
   roundTrip('x(y(z t))')
 });
 
-describe ('Expr.format: aliases behavior', () => {
-  it ('honors alias deletion and restriction', () =>{
+describe('Expr.format: aliases behavior', () => {
+  it('honors alias deletion and restriction', () => {
     const ski = new SKI();
     ski.add('T', 'CI');
     ski.add('M', 'SII');
     ski.add('x', '42');
 
-    const T = ski.getTerms()['T'];
+    const T = ski.getTerms().T;
 
     const foo = ski.parse('T(Mx)');
 
@@ -52,27 +52,27 @@ describe ('Expr.format: aliases behavior', () => {
     expect(foo.format({ terse: false, inventory: {} })).to.equal('C(I)(S(I)(I)(42))');
 
     expect(foo.format({
-      terse: false,
-      inventory:  { T, M: ski.parse('a->a a')},
+      terse:     false,
+      inventory: { T, M: ski.parse('a->a a') },
     })).to.equal('T(S(I)(I)(42))');
 
     ski.add('M', 'a->a a');
     ski.remove('T');
 
-    expect(foo.format({terse: false})).to.equal('C(I)(S(I)(I)(x))');
-    expect(foo.format({terse: false, inventory: { T }})).to.equal('T(S(I)(I)(42))');
+    expect(foo.format({ terse: false })).to.equal('C(I)(S(I)(I)(x))');
+    expect(foo.format({ terse: false, inventory: { T } })).to.equal('T(S(I)(I)(42))');
   });
 });
 
 describe('Expr.format: fancy names', () => {
-  it ('handles fancy variable/native term names', () => {
+  it('handles fancy variable/native term names', () => {
     const ski = new SKI();
     ski.add('S', a => b => c => a.apply(c, b.apply(c)) );
     ski.getTerms().S.fancyName = '&Sigma;';
     ski.add('K', a => b => a);
     ski.getTerms().K.fancyName = '&Kappa;';
 
-    const {x} = SKI.vars()
+    const { x } = SKI.vars()
     x.fancyName = '&chi;';
 
     const expr = ski.parse('S(KS)K'); // B
@@ -90,19 +90,17 @@ function check (src, options, result, comment) {
   describe(src, () => {
     const expr = mainParser.parse(src);
     const formatted = expr.format(options);
-    it (`formats to ${result}`, () => {
+    it(`formats to ${result}`, () => {
       expect(formatted).to.equal(result, comment);
     });
 
-    it ('round-trips', () => {
+    it('round-trips', () => {
       const stripped = options.html
         ? formatted.replace(/<[^>]+>/g, '').replace(/&gt;/g, '>')
         : formatted;
       const expr2 = mainParser.parse(stripped);
       expr.expect(expr2);
     });
-
-
   });
 }
 
@@ -110,7 +108,7 @@ function roundTrip (src) {
   describe(src + ' round trips', () => {
     const expr = mainParser.parse(src);
 
-    it ('format w/o options coincides with toString', () => {
+    it('format w/o options coincides with toString', () => {
       expect(expr.format()).to.equal(expr.toString());
     });
 
@@ -121,13 +119,13 @@ function roundTrip (src) {
     );
 
     sameAs(
-      expr.format({terse: false}),
+      expr.format({ terse: false }),
       expr,
       'terse: false'
     );
 
-    it ('round-trips with html:true', () => {
-      const formatted = expr.format({html: true});
+    it('round-trips with html:true', () => {
+      const formatted = expr.format({ html: true });
       const stripped = formatted.replace(/<[^>]+>/g, '').replace(/&gt;/g, '>');
       const expr2 = mainParser.parse(stripped);
       expr.expect(expr2);
@@ -142,7 +140,7 @@ function roundTrip (src) {
 }
 
 function sameAs (src, expr, comment) {
-  it (`${comment}: evaluates ${src} as ${expr}`, () => {
+  it(`${comment}: evaluates ${src} as ${expr}`, () => {
     const expr2 = mainParser.parse(src);
     expr.expect(expr2, comment);
   });

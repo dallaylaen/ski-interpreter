@@ -1,9 +1,9 @@
-const {expect} = require('chai');
-const {SKI} = require('../index');
+const { expect } = require('chai');
+const { SKI } = require('../index');
 
 describe( 'SKI.parse', () => {
-  it ('handles comments, definitions, and stuff', done => {
-    const ski = new SKI ({allow: 'SKI'});
+  it('handles comments, definitions, and stuff', done => {
+    const ski = new SKI({ allow: 'SKI' });
     const vars = {};
     const expr = ski.parse(`
       // this is a comment
@@ -14,35 +14,35 @@ describe( 'SKI.parse', () => {
 
     // verify that no aliased terms were created within ski itself
     for (const x of Object.values(ski.getTerms()))
-      expect (x).to.be.instanceof(SKI.classes.Native);
+      expect(x).to.be.instanceof(SKI.classes.Native);
 
     expect(vars).to.deep.equal({});
 
     done();
   });
 
-  it ('handles comment at definitions end', () => {
+  it('handles comment at definitions end', () => {
     const ski = new SKI();
     const expr = ski.parse('S // just an S combinator');
     expr.expect(SKI.S);
   });
 
-  it ('makes last expr an alias if = given', done => {
+  it('makes last expr an alias if = given', done => {
     const ski = new SKI();
     const expr = ski.parse('foo = SKK');
-    const {x} = SKI.vars()
+    const { x } = SKI.vars()
 
-    expect( expr.name ).to.equal ("foo");
+    expect( expr.name ).to.equal('foo');
     expect( expr.run(x).expr).to.equal(x);
 
     done();
   });
 
-  it ('does not leak intermediate terms', done => {
-    const ski = new SKI;
-    const {x} = SKI.vars()
+  it('does not leak intermediate terms', done => {
+    const ski = new SKI();
+    const { x } = SKI.vars()
     const jar = { x };
-    const intact = { ... jar };
+    const intact = { ...jar };
     // console.log(jar);
 
     const expr = ski.parse('y = SK; z=KI; K', { env: jar });
@@ -57,7 +57,7 @@ describe( 'SKI.parse', () => {
 
     // setup some vars in the interpreter itself
     ski.add('V', 'BC(CI)'); // x->y->z->z x y'
-    const {x, y} = SKI.vars()
+    const { x, y } = SKI.vars()
     ski.add('pair', ski.getTerms().V.apply(x, y));
     ski.add('which', SKI.K);
 
@@ -76,7 +76,7 @@ describe( 'SKI.parse', () => {
   });
 
   it('can co-parseLine terms with same free vars', done => {
-    const ski = new SKI;
+    const ski = new SKI();
     const jar = {};
     const xy = ski.parse('x(y)', { scope: jar });
     const yx = ski.parse('y(x)', { scope: jar });
@@ -89,16 +89,16 @@ describe( 'SKI.parse', () => {
   });
 
   it('does not display intermediate terms unless added', done => {
-    const ski = new SKI;
+    const ski = new SKI();
 
     // use small letters as we'll make BCKW available by default
     const expr = ski.parse('b = S(KS)K; w = SS(KI); bw = b w');
 
     expect( expr instanceof SKI.classes.Alias).to.equal(true, 'returns an alias');
 
-    expect(''+expr.impl).to.match(/^[SKI()]*$/, "no traces of b() and w()");
+    expect('' + expr.impl).to.match(/^[SKI()]*$/, 'no traces of b() and w()');
 
-    const {x, y, z} = SKI.vars();
+    const { x, y, z } = SKI.vars();
     // just check the expr to work
     expect(expr.run(x, y, z).expr.toString()).to.equal('x y z z');
 

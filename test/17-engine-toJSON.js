@@ -1,9 +1,9 @@
-const { expect } = require ('chai');
-const { SKI } = require ('../index');
+const { expect } = require('chai');
+const { SKI } = require('../index');
 
-describe ('SKI.toJSON', () => {
-  it ('makes data round trip', () => {
-    const ski = new SKI({numbers: false});
+describe('SKI.toJSON', () => {
+  it('makes data round trip', () => {
+    const ski = new SKI({ numbers: false });
     ski.add('swap', 'C(WK)');
     ski.restrict('SKI swap');
 
@@ -18,10 +18,9 @@ describe ('SKI.toJSON', () => {
     const jar = {}; // share variables with the same names
     copy.parse('y x', { to_be_deleted: jar })
       .expect( copy.parse('swap x y', { to_be_deleted: jar }).run().expr);
-
   });
 
-  it ('preserves interdependent terms', () => {
+  it('preserves interdependent terms', () => {
     const ski = new SKI();
     ski.add('T', 'CI');
     ski.add('R', 'BBT');
@@ -37,7 +36,7 @@ describe ('SKI.toJSON', () => {
 
     const copy = new SKI(raw);
 
-    expect (copy.parse('v3 a b c f').run().expr + '').to.equal('f a b c');
+    expect(copy.parse('v3 a b c f').run().expr + '').to.equal('f a b c');
     const terms = copy.getTerms();
     expect(terms.V.impl + '').to.equal('BCT');
     expect(terms.v3.impl + '').to.equal('BBBCV');
@@ -45,8 +44,8 @@ describe ('SKI.toJSON', () => {
     expect(JSON.stringify(copy)).to.equal(str); // some stupid round trip
   });
 
-  it ('preserves swapped native terms', () => {
-    const ski = new SKI({numbers: false, lambdas: false, allow: 'SK'});
+  it('preserves swapped native terms', () => {
+    const ski = new SKI({ numbers: false, lambdas: false, allow: 'SK' });
     ski.add('tmp', 'S');
     ski.add('S', 'K');
     ski.add('K', 'tmp');
@@ -62,10 +61,9 @@ describe ('SKI.toJSON', () => {
     const expr1 = copy.parse('K(SK)S a b c');
     expect(expr1.run().expr + '').to.equal('a(b c)');
   });
-  
 });
 
-function declarationPreceedsUsage(list, known='') {
+function declarationPreceedsUsage (list, known = '') {
   // list = ['foo = bar baz', 'quux = foo ...', ...]
   const token = /\b[a-z_][a-z_0-9]*\b|[A-Z]/g;
   const defined = new Set( known.match(token) || [] );

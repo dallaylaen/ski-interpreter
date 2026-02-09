@@ -1,8 +1,8 @@
-const {expect} = require('chai');
+const { expect } = require('chai');
 const fs = require('node:fs').promises;
 
 const { Tokenizer } = require('../lib/internal');
-const {SKI, Quest} = require('../index');
+const { SKI, Quest } = require('../index');
 
 const dir = __dirname + '/../docs/quest-data/';
 
@@ -25,8 +25,8 @@ describe('quest-data', () => {
             .then(data => JSON.parse(data))
             .then(raw => {
               raw = Array.isArray(raw) ? { content: raw } : raw;
-              const merged = { ...entry, ...raw};
-              verifyChapter (merged, n);
+              const merged = { ...entry, ...raw };
+              verifyChapter(merged, n);
             });
         });
       }
@@ -36,7 +36,7 @@ describe('quest-data', () => {
 
 function verifyChapter (entry, n) {
   describe('chapter ' + n + ' ' + (entry.link ?? 'empty'), () => {
-    it ('has uniques id', () => {
+    it('has uniques id', () => {
       expect(entry.id).to.be.a('string');
       expect(uniqChapter.has(entry.id)).to.equal(false, 'chapter id is unique: ' + entry.id);
       uniqChapter.add(entry.id);
@@ -77,11 +77,11 @@ function verifyChapter (entry, n) {
         it('has title', () => {
           expect(typeof q.name).to.equal('string');
         });
-        it ('has description', () => {
+        it('has description', () => {
           expect(typeof q.intro).to.equal('string');
           checkHtml(q.intro);
         });
-        it ('has date', () => {
+        it('has date', () => {
           const date = q.meta.created_at;
           expect(date).to.be.a('string');
           expect(new Date(date)).to.be.instanceof(Date);
@@ -92,10 +92,10 @@ function verifyChapter (entry, n) {
           it('passes included example solution', () => {
             const result = q.check(quest.solution);
             if (!result.pass) {
-              console.log('proposed solution failed: ' + result.expr.expand().format({terse: false}));
+              console.log('proposed solution failed: ' + result.expr.expand().format({ terse: false }));
               for (const entry of result.details) {
-                console.log("found:    " + entry.found);
-                console.log("expected: " + entry.expected);
+                console.log('found:    ' + entry.found);
+                console.log('expected: ' + entry.expected);
               }
             }
             expect(result.pass).to.equal(true);
@@ -117,11 +117,10 @@ function verifyChapter (entry, n) {
         });
       });
     }
-
   });
 }
 
-function checkHtml(text) {
+function checkHtml (text) {
   const tokenizer = new Tokenizer('</?[a-z][a-z_0-9]*[^>]*>', '[^<>&]+', '&[A-Za-z_0-9#]+;');
 
   const tokens = tokenizer.split(text);
@@ -132,7 +131,7 @@ function checkHtml(text) {
         if (!stack.length)
           throw new Error('Unexpected closing tag: ' + tok);
         const tag = stack.pop();
-        if ('</'+tag+'>' !== tok)
+        if ('</' + tag + '>' !== tok)
           throw new Error('Mismatched closing tag: ' + tok + ' vs ' + tag);
       } else {
         const match = tok.match(/^<([a-z][a-z_0-9]*)/);
@@ -145,4 +144,3 @@ function checkHtml(text) {
   if (stack.length)
     throw new Error('Unclosed tags: ' + stack.join(', '));
 }
-

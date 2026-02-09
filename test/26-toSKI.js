@@ -47,10 +47,8 @@ describe('Expr.toSKI()', () => {
     it(`round trips on every step for ${src} aka ${canon}`, () => {
       const expr = ski.parse(src);
       const seq = expr.toSKI();
-      for (const step of seq) {
+      for (const step of seq)
         canon.expect(step.expr.infer().expr);
-      }
     });
   }
-
 });

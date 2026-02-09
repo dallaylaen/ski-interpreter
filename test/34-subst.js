@@ -1,12 +1,12 @@
-const {expect} = require('chai');
+const { expect } = require('chai');
 
-const {SKI} = require('../index');
-const {Alias} = SKI.classes;
+const { SKI } = require('../index');
+const { Alias } = SKI.classes;
 
 const ski = new SKI();
 
 describe('Expr.subst', () => {
-  const {x, y, z} = SKI.vars()
+  const { x, y, z } = SKI.vars()
 
   it('handles simple variable cases', () => {
     check(x.subst(y, z), null);
@@ -20,9 +20,9 @@ describe('Expr.subst', () => {
     const tx = new Alias('tx', ski.parse('CI').apply(x));
 
     check(tx.subst(y, z), null);
-    check(tx.subst(x, z), 'CIz', {z});
+    check(tx.subst(x, z), 'CIz', { z });
     check(tx.subst(tx, z), z);
-    check(tx.subst(SKI.C, SKI.K), 'K I x', {x});
+    check(tx.subst(SKI.C, SKI.K), 'K I x', { x });
     check(tx.subst(SKI.K, SKI.S), null);
   });
 
@@ -36,11 +36,10 @@ describe('Expr.subst', () => {
 
         const got = expr.subst(plugExpr, replExpr);
 
-        if (expected === null) {
+        if (expected === null)
           expect(got).to.equal(null);
-        } else {
+        else
           expected.expect(got);
-        }
       });
     };
 
@@ -49,17 +48,13 @@ describe('Expr.subst', () => {
 
     runcase('some expr', 'f=5 x; a->f a', 'x', 'y', 'a->5 y a');
   });
-
-
-
 });
 
 function check (got, expected, jar) {
-  if (expected === null) {
+  if (expected === null)
     expect(got).to.equal(null);
-  } else if (typeof expected === 'string') {
+  else if (typeof expected === 'string')
     ski.parse(expected, { env: jar }).expect(got);
-  } else {
+  else
     expected.expect(got);
-  }
 }

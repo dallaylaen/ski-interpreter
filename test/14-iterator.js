@@ -1,29 +1,29 @@
-const { expect } = require ('chai');
+const { expect } = require('chai');
 const { SKI } = require('../index');
 
-describe ('Expr.walk', () => {
-  it ('works exactly for very simple example', () => {
+describe('Expr.walk', () => {
+  it('works exactly for very simple example', () => {
     const ski = new SKI();
     const expr = ski.parse('KI x y');
-    const frames = [ ... expr.walk() ].map( entry => [entry.expr.format({terse: false}), entry.steps, entry.final]);
+    const frames = [...expr.walk()].map( entry => [entry.expr.format({ terse: false }), entry.steps, entry.final]);
 
-    expect (frames).to.deep.equal([
-      [ 'K(I)(x)(y)', 0, false ],
-      [ 'I(y)', 1, false ],
-      [ 'y', 2, true],
+    expect(frames).to.deep.equal([
+      ['K(I)(x)(y)', 0, false],
+      ['I(y)', 1, false],
+      ['y', 2, true],
     ]);
   });
 
   const cases = [
-    [ 'S(K(SI))K foo bar', 'bar foo'],
-    [ '2 x y ', 'x(x y)'],
-    [ 'WI(C(K(WI))) x y z t', 'C(K(WI))(C(K(WI)))'],
-    [ '10 (CIx) y', 'y x x x x x x x x x x']
+    ['S(K(SI))K foo bar', 'bar foo'],
+    ['2 x y ', 'x(x y)'],
+    ['WI(C(K(WI))) x y z t', 'C(K(WI))(C(K(WI)))'],
+    ['10 (CIx) y', 'y x x x x x x x x x x']
   ];
 
   for (const line of cases) {
-    const [ start, result ] = line;
-    it('iterates correctly over '+start, () => {
+    const [start, result] = line;
+    it('iterates correctly over ' + start, () => {
       const ski = new SKI();
 
       let expr = ski.parse(start);
@@ -33,7 +33,7 @@ describe ('Expr.walk', () => {
       for (const state of expr.walk()) {
         expect(end).to.equal(false, 'make sure we never run past last iteration');
 
-        console.log("step", state.steps, ":", state.expr.format({terse: true}));
+        console.log('step', state.steps, ':', state.expr.format({ terse: true }));
 
         // steps must be ascending
         expect(state.steps).to.be.within(n, Infinity);

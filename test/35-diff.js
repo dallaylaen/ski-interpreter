@@ -5,7 +5,7 @@ const { expect } = require('chai');
 const { SKI } = require('../index');
 
 describe('Expr.diff', () => {
-  it ('computes differences between expressions', () => {
+  it('computes differences between expressions', () => {
     const ski = new SKI();
 
     const expr1 = ski.parse('S(Kfoo)K');
@@ -33,7 +33,7 @@ describe('Expr.diff', () => {
     expect(SKI.K.apply(x1).diff(SKI.K.apply(x2))).to.match(/^K\([^A-Za-z]*x\[\d+] *!= *x\[\d+]/);
   });
 
-  it ('shows when expressions are identical', () => {
+  it('shows when expressions are identical', () => {
     const ski = new SKI();
 
     const expr1 = ski.parse('S(KS)K');
@@ -42,11 +42,7 @@ describe('Expr.diff', () => {
     expect(expr1.diff(expr2)).to.equal(null);
   });
 
-  it ('handles aliases correctly', () => {
+  it('handles aliases correctly', () => {
     const ski = new SKI();
-
-
   });
-
-
 });

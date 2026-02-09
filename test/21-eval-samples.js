@@ -1,9 +1,9 @@
-const { expect } = require ('chai');
+const { expect } = require('chai');
 const { SKI } = require('../index');
 
 const ski = new SKI();
 
-describe ('expression samples evaluate correctly', () => {
+describe('expression samples evaluate correctly', () => {
   // [source, final state, # of steps]
   const cases = [
     ['S x y z', 'x z (y z)', 1],
@@ -37,11 +37,11 @@ describe ('expression samples evaluate correctly', () => {
   for (const entry of cases) {
     const [start, end, steps] = entry;
     const jar = {};
-    it ('evaluates ' + start + ' in at most ' + steps + ' steps', () => {
+    it('evaluates ' + start + ' in at most ' + steps + ' steps', () => {
       const expr = ski.parse(start, { to_be_deleted: jar });
       if (expr instanceof SKI.classes.Alias)
         ski.add(expr.name, expr.impl);
-      const got = expr.run({max: steps ? steps+1 : undefined}); // 1 extra step for the "final" badge
+      const got = expr.run({ max: steps ? steps + 1 : undefined }); // 1 extra step for the "final" badge
       if (end !== undefined) {
         try {
           got.expr.expect(ski.parse(end, { to_be_deleted: jar }));
@@ -50,12 +50,11 @@ describe ('expression samples evaluate correctly', () => {
           throw e;
         }
       }
-      expect(got.final).to.equal(true, 'final expr in '+steps+' steps');
+      expect(got.final).to.equal(true, 'final expr in ' + steps + ' steps');
     });
   }
 
   // run in super slo mo whatever failed
-
 });
 
 function recheck (start, end, steps) {
@@ -63,14 +62,14 @@ function recheck (start, end, steps) {
   const expr = ski.parse(start, { to_be_deleted: jar });
   const target = ski.parse(end, { to_be_deleted: jar });
 
-  console.log('rechecking '+start+ ' vs '+end);
+  console.log('rechecking ' + start + ' vs ' + end);
 
-  for (let state of expr.walk()) {
+  for (const state of expr.walk()) {
     console.log('step ' + state.steps + ': ' + state.expr);
-    console.dir (state.expr, { depth: Infinity });
+    console.dir(state.expr, { depth: Infinity });
     if (state.steps > steps)
       break;
   }
   console.log('expected');
-  console.dir(target, { depth: Infinity});
+  console.dir(target, { depth: Infinity });
 }

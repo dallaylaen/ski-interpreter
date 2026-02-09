@@ -2,23 +2,23 @@ const { expect } = require('chai');
 const { SKI } = require('../index');
 
 describe('SKI.equals', () => {
-  it ('actually works as equality', done => {
-    const ski = new SKI;
+  it('actually works as equality', done => {
+    const ski = new SKI();
     expect( ski.parse('SII').equals(ski.parse('SII'))).to.equal(true);
     expect( ski.parse('K').equals(ski.parse('K'))).to.equal(true);
     expect( ski.parse('KI').equals(ski.parse('SK'))).to.equal(false);
     done();
   });
 
-  it ('works for global free variables', done => {
-    const ski = new SKI;
+  it('works for global free variables', done => {
+    const ski = new SKI();
     expect( ski.parse('x').equals(ski.parse('x'))).to.equal(true);
     expect( ski.parse('Ix').equals(ski.parse('Ix'))).to.equal(true);
     done();
   });
 
-  it ('can actually be used to compare function by feeding them the same free terms', done => {
-    const ski = new SKI;
+  it('can actually be used to compare function by feeding them the same free terms', done => {
+    const ski = new SKI();
     const e1 = ski.parse('SK');
     const e2 = ski.parse('KI');
     const x = ski.parse('x');
@@ -32,7 +32,7 @@ describe('SKI.equals', () => {
   });
 
   it('can compare aliases to the same thing', done => {
-    const ski = new SKI;
+    const ski = new SKI();
 
     ski.add('foo', 'SK');
     ski.add('bar', 'SK');
@@ -54,7 +54,7 @@ describe('SKI.equals', () => {
     expect(ski.parse('SI').equals(ski.parse('SII'))).to.equal(false);
   });
 
-  it ('can compare Church numbers', () => {
+  it('can compare Church numbers', () => {
     expect(SKI.church(5).equals(SKI.church(5))).to.equal(true);
     expect(SKI.church(5).equals(SKI.church(4))).to.equal(false);
     expect(SKI.church(1).equals(SKI.I)).to.equal(false);
@@ -66,29 +66,29 @@ describe('SKI.equals', () => {
   });
 
   const eqCases = [
-    ["x", "x"],
-    ["S", "S"],
-    ["SKK", "SKK"],
-    ["5", "5"],
-    ["x->xS", "y->yS"],
-    ["T=CI", "CI"],
-    ["CI", "T=CI"],
-    ["x=SK", "y=SK"],
+    ['x', 'x'],
+    ['S', 'S'],
+    ['SKK', 'SKK'],
+    ['5', '5'],
+    ['x->xS', 'y->yS'],
+    ['T=CI', 'CI'],
+    ['CI', 'T=CI'],
+    ['x=SK', 'y=SK'],
   ];
 
   const ineqCases = [
-    ["S", "K"],
-    ["S", "SK"],
-    ["x", "y"],
-    ["5", "6"],
-    ["K", "x->y->x"],
-    ["T=CI", "T=SK"],
+    ['S', 'K'],
+    ['S', 'SK'],
+    ['x', 'y'],
+    ['5', '6'],
+    ['K', 'x->y->x'],
+    ['T=CI', 'T=SK'],
   ];
 
   const ski = new SKI();
 
   for (const [term1, term2] of eqCases) {
-    it (`equates ${term1} to ${term2}`, () => {
+    it(`equates ${term1} to ${term2}`, () => {
       const t1 = ski.parse(term1);
       const t2 = ski.parse(term2);
       expect(t1.equals(t2)).to.equal(true);
