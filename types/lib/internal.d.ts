@@ -24,3 +24,29 @@ export class Tokenizer {
  * @returns {Set<string>}
  */
 export function restrict(set: Set<string>, spec?: string): Set<string>;
+/**
+ * @private
+ * @template T
+ * @param {T|ActionWrapper<T>} value
+ * @returns {[T?, string|undefined]}
+ */
+export function unwrap<T>(value: T | ActionWrapper<T>): [T?, string | undefined];
+/**
+ *
+ * @private
+ * @template T
+ * @param {string} action
+ * @returns {function(T): ActionWrapper<T>}
+ */
+export function prepareWrapper<T>(action: string): (arg0: T) => ActionWrapper<T>;
+declare class ActionWrapper {
+    /**
+     * @template T
+     * @param {T} value
+     * @param {string} action
+     */
+    constructor(value: T, action: string);
+    value: T;
+    action: string;
+}
+export {};

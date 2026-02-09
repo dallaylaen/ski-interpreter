@@ -1,3 +1,7 @@
+export type ActionWrapper<T> = T | {
+    value: T | null;
+    action: string;
+} | null;
 export type Partial = Expr | ((arg0: Expr) => Partial);
 /**
  * @typedef {Expr | function(Expr): Partial} Partial
@@ -36,7 +40,28 @@ export class Expr {
      */
     any(predicate: (e: Expr) => boolean): boolean;
     /**
-     * @desc rought estimate of the complexity of the term
+     * @desc Fold the expression into a single value by recursively applying combine() to its subterms.
+     *       Nodes are traversed in leftmost-outermost order, i.e. the same order as reduction steps are taken.
+     *
+     * null or undefined return value from combine() means "keep current value and descend further".
+     *
+     * SKI.control provides primitives to control the folding flow:
+     *  - SKI.control.prune(value) means "use value and don't descend further into this branch";
+     *  - SKI.control.stop(value) means "stop folding immediately and return value".
+     *  - SKI.control.descend(value) is the default behavior, meaning "use value and descend further".
+     *
+     * This method is experimental and may change in the future.
+     *
+     * @experimental
+     * @template T
+     * @param {T} initial
+     * @param {(acc: T, expr: Expr) => ActionWrapper<T>} combine
+     * @returns {T}
+     */
+    fold<T>(initial: T, combine: (acc: T, expr: Expr) => ActionWrapper<T>): T;
+    _fold(initial: any, combine: any): any;
+    /**
+     * @desc rough estimate of the complexity of the term
      * @return {number}
      */
     weight(): number;
@@ -340,6 +365,7 @@ export class Expr {
 export namespace Expr {
     export { declare };
     export { native };
+    export { control };
 }
 export class App extends Expr {
     /**
@@ -531,6 +557,11 @@ declare function declare(inventory: Expr[]): string[];
 declare const native: {
     [key: string]: Native;
 };
+declare namespace control {
+    let descend: (arg0: any) => any;
+    let prune: (arg0: any) => any;
+    let stop: (arg0: any) => any;
+}
 declare class Named extends Expr {
     /**
      * @desc An abstract class representing a term named 'name'.

@@ -169,6 +169,11 @@ export namespace SKI {
     export function church(n: number): typeof import("./expr").Church;
     export { native };
     export { declare };
+    export let control: {
+        descend: (arg0: any) => any;
+        prune: (arg0: any) => any;
+        stop: (arg0: any) => any;
+    };
 }
 import classes = require("./expr");
 declare const native: {
