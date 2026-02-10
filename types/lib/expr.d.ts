@@ -406,6 +406,17 @@ export class App extends Expr {
     _format(options: any, nargs: any): any;
     _unspaced(arg: any): any;
 }
+export class Named extends Expr {
+    /**
+     * @desc An abstract class representing a term named 'name'.
+     *
+     * @param {String} name
+     */
+    constructor(name: string);
+    name: string;
+    _unspaced(arg: any): boolean;
+    _format(options: any, nargs: any): any;
+}
 export class FreeVar extends Named {
     /**
      * @desc A named variable.
@@ -561,16 +572,5 @@ declare namespace control {
     let descend: (arg0: any) => any;
     let prune: (arg0: any) => any;
     let stop: (arg0: any) => any;
-}
-declare class Named extends Expr {
-    /**
-     * @desc An abstract class representing a term named 'name'.
-     *
-     * @param {String} name
-     */
-    constructor(name: string);
-    name: string;
-    _unspaced(arg: any): boolean;
-    _format(options: any, nargs: any): any;
 }
 export {};

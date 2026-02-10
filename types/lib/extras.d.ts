@@ -53,5 +53,5 @@ export function search(seed: Expr[], options: {
  * @param {object} [options] - see Expr.format()
  * @returns {any}
  */
-export function flattenExpr(obj: any, options?: object): any;
+export function deepFormat(obj: any, options?: object): any;
 import { Expr } from "./expr";
