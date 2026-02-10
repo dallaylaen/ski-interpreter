@@ -262,18 +262,3 @@ describe('Quest', () => {
   });
    */
 });
-
-function flattenExpr (obj) {
-  if (Array.isArray(obj))
-    return obj.map(flattenExpr);
-  if (typeof obj !== 'object')
-    return obj;
-  if (obj instanceof SKI.classes.Expr)
-    return obj.format({ terse: true });
-
-  const out = {};
-  for (const key in obj)
-    out[key] = flattenExpr(obj[key]);
-
-  return out;
-}

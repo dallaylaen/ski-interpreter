@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const fs = require('node:fs').promises;
 
 const { Tokenizer } = require('../lib/internal');
-const { SKI, Quest } = require('../index');
+const { Quest } = require('../index');
 
 const dir = __dirname + '/../docs/quest-data/';
 

@@ -3,14 +3,14 @@ const { SKI } = require('../index');
 
 describe( 'SKI', () => {
   it('can declare terms', done => {
-    const ski = new SKI;
+    const ski = new SKI();
     ski.add('T', 'S(K(SI))K');
 
     const term = ski.parseLine('T x y');
 
     const result = term.run();
 
-    expect( ''+result.expr).to.equal('y x');
+    expect( '' + result.expr).to.equal('y x');
 
     // console.log(ski.list());
 
@@ -18,7 +18,7 @@ describe( 'SKI', () => {
   });
 
   it('does not overwrite read-only data', done => {
-    const ski = new SKI;
+    const ski = new SKI();
 
     const note = SKI.S.note;
     expect(typeof note).to.equal('string', 'note is a string');
@@ -29,8 +29,8 @@ describe( 'SKI', () => {
 
     const known = ski.getTerms();
 
-    expect (known.S.note).to.equal(note);
-    expect (known.sub.note).to.equal('just an alias');
+    expect(known.S.note).to.equal(note);
+    expect(known.sub.note).to.equal('just an alias');
 
     let expr = known.sub;
     expect( expr ).to.be.instanceof( SKI.classes.Alias );
@@ -47,19 +47,19 @@ describe( 'SKI', () => {
     const expr = ski.parseLine('n2 n2 n2 x y');
 
     const canonic = expr.expand();
-    expect( canonic.format({terse: false}) ).to.match(/^[SKI()]+\(x\)\(y\)$/);
+    expect( canonic.format({ terse: false }) ).to.match(/^[SKI()]+\(x\)\(y\)$/);
 
     const result = expr.run( 10000).expr;
-    expect( (''+result).replace(/[() ]/g, '') )
-      .to.equal('x'.repeat(16)+'y');
+    expect( ('' + result).replace(/[() ]/g, '') )
+      .to.equal('x'.repeat(16) + 'y');
 
     const alt = canonic.run(10000).expr;
-    expect(''+alt).to.equal(''+result);
+    expect('' + alt).to.equal('' + result);
 
     done();
   });
 
-  it ('can add aliases', () => {
+  it('can add aliases', () => {
     const ski = new SKI();
     const alias = ski.parse('T = S(K(SI))K');
     expect(alias).to.be.instanceof(SKI.classes.Alias);
@@ -68,14 +68,14 @@ describe( 'SKI', () => {
     expr.expect( ski.parse('y x'));
   });
 
-  it ('can auto-annotate proper terms', () => {
-    const ski = new SKI({annotate: true});
+  it('can auto-annotate proper terms', () => {
+    const ski = new SKI({ annotate: true });
     ski.add('v3', 'BBBC(BC(CI))');
     expect(ski.getTerms().v3.note.replace(/\s*(&rarr;|&mapsto;)\s*/gi, '->').replace(/<[^>]+>/g, ''))
       .to.equal('a->b->c->d->d a b c');
   });
 
-  it ('delays proper term computation', () => {
+  it('delays proper term computation', () => {
     const ski = new SKI();
     ski.add('T', 'CI');
 
@@ -97,7 +97,7 @@ describe( 'SKI', () => {
     expect(T.apply(x, y).step().expr.toString()).to.equal('CIx y');
   });
 
-  it ('honors alias arity if added via one-arg form', () => {
+  it('honors alias arity if added via one-arg form', () => {
     const ski = new SKI();
     const alias = ski.parse('T=CI');
     ski.add(alias);
@@ -111,7 +111,7 @@ describe( 'SKI', () => {
     expect(T.apply(x, y).step().expr.toString()).to.equal('CIx y');
   });
 
-  it ('can declare native terms', () => {
+  it('can declare native terms', () => {
     const ski = new SKI();
     ski.add('T', a => b => b.apply(a));
     ski.add('S', a => b => c => a.apply(c, b.apply(c)));
@@ -120,14 +120,13 @@ describe( 'SKI', () => {
     expect(ski.parse('S T x y').run().expr.toString()).to.equal('x y y');
   })
 
-  it ('can handle self-referential terms', () => {
+  it('can handle self-referential terms', () => {
     const ski = new SKI();
     ski.add('Y', function (f) { return f.apply(this.apply(f)); });
 
     const expr = ski.parse('Y f');
-    const eval = expr.walk();
-    for (let i=0; i<5; i++) {
-      ski.parse(i + ' f (Y f)').step().expr.expect(eval.next().value.expr);
-    }
+    const walk = expr.walk();
+    for (let i = 0; i < 5; i++)
+      ski.parse(i + ' f (Y f)').step().expr.expect(walk.next().value.expr);
   });
 });

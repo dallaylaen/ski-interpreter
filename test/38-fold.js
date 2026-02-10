@@ -12,7 +12,7 @@ describe( 'Expr.fold', () => {
   // please create an expr with all classes in use
   const expr = ski.parse('x->x (5 K  y) (M z)');
 
-  it ('goes through all nodes in LO order', () => {
+  it('goes through all nodes in LO order', () => {
     const trace = [];
     const ret = expr.fold(42, (acc, e) => {
       trace.push(e.constructor.name + ':' + e.toString());
@@ -40,7 +40,7 @@ describe( 'Expr.fold', () => {
     expect(ret).to.equal(42); // all null => return initial value
   });
 
-  it ('can enumerate leaf nodes', () => {
+  it('can enumerate leaf nodes', () => {
     const trace = expr.fold('', (acc, e) => {
       if (e instanceof Lambda || e instanceof App)
         return null;
@@ -50,7 +50,7 @@ describe( 'Expr.fold', () => {
     expect(trace).to.equal('x 5 K y M z ');
   });
 
-  it ('can break out', () => {
+  it('can break out', () => {
     const trace = [];
     const ret = expr.fold(false, (acc, e) => {
       trace.push(e.constructor.name + ':' + e.toString());

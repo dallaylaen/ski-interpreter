@@ -48,6 +48,7 @@ describe( 'SKI.parse', () => {
     const expr = ski.parse('y = SK; z=KI; K', { env: jar });
 
     expect(jar).to.deep.equal(intact);
+    expr.expect(SKI.K);
 
     done();
   });

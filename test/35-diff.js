@@ -43,6 +43,7 @@ describe('Expr.diff', () => {
   });
 
   it('handles aliases correctly', () => {
-    const ski = new SKI();
+    // TODO!!!
+
   });
 });
