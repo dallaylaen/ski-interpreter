@@ -15,7 +15,7 @@
     "ski": "bin/ski.js"
   },
   "scripts": {
-    "lint": "npx eslint lib --ext .js,.ts",
+    "lint": "npx eslint --ext .js,.ts lib test index.js bin",
     "types": "npx -p typescript tsc index.js --declaration --allowJs --emitDeclarationOnly --outDir types",
     "test": "npx nyc mocha",
     "minify": "npx esbuild --bundle ./index.js --outfile=docs/build/js/ski-interpreter.min.js --minify --sourcemap",
