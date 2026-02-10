@@ -105,4 +105,12 @@ describe( 'SKI.parse', () => {
 
     done();
   });
+
+  it ('can erase preexisting terms', () => {
+    const ski = new SKI();
+    ski.add('foo', 'SK');
+    const expr = ski.parse('foo =; foo foo x');
+    expect(expr.run().expr + '').to.equal('foo foo x');
+    expect(expr?.context?.env?.foo).to.be.instanceOf(SKI.classes.FreeVar);
+  });
 });
