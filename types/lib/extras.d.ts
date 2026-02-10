@@ -2,6 +2,7 @@
  * @desc  Extra utilities that do not belong in the core.
  */
 /**
+ * @experimental
  * @desc  Look for an expression that matches the predicate,
  *        starting with the seed and applying the terms to one another.
  *
@@ -39,3 +40,18 @@ export function search(seed: Expr[], options: {
     probed: number;
     gen: number;
 };
+/**
+ * @desc Recursively replace all instances of Expr in a data structure with
+ *       respective string representation using the format() options.
+ *       Objects of other types and primitive values are eft as is.
+ *
+ *       May be useful for debugging or diagnostic output.
+ *
+ * @experimental
+ *
+ * @param {any} obj
+ * @param {object} [options] - see Expr.format()
+ * @returns {any}
+ */
+export function flattenExpr(obj: any, options?: object): any;
+import { Expr } from "./expr";
