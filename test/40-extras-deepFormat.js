@@ -39,7 +39,7 @@ describe('deepFormat', () => {
     expect(extras.deepFormat(undefined)).to.equal(undefined);
   });
 
-  it ('does not modify non-Expr objects', () => {
+  it('does not modify non-Expr objects', () => {
     const date = new Date();
     const regex = /test/;
     const obj = { date, regex };

@@ -109,9 +109,9 @@ function compareInventories (got, exp) {
   const green = {};
   const red = {};
   for (const k of keys) {
-    if (!got.hasOwnProperty(k))
+    if (!Object.prototype.hasOwnProperty.call(got, k))
       green[k] = exp[k];
-    else if (!exp.hasOwnProperty(k))
+    else if (!Object.prototype.hasOwnProperty.call(exp, k))
       red[k] = got[k];
     else if (!got[k].equals(exp[k])) {
       green[k] = exp[k];

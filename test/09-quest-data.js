@@ -1,17 +1,18 @@
 const { expect } = require('chai');
 const fs = require('node:fs').promises;
+const path = require('node:path');
 
 const { Tokenizer } = require('../lib/internal');
 const { Quest } = require('../index');
 
-const dir = __dirname + '/../docs/quest-data/';
+const dir = path.join(__dirname, '../docs/quest-data/');
 
 const uniqQuest = new Set();
 const uniqChapter = new Set();
 
 describe('quest-data', () => {
   it('has index', async () => {
-    const index = await fs.readFile(dir + 'index.json')
+    const index = await fs.readFile(path.join(dir, 'index.json'))
       .then(data => JSON.parse(data));
 
     expect(Array.isArray(index)).to.equal(true, 'index is an array');
@@ -21,7 +22,7 @@ describe('quest-data', () => {
         const entry = typeof index[n] === 'string' ? { link: index[n] } : index[n];
         it('entry ' + n + ' has quest file ' + entry.link, () => {
           expect(typeof entry.link).to.equal('string');
-          return fs.readFile(dir + entry.link)
+          return fs.readFile(path.join(dir, entry.link))
             .then(data => JSON.parse(data))
             .then(raw => {
               raw = Array.isArray(raw) ? { content: raw } : raw;
