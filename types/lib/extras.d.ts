@@ -20,10 +20,11 @@
  * @param {number} [options.maxArgs] - arguments in infer()
  * @param {number} [options.max] - step limit in infer()
  * @param {boolean} [options.noskip] - prevents skipping equivalent terms. Always true if infer is false.
+ * @param {boolean} [retain] - if true. also add the whole cache to returned value
  * @param {({gen: number, total: number, probed: number, step: boolean}) => void} [options.progress]
  * @param {number} [options.progressInterval] - minimum number of tries between calls to options.progress, default 1000.
  * @param {(e: Expr, props: {}) => number?} predicate
- * @return {{expr?: Expr, total: number, probed: number, gen: number}}
+ * @return {{expr?: Expr, total: number, probed: number, gen: number, cache?: Expr[][]}}
  */
 export function search(seed: Expr[], options: {
     depth?: number;
@@ -32,13 +33,12 @@ export function search(seed: Expr[], options: {
     maxArgs?: number;
     max?: number;
     noskip?: boolean;
-    progress?: ({ gen: number, total: number, probed: number, step: boolean }: any) => void;
-    progressInterval?: number;
 }, predicate: (e: Expr, props: {}) => number | null): {
     expr?: Expr;
     total: number;
     probed: number;
     gen: number;
+    cache?: Expr[][];
 };
 /**
  * @desc Recursively replace all instances of Expr in a data structure with

@@ -114,12 +114,17 @@ export class Expr {
      */
     private _infer;
     /**
-     * @desc Expand application trees into lists of terms, e.g. ((a b) c) => [a, b, c].
+     * @desc Expand an expression into a list of terms
+     * that give the initial expression when applied from left to right:
+     * ((a, b), (c, d)) => [a, b, (c, d)]
+     *
+     * This can be thought of as an opposite of apply:
+     * fun.apply(...arg).unroll() is exactly [fun, ...args]
+     * (even if ...arg is in fact empty).
+     *
      * @returns {Expr[]}
-     * @private
      */
-    private _aslist;
-    _firstVar(): boolean;
+    unroll(): Expr[];
     /**
      * @desc Returns a series of lambda terms equivalent to the given expression,
      *       up to the provided computation steps limit,
@@ -361,6 +366,7 @@ export class Expr {
      */
     private _format;
     _declare(output: any, inventory: any, seen: any): void;
+    toJSON(): string;
 }
 export namespace Expr {
     export { declare };
@@ -370,22 +376,19 @@ export namespace Expr {
 export class App extends Expr {
     /**
      * @desc Application of fun() to args.
-     * Never ever use new App(fun, ...args) directly, use fun.apply(...args) instead.
+     * Never ever use new App(fun, arg) directly, use fun.apply(...args) instead.
      * @param {Expr} fun
-     * @param {Expr} args
+     * @param {Expr} arg
      */
-    constructor(fun: Expr, ...args: Expr);
-    arg: any;
-    fun: any;
+    constructor(fun: Expr, arg: Expr);
+    arg: Expr;
+    fun: Expr;
     final: boolean;
-    arity: any;
-    weight(): any;
+    arity: number;
     _infer(options: any, preArgs?: any[], steps?: number): any;
-    _firstVar(): any;
-    expand(): any;
-    traverse(change: any): any;
+    traverse(change: any): Expr;
     any(predicate: any): any;
-    subst(search: any, replace: any): any;
+    subst(search: any, replace: any): Expr;
     /**
      * @return {{expr: Expr, steps: number}}
      */
@@ -393,9 +396,7 @@ export class App extends Expr {
         expr: Expr;
         steps: number;
     };
-    invoke(arg: any): any;
-    split(): any[];
-    _aslist(): any[];
+    invoke(arg: any): Partial;
     /**
      * @desc Convert the expression to SKI combinatory logic
      * @return {Expr}
@@ -403,8 +404,8 @@ export class App extends Expr {
     _rski(options: any): Expr;
     diff(other: any, swap?: boolean): string;
     _braced(first: any): boolean;
-    _format(options: any, nargs: any): any;
-    _unspaced(arg: any): any;
+    _format(options: any, nargs: any): string;
+    _unspaced(arg: any): boolean;
 }
 export class Named extends Expr {
     /**
