@@ -61,5 +61,7 @@ describe('deepFormat', () => {
       val: 'I',
       num: 7
     });
+
+    expect(JSON.parse(JSON.stringify(nested))).to.deep.equal(result);
   });
 });
