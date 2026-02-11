@@ -230,8 +230,13 @@ describe('Quest', () => {
     const failing = quest.check('K(x arg)').details[0];
     expect(failing.reason).to.match(/!=/);
     expect(failing.pass).to.equal(false, 'var with the same name but not in the list = no go');
+
+    JSON.stringify(failing); // doesn't die, TODO proper test
   });
   /*
+
+  // TODO uncomment & make pass
+
   describe ('quest with shielded variables in env', () => {
     const quest = new Quest({
       title: 'first member of a pair',
