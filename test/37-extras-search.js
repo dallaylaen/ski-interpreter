@@ -22,12 +22,14 @@ describe('SKI.extras.search', () => {
       for (let gen = 0; gen < cache.length; gen++) {
         expect(Array.isArray(cache[gen])).to.equal(true, 'level ' + gen + ' is an array, not ' + typeof (cache[gen]));
         for (const item of cache[gen]) {
-          expect((item + '').replace(/[() ]/g, '').length ).to.equal(gen, item + '');
+          expect((item + '').replace(/[() ]/g, '').length ).to.equal(gen + 1, item + ' in gen ' + gen);
           if (uniq[item])
             dupes.push(item + '');
           uniq[item] = true;
         }
       }
+
+      expect(cache[0]).to.deep.equal([x, y]);
 
       expect(dupes).to.deep.equal([]);
       expect(Object.keys(uniq).length).to.equal(total);
