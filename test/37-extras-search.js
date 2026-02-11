@@ -8,6 +8,32 @@ const { search } = SKI.extras;
 describe('SKI.extras.search', () => {
   const vars = SKI.vars();
   const { x, y, z } = vars;
+
+  describe('some basic conditions', () => {
+    it('generates all possible combinations without repetition', () => {
+      const { cache, total } = SKI.extras.search([x, y], { depth: 5, retain: true, infer: false }, () => 0);
+
+      // console.log(SKI.extras.deepFormat(cache));
+
+      expect(Array.isArray(cache)).to.equal(true, 'cache is array');
+      const uniq = {};
+      const dupes = [];
+
+      for (let gen = 0; gen < cache.length; gen++) {
+        expect(Array.isArray(cache[gen])).to.equal(true, 'level ' + gen + ' is an array, not ' + typeof (cache[gen]));
+        for (const item of cache[gen]) {
+          expect((item + '').replace(/[() ]/g, '').length ).to.equal(gen, item + '');
+          if (uniq[item])
+            dupes.push(item + '');
+          uniq[item] = true;
+        }
+      }
+
+      expect(dupes).to.deep.equal([]);
+      expect(Object.keys(uniq).length).to.equal(total);
+    })
+  });
+
   check('finds S', [SKI.S], {}, (e, _) => e === SKI.S ? 1 : 0);
   check('finds I', [SKI.S, SKI.K], {}, (e, _) => getsto(e, [x], x));
   check('finds nothing and terminates', [SKI.S, SKI.K], { tries: 100 },
