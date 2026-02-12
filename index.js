@@ -1,6 +1,6 @@
-const main = require('./lib/parser');
-const quest = require('./lib/quest');
-const extras = require('./lib/extras');
+const main = require('./src/parser');
+const quest = require('./src/quest');
+const extras = require('./src/extras');
 
 main.SKI.Quest = quest.Quest;
 main.SKI.extras = extras;

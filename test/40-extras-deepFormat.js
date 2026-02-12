@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const { SKI } = require('../index');
-const extras = require('../lib/extras');
+const { extras } = SKI;
 
 describe('deepFormat', () => {
   const ski = new SKI();

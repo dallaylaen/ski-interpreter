@@ -9,18 +9,19 @@
     "education",
     "interpreter"
   ],
-  "main": "index.js",
+  "main": "lib/ski-interpreter.min.js",
   "types": "types/index.d.ts",
   "bin": {
     "ski": "bin/ski.js"
   },
   "scripts": {
-    "lint": "npx eslint --ext .js,.ts lib test index.js bin",
+    "lint": "npx eslint --ext .js,.ts src test index.js bin",
     "types": "npx -p typescript tsc index.js --declaration --allowJs --emitDeclarationOnly --outDir types",
     "test": "npx nyc mocha",
     "minify": "npx esbuild --bundle ./index.js --outfile=docs/build/js/ski-interpreter.min.js --minify --sourcemap",
+    "copy-min": "mkdir -p lib && cp docs/build/js/ski-interpreter.min.js* lib/",
     "build-site": "npx esbuild --bundle ./site-src/index.js --outfile=docs/build/js/util.min.js --minify --sourcemap",
-    "build": "npm run lint && npm run types && npm run test && npm run minify && npm run build-site"
+    "build": "npm run lint && npm run types && npm run test && npm run minify && npm run build-site && npm run copy-min"
   },
   "files": [
     "package.json",
