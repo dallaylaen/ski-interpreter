@@ -12,3 +12,4 @@ isolate-*.log
 prof.txt
 *.orig
 *.rej
+lib
