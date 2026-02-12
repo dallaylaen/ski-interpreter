@@ -6,7 +6,7 @@ main.SKI.Quest = quest.Quest;
 main.SKI.extras = extras;
 
 // SKI_REPL=1 node -r ./index.js
-if (process.env.SKI_REPL && typeof global !== 'undefined')
+if (typeof process === 'object' && process.env.SKI_REPL && typeof global !== 'undefined')
   global.SKI = main.SKI;
 
 // we're in a browser
