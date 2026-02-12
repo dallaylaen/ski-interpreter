@@ -1,0 +1,30 @@
+// This file generates a trace of a Collatz 3n+1 sequence,
+// producing HUGE number of steps with very deep recursion,
+// and can thus be used as a rough performance benchmark.
+
+// `calc f n` == `f n`, provided n is a number, except that `n` is
+// forced into a redex position before being fed to `f`,
+// thus eliminating possible duplicate computations.
+
+T=CI;
+V=BCT;
+calc=BBB(T 0)(V(CB+));
+if=BBB(B(BW)C)C;
+half=C(V(C(V(T(KI))(C(B+)K)))(K 0))K;
+collatz=if(VCK)half(B(V+ 1)(B 3));
+dec=BBBCV(C(BT)+)(K 0)I;
+M=WI;
+wait4=BBB(BCC)(BCC);
+nil=KI;
+lst=BS(C(BB));
+fold=M(B(SI)(wait4M))(B(C(BV(BBBK))nil)(C(BBlst)));
+L=BWB;
+lazyy=M(B(SI)(wait4M));
+lesseq=C(BB(VT(KK)))(VT(K(KI)));
+P=M(C(BL(WC)));
+R=CC;
+v3=BBBCV;
+
+BML(B(S(B(BB(B(Bcalc(SV))))(Cif (Knil)))) (B(S(CB)))) (C lesseq 1) (collatz) 127
+// BML(B(S(B(BB(B((SV))))(Cif (Knil)))) (B(S(CB)))) (C lesseq 1) (collatz) 27
+
