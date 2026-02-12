@@ -563,6 +563,10 @@ class Expr {
   // output: string[] /* appended */, inventory: { [key: string]: Expr }, seen: Set<Expr>
   _declare (output, inventory, seen) {}
 
+  declare (options) {
+    return this.format(options);
+  }
+
   toJSON () {
     return this.format();
   }
@@ -1234,6 +1238,13 @@ class Alias extends Named {
     if (inventory[this.name] === this)
       output.push(this.name + '=' + this.impl.format({ terse: true, inventory }));
   }
+
+  declare (options = {}) {
+    // TODO logic? figure out when to emit a declaration
+    if (options.inventory && options.inventory[this.name] === this)
+      return this.name + '=' + this.impl.format(options);
+    return this.format(options);
+  }
 }
 
 // ----- Expr* classes end here -----
@@ -1410,8 +1421,53 @@ function * simplifyLambda (expr, options = {}, state = { steps: 0 }) {
     yield { expr: canon.expr, steps: state.steps, comment: '(canonical)' };
 }
 
+function toposort (env, list) {
+  if (env) {
+    // TODO check in[name].name === name
+    if (!list)
+      list = Object.values(env);
+  } else {
+    if (!list)
+      return [];
+    if (!env) {
+      env = {};
+      for (const item of list) {
+        if (!(item instanceof Named))
+          continue;
+        if (env[item.name])
+          throw new Error('duplicate name ' + item);
+        env[item.name] = item;
+      }
+    }
+  }
+
+  const out = [];
+  const seen = new Set();
+  const rec = term => {
+    if (seen.has(term))
+      return;
+    term.fold(null, (acc, e) => {
+      if (e !== term && e instanceof Named && env[e.name] === e) {
+        rec(e);
+        return Expr.control.prune(null);
+      }
+    });
+    out.push(term);
+    seen.add(term);
+  };
+
+  for (const term of list)
+    rec(term);
+
+  return {
+    list: out,
+    env,
+  };
+}
+
 Expr.declare = declare;
 Expr.native = native;
 Expr.control = control;
+Expr.extras = { toposort };
 
 module.exports = { Expr, App, Named, FreeVar, Lambda, Native, Alias, Church };

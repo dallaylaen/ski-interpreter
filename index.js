@@ -1,16 +1,18 @@
-const main = require('./src/parser');
-const quest = require('./src/quest');
+const { SKI } = require('./src/parser');
+const { Quest } = require('./src/quest');
 const extras = require('./src/extras');
 
-main.SKI.Quest = quest.Quest;
-main.SKI.extras = extras;
+SKI.Quest = Quest;
+SKI.extras = { ...extras, ...SKI.classes.Expr.extras };
 
 // SKI_REPL=1 node -r ./index.js
-if (typeof process === 'object' && process.env.SKI_REPL && typeof global !== 'undefined')
-  global.SKI = main.SKI;
+if (typeof process === 'object' && process.env.SKI_REPL && typeof global !== 'undefined') {
+  global.SKI = SKI;
+  console.log('SKI_REPL activated, try `new SKI();`');
+}
 
 // we're in a browser
 if (typeof window !== 'undefined')
-  window.SKI = main.SKI;
+  window.SKI = SKI;
 
-module.exports = { ...main, ...quest };
+module.exports = { SKI, Quest }; // TODO remove Quest on next breaking release, it's in SKI already!
