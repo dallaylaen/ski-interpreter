@@ -385,8 +385,6 @@ function maybeAlias (name, expr) {
 
 // Create shortcuts for common terms
 
-SKI.classes = classes;
-
 /**
  * @desc Create a proxy object that generates variables on demand,
  *       with names corresponding to the property accessed.
@@ -427,6 +425,8 @@ SKI.church = n => new Church(n);
 
 for (const name in native)
   SKI[name] = native[name];
+
+SKI.classes = classes;
 SKI.native = native;
 SKI.declare = declare;
 SKI.control = Expr.control;
