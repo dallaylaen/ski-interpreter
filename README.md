@@ -147,7 +147,7 @@ const lambdaSteps = [...skiExpr.toLambda()];
 ## Fancy formatting
 
 The `format` methods of the `Expr` class supports
-a number of options, see [the source code](lib/expr.js) for details.
+a number of options, see [the source code](src/expr.js) for details.
 
 ## Variable scoping
 
