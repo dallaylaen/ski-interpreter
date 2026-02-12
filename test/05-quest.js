@@ -6,7 +6,6 @@ describe('Quest', () => {
 
   it('can validate I', () => {
     const quest = new Quest({
-      subst: '&phi;',
       allow: 'SK',
       input: 'phi',
       cases: [
@@ -21,12 +20,12 @@ describe('Quest', () => {
     expect(pass.weight).to.equal(3);
 
     const details = pass.details[0];
-    expect(details.start + ' -> ' + details.found).to.equal('&phi; x -> x');
+    expect(details.start + ' -> ' + details.found).to.equal('phi x -> x');
     expect(details.steps).to.be.within(2, 3, 'SKK=I takes 2-3 steps to validate');
 
     const fail = quest.check('S(SKK)(SKK)');
     expect(fail.pass).to.equal(false);
-    expect(reduct(fail.details[0])).to.equal('&phi; x -> x x vs x');
+    expect(reduct(fail.details[0])).to.equal('phi x -> x x vs x');
 
     const violate = quest.check('I');
     expect(violate.pass).to.equal(false);
@@ -36,9 +35,8 @@ describe('Quest', () => {
 
   it('cannot be fooled by passing free variables with the same name as case placeholders', () => {
     const quest = new Quest({
-      subst: '&phi;',
       allow: 'SK',
-      input: 'phi',
+      input: { name: 'phi', fancy: '&phi;' },
       cases: [
         ['phi x', 'x']
       ]
@@ -52,20 +50,18 @@ describe('Quest', () => {
 
   it('can validate quine', () => {
     const quest = new Quest({
-      subst: '&phi;',
-      input: 'f',
-      cases: [['f x', 'f']],
+      input: 'quine',
+      cases: [['quine x', 'quine']],
     });
 
     const pass = quest.check('SII (S(S(KS)K)K)');
     // console.log(pass);
     expect(pass.pass).to.equal(true);
-    expect(reduct(pass.details[0])).to.match(/&phi; *\(?x\)? -> ([SKI()]+) vs \1/);
+    expect(reduct(pass.details[0])).to.match(/quine *\(?x\)? -> ([SKI()]+) vs \1/);
   });
 
   it('can validate truth tables', () => {
     const quest = new Quest({
-      subst: '&phi;',
       input: 'f',
       cases: [
         ['f (KI) (KI)', 'KI'],
