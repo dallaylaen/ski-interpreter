@@ -263,7 +263,8 @@ class SKI {
     if (typeof source !== 'string')
       throw new Error('parse: source must be a string, got ' + typeof source);
 
-    const lines = source.replace(/\/\/[^\n]*$/gm, '')
+    const lines = source.replace(/\/\/[^\n]*$/gm, '\n')
+      .replace(/\/\*.*?\*\//gs, ' ')
       .split(/\s*;[\s;]*/).filter( s => s.match(/\S/));
 
     const jar = { ...options.env };
@@ -275,7 +276,7 @@ class SKI {
       if (expr instanceof Alias)
         expr.outdated = true;
       expr = (str === '' && save !== undefined)
-        ? new FreeVar(save, options.scope)
+        ? new FreeVar(save, options.scope ?? SKI)
         : this.parseLine(str, jar, options);
 
       if (save !== undefined) {
@@ -289,7 +290,7 @@ class SKI {
     }
 
     expr.context = {
-      env:    jar, // also contains pre-parsed terms
+      env:    { ...this.getTerms(), ...jar }, // also contains pre-parsed terms
       scope:  options.scope,
       src:    source,
       parser: this,

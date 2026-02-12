@@ -563,10 +563,10 @@ class Expr {
   // output: string[] /* appended */, inventory: { [key: string]: Expr }, seen: Set<Expr>
   _declare (output, inventory, seen) {}
 
-  declare (options) {
-    return this.format(options);
-  }
-
+  /**
+   * @desc Convert the expression to a JSON-serializable format.
+   * @returns {string}
+   */
   toJSON () {
     return this.format();
   }
@@ -1237,13 +1237,6 @@ class Alias extends Named {
     // only declare if in inventory and matches
     if (inventory[this.name] === this)
       output.push(this.name + '=' + this.impl.format({ terse: true, inventory }));
-  }
-
-  declare (options = {}) {
-    // TODO logic? figure out when to emit a declaration
-    if (options.inventory && options.inventory[this.name] === this)
-      return this.name + '=' + this.impl.format(options);
-    return this.format(options);
   }
 }
 

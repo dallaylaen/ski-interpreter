@@ -1,6 +1,6 @@
 'use strict';
 
-const { Expr } = require('./expr')
+const { Expr, Alias, FreeVar } = require('./expr')
 
 /**
  * @desc  Extra utilities that do not belong in the core.
@@ -137,4 +137,16 @@ function deepFormat (obj, options = {}) {
   return out;
 }
 
-module.exports = { search, deepFormat };
+function declare (expr, env) {
+  const res = Expr.extras.toposort(env, [expr]);
+
+  return res.list.map(s => {
+    if (s instanceof Alias)
+      return s.name + '=' + s.impl.format({ inventory: res.env });
+    if (s instanceof FreeVar)
+      return s.name + '=';
+    return s.format({ inventory: res.env });
+  }).join('; ');
+}
+
+module.exports = { search, deepFormat, declare };
