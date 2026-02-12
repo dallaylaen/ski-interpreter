@@ -3,5 +3,5 @@ declare const _exports: {
     SKI: typeof main.SKI;
 };
 export = _exports;
-import quest = require("./lib/quest");
-import main = require("./lib/parser");
+import quest = require("./src/quest");
+import main = require("./src/parser");
