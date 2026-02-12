@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-02-12
+
+### BREAKING CHANGES
+
+- Quest: rename `vars` -> `env`, `title` -> `name`, and `descr` -> `intro`.
+- Quest: remove `subst` for good, use input: `{ name, fancy }` instead
+- App: remove `split()` method, use `foo.fun` and `foo.arg` directly or better yet `foo.unroll()` instead.
+
+### Added
+
+- `SKI.extras.search(seed: Expr[], options:{...}, predicate: (e: Expr, props: infer()) => 1|0|-1)` that brute forces all possible applications of `seed` (with some heuristics) returns the first matching expr (if can)
+- Add experimental `Expr.fold<T>(initial : T, combine: (acc : T, expr) => T?)` that folds an expression tree in LO order. Composite nodes are first checked as is and then descended into. If `combine` returns null, it is discarded and the previous value is kept.
+- Add `SKI.control.{descend, prune, stop}` helper functions for more precise `fold` control.
+- Add optional `Expr.context{ parser, scope, env, src }` which is filled by the parser.
+- Add `SKI.extras.deepFormat({}|[]|Expr|..., options={})` that recursively formats a deep structure with given options, leaving non-Expr values as is. Useful for debugging.
+- Add `Expr.toJSON()`, currently just `format()` with no options
+- Add `Expr.unroll()` that returns a list of terms
+that give the initial expression when applied
+from left to right: `((a, b), (c, d)) => [a, b, (c, d)]`
+
 ## [2.0.0] - 2026-02-06
 
 ### BREAKING CHANGES
