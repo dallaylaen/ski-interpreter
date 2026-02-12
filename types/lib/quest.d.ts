@@ -18,6 +18,13 @@ export type Capability = {
     duplicate: boolean | null;
     arity: number | null;
 };
+export type InputSpec = string | {
+    name: string;
+    fancy?: string;
+    allow?: string;
+    numbers?: boolean;
+    lambdas?: boolean;
+};
 export type QuestResult = {
     pass: boolean;
     details: CaseResult[];
@@ -59,6 +66,9 @@ export type QuestResult = {
  * } TestCase
  */
 /**
+ * @typedef {string | {name: string, fancy?: string, allow?: string, numbers?: boolean, lambdas?: boolean}} InputSpec
+ */
+/**
  * @typedef {{
  *   pass: boolean,
  *   details: CaseResult[],
@@ -73,48 +83,53 @@ export class Quest {
     /**
      * @description A combinator problem with a set of test cases for the proposed solution.
      * @param {{
-     *    name: string?,
-     *    intro: string?,
-     *    subst: string?, // default for input[0].fancy, TODO remove
-     *    allow: string?,
-     *    numbers: boolean?,
-     *    env: string[]?,
-     *    engine: SKI?,
-     *    engineFull: SKI?,
+     *    input: InputSpec | InputSpec[],
      *    cases: TestCase[],
+     *
+     *    // the rest is optional
+  
+     *    allow?: string,
+     *    numbers?: boolean,
+     *    env?: string[],
+     *    engine?: SKI,
+     *    engineFull?: SKI,
+     *
+     *    // metadata, also any fields not listed here will go to quest.meta.???
+     *    id?: string|number,
+     *    name?: string,
+     *    intro?: string|string[], // multiple strings will be concatenated with spaces
      * }} options
+     *
+     * @example const quest = new Quest({
+     *    input: 'identity',
+     *    cases: [
+     *      ['identity x', 'x'],
+     *    ],
+     *    allow: 'SK',
+     *    intro: 'Find a combinator that behaves like the identity function.',
+     * });
+     * quest.check('S K K'); // { pass: true, details: [...], ... }
+     * quest.check('K S');   // { pass: false, details: [...], ... }
+     * quest.check('K x');   // fail! internal variable x is not equal to free variable x,
+     *                       //     despite having the same name.
+     * quest.check('I');     // fail! I not in the allowed list.
      */
-    constructor(options?: {
-        name: string | null;
-        intro: string | null;
-        subst: string | null;
-        allow: string | null;
-        numbers: boolean | null;
-        env: string[] | null;
-        engine: SKI | null;
-        engineFull: SKI | null;
-        cases: TestCase[];
-    });
-    engine: SKI;
-    engineFull: SKI;
+    constructor(options?: {});
+    engine: any;
+    engineFull: any;
     restrict: {
-        allow: string;
-        numbers: boolean;
+        allow: any;
+        numbers: any;
         lambdas: any;
     };
     env: {};
-    subst: string[] | (string & any[]);
     input: any[];
     envFull: {};
     cases: any[];
     name: any;
-    intro: string;
+    intro: any;
     id: any;
-    meta: {
-        name: string | null;
-        intro: string | null;
-        env: string[] | null;
-    };
+    meta: {};
     /**
      *   Display allowed terms based on what engine thinks of this.env + this.restrict.allow
      *   @return {string}
