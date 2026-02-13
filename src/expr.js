@@ -55,11 +55,14 @@ class Expr {
   }
 
   /**
-   * expand all terms but don't perform any calculations
+   * @desc Replace all aliases in the expression with their definitions, recursively.
    * @return {Expr}
    */
   expand () {
-    return this;
+    return this.traverse(e => {
+      if (e instanceof Alias)
+        return e.impl.expand();
+    }) ?? this;
   }
 
   freeOnly () {
@@ -638,10 +641,6 @@ class App extends Expr {
     };
   }
 
-  expand () {
-    return this.fun.expand().apply(this.arg.expand());
-  }
-
   traverse (change) {
     const replaced = change(this);
     if (replaced instanceof Expr)
@@ -1011,10 +1010,6 @@ class Lambda extends Expr {
     return change ? new Lambda(this.arg, change) : null;
   }
 
-  expand () {
-    return new Lambda(this.arg, this.impl.expand());
-  }
-
   _rski (options) {
     const impl = this.impl._rski(options);
     if (options.steps >= options.max)
@@ -1145,10 +1140,6 @@ class Alias extends Named {
 
   weight () {
     return this.terminal ? 1 : this.impl.weight();
-  }
-
-  expand () {
-    return this.impl.expand();
   }
 
   traverse (change) {
