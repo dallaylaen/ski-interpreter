@@ -15,7 +15,7 @@ export class Expr {
      */
     apply(...args: Expr): Expr;
     /**
-     * expand all terms but don't perform any calculations
+     * @desc Replace all aliases in the expression with their definitions, recursively.
      * @return {Expr}
      */
     expand(): Expr;
@@ -470,7 +470,6 @@ export class Lambda extends Expr {
     traverse(change: any): Expr | Lambda;
     any(predicate: any): any;
     subst(search: any, replace: any): Lambda;
-    expand(): Lambda;
     _rski(options: any): any;
     diff(other: any, swap?: boolean): string;
     _format(options: any, nargs: any): string;
