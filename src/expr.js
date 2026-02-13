@@ -1138,6 +1138,8 @@ class Alias extends Named {
    */
   constructor (name, impl, options = {}) {
     super(name);
+    if (!(impl instanceof Expr))
+      throw new Error('Attempt to create an alias for a non-expression: ' + impl);
     this.impl = impl;
 
     if (options.note)
@@ -1418,7 +1420,7 @@ function toposort (env, list) {
   if (env) {
     // TODO check in[name].name === name
     if (!list)
-      list = Object.values(env);
+      list = Object.keys(env).sort().map(k => env[k]); // ensure deterministic order
   } else {
     if (!list)
       return [];
