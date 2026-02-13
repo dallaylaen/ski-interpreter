@@ -9,7 +9,12 @@
     "education",
     "interpreter"
   ],
-  "main": "lib/ski-interpreter.min.js",
+  "main": "lib/ski-interpreter.cjs.js",
+  "module": "lib/ski-interpreter.esm.js",
+  "exports": {
+    "import": "./lib/ski-interpreter.esm.js",
+    "require": "./lib/ski-interpreter.cjs.js"
+  },
   "types": "types/index.d.ts",
   "bin": {
     "ski": "bin/ski.js"
@@ -18,10 +23,11 @@
     "lint": "npx eslint --ext .js,.ts src test index.js bin",
     "types": "npx -p typescript tsc index.js --declaration --allowJs --emitDeclarationOnly --outDir types",
     "test": "npx nyc mocha",
-    "minify": "npx esbuild --bundle ./index.js --outfile=docs/build/js/ski-interpreter.min.js --minify --sourcemap",
-    "copy-min": "mkdir -p lib && cp docs/build/js/ski-interpreter.min.js* lib/",
+    "build-web": "npx esbuild --bundle --minify --sourcemap ./index.js --outfile=docs/build/js/ski-interpreter.min.js",
+    "build-cjs": "npx esbuild --bundle --sourcemap --format=cjs ./index.js --outfile=lib/ski-interpreter.cjs.js",
+    "build-esm": "npx esbuild --bundle --sourcemap --format=esm ./index.js --outfile=lib/ski-interpreter.esm.js",
     "build-site": "npx esbuild --bundle ./site-src/index.js --outfile=docs/build/js/util.min.js --minify --sourcemap",
-    "build": "npm run lint && npm run types && npm run test && npm run minify && npm run build-site && npm run copy-min"
+    "build": "npm run lint && npm run types && npm run test && npm run build-cjs && npm run build-esm && npm run build-web && npm run build-site"
   },
   "files": [
     "package.json",

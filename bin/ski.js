@@ -2,7 +2,7 @@
 
 const fs = require('node:fs/promises');
 
-const { SKI } = require('../index');
+const { SKI } = require('../lib/ski-interpreter.cjs');
 
 const [myname, options, positional] = parseArgs(process.argv);
 
