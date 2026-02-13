@@ -57,13 +57,18 @@ describe('SKI.toJSON', () => {
 
     console.log(raw.terms);
 
-    declarationPreceedsUsage(raw.terms, 'SK');
+    declarationPreceedsUsage(raw.terms, 'SKB');
 
     const copy = new SKI(raw);
 
     const expr1 = copy.parse('K(SK)S a b c');
     expect(expr1.run().expr + '').to.equal('a(b c)');
     expect(expr1 + '').to.equal('K(SK)Sa b c');
+
+    const expr2 = copy.parse('B a b c');
+    expect(expr2.run().expr + '').to.equal('a(b c)');
+
+    // expect(copy.getTerms().B?.impl.format().replace(' ', '')).to.equal('K(SK)S');
   });
 });
 
@@ -73,15 +78,15 @@ function declarationPreceedsUsage (list, known = '') {
   const predefined = new Set(known.match(token));
   const defined = new Set();
   for (const line of list) {
-    const [name, expr] = line.split('=').map(s => s.trim());
-    if (defined.has(name) && expr !== '')
+    const [name, impl] = line.split('=').map(s => s.trim());
+    if (defined.has(name) && impl !== '')
       throw new Error(`Term "${name}" declared twice.`);
-    const tokens = expr.match(token) || [];
+    const tokens = impl.replace(/^.*=/, '').match(token) || [];
     for (const token of tokens) {
       if (defined.has(token)) continue;
       if (predefined.has(token)) continue;
       if (token === name) continue; // self-reference allowed
-      throw new Error(`Term "${token}" used before its declaration.`);
+      throw new Error(`Term "${token}" used before its declaration in ${impl.replace(/^.*=/, '')}`);
     }
     defined.add(name);
   }
