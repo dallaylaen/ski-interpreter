@@ -7,7 +7,7 @@ const { Tokenizer, restrict } = require('./internal');
 const classes = require('./expr');
 
 const { Expr, Named, Native, Alias, FreeVar, Lambda, Church } = classes;
-const { native, declare } = Expr;
+const { native } = Expr;
 
 class Empty extends Expr {
   apply (...args) {
@@ -495,7 +495,6 @@ for (const name in native)
 
 SKI.classes = classes;
 SKI.native = native;
-SKI.declare = declare;
 SKI.control = Expr.control;
 
 module.exports = { SKI };

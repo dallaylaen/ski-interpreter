@@ -560,9 +560,6 @@ class Expr {
     throw new Error( 'No _format() method defined in class ' + this.constructor.name );
   }
 
-  // output: string[] /* appended */, inventory: { [key: string]: Expr }, seen: Set<Expr>
-  _declare (output, inventory, seen) {}
-
   /**
    * @desc Convert the expression to a JSON-serializable format.
    * @returns {string}
@@ -773,11 +770,6 @@ class App extends Expr {
       return wrap[0] + fun + (this.fun._unspaced(this.arg) ? '' : options.space) + arg + wrap[1];
     else
       return wrap[0] + fun + options.brackets[0] + arg + options.brackets[1] + wrap[1];
-  }
-
-  _declare (output, inventory, seen) {
-    this.fun._declare(output, inventory, seen);
-    this.arg._declare(output, inventory, seen);
   }
 
   _unspaced (arg) {
@@ -1067,10 +1059,6 @@ class Lambda extends Expr {
       + (nargs > 0 ? options.brackets[1] : '');
   }
 
-  _declare (output, inventory, seen) {
-    this.impl._declare(output, inventory, seen);
-  }
-
   _braced (first) {
     return true;
   }
@@ -1225,21 +1213,6 @@ class Alias extends Named {
       : this.outdated;
     return outdated ? this.impl._format(options, nargs) : super._format(options, nargs);
   }
-
-  _declare (output, inventory, seen) {
-    // this is part of the 'declare' function, see below
-    // only once
-    if (seen.has(this))
-      return;
-    seen.add(this);
-
-    // topological order
-    this.impl._declare(output, inventory, seen);
-
-    // only declare if in inventory and matches
-    if (inventory[this.name] === this)
-      output.push(this.name + '=' + this.impl.format({ terse: true, inventory }));
-  }
 }
 
 // ----- Expr* classes end here -----
@@ -1263,60 +1236,6 @@ addNative(
 );
 
 // utility functions dependent on Expr* classes, in alphabetical order
-
-/**
- *
- * @param {Expr[]} inventory
- * @return {string[]}
- */
-function declare (inventory) {
-  const misnamed = Object.keys(inventory)
-    .filter(s => !(inventory[s] instanceof Named && inventory[s].name === s))
-    .map(s => s + ' = ' + inventory[s]);
-  if (misnamed.length > 0)
-    throw new Error('Inventory must be a hash of named terms with matching names: ' + misnamed.join(', '));
-
-  inventory = { ...inventory }; // shallow copy to avoid mutating input
-
-  // If any aliases mask native terms, those cannot be easily restored.
-  // Moreover, subsequent terms may refer to both native term and and the conflicting alias.
-  // Therefore, we will instead rename such aliases to something else
-  // and only restore them at the end.
-  const detour = [];
-  let tmpId = 1;
-  for (const name in native) {
-    if (!(inventory[name] instanceof Alias))
-      continue;
-    while ('temp' + tmpId in inventory)
-      tmpId++;
-    const temp = 'temp' + tmpId;
-    const orig = inventory[name];
-    delete inventory[name];
-    const masked = new Alias(temp, orig);
-    for (const key in inventory)
-      inventory[key] = inventory[key].subst(orig, masked) ?? inventory[key];
-
-    inventory[temp] = masked;
-    detour.push([name, temp]);
-  }
-
-  // only want to declare aliases
-  const terms = Object.values(inventory)
-    .filter(s => s instanceof Alias)
-    .sort((a, b) => a.name.localeCompare(b.name));
-
-  const out = [];
-  const seen = new Set();
-  for (const term of terms)
-    term._declare(out, inventory, seen);
-
-  for (const [name, temp] of detour) {
-    out.push(name + '=' + temp); // rename
-    out.push(temp + '=');        // delete
-  }
-
-  return out;
-}
 
 function maybeLambda (args, expr, caps = {}) {
   const count = new Array(args.length).fill(0);
@@ -1460,7 +1379,6 @@ function toposort (env, list) {
   };
 }
 
-Expr.declare = declare;
 Expr.native = native;
 Expr.control = control;
 Expr.extras = { toposort };
