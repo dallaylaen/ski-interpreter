@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-02-14
+
+### BREAKING CHANGES
+
+- Remove `Expr.declare()` method for good, use `toposort()` or static `declare` instead
+
+### Added
+
+- `SKI.extras.toposort(list, env)` function to output named terms in dependency order
+- `SKI.extras.declare(term, {env})` function for term declarations
+- `Expr.unroll()` method to get a list of terms
+that give the initial expression when applied
+from left to right: `((a, b), (c, d)) => [a, b, (c, d)]`
+- Parser: Support for chained assignments (`'foo=bar=baz'` expressions)
+- Parser: Support for multi-line comment syntax (`/* comments */`)
+
+### Changed
+
+- Parser improvements and bug fixes for variable handling
+- `expand()` method refactored to use `traverse()`
+- Package now builds both CJS and ESM bundles.
+- Moved source from `lib/` to `src/` directory
+
 ## [2.1.0] - 2026-02-12
 
 ### BREAKING CHANGES
