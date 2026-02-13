@@ -16,7 +16,7 @@ describe('SKI.extras.toposort', () => {
   it('sorts dependencies', () => {
     const expr = ski.parse('T=CI; V=BCT; pair=V x y;');
 
-    const res = SKI.extras.toposort(expr.context.env, [expr]);
+    const res = SKI.extras.toposort([expr], expr.context.env);
 
     // console.log(res);
 

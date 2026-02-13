@@ -273,7 +273,7 @@ class SKI {
 
     // console.log(env);
 
-    const list = Expr.extras.toposort(env).list;
+    const list = Expr.extras.toposort(undefined, env).list;
 
     const detour = new Map();
     if (Object.keys(needDetour).length) {

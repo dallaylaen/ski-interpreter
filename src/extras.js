@@ -138,7 +138,7 @@ function deepFormat (obj, options = {}) {
 }
 
 function declare (expr, env) {
-  const res = Expr.extras.toposort(env, [expr]);
+  const res = Expr.extras.toposort([expr], env);
 
   return res.list.map(s => {
     if (s instanceof Alias)
