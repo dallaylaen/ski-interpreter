@@ -22,7 +22,7 @@
   "scripts": {
     "lint": "npx eslint --ext .js,.ts src test index.js bin",
     "types": "npx -p typescript tsc index.js --declaration --allowJs --emitDeclarationOnly --outDir types",
-    "test": "npx nyc mocha",
+    "test": "npx nyc mocha --recursive test",
     "build-web": "npx esbuild --bundle --minify --sourcemap ./index.js --outfile=docs/build/js/ski-interpreter.min.js",
     "build-cjs": "npx esbuild --bundle --sourcemap --format=cjs ./index.js --outfile=lib/ski-interpreter.cjs.js",
     "build-esm": "npx esbuild --bundle --sourcemap --format=esm ./index.js --outfile=lib/ski-interpreter.esm.js",
