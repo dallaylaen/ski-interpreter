@@ -86,7 +86,8 @@ export class SKI {
         [key: string]: typeof classes.Native | typeof classes.Alias;
     };
     /**
-     * Export term declarations for use in bulkAdd().
+     * @desc Export term declarations for use in bulkAdd().
+     * Currently only Alias terms are serialized.
      * @returns {string[]}
      */
     declare(): string[];
@@ -143,7 +144,9 @@ export class SKI {
     };
 }
 export namespace SKI {
-    export { classes };
+    /**
+     *  Public static shortcuts to common functions (see also ./extras.js)
+     */
     /**
      * @desc Create a proxy object that generates variables on demand,
      *       with names corresponding to the property accessed.
@@ -167,8 +170,8 @@ export namespace SKI {
      * @return {Church}
      */
     export function church(n: number): typeof import("./expr").Church;
+    export { classes };
     export { native };
-    export { declare };
     export let control: {
         descend: (arg0: any) => any;
         prune: (arg0: any) => any;
@@ -179,5 +182,4 @@ import classes = require("./expr");
 declare const native: {
     [key: string]: classes.Native;
 };
-declare const declare: (inventory: Expr[]) => string[];
 export {};

@@ -365,13 +365,18 @@ export class Expr {
      * @private
      */
     private _format;
-    _declare(output: any, inventory: any, seen: any): void;
+    /**
+     * @desc Convert the expression to a JSON-serializable format.
+     * @returns {string}
+     */
     toJSON(): string;
 }
 export namespace Expr {
-    export { declare };
     export { native };
     export { control };
+    export namespace extras {
+        export { toposort };
+    }
 }
 export class App extends Expr {
     /**
@@ -558,12 +563,6 @@ export class Church extends Native {
     diff(other: any, swap?: boolean): string;
 }
 /**
- *
- * @param {Expr[]} inventory
- * @return {string[]}
- */
-declare function declare(inventory: Expr[]): string[];
-/**
  * @type {{[key: string]: Native}}
  */
 declare const native: {
@@ -574,4 +573,8 @@ declare namespace control {
     let prune: (arg0: any) => any;
     let stop: (arg0: any) => any;
 }
+declare function toposort(env: any, list: any): any[] | {
+    list: any[];
+    env: any;
+};
 export {};
