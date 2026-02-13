@@ -254,26 +254,11 @@ class SKI {
         delete env[name];
     }
 
-    // replace aliases with their map counterpart.
-    // we have to go recursive, otherwise an alias will be expanded to its impl
-    // and name infos will be erased
-    const rework = (expr, map) => {
-      return expr.traverse(e => {
-        if (!(e instanceof Alias))
-          return null; // continue
-        const newAlias = map.get(e);
-        if (newAlias)
-          return newAlias;
-        return new Alias(e.name, rework(e.impl, map));
-      }) ?? expr;
-    };
-
     // avert conflicts if native terms were redefined:
     // create a temporary alias for each native term that was redefined;
     // replace usage of redefined term in subexpressions;
     // finally, remove the temporary aliases from the output
-    const detour = new Map();
-    const detourIndex = {};
+    const needDetour = {};
     let i = 1;
     for (const name in native) {
       if (!(env[name] instanceof Alias))
@@ -281,20 +266,35 @@ class SKI {
       while ('tmp' + i in env)
         i++;
       const temp = new Alias('tmp' + i, env[name]);
-      detourIndex[temp] = env[name];
+      needDetour[temp] = env[name];
       env[temp] = temp;
       delete env[name];
     }
 
-    console.log(env);
+    // console.log(env);
 
     const list = Expr.extras.toposort(env).list;
 
-    if (Object.keys(detourIndex).length) {
+    const detour = new Map();
+    if (Object.keys(needDetour).length) {
+      // replace aliases with their detoured counterparts.
+      // we have to go recursive, otherwise an unrelated alias may be expanded to its impl
+      // and name infos will be erased
+      const rework = expr => {
+        return expr.traverse(e => {
+          if (!(e instanceof Alias))
+            return null; // continue
+          const newAlias = detour.get(e);
+          if (newAlias)
+            return newAlias;
+          return new Alias(e.name, rework(e.impl));
+        }) ?? expr;
+      };
+
       for (let i = 0; i < list.length; i++) {
         // upon processing list[i], only terms declared before it may be detoured
         list[i] = rework(list[i], detour);
-        detour.set(detourIndex[list[i].name], list[i]);
+        detour.set(needDetour[list[i].name], list[i]);
         env[list[i].name] = list[i];
         console.log(`list[${i}] = ${list[i].name}=${list[i].impl};`);
       }
@@ -302,7 +302,10 @@ class SKI {
     }
 
     // console.log(res);
-    const out = list.map(e => e.name + '=' + e.impl.format({ inventory: env }));
+    const out = list.map(e => needDetour[e]
+      ? e.name + '=' + needDetour[e].name + '=' + e.impl.format({ inventory: env })
+      : e.name + '=' + e.impl.format({ inventory: env })
+    );
 
     for (const [name, temp] of detour)
       out.push(name + '=' + temp, temp + '=');
@@ -325,27 +328,28 @@ class SKI {
     if (typeof source !== 'string')
       throw new Error('parse: source must be a string, got ' + typeof source);
 
-    const lines = source.replace(/\/\/[^\n]*$/gm, '\n')
+    const lines = source.replace(/\/\/[^\n]*$/gm, ' ')
       .replace(/\/\*.*?\*\//gs, ' ')
+      .trim()
       .split(/\s*;[\s;]*/).filter( s => s.match(/\S/));
 
     const jar = { ...options.env };
 
     let expr = new Empty();
     for (const item of lines) {
-      const [_, save, str] = item.match(/^(?:\s*([A-Z]|[a-z][a-z_0-9]*)\s*=\s*)?(.*)$/s);
-
       if (expr instanceof Alias)
         expr.outdated = true;
-      expr = (str === '' && save !== undefined)
-        ? new FreeVar(save, options.scope ?? SKI)
-        : this.parseLine(str, jar, options);
 
-      if (save !== undefined) {
-        if (jar[save] !== undefined)
-          throw new Error('Attempt to redefine a known term: ' + save);
-        expr = maybeAlias(save, expr);
-        jar[save] = expr;
+      const def = item.match(/^([A-Z]|[a-z][a-z_0-9]*)\s*=(.*)$/s);
+      if (def && def[2] === '')
+        expr = new FreeVar(def[1], options.scope ?? SKI);
+      else
+        expr = this.parseLine(item, jar, options);
+
+      if (def) {
+        if (jar[def[1]] !== undefined)
+          throw new Error('Attempt to redefine a known term: ' + def[1]);
+        jar[def[1]] = expr;
       }
 
       // console.log('parsed line:', item, '; got:', expr,'; jar now: ', jar);
@@ -373,6 +377,10 @@ class SKI {
    * @return {Expr} parsed expression
    */
   parseLine (source, env = {}, options = {}) {
+    const aliased = source.match(/^\s*([A-Z]|[a-z][a-z_0-9]*)\s*=\s*(.*)$/s);
+    if (aliased)
+      return new Alias(aliased[1], this.parseLine(aliased[2], env, options));
+
     const opt = {
       numbers: options.numbers ?? this.hasNumbers,
       lambdas: options.lambdas ?? this.hasLambdas,
@@ -438,12 +446,6 @@ class SKI {
       terms:    this.declare(),
     }
   }
-}
-
-function maybeAlias (name, expr) {
-  if (expr instanceof Named && expr.name === name)
-    return expr;
-  return new Alias(name, expr);
 }
 
 /**
