@@ -245,7 +245,47 @@ class SKI {
    */
   declare () {
     // TODO accept argument to declare specific terms only
-    return declare(this.getTerms());
+    const env = this.getTerms();
+
+    // not serializing native terms, and we don't care about free vars
+    for (const name in env) {
+      if (!(env[name] instanceof Alias))
+        delete env[name];
+    }
+
+    // avert conflicts if native terms were redefined:
+    // create a temporary alias for each native term that was redefined;
+    // replace usage of redefined term in subexpressions;
+    // finally, remove the temporary aliases from the output
+    const detour = new Map();
+    let i = 1;
+    for (const name in native) {
+      if (!(env[name] instanceof Alias))
+        continue;
+      while ('tmp' + i in env)
+        i++;
+      const temp = new Alias('tmp' + i, env[name]);
+      detour.set(env[name], temp);
+      // console.log('before rework', list);
+
+      // console.log('detouring', name, 'to', temp.name);
+      env[temp] = temp;
+      delete env[name];
+    }
+
+    if (detour.size) {
+      for (const name in env)
+        env[name] = rework(env[name], detour);
+    }
+
+    const res = Expr.extras.toposort(env);
+    // console.log(res);
+    const out = res.list.map(e => e.name + '=' + e.impl.format({ inventory: env }));
+
+    for (const [name, temp] of detour)
+      out.push(name + '=' + temp, temp + '=');
+
+    return out;
   }
 
   /**
@@ -384,7 +424,20 @@ function maybeAlias (name, expr) {
   return new Alias(name, expr);
 }
 
-// Create shortcuts for common terms
+function rework (expr, map) {
+  return expr.traverse(e => {
+    if (!(e instanceof Alias))
+      return null; // continue
+    const newAlias = map.get(e);
+    if (newAlias)
+      return newAlias;
+    return new Alias(e.name, rework(e.impl, map));
+  }) ?? expr;
+}
+
+/**
+ *  Public static shortcuts to common functions (see also ./extras.js)
+ */
 
 /**
  * @desc Create a proxy object that generates variables on demand,

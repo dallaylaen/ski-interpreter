@@ -50,9 +50,12 @@ describe('SKI.toJSON', () => {
     ski.add('S', 'K');
     ski.add('K', 'tmp');
     ski.remove('tmp');
+    ski.add('B', 'K(SK)S');
 
     const str = JSON.stringify(ski);
     const raw = JSON.parse(str);
+
+    console.log(raw.terms);
 
     declarationPreceedsUsage(raw.terms, 'SK');
 
@@ -60,18 +63,23 @@ describe('SKI.toJSON', () => {
 
     const expr1 = copy.parse('K(SK)S a b c');
     expect(expr1.run().expr + '').to.equal('a(b c)');
+    expect(expr1 + '').to.equal('K(SK)Sa b c');
   });
 });
 
 function declarationPreceedsUsage (list, known = '') {
   // list = ['foo = bar baz', 'quux = foo ...', ...]
   const token = /\b[a-z_][a-z_0-9]*\b|[A-Z]/g;
-  const defined = new Set( known.match(token) || [] );
+  const predefined = new Set(known.match(token));
+  const defined = new Set();
   for (const line of list) {
     const [name, expr] = line.split('=').map(s => s.trim());
+    if (defined.has(name) && expr !== '')
+      throw new Error(`Term "${name}" declared twice.`);
     const tokens = expr.match(token) || [];
     for (const token of tokens) {
       if (defined.has(token)) continue;
+      if (predefined.has(token)) continue;
       if (token === name) continue; // self-reference allowed
       throw new Error(`Term "${token}" used before its declaration.`);
     }
