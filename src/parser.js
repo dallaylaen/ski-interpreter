@@ -240,7 +240,8 @@ class SKI {
   }
 
   /**
-   * Export term declarations for use in bulkAdd().
+   * @desc Export term declarations for use in bulkAdd().
+   * Currently only Alias terms are serialized.
    * @returns {string[]}
    */
   declare () {
@@ -253,11 +254,26 @@ class SKI {
         delete env[name];
     }
 
+    // replace aliases with their map counterpart.
+    // we have to go recursive, otherwise an alias will be expanded to its impl
+    // and name infos will be erased
+    const rework = (expr, map) => {
+      return expr.traverse(e => {
+        if (!(e instanceof Alias))
+          return null; // continue
+        const newAlias = map.get(e);
+        if (newAlias)
+          return newAlias;
+        return new Alias(e.name, rework(e.impl, map));
+      }) ?? expr;
+    };
+
     // avert conflicts if native terms were redefined:
     // create a temporary alias for each native term that was redefined;
     // replace usage of redefined term in subexpressions;
     // finally, remove the temporary aliases from the output
     const detour = new Map();
+    const detourIndex = {};
     let i = 1;
     for (const name in native) {
       if (!(env[name] instanceof Alias))
@@ -265,22 +281,28 @@ class SKI {
       while ('tmp' + i in env)
         i++;
       const temp = new Alias('tmp' + i, env[name]);
-      detour.set(env[name], temp);
-      // console.log('before rework', list);
-
-      // console.log('detouring', name, 'to', temp.name);
+      detourIndex[temp] = env[name];
       env[temp] = temp;
       delete env[name];
     }
 
-    if (detour.size) {
-      for (const name in env)
-        env[name] = rework(env[name], detour);
+    console.log(env);
+
+    const list = Expr.extras.toposort(env).list;
+
+    if (Object.keys(detourIndex).length) {
+      for (let i = 0; i < list.length; i++) {
+        // upon processing list[i], only terms declared before it may be detoured
+        list[i] = rework(list[i], detour);
+        detour.set(detourIndex[list[i].name], list[i]);
+        env[list[i].name] = list[i];
+        console.log(`list[${i}] = ${list[i].name}=${list[i].impl};`);
+      }
+      console.log('detour:', detour);
     }
 
-    const res = Expr.extras.toposort(env);
     // console.log(res);
-    const out = res.list.map(e => e.name + '=' + e.impl.format({ inventory: env }));
+    const out = list.map(e => e.name + '=' + e.impl.format({ inventory: env }));
 
     for (const [name, temp] of detour)
       out.push(name + '=' + temp, temp + '=');
@@ -422,17 +444,6 @@ function maybeAlias (name, expr) {
   if (expr instanceof Named && expr.name === name)
     return expr;
   return new Alias(name, expr);
-}
-
-function rework (expr, map) {
-  return expr.traverse(e => {
-    if (!(e instanceof Alias))
-      return null; // continue
-    const newAlias = map.get(e);
-    if (newAlias)
-      return newAlias;
-    return new Alias(e.name, rework(e.impl, map));
-  }) ?? expr;
 }
 
 /**
