@@ -54,5 +54,5 @@ export function search(seed: Expr[], options: {
  * @returns {any}
  */
 export function deepFormat(obj: any, options?: object): any;
-export function declare(expr: any, env: any): any;
+export function declare(expr: any, env: any): string;
 import { Expr } from "./expr";
