@@ -93,7 +93,7 @@ class QuestBox {
   }
 
   draw (element) {
-    this.view.frame = append(element, 'div', { class: ['quest-box'] });
+    this.view.frame = append(element, 'div', { class: ['ski-quest-box'] });
     this.view.frame.id = this.name;
 
     const title = append(this.view.frame, 'h3');
@@ -106,16 +106,16 @@ class QuestBox {
     const allowed = this.impl.allowed();
     if (allowed)
       append(title, 'span', { content: ' [' + allowed + ']' });
-    this.view.stat = append(title, 'span', { class: ['float-right'] });
+    this.view.stat = append(title, 'span', { class: ['ski-quest-float-right'] });
 
     const descr = append(body, 'div');
-    append(descr, 'div', { content: cat(this.impl.intro), class: ['note'] });
+    append(descr, 'div', { content: cat(this.impl.intro), class: ['ski-quest-note'] });
     if (this.impl.meta.hint)
       hint(descr, ' Hint:...', ' Hint: ' + this.impl.meta.hint);
 
-    this.view.display = append(body, 'div', { class: ['quest-display'], content: '.....' });
+    this.view.display = append(body, 'div', { class: ['ski-quest-display'], content: '.....' });
 
-    this.view.solution = append(body, 'div', { class: ['quest-solution'] });
+    this.view.solution = append(body, 'div', { class: ['ski-quest-solution'] });
 
     this.drawInput(this.view.solution);
 
@@ -128,10 +128,10 @@ class QuestBox {
 
     for (const item of spec) {
       if (multi) {
-        const label = append(element, 'div', { class: ['label'] });
+        const label = append(element, 'div', { class: ['ski-quest-label'] });
         append(label, 'b', { content: item.name });
         if (item.note)
-          append(label, 'span', { content: ' // ' + item.note, class: ['comment'] });
+          append(label, 'span', { content: ' // ' + item.note, class: ['ski-quest-comment'] });
       }
       const input = append(element, 'input');
       input.type = 'text';
@@ -169,15 +169,15 @@ class QuestBox {
     append(echo, 'span', { content: 'Your solution: ' + expand(result.expr) + ' ' });
 
     if (result.exception)
-      append(this.view.display, 'div', { class: ['error'], content: 'Execution failed: ' + result.exception });
+      append(this.view.display, 'div', { class: ['ski-quest-error'], content: 'Execution failed: ' + result.exception });
 
     for (const item of result.details) {
-      const line = append(this.view.display, 'div', { class: item.pass ? ['success'] : ['error'] });
+      const line = append(this.view.display, 'div', { class: item.pass ? ['ski-quest-success'] : ['ski-quest-error'] });
       append(line, 'span', { content: item.pass ? '&check; ' : '&cross; ' });
       append(line, 'span', { content: `${item.start} &rarr; ${item.found} ` });
-      const showSteps = append(line, 'a', { content: `in ${item.steps} steps`, class: ['control'] });
+      const showSteps = append(line, 'a', { content: `in ${item.steps} steps`, class: ['ski-quest-control'] });
       append(line, 'span', { content: ' ' });
-      const hideSteps = append(line, 'a', { content: ' (hide)', class: ['control'], hidden: true });
+      const hideSteps = append(line, 'a', { content: ' (hide)', class: ['ski-quest-control'], hidden: true });
 
       if (!item.pass) {
         append(line, 'br');
@@ -196,7 +196,7 @@ class QuestBox {
         termDiv.innerHTML = '';
         hideSteps.hidden = false;
         const box = new EvalBox(termDiv, { engine: this.engine, height: Infinity, max: item.steps + 2, headless: true });
-        box.run(item.start);
+        box.start(item.start);
       };
       hideSteps.onclick = () => {
         termDiv.innerHTML = '';
@@ -281,7 +281,7 @@ class Chapter {
   }
 
   attach (element, options) {
-    this.view.frame = append(element, 'div', { class: ['chapter'] });
+    this.view.frame = append(element, 'div', { class: ['ski-quest-chapter'] });
     this.view.frame.id = this.id;
 
     if (options.placeholder)
@@ -295,11 +295,11 @@ class Chapter {
     const title = append(this.view.frame, 'h2');
     const body = append(this.view.frame, 'div');
     append(title, 'span', { content: 'Chapter ' + this.number + ': ' + this.options.name });
-    this.view.stat = append(title, 'span', { class: ['float-right'] });
+    this.view.stat = append(title, 'span', { class: ['ski-quest-float-right'] });
     title.onclick = () => { showhide(body, this.visible = !this.visible) };
 
-    this.view.intro = append(body, 'div', { content: cat(this.options.intro), class: ['note', 'chapter-intro'] });
-    this.view.content = append(body, 'div', { class: ['chapter-content'] });
+    this.view.intro = append(body, 'div', { content: cat(this.options.intro), class: ['ski-quest-note', 'ski-quest-chapter-intro'] });
+    this.view.content = append(body, 'div', { class: ['ski-quest-chapter-content'] });
 
     for (const quest of this.quests) {
       quest.load();
@@ -326,7 +326,7 @@ class Chapter {
     const link = append(element, 'a');
     link.href = '#' + this.id;
     this.view.link = link;
-    this.view.progressbar = append(link, 'span', { class: ['completion'] });
+    this.view.progressbar = append(link, 'span', { class: ['ski-quest-completion'] });
     this.view.linkText = append(link, 'span', { content: 'Chapter ' + this.number + '...' });
   }
 
@@ -342,7 +342,7 @@ class Chapter {
 
 function hint (element, shown, hidden) {
   const container = append(element, 'span', {});
-  const clickme = append(container, 'span', { content: shown, class: ['hint'] });
+  const clickme = append(container, 'span', { content: shown, class: ['ski-quest-hint'] });
   clickme.onclick = () => {
     clickme.remove();
     append(container, 'span', { content: hidden });

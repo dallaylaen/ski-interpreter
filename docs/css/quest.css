@@ -1,22 +1,22 @@
 /* quest-specific */
 
-.quest-box {
+.ski-quest-box {
     margin: 0.5em;
     border: 0.3em solid maroon;
     padding: 0.2em;
     border-radius: 0.5em;
 }
-.chapter {
+.ski-quest-chapter {
     border: maroon solid 0.3em;
     border-radius: 0.5em;
     background-color: antiquewhite;
 }
 
-.chapter ~ .chapter {
+.ski-quest-chapter ~ .ski-quest-chapter {
     margin-top: 1em;
 }
 
-.chapter h2 {
+.ski-quest-chapter h2 {
     background-color: maroon;
     color: palegoldenrod;
     font-weight: bold;
@@ -25,7 +25,7 @@
     margin: 0;
 }
 
-.chapter h3 {
+.ski-quest-chapter h3 {
     background-color: maroon;
     color: palegoldenrod;
     font-weight: bold;
@@ -36,39 +36,39 @@
     border-radius: 0.7em;
 }
 
-.chapter h3 a {
+.ski-quest-chapter h3 a {
     color: inherit;
     text-decoration: inherit;
 }
 
-.chapter .note {
+.ski-quest-chapter .ski-quest-note {
     margin: 1ex;
 }
 
-.chapter code {
+.ski-quest-chapter code {
     font-family: inherit;
     font-style: italic;
     color: indigo;
     white-space: nowrap;
 }
 
-.quest-box .note {
+.ski-quest-box .ski-quest-note {
     border: 1px solid goldenrod;
     border-radius: 0.5em;
     padding: 0 0.5em;
     margin: 1ex 0;
 }
-.quest-box textarea {
+.ski-quest-box textarea {
     width: 80%;
     field-sizing: content;
     min-width: 10em;
     min-height: 1em;
 }
-.quest-box input[type="text"] {
+.ski-quest-box input[type="text"] {
     width: 80%;
     font-family: monospace;
 }
-.quest-box .label {
+.ski-quest-box .ski-quest-label {
     font-size: small;
 }
 
@@ -78,9 +78,51 @@
     border: 1px solid black;
 }
 
-.quest-inventory h3 {
+.ski-quest-inventory h3 {
     color: maroon;
     font-weight: bold;
     text-align: center;
     margin: 0.2em;
+}
+
+.ski-quest-float-right {
+    display: inline-block;
+    float: right;
+}
+
+.ski-quest-error {
+    color: red;
+}
+
+.ski-quest-success {
+    color: green;
+}
+
+.ski-quest-hint {
+    cursor: pointer;
+}
+
+.ski-quest-completion {
+    background-color: lightgreen;
+    border-radius: 0.2em;
+}
+
+.ski-quest-control {
+    /* display: inline-block; */
+    /* border: 1px solid cornflowerblue; */
+    border-radius: 0.5em;
+    padding: -0.1em 0.7em;
+    margin: 0.1em 0.3em;
+    color: cornflowerblue;
+    /* background-color: white; */
+}
+
+.ski-quest-control:hover {
+    cursor: pointer;
+    background-color: lightyellow;
+}
+
+.ski-quest-comment {
+    color: grey;
+    font-style: italic;
 }
