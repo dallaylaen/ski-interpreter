@@ -1,22 +1,22 @@
 export type CaseResult = {
     pass: boolean;
-    reason: string | null;
+    reason?: string;
     steps: number;
     start: typeof import("./expr").Expr;
     found: typeof import("./expr").Expr;
     expected: typeof import("./expr").Expr;
-    note: string | null;
+    note?: string;
     args: typeof import("./expr").Expr[];
     case: Case;
 };
 export type Capability = {
-    linear: boolean | null;
-    affine: boolean | null;
-    normal: boolean | null;
-    proper: boolean | null;
-    discard: boolean | null;
-    duplicate: boolean | null;
-    arity: number | null;
+    linear?: boolean;
+    affine?: boolean;
+    normal?: boolean;
+    proper?: boolean;
+    discard?: boolean;
+    duplicate?: boolean;
+    arity?: number;
 };
 export type InputSpec = string | {
     name: string;
@@ -37,32 +37,32 @@ export type QuestResult = {
 /**
  * @typedef {{
  *   pass: boolean,
- *   reason: string?,
+ *   reason?: string,
  *   steps: number,
  *   start: Expr,
  *   found: Expr,
  *   expected: Expr,
- *   note: string?,
+ *   note?: string,
  *   args: Expr[],
  *   case: Case
  * }} CaseResult
  */
 /**
  * @typedef {{
- *   linear: boolean?,
- *   affine: boolean?,
- *   normal: boolean?,
- *   proper: boolean?,
- *   discard: boolean?,
- *   duplicate: boolean?,
- *   arity: number?,
+ *   linear?: boolean,
+ *   affine?: boolean,
+ *   normal?: boolean,
+ *   proper?: boolean,
+ *   discard?: boolean,
+ *   duplicate?: boolean,
+ *   arity?: number,
  * }} Capability
  */
 /**
  * @typedef {
  *   [string, string]
- *   | [{max: number?}, string, string]
- *   | [{caps: Capability, max: number?}, string]
+ *   | [{max?: number}, string, string]
+ *   | [{caps: Capability, max?: number}, string]
  * } TestCase
  */
 /**

@@ -158,7 +158,7 @@ export class Expr {
      *   latin?: number,
      * }} options
      * @param {number} [maxWeight] - maximum allowed weight of terms in the sequence
-     * @return {IterableIterator<{expr: Expr, steps: number?, comment: string?}>}
+     * @return {IterableIterator<{expr: Expr, steps?: number, comment?: string}>}
      */
     toLambda(options?: {
         max?: number;
@@ -169,8 +169,8 @@ export class Expr {
         latin?: number;
     }): IterableIterator<{
         expr: Expr;
-        steps: number | null;
-        comment: string | null;
+        steps?: number;
+        comment?: string;
     }>;
     /**
      * @desc Rewrite the expression into S, K, and I combinators step by step.
@@ -241,14 +241,14 @@ export class Expr {
      * @desc Run uninterrupted sequence of step() applications
      *       until the expression is irreducible, or max number of steps is reached.
      *       Default number of steps = 1000.
-     * @param {{max: number?, steps: number?, throw: boolean?}|Expr} [opt]
+     * @param {{max?: number, steps?: number, throw?: boolean}|Expr} [opt]
      * @param {Expr} args
      * @return {{expr: Expr, steps: number, final: boolean}}
      */
     run(opt?: {
-        max: number | null;
-        steps: number | null;
-        throw: boolean | null;
+        max?: number;
+        steps?: number;
+        throw?: boolean;
     } | Expr, ...args: Expr): {
         expr: Expr;
         steps: number;
@@ -257,11 +257,11 @@ export class Expr {
     /**
      * Execute step() while possible, yielding a brief description of events after each step.
      * Mnemonics: like run() but slower.
-     * @param {{max: number?}} options
+     * @param {{max?: number}} options
      * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
      */
     walk(options?: {
-        max: number | null;
+        max?: number;
     }): IterableIterator<{
         final: boolean;
         expr: Expr;
@@ -417,6 +417,16 @@ export class App extends Expr {
     } | {
         normal: boolean;
         steps: number;
+    } | {
+        expr: Expr;
+        arity?: number;
+        skip?: Set<number>;
+        dup?: Set<number>;
+        duplicate?: any;
+        discard?: any;
+        proper: boolean;
+        normal: boolean;
+        steps: number;
     };
     traverse(change: any): Expr;
     any(predicate: any): any;
@@ -558,14 +568,14 @@ export class Alias extends Named {
      *
      * @param {String} name
      * @param {Expr} impl
-     * @param {{canonize: boolean?, max: number?, maxArgs: number?, note: string?, terminal: boolean?}} [options]
+     * @param {{canonize?: boolean, max?: number, maxArgs?: number, note?: string, terminal?: boolean}} [options]
      */
     constructor(name: string, impl: Expr, options?: {
-        canonize: boolean | null;
-        max: number | null;
-        maxArgs: number | null;
-        note: string | null;
-        terminal: boolean | null;
+        canonize?: boolean;
+        max?: number;
+        maxArgs?: number;
+        note?: string;
+        terminal?: boolean;
     });
     impl: Expr;
     note: string;
