@@ -8,4 +8,332 @@
  * @requires append
  */
 
+/* global SKI, store, EvalBox, append */
 
+class QuestBox {
+  constructor (spec, options) {
+    this.impl = new SKI.Quest({ ...spec, engine: ski });
+    this.name = 'quest-' + this.impl.id;
+    this.chapter = options.chapter;
+    if (this.chapter && options.number)
+      this.number = this.chapter.number + '.' + options.number;
+    this.view = {};
+    this.input = [];
+  }
+
+  load () {
+    const data = store.load(this.name) ?? {};
+    this.status = {
+      solved:   data.solved ?? false,
+      steps:    data.steps ?? 0,
+      attempts: data.attempts ?? 0,
+      weight:   data.weight ?? 0,
+      total:    data.total ?? 0,
+    };
+    if (this.status.solved)
+      this.onSolved();
+    return this;
+  }
+
+  save () {
+    store.save(this.name, this.status);
+    return this;
+  }
+
+  update (result) {
+    if (this.status.solved)
+      return;
+    this.status.attempts++;
+    this.status.total += result.steps;
+    this.status.steps = result.steps;
+    this.status.weight = result.weight;
+    if (result.pass) {
+      this.status.solved = true;
+      this.onSolved(result);
+    }
+    this.save();
+    this.showStatus();
+  }
+
+  onSolved (result) {
+    if (this.impl.meta.unlock && result) {
+      ski.maybeAdd(this.impl.meta.unlock, result.expr.expand());
+      store.save('engine', ski);
+      showKnown();
+    }
+    if (this.chapter)
+      this.chapter.addSolved(this.impl.id);
+  }
+
+  check () {
+    if (this.view.display)
+      this.view.display.innerHTML = 'running...';
+    const got = this.input.map(x => x.value);
+    const result = this.impl.check(...got);
+    this.showResult(result);
+    this.update(result);
+  }
+
+  draw (element) {
+    this.view.frame = append(element, 'div', { class: ['quest-box'] });
+    this.view.frame.id = this.name;
+
+    const title = append(this.view.frame, 'h3');
+    const body = append(this.view.frame, 'div');
+    const expand = append(title, 'a', { content: this.number ? '#' + this.number + '' : 'Quest' });
+    expand.href = '#' + this.name;
+    expand.onclick = () => showhide(body, true);
+
+    append(title, 'span', { content: ' ' + this.impl.name });
+    const allowed = this.impl.allowed();
+    if (allowed)
+      append(title, 'span', { content: ' [' + allowed + ']' });
+    this.view.stat = append(title, 'span', { class: ['float-right'] });
+
+    const descr = append(body, 'div');
+    append(descr, 'div', { content: cat(this.impl.intro), class: ['note'] });
+    if (this.impl.meta.hint)
+      hint(descr, ' Hint:...', ' Hint: ' + this.impl.meta.hint);
+
+    this.view.display = append(body, 'div', { class: ['quest-display'], content: '.....' });
+
+    this.view.solution = append(body, 'div', { class: ['quest-solution'] });
+
+    this.drawInput(this.view.solution);
+
+    this.showStatus();
+  }
+
+  drawInput (element) {
+    const spec = this.impl.input;
+    const multi = spec.length !== 1;
+
+    for (const item of spec) {
+      if (multi) {
+        const label = append(element, 'div', { class: ['label'] });
+        append(label, 'b', { content: item.name });
+        if (item.note)
+          append(label, 'span', { content: ' // ' + item.note, class: ['comment'] });
+      }
+      const input = append(element, 'input');
+      input.type = 'text';
+      input.onkeydown = e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.check();
+        }
+      };
+      this.input.push(input);
+      append(element, 'br');
+    }
+
+    const btn = append(element, 'button', { content: 'solve!' });
+    btn.onclick = () => this.check();
+    this.view.moveOn = append(element, 'button', { content: 'move on >>', hidden: true });
+    this.view.moveOn.onclick = () => showhide(body, false);
+  }
+
+  showStatus () {
+    if (!this.view.stat)
+      return;
+    if (this.status.attempts) {
+      const tries = 'in ' + this.status.attempts + (this.status.attempts === 1 ? ' try' : ' tries');
+      const steps = this.status.solved
+        ? '&check; ' + this.status.steps + ' steps/' + this.status.weight + ' terms '
+        : this.status.total + ' total steps ';
+      this.view.stat.innerHTML = steps + ' ' + tries;
+    }
+  }
+
+  showResult (result) {
+    if (!this.view.display)
+      return;
+    this.view.display.innerHTML = '';
+    const echo = append(this.view.display, 'div');
+    append(echo, 'span', { content: 'Your solution: ' + expand(result.expr) + ' ' });
+
+    if (result.exception)
+      append(this.view.display, 'div', { class: ['error'], content: 'Execution failed: ' + result.exception });
+
+    for (const item of result.details) {
+      const line = append(this.view.display, 'div', { class: item.pass ? ['success'] : ['error'] });
+      append(line, 'span', { content: item.pass ? '&check; ' : '&cross; ' });
+      append(line, 'span', { content: `${item.start} &rarr; ${item.found} ` });
+      const showSteps = append(line, 'a', { content: `in ${item.steps} steps`, class: ['control'] });
+      append(line, 'span', { content: ' ' });
+      const hideSteps = append(line, 'a', { content: ' (hide)', class: ['control'], hidden: true });
+
+      if (!item.pass) {
+        append(line, 'br');
+        if (item.expected !== undefined) {
+          append(line, 'span', { content: '&nbsp;&nbsp;' + 'expected: ' + item.expected });
+          append(line, 'br');
+        }
+        if (item.reason) {
+          append(line, 'span', { content: '&nbsp;&nbsp;' + item.reason });
+          append(line, 'br');
+        }
+      }
+      // replay specific test case via EvalBox
+      const termDiv = append(line, 'div', {});
+      showSteps.onclick = () => {
+        termDiv.innerHTML = '';
+        hideSteps.hidden = false;
+        const box = new EvalBox(termDiv, { engine: ski, height: Infinity, max: item.steps + 2, headless: true });
+        box.run(item.start);
+      };
+      hideSteps.onclick = () => {
+        termDiv.innerHTML = '';
+        hideSteps.hidden = true;
+      };
+    }
+  }
+}
+
+let chapterId = 0;
+class Chapter {
+  constructor (options) {
+    this.options = options;
+    this.quests = [];
+    this.solved = new Set();
+    this.view = {};
+    this.number = options.number ?? ++chapterId;
+    this.updateMeta();
+  }
+
+  updateMeta (meta = {}) {
+    this.options = { ...this.options, ...meta };
+    this.id = 'chapter-' + (meta.id ?? this.number);
+    if (this.view.frame)
+      this.view.frame.id = this.id;
+    if (this.view.link)
+      this.view.link.href = '#' + this.id;
+    if (this.options.name && this.view.linkText)
+      this.view.linkText.innerHTML = 'Chapter ' + this.number + ': ' + this.options.name;
+  }
+
+  fetch () {
+    return fetch(questDir + this.options.link)
+      .then( resp => resp.json() )
+      .then(data => {
+        if (Array.isArray(data))
+          data = { content: data };
+        if (!Array.isArray(data.content))
+          throw new Error('Invalid quest list in ' + this.options.link);
+
+        this.updateMeta(data);
+
+        let k = 0;
+        for (const item of data.content)
+          this.quests.push(new QuestBox(item, { chapter: this, number: ++k }));
+
+        return this;
+      });
+  }
+
+  addSolved (questId) {
+    if (this.solved.has(questId))
+      return;
+    this.solved.add(questId);
+    this.showStatus();
+  }
+
+  getProgress () {
+    return {
+      total:      this.quests.length,
+      solved:     this.solved.size,
+      complete:   this.solved.size === this.quests.length,
+      percentage: Math.round(this.solved.size / this.quests.length * 100),
+    }
+  }
+
+  attach (element, options) {
+    this.view.frame = append(element, 'div', { class: ['chapter'] });
+    this.view.frame.id = this.id;
+
+    if (options.placeholder)
+      this.view.placeholder = append(this.view.frame, 'div', { content: options.placeholder });
+    return this;
+  }
+
+  draw () {
+    this.visible = true;
+    this.view.placeholder?.remove();
+    const title = append(this.view.frame, 'h2');
+    const body = append(this.view.frame, 'div');
+    append(title, 'span', { content: 'Chapter ' + this.number + ': ' + this.options.name });
+    this.view.stat = append(title, 'span', { class: ['float-right'] });
+    title.onclick = () => showhide(body, this.visible = !this.visible);
+
+    this.view.intro = append(body, 'div', { content: cat(this.options.intro), class: ['note', 'chapter-intro'] });
+    this.view.content = append(body, 'div', { class: ['chapter-content'] });
+
+    for (const quest of this.quests) {
+      quest.load();
+      quest.draw(this.view.content);
+    }
+
+    this.showStatus();
+  }
+
+  showStatus () {
+    if (!this.view.stat)
+      return;
+    const progress = this.getProgress();
+    this.view.stat.innerHTML = 'Progress: ' + progress.solved + '/' + progress.total + ' (' + progress.percentage + '%)';
+    if (progress.complete)
+      this.view.stat.classList.add('success');
+    if (this.view.progressbar) {
+      this.view.progressbar.style.paddingRight = progress.percentage + '%';
+      this.view.progressbar.style.marginRight = -progress.percentage + '%';
+    }
+  }
+
+  addLink (element) {
+    const link = append(element, 'a');
+    link.href = '#' + this.id;
+    this.view.link = link;
+    this.view.progressbar = append(link, 'span', { class: ['completion'] });
+    this.view.linkText = append(link, 'span', { content: 'Chapter ' + this.number + '...' });
+  }
+
+  // TODO hide solved chapters
+}
+
+/**
+ * @desc Create a self-revealing spoiler
+ * @param element
+ * @param shown
+ * @param hidden
+ */
+
+function hint (element, shown, hidden) {
+  const container = append(element, 'span', {});
+  const clickme = append(container, 'span', { content: shown, class: ['hint'] });
+  clickme.onclick = () => {
+    clickme.remove();
+    append(container, 'span', { content: hidden });
+  };
+}
+
+/**
+ * @desc Coerce array of strings to string
+ * @param {string[]|string|number} input
+ * @return {string}
+ */
+function cat (input) {
+  if (Array.isArray(input))
+    return input.join(' ');
+  else
+    return '' + input;
+}
+
+function expand (expr) {
+  return expr instanceof SKI.classes.Expr
+    ? (
+      expr instanceof SKI.classes.Alias
+        ? expr.name + ' = ' + expr.expand()
+        : '' + expr.expand()
+    )
+    : '' + expr;
+}
