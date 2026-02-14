@@ -5,36 +5,54 @@
     <title>Quests - Simple Kombinator Interpreter</title>
     <link rel="shortcut icon" type="image/png" href="img/ski-64.png">
     <script src="build/js/ski-interpreter.min.js"></script>
-    <script src="js/util-html.js"></script>
-    <script src="js/util-ski.js"></script>
+    <script src="build/js/util.min.js"></script>
+    <script src="js/quest.js"></script>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/quest.css">
+    <style>
+        body {
+            height: 100vh;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: 15fr 70fr 15fr;
+            grid-template-rows: auto 1fr auto;
+            grid-template-areas:
+               "header header header"
+               "chapters main inventory"
+               "footer footer footer";
+        }
+    </style>
+    <script>
+        // TODO: move elsewhere
+        function showTerm(term) {
+            return term.note ?? (term.impl ?? term).format({html: true, lambda: ['', ' &mapsto; ', '']});
+        }
+    </script>
 </head>
 <body>
-<div class="layout" id="top">
-    <div class="float-left"><span id="menu" class="big">&#9776;</span></div>
-    <h1><img src="img/mock1.png">Simple Kombinator Interpreter Quests<img src="img/mock2.png"></h1>
-</div>
-<div class="layout" id="main">
-    <div class="side pane" style="width: 15%">
+    <header id="top" class="layout" style="grid-area: header;">
+        <div class="float-left"><span id="menu" class="big">&#9776;</span></div>
+        <h1><img src="img/mock1.png">Simple Kombinator Interpreter Quests<img src="img/mock2.png"></h1>
+    </header>
+    <div class="side pane" style="grid-area: chapters;">
         <div class="content-table" id="chapterlist"></div>
     </div>
-    <div class="pane" id="quest" style="width: 70%;"></div>
-    <div class="side pane" style="width: 15%">
+    <div class="pane" id="quest" style="grid-area: main;"></div>
+    <div class="side pane" style="grid-area: inventory;">
         <div class="quest-inventory quest-box">
             <h3>Inventory</h3>
             <dl id="known" class="term-list">
             </dl>
         </div>
     </div>
-</div>
-<div class="layout" id="bottom">
-    <div>
-        <small>&copy;&thinsp;2024&thinsp;&ndash;&thinsp;2025
-        <a href="https://github.com/dallaylaen" target="_blank">dallaylaen</a>
-        (<a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">sources</a>)</small>
-    </div>
-</div>
+    <footer class="layout" id="bottom" style="grid-area: footer; text-align: center; font-size: smaller;">
+        <div>
+            &copy;&thinsp;2024&thinsp;&ndash;&thinsp;2026
+            <a href="https://github.com/dallaylaen" target="_blank">dallaylaen</a>
+            (<a href="https://github.com/dallaylaen/ski-interpreter" target="_blank">sources</a>)
+        </div>
+    </footer>
 <script>
     const { Expr } = SKI.classes; // just for type annotations
 
@@ -45,12 +63,11 @@
 
     const chapters = [];
 
-    const view = grabView('quest', 'known', 'chapterlist', 'menu');
+    const view = util.grabView('quest', 'known', 'chapterlist', 'menu');
     const questDir = 'quest-data/';
 
     const linkedTo = window.location.hash.slice(1);
 
-    rubberDesign('main');
     showKnown();
 
     initMenu();
