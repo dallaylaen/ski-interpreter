@@ -79,27 +79,29 @@ export type QuestResult = {
  *   weight?: number
  * }} QuestResult
  */
+/**
+ * @typedef {{
+ *    input: InputSpec | InputSpec[],
+ *    cases: TestCase[],
+ *
+ *    // the rest is optional
+ *
+ *    allow?: string,
+ *    numbers?: boolean,
+ *    env?: string[],
+ *    engine?: SKI,
+ *    engineFull?: SKI,
+ *
+ *    // metadata, also any fields not listed here will go to quest.meta.???
+ *    id?: string|number,
+ *    name?: string,
+ *    intro?: string|string[], // multiple strings will be concatenated with spaces
+ * }} QuestSpec
+ */
 export class Quest {
     /**
      * @description A combinator problem with a set of test cases for the proposed solution.
-     * @param {{
-     *    input: InputSpec | InputSpec[],
-     *    cases: TestCase[],
-     *
-     *    // the rest is optional
-  
-     *    allow?: string,
-     *    numbers?: boolean,
-     *    env?: string[],
-     *    engine?: SKI,
-     *    engineFull?: SKI,
-     *
-     *    // metadata, also any fields not listed here will go to quest.meta.???
-     *    id?: string|number,
-     *    name?: string,
-     *    intro?: string|string[], // multiple strings will be concatenated with spaces
-     * }} options
-     *
+     * @param {QuestSpec} options
      * @example const quest = new Quest({
      *    input: 'identity',
      *    cases: [
@@ -114,11 +116,11 @@ export class Quest {
      *                       //     despite having the same name.
      * quest.check('I');     // fail! I not in the allowed list.
      */
-    constructor(options?: {});
+    constructor(options: QuestSpec);
     engine: any;
     engineFull: any;
     restrict: {
-        allow: any;
+        allow: QuestSpec;
         numbers: any;
         lambdas: any;
     };
@@ -129,7 +131,7 @@ export class Quest {
     name: any;
     intro: any;
     id: any;
-    meta: {};
+    meta: QuestSpec;
     /**
      *   Display allowed terms based on what engine thinks of this.env + this.restrict.allow
      *   @return {string}
