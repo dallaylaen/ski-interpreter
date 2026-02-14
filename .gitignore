@@ -12,4 +12,5 @@ isolate-*.log
 prof.txt
 *.orig
 *.rej
+*.tgz
 lib
