@@ -19,12 +19,18 @@ export class Expr {
      * @return {Expr}
      */
     expand(): Expr;
+    /**
+     * @desc Returns true if the expression contains only free variables and applications, false otherwise.
+     * @returns {boolean}
+     */
     freeOnly(): boolean;
     /**
      * @desc Traverse the expression tree, applying change() to each node.
      *       If change() returns an Expr, the node is replaced with that value.
-     *       Otherwise, the node is left descended further (if applicable)
+     *       Otherwise, the node is descended further (if applicable)
      *       or left unchanged.
+     *
+     *       The traversal order is leftmost-outermost (LO), i.e. the same order as reduction steps are taken.
      *
      *       Returns null if no changes were made, or the new expression otherwise.
      *
@@ -61,7 +67,7 @@ export class Expr {
     fold<T>(initial: T, combine: (acc: T, expr: Expr) => ActionWrapper<T>): T;
     _fold(initial: any, combine: any): any;
     /**
-     * @desc rough estimate of the complexity of the term
+     * @desc rough estimate of the term's complexity
      * @return {number}
      */
     weight(): number;
@@ -109,7 +115,15 @@ export class Expr {
      * @param {{max: number, maxArgs: number, index: number}} options
      * @param {FreeVar[]} preArgs
      * @param {number} steps
-     * @returns {{normal: boolean, steps: number}|{normal: boolean, steps: number}|{normal: boolean, steps: number, expr: Lambda|*, arity?: *, skip?: Set<any>, dup?: Set<any>, duplicate, discard, proper: boolean}|*|{normal: boolean, steps: number}}
+     * @returns {{
+     *    normal: boolean,
+     *    steps: number,
+     *    expr?: Expr,
+     *    arity?: number,
+     *    skip?: Set<number>,
+     *    dup?: Set<number>,
+     *    duplicate, discard, proper: boolean
+     * }
      * @private
      */
     private _infer;
@@ -390,7 +404,20 @@ export class App extends Expr {
     fun: Expr;
     final: boolean;
     arity: number;
-    _infer(options: any, preArgs?: any[], steps?: number): any;
+    _infer(options: any, preArgs?: any[], steps?: number): {
+        normal: boolean;
+        steps: number;
+        expr?: Expr;
+        arity?: number;
+        skip?: Set<number>;
+        dup?: Set<number>;
+        duplicate: any;
+        discard: any;
+        proper: boolean;
+    } | {
+        normal: boolean;
+        steps: number;
+    };
     traverse(change: any): Expr;
     any(predicate: any): any;
     subst(search: any, replace: any): Expr;
@@ -402,11 +429,7 @@ export class App extends Expr {
         steps: number;
     };
     invoke(arg: any): Partial;
-    /**
-     * @desc Convert the expression to SKI combinatory logic
-     * @return {Expr}
-     */
-    _rski(options: any): Expr;
+    _rski(options: any): Expr | this;
     diff(other: any, swap?: boolean): string;
     _braced(first: any): boolean;
     _format(options: any, nargs: any): string;
@@ -465,7 +488,20 @@ export class Lambda extends Expr {
     arg: FreeVar;
     impl: Expr;
     arity: number;
-    _infer(options: any, preArgs?: any[], steps?: number): any;
+    _infer(options: any, preArgs?: any[], steps?: number): {
+        normal: boolean;
+        steps: number;
+        expr?: Expr;
+        arity?: number;
+        skip?: Set<number>;
+        dup?: Set<number>;
+        duplicate: any;
+        discard: any;
+        proper: boolean;
+    } | {
+        normal: boolean;
+        steps: number;
+    };
     invoke(arg: any): Expr;
     traverse(change: any): Expr | Lambda;
     any(predicate: any): any;
@@ -503,6 +539,10 @@ export class Native extends Named {
     note: any;
     _rski(options: any): Expr | this;
 }
+/**
+ * @class
+ * @extends Named
+ */
 export class Alias extends Named {
     /**
      * @desc A named alias for an existing expression.
@@ -537,9 +577,18 @@ export class Alias extends Named {
     traverse(change: any): any;
     any(predicate: any): any;
     subst(search: any, replace: any): any;
-    _infer(options: any, preArgs?: any[], steps?: number): any;
+    _infer(options: any, preArgs?: any[], steps?: number): {
+        normal: boolean;
+        steps: number;
+        expr?: Expr;
+        arity?: number;
+        skip?: Set<number>;
+        dup?: Set<number>;
+        duplicate: any;
+        discard: any;
+        proper: boolean;
+    };
     /**
-     *
      * @return {{expr: Expr, steps: number}}
      */
     step(): {
