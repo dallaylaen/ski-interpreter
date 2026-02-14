@@ -4,12 +4,12 @@ const { Expr, FreeVar, Alias, Lambda } = SKI.classes;
 /**
  * @typedef {{
  *   pass: boolean,
- *   reason: string?,
+ *   reason?: string,
  *   steps: number,
  *   start: Expr,
  *   found: Expr,
  *   expected: Expr,
- *   note: string?,
+ *   note?: string,
  *   args: Expr[],
  *   case: Case
  * }} CaseResult
@@ -17,21 +17,21 @@ const { Expr, FreeVar, Alias, Lambda } = SKI.classes;
 
 /**
  * @typedef {{
- *   linear: boolean?,
- *   affine: boolean?,
- *   normal: boolean?,
- *   proper: boolean?,
- *   discard: boolean?,
- *   duplicate: boolean?,
- *   arity: number?,
+ *   linear?: boolean,
+ *   affine?: boolean,
+ *   normal?: boolean,
+ *   proper?: boolean,
+ *   discard?: boolean,
+ *   duplicate?: boolean,
+ *   arity?: number,
  * }} Capability
  */
 
 /**
  * @typedef {
  *   [string, string]
- *   | [{max: number?}, string, string]
- *   | [{caps: Capability, max: number?}, string]
+ *   | [{max?: number}, string, string]
+ *   | [{caps: Capability, max?: number}, string]
  * } TestCase
  */
 
@@ -292,10 +292,10 @@ class ExprCase extends Case {
   /**
    * @param {FreeVar[]} input
    * @param {{
-   *    max: number?,
-   *    note: string?,
-   *    env: {string: Expr}?,
-   *    engine: SKI?
+   *    max?: number,
+   *    note?: string,
+   *    env?: {string: Expr},
+   *    engine?: SKI
    * }} options
    * @param {[e1: string, e2: string]} terms
    */

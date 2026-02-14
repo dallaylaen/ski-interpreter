@@ -254,7 +254,7 @@ class Expr {
    *   latin?: number,
    * }} options
    * @param {number} [maxWeight] - maximum allowed weight of terms in the sequence
-   * @return {IterableIterator<{expr: Expr, steps: number?, comment: string?}>}
+   * @return {IterableIterator<{expr: Expr, steps?: number, comment?: string}>}
    */
   * toLambda (options = {}) {
     const expr = this.traverse(e => {
@@ -352,7 +352,7 @@ class Expr {
    * @desc Run uninterrupted sequence of step() applications
    *       until the expression is irreducible, or max number of steps is reached.
    *       Default number of steps = 1000.
-   * @param {{max: number?, steps: number?, throw: boolean?}|Expr} [opt]
+   * @param {{max?: number, steps?: number, throw?: boolean}|Expr} [opt]
    * @param {Expr} args
    * @return {{expr: Expr, steps: number, final: boolean}}
    */
@@ -383,7 +383,7 @@ class Expr {
   /**
    * Execute step() while possible, yielding a brief description of events after each step.
    * Mnemonics: like run() but slower.
-   * @param {{max: number?}} options
+   * @param {{max?: number}} options
    * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
    */
   * walk (options = {}) {
@@ -1130,7 +1130,7 @@ class Alias extends Named {
    *
    * @param {String} name
    * @param {Expr} impl
-   * @param {{canonize: boolean?, max: number?, maxArgs: number?, note: string?, terminal: boolean?}} [options]
+   * @param {{canonize?: boolean, max?: number, maxArgs?: number, note?: string, terminal?: boolean}} [options]
    */
   constructor (name, impl, options = {}) {
     super(name);
@@ -1252,7 +1252,7 @@ addNative(
  * @param {FreeVar[]} args
  * @param {Expr} expr
  * @param {object} caps
- * @returns {{expr: Expr, arity?: number, skip?: Set<number>, dup?: Set<number>, duplicate, discard, proper: boolean}}
+ * @returns {{expr: Expr, arity?: number, skip?: Set<number>, dup?: Set<number>, duplicate?, discard?, proper: boolean}}
  */
 function maybeLambda (args, expr, caps = {}) {
   const count = new Array(args.length).fill(0);
@@ -1296,9 +1296,9 @@ function nthvar (n) {
 /**
  * @private
  * @param {Expr} expr
- * @param {{max: number?, maxArgs: number?}} options
+ * @param {{max?: number, maxArgs?: number}} options
  * @param {number} maxWeight
- * @yields {{expr: Expr, steps: number?, comment: string?}}
+ * @yields {{expr: Expr, steps?: number, comment?: string}}
  */
 function * simplifyLambda (expr, options = {}, state = { steps: 0 }) {
   // expr is a lambda, free variable, or an application thereof
