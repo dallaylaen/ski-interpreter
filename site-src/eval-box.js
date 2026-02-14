@@ -65,6 +65,7 @@ class EvalBox {
       this.expr = null;
       this.src = null;
     } else if (typeof arg === 'object' && typeof arg.format === 'function') {
+      // assume it's an Expr
       this.expr = arg;
       this.src = arg.format();
     } else {
