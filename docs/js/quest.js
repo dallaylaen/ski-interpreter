@@ -161,6 +161,10 @@ class QuestBox {
     }
   }
 
+  /**
+   *
+   * @param {QuestResult} result
+   */
   showResult (result) {
     if (!this.view.display)
       return;
@@ -195,7 +199,7 @@ class QuestBox {
       showSteps.onclick = () => {
         termDiv.innerHTML = '';
         hideSteps.hidden = false;
-        const box = new EvalBox(termDiv, { engine: this.engine, height: Infinity, max: item.steps + 2, headless: true });
+        const box = new EvalBox({ parent: termDiv, engine: this.engine, height: Infinity, max: item.steps + 2, headless: true });
         box.start(item.start);
       };
       hideSteps.onclick = () => {
