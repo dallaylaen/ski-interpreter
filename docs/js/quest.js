@@ -77,7 +77,7 @@ class QuestBox {
     if (this.impl.meta.unlock && result) {
       this.engine.maybeAdd(this.impl.meta.unlock, result.expr.expand());
       this.store.save('engine', this.engine);
-      showKnown();
+      this.chapter?.onUnlock();
     }
     if (this.chapter)
       this.chapter.addSolved(this.impl.id);
@@ -219,6 +219,8 @@ class Chapter {
    *   link: string, // URL to fetch quest list from
    *   number?: number,
    *   engine: SKI,
+   *   store: Store,
+   *   onUnlock?: function, // callback for when a quest is solved and unlocks something in the engine
    * }}options
    */
   constructor (options) {
@@ -229,6 +231,7 @@ class Chapter {
     this.number = options.number ?? ++chapterId;
     this.engine = options.engine;
     this.store = options.store;
+    this.onUnlock = options.onUnlock ?? (() => {});
     this.updateMeta();
   }
 
@@ -294,7 +297,7 @@ class Chapter {
     const body = append(this.view.frame, 'div');
     append(title, 'span', { content: 'Chapter ' + this.number + ': ' + this.options.name });
     this.view.stat = append(title, 'span', { class: ['float-right'] });
-    title.onclick = () => showhide(body, this.visible = !this.visible);
+    title.onclick = () => { showhide(body, this.visible = !this.visible) };
 
     this.view.intro = append(body, 'div', { content: cat(this.options.intro), class: ['note', 'chapter-intro'] });
     this.view.content = append(body, 'div', { class: ['chapter-content'] });
@@ -367,4 +370,10 @@ function expand (expr) {
         : '' + expr.expand()
     )
     : '' + expr;
+}
+
+function showhide (element, show) {
+  if (show === undefined)
+    show = element.hidden;
+  element.hidden = !show;
 }
