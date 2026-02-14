@@ -34,7 +34,7 @@ class Expr {
    *    env?: { [key: string]: Expr },
    *    src?: string,
    *    parser: object,
-   *  }} [context] // TODO proper type
+   *  }} [context]
    */
   constructor () {
     if (new.target === Expr)
@@ -65,6 +65,10 @@ class Expr {
     }) ?? this;
   }
 
+  /**
+   * @desc Returns true if the expression contains only free variables and applications, false otherwise.
+   * @returns {boolean}
+   */
   freeOnly () {
     return !this.any(e => !(e instanceof FreeVar || e instanceof App));
   }
@@ -72,8 +76,10 @@ class Expr {
   /**
    * @desc Traverse the expression tree, applying change() to each node.
    *       If change() returns an Expr, the node is replaced with that value.
-   *       Otherwise, the node is left descended further (if applicable)
+   *       Otherwise, the node is descended further (if applicable)
    *       or left unchanged.
+   *
+   *       The traversal order is leftmost-outermost (LO), i.e. the same order as reduction steps are taken.
    *
    *       Returns null if no changes were made, or the new expression otherwise.
    *
@@ -124,7 +130,7 @@ class Expr {
   }
 
   /**
-   * @desc rough estimate of the complexity of the term
+   * @desc rough estimate of the term's complexity
    * @return {number}
    */
   weight () {
@@ -168,7 +174,15 @@ class Expr {
    * @param {{max: number, maxArgs: number, index: number}} options
    * @param {FreeVar[]} preArgs
    * @param {number} steps
-   * @returns {{normal: boolean, steps: number}|{normal: boolean, steps: number}|{normal: boolean, steps: number, expr: Lambda|*, arity?: *, skip?: Set<any>, dup?: Set<any>, duplicate, discard, proper: boolean}|*|{normal: boolean, steps: number}}
+   * @returns {{
+   *    normal: boolean,
+   *    steps: number,
+   *    expr?: Expr,
+   *    arity?: number,
+   *    skip?: Set<number>,
+   *    dup?: Set<number>,
+   *    duplicate, discard, proper: boolean
+   * }
    * @private
    */
   _infer (options, preArgs = [], steps = 0) {
@@ -732,11 +746,6 @@ class App extends Expr {
     return [...this.fun.unroll(), this.arg];
   }
 
-  /**
-   * @desc Convert the expression to SKI combinatory logic
-   * @return {Expr}
-   */
-
   _rski (options) {
     if (options.steps >= options.max)
       return this;
@@ -1102,6 +1111,10 @@ function waitn (expr, n) {
   return arg => n <= 1 ? expr.apply(arg) : waitn(expr.apply(arg), n - 1);
 }
 
+/**
+ * @class
+ * @extends Named
+ */
 class Alias extends Named {
   /**
    * @desc A named alias for an existing expression.
@@ -1172,8 +1185,9 @@ class Alias extends Named {
     return this.impl._infer(options, preArgs, steps);
   }
 
+  // DO NOT REMOVE TYPE or tsc chokes with
+  //       TS2527: The inferred type of 'Alias' references an inaccessible 'this' type.
   /**
-   *
    * @return {{expr: Expr, steps: number}}
    */
   step () {
@@ -1228,6 +1242,18 @@ addNative(
 
 // utility functions dependent on Expr* classes, in alphabetical order
 
+/**
+ * @private
+ * @given a list of free variables, an expression, and some capabilities of the context,
+ *        return either a lambda term, or the original expression if no lambda abstraction is needed,
+ *        plus some metadata about the term and the context.
+ *
+ *        Used by infer() internally.
+ * @param {FreeVar[]} args
+ * @param {Expr} expr
+ * @param {object} caps
+ * @returns {{expr: Expr, arity?: number, skip?: Set<number>, dup?: Set<number>, duplicate, discard, proper: boolean}}
+ */
 function maybeLambda (args, expr, caps = {}) {
   const count = new Array(args.length).fill(0);
   let proper = true;
@@ -1268,7 +1294,7 @@ function nthvar (n) {
 }
 
 /**
- *
+ * @private
  * @param {Expr} expr
  * @param {{max: number?, maxArgs: number?}} options
  * @param {number} maxWeight
