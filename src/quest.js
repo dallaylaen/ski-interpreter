@@ -51,27 +51,30 @@ const { Expr, FreeVar, Alias, Lambda } = SKI.classes;
  * }} QuestResult
  */
 
+/**
+ * @typedef {{
+ *    input: InputSpec | InputSpec[],
+ *    cases: TestCase[],
+ *
+ *    // the rest is optional
+ *
+ *    allow?: string,
+ *    numbers?: boolean,
+ *    env?: string[],
+ *    engine?: SKI,
+ *    engineFull?: SKI,
+ *
+ *    // metadata, also any fields not listed here will go to quest.meta.???
+ *    id?: string|number,
+ *    name?: string,
+ *    intro?: string|string[], // multiple strings will be concatenated with spaces
+ * }} QuestSpec
+ */
+
 class Quest {
   /**
    * @description A combinator problem with a set of test cases for the proposed solution.
-   * @param {{
-   *    input: InputSpec | InputSpec[],
-   *    cases: TestCase[],
-   *
-   *    // the rest is optional
-
-   *    allow?: string,
-   *    numbers?: boolean,
-   *    env?: string[],
-   *    engine?: SKI,
-   *    engineFull?: SKI,
-   *
-   *    // metadata, also any fields not listed here will go to quest.meta.???
-   *    id?: string|number,
-   *    name?: string,
-   *    intro?: string|string[], // multiple strings will be concatenated with spaces
-   * }} options
-   *
+   * @param {QuestSpec} options
    * @example const quest = new Quest({
    *    input: 'identity',
    *    cases: [
@@ -86,7 +89,7 @@ class Quest {
    *                       //     despite having the same name.
    * quest.check('I');     // fail! I not in the allowed list.
    */
-  constructor (options = {}) {
+  constructor (options) {
     const { input, cases, allow, numbers, lambdas, engine, engineFull, ...meta } = options;
     const env = options.env ?? options.vars; // backwards compatibility
 
