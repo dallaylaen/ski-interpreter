@@ -78,7 +78,7 @@
             .then( list => {
                 const joint = [];
                 for (const item of list) {
-                    const chapter = new Chapter(typeof item === 'string' ? {link: item} : item);
+                    const chapter = new Chapter({ link: questDir + item, engine: ski, store });
                     chapters.push(chapter);
                     chapter.attach(view.quest, {placeholder: 'loading chapter' + chapter.number + '...'});
                     chapter.addLink(view.chapterlist);
@@ -107,10 +107,6 @@
         });
     }
 
-
-
-
-
     function showKnown() {
         view.known.innerHTML = '';
         const terms = ski.getTerms();
@@ -124,8 +120,6 @@
         };
         window.location.reload();
     }
-
-
 
 </script>
 </body>

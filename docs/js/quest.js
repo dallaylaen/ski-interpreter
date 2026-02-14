@@ -8,21 +8,39 @@
  * @requires append
  */
 
-/* global SKI, store, EvalBox, append */
+/* global SKI, EvalBox, append */
 
 class QuestBox {
+  /**
+   * @desc Create a quest box with given spec and options
+   * @param {QuestSpec} spec
+   * @param {{
+   *   engine?: SKI,
+   *   chapter?: Chapter,
+   *   number?: number,
+   *   store?: Store,
+   * }}options
+   */
   constructor (spec, options) {
-    this.impl = new SKI.Quest({ ...spec, engine: ski });
-    this.name = 'quest-' + this.impl.id;
+    const engine = options.engine ?? (options.chapter?.engine);
+    if (!engine)
+      throw new Error('QuestBox requires an engine: SKI in either options or chapter');
+    const store = options.store ?? options.chapter?.store;
+    if (!store)
+      throw new Error('QuestBox requires a store: Store in either options or chapter');
+    this.impl = new SKI.Quest({ ...spec, engine });
+    this.name = this.impl.id ? 'quest-' + this.impl.id : '';
     this.chapter = options.chapter;
     if (this.chapter && options.number)
       this.number = this.chapter.number + '.' + options.number;
+    this.store = store;
+    this.engine = engine;
     this.view = {};
     this.input = [];
   }
 
   load () {
-    const data = store.load(this.name) ?? {};
+    const data = this.store.load(this.name) ?? {};
     this.status = {
       solved:   data.solved ?? false,
       steps:    data.steps ?? 0,
@@ -36,7 +54,7 @@ class QuestBox {
   }
 
   save () {
-    store.save(this.name, this.status);
+    this.store.save(this.name, this.status);
     return this;
   }
 
@@ -57,8 +75,8 @@ class QuestBox {
 
   onSolved (result) {
     if (this.impl.meta.unlock && result) {
-      ski.maybeAdd(this.impl.meta.unlock, result.expr.expand());
-      store.save('engine', ski);
+      this.engine.maybeAdd(this.impl.meta.unlock, result.expr.expand());
+      this.store.save('engine', this.engine);
       showKnown();
     }
     if (this.chapter)
@@ -179,7 +197,7 @@ class QuestBox {
       showSteps.onclick = () => {
         termDiv.innerHTML = '';
         hideSteps.hidden = false;
-        const box = new EvalBox(termDiv, { engine: ski, height: Infinity, max: item.steps + 2, headless: true });
+        const box = new EvalBox(termDiv, { engine: this.engine, height: Infinity, max: item.steps + 2, headless: true });
         box.run(item.start);
       };
       hideSteps.onclick = () => {
@@ -192,12 +210,25 @@ class QuestBox {
 
 let chapterId = 0;
 class Chapter {
+  /**
+   * @desc A collection of quests, typically related,
+   *       with a title and intro text. Optionally numbered, too.
+   * @param {{
+   *   name?: string,
+   *   intro?: string|string[],
+   *   link: string, // URL to fetch quest list from
+   *   number?: number,
+   *   engine: SKI,
+   * }}options
+   */
   constructor (options) {
     this.options = options;
     this.quests = [];
     this.solved = new Set();
     this.view = {};
     this.number = options.number ?? ++chapterId;
+    this.engine = options.engine;
+    this.store = options.store;
     this.updateMeta();
   }
 
@@ -213,7 +244,7 @@ class Chapter {
   }
 
   fetch () {
-    return fetch(questDir + this.options.link)
+    return fetch(this.options.link)
       .then( resp => resp.json() )
       .then(data => {
         if (Array.isArray(data))
