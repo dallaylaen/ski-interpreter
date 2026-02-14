@@ -147,8 +147,6 @@ class QuestBox {
 
     const btn = append(element, 'button', { content: 'solve!' });
     btn.onclick = () => this.check();
-    this.view.moveOn = append(element, 'button', { content: 'move on >>', hidden: true });
-    this.view.moveOn.onclick = () => showhide(body, false);
   }
 
   showStatus () {
@@ -209,6 +207,7 @@ class QuestBox {
 }
 
 let chapterId = 0;
+// eslint-disable-next-line no-unused-vars
 class Chapter {
   /**
    * @desc A collection of quests, typically related,
