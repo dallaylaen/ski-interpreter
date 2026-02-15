@@ -13,6 +13,8 @@ describe( 'Expr.fold', () => {
   const expr = ski.parse('x->x (5 K  y) (M z)');
 
   it('goes through all nodes in LO order', () => {
+    // use imperative trace here to verify the order of traversal
+    // and not our ability to write a proper traverse :-D
     const trace = [];
     const ret = expr.fold(42, (acc, e) => {
       trace.push(e.constructor.name + ':' + e.toString());
@@ -51,11 +53,11 @@ describe( 'Expr.fold', () => {
   });
 
   it('can break out', () => {
-    const trace = [];
-    const ret = expr.fold(false, (acc, e) => {
-      trace.push(e.constructor.name + ':' + e.toString());
+    const trace = expr.fold([], (acc, e) => {
+      const next = [...acc, e.constructor.name + ':' + e];
       if (e instanceof Church)
-        return SKI.control.stop(true);
+        return SKI.control.stop(next);
+      return next;
     });
     expect(trace).to.deep.equal([
       'Lambda:x->x(5 Ky)(Mz)',
@@ -66,16 +68,14 @@ describe( 'Expr.fold', () => {
       'App:5 K',
       'Church:5',
     ]);
-    expect(ret).to.equal(true);
   });
 
   it('can prune branches', () => {
-    const trace = [];
-    const ret = expr.fold(false, (acc, e) => {
-      trace.push(e.constructor.name + ':' + e.toString());
+    const trace = expr.fold([], (acc, e) => {
+      const next = [...acc, e.constructor.name + ':' + e.toString()];
       if (e instanceof SKI.classes.Alias)
-        return SKI.control.prune(true);
-      return null;
+        return SKI.control.prune(next);
+      return next;
     });
     expect(trace).to.deep.equal([
       'Lambda:x->x(5 Ky)(Mz)',
@@ -91,6 +91,5 @@ describe( 'Expr.fold', () => {
       'Alias:M',
       'FreeVar:z'
     ]);
-    expect(ret).to.equal(true);
   });
 });
