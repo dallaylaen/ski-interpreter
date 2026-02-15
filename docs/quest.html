@@ -54,17 +54,26 @@
         </div>
     </footer>
 <script>
-    const questDir = 'quest-data/';
+    // fetch query parameter "index"
+    const custom = new URLSearchParams(window.location.search).get('index');
+
+    const indexUrl = custom ?? 'index.json';
+    const baseUrl  = custom ? custom.slice(0, custom.lastIndexOf('/') + 1) : 'quest-data/';
+
+    if (custom)
+        console.log(`Loading quests from ${indexUrl} with base URL ${baseUrl}`);
+
+    const store = new Store(custom ? 'quest-'+custom : 'quest-page');
+
     const view = util.grabView('quest', 'known', 'chapterlist', 'menu');
     const linkedTo = window.location.hash.slice(1);
     const chapters = []; // for debugging only
-    const store = new Store('quest-page');
 
     initMenu();
 
     loadQuests({
-      baseUrl: questDir,
-      index: 'index.json',
+      baseUrl: baseUrl,
+      index: indexUrl,
 
       indexBox: view.chapterlist,
       contentBox: view.quest,
@@ -75,7 +84,7 @@
       linkedTo: linkedTo,
 
       chapterList: chapters,
-      onLoad: () => { console.log('Quests loaded') },
+      // onLoad: () => { console.log('Quests loaded') },
     });
 
     function initMenu() {

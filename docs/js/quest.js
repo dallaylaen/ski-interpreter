@@ -33,7 +33,7 @@
 // eslint-disable-next-line no-unused-vars
 function loadQuests(options) {
   const root = options.baseUrl ?? '.';
-  const link = str => str.match(/^\w+:\/\//) ? str : root + '/' + str;
+  const link = str => (str.match(/^\w+:\/\//) || str.match(/^[/.]/)) ? str : root + '/' + str;
 
   const store = options.store;
   const engine = options.engine ?? new SKI(store.load('engine') ?? { annotate: true, allow: 'SKI' });
@@ -56,9 +56,11 @@ function loadQuests(options) {
   fetch(link(options.index))
     .then(resp => resp.json())
     .then(list => {
+      let chapterId = 0;
       const joint = [];
       for (const item of list) {
         const chapter = new Chapter({
+          number: ++chapterId,
           link: link(item),
           engine,
           store,
@@ -291,7 +293,6 @@ class QuestBox {
   }
 }
 
-let chapterId = 0;
 class Chapter {
   /**
    * @desc A collection of quests, typically related,
@@ -311,12 +312,11 @@ class Chapter {
     this.quests = [];
     this.solved = new Set();
     this.view = {};
-    this.number = options.number ?? ++chapterId;
+    this.number = options.number ?? 0;
     this.engine = options.engine;
     this.store = options.store;
     this.onUnlock = options.onUnlock ?? (() => {});
     this.updateMeta();
-    // console.log('created chapter', this);
   }
 
   updateMeta (meta = {}) {
