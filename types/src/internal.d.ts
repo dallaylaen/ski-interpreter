@@ -27,26 +27,40 @@ export function restrict(set: Set<string>, spec?: string): Set<string>;
 /**
  * @private
  * @template T
- * @param {T|ActionWrapper<T>} value
- * @returns {[T?, string|undefined]}
+ * @param {T|TraverseControl<T>|null} value
+ * @returns {[T?, function|undefined]}
  */
-export function unwrap<T>(value: T | ActionWrapper<T>): [T?, string | undefined];
+export function unwrap<T>(value: T | TraverseControl<T> | null): [T?, Function | undefined];
 /**
+ *
+ * @desc Prepare a self-referencing wrapper function for use as a fold/traverse control decorator.
+ *
+ *       If `fun` is created by `prepareWrapper`, then
+ *       unwrap(fun(x)) will always return exactly [x, fun], and the second value can be checked with ===.
+ *
+ *       An optional name can be given for debugging purposes.
  *
  * @private
  * @template T
- * @param {string} action
- * @returns {function(T): ActionWrapper<T>}
+ * @param {string} [name]
+ * @returns {function(T): TraverseControl<T>}
  */
-export function prepareWrapper<T>(action: string): (arg0: T) => ActionWrapper<T>;
-declare class ActionWrapper {
+export function prepareWrapper<T>(name?: string): (arg0: T) => TraverseControl<T>;
+declare class TraverseControl {
     /**
+     * @desc A wrapper for values returned by fold/traverse callbacks
+     *       which instructs the traversal to alter its behavior while
+     *       retaining the value in question.
+     *
+     *       This class is instantiated internally be `SKI.control.*` functions,
+     *       and is not intended to be used directly by client code.
+     *
      * @template T
      * @param {T} value
-     * @param {string} action
+     * @param {function(T): TraverseControl<T>} decoration
      */
-    constructor(value: T, action: string);
+    constructor(value: T, decoration: (arg0: T) => TraverseControl<T>);
     value: T;
-    action: string;
+    decoration: (arg0: T) => TraverseControl<T>;
 }
 export {};

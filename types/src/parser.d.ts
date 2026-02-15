@@ -175,6 +175,7 @@ export namespace SKI {
     export let control: {
         descend: (arg0: any) => any;
         prune: (arg0: any) => any;
+        redo: (arg0: any) => any;
         stop: (arg0: any) => any;
     };
 }

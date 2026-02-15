@@ -1,7 +1,4 @@
-export type ActionWrapper<T> = T | {
-    value: T | null;
-    action: string;
-} | null;
+export type TraverseValue<T> = T | TraverseControl<T> | null;
 export type Partial = Expr | ((arg0: Expr) => Partial);
 /**
  * @typedef {Expr | function(Expr): Partial} Partial
@@ -61,10 +58,10 @@ export class Expr {
      * @experimental
      * @template T
      * @param {T} initial
-     * @param {(acc: T, expr: Expr) => ActionWrapper<T>} combine
+     * @param {(acc: T, expr: Expr) => TraverseValue<T>} combine
      * @returns {T}
      */
-    fold<T>(initial: T, combine: (acc: T, expr: Expr) => ActionWrapper<T>): T;
+    fold<T>(initial: T, combine: (acc: T, expr: Expr) => TraverseValue<T>): T;
     _fold(initial: any, combine: any): any;
     /**
      * @desc rough estimate of the term's complexity
@@ -598,13 +595,6 @@ export class Alias extends Named {
         discard: any;
         proper: boolean;
     };
-    /**
-     * @return {{expr: Expr, steps: number}}
-     */
-    step(): {
-        expr: Expr;
-        steps: number;
-    };
     diff(other: any, swap?: boolean): any;
     _rski(options: any): Expr;
     _braced(first: any): boolean;
@@ -629,6 +619,7 @@ declare const native: {
 declare namespace control {
     let descend: (arg0: any) => any;
     let prune: (arg0: any) => any;
+    let redo: (arg0: any) => any;
     let stop: (arg0: any) => any;
 }
 /**
