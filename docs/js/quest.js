@@ -10,6 +10,87 @@
 
 /* global SKI, EvalBox, append */
 
+/**
+ * @desc Load quests from server and display them. Options:
+ * @param {{
+ *   index: string, // URL to fetch quest list from
+ *   baseUrl?: string, // root URL to fetch quest data from, default 'data/quests/'
+ *   // page elements to attach to:
+ *   indexBox: HTMLElement, // element to attach chapter list to
+ *   contentBox: HTMLElement, // element to attach chapter content to
+ *   inventoryBox: HTMLElement, // element to attach inventory to
+ *   // extra stuff
+ *   linkedTo?: string, // id of element to scroll into view after loading
+ *   store: Store, // TODO move out into callbacks, also make async
+ *   engine?: SKI, // defautl = new SKI()
+ *   onLoad?: function, // callback for when quests are loaded, gets list of Chapter objects as argument
+ *   onSolved?: function, // callback for when a quest is solved
+ *   onFailed?: function, // callback for when a quest is attempted but not solved
+ *   onUnlock?: function, // callback for when a quest is solved and unlocks something in the engine
+ *   chapterList?: Chapter[], // optional write-only list for observability only
+ * }} options
+ */
+// eslint-disable-next-line no-unused-vars
+function loadQuests(options) {
+  const root = options.baseUrl ?? '.';
+  const link = str => str.match(/^\w+:\/\//) ? str : root + '/' + str;
+
+  const store = options.store;
+  const engine = options.engine ?? new SKI(store.load('engine') ?? { annotate: true, allow: 'SKI' });
+
+  if (options.inventoryBox)
+    showKnown(engine, options.inventoryBox);
+
+  const chapters = options.chapterList ?? [];
+
+  const onUnlock = () => {
+    //engine.maybeAdd(term);
+    //if (store)
+     // store.save('engine', engine);
+    if (options.inventoryBox)
+      showKnown(engine, options.inventoryBox);
+    // options.onUnlock?();
+  };
+
+  fetch(link(options.index))
+    .then(resp => resp.json())
+    .then(list => {
+      const joint = [];
+      for (const item of list) {
+        const chapter = new Chapter({
+          link: link(item),
+          engine,
+          store,
+          onUnlock,
+          onSolved: options.onSolved,
+          onFailed: options.onFailed,
+        });
+        chapters.push(chapter);
+        chapter.attach(options.contentBox, { placeholder: 'loading chapter' + chapter.number + '...' });
+        chapter.addLink(options.indexBox);
+        joint.push(chapter.fetch().then(chapter => {
+          chapter.draw();
+        }));
+      }
+      Promise.all(joint).then(() => {
+        if (options.linkedTo) {
+          const target = document.getElementById(options.linkedTo);
+          if (target)
+            target.scrollIntoView();
+        };
+        options.onLoad?.(chapters);
+      });
+    });
+}
+
+function showKnown(ski, elem) {
+  // TODO ul, li
+  elem.innerHTML = '';
+  const terms = ski.getTerms();
+  for (const entry of Object.keys(terms).sort().map(x => [x, terms[x]]))
+    append(elem, 'div', {content: `<dt>${entry[0]}</dt><dd>= ${showTerm(entry[1])}</dd>`});
+}
+
 class QuestBox {
   /**
    * @desc Create a quest box with given spec and options
@@ -77,7 +158,7 @@ class QuestBox {
     if (this.impl.meta.unlock && result) {
       this.engine.maybeAdd(this.impl.meta.unlock, result.expr.expand());
       this.store.save('engine', this.engine);
-      this.chapter?.onUnlock();
+      this.chapter?.onUnlock(new SKI.classes.Alias(this.impl.meta.unlock, result.expr.expand()));
     }
     if (this.chapter)
       this.chapter.addSolved(this.impl.id);
@@ -211,7 +292,6 @@ class QuestBox {
 }
 
 let chapterId = 0;
-// eslint-disable-next-line no-unused-vars
 class Chapter {
   /**
    * @desc A collection of quests, typically related,
@@ -236,6 +316,7 @@ class Chapter {
     this.store = options.store;
     this.onUnlock = options.onUnlock ?? (() => {});
     this.updateMeta();
+    // console.log('created chapter', this);
   }
 
   updateMeta (meta = {}) {

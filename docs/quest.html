@@ -54,47 +54,29 @@
         </div>
     </footer>
 <script>
-    const { Expr } = SKI.classes; // just for type annotations
-
-    const store = new Store('quest-page');
-    const skiopt = store.load('engine') ?? {lambdas: false, numbers: false, allow: 'SKI'};
-    skiopt.annotate = true;
-    const ski = new SKI(skiopt);
-
-    const chapters = [];
-
-    const view = util.grabView('quest', 'known', 'chapterlist', 'menu');
     const questDir = 'quest-data/';
-
+    const view = util.grabView('quest', 'known', 'chapterlist', 'menu');
     const linkedTo = window.location.hash.slice(1);
+    const chapters = []; // for debugging only
+    const store = new Store('quest-page');
 
-    showKnown();
     initMenu();
-    loadQuests();
 
-    function loadQuests() {
-        fetch(questDir + 'index.json')
-            .then( resp => resp.json())
-            .then( list => {
-                const joint = [];
-                for (const item of list) {
-                    const chapter = new Chapter({ link: questDir + item, engine: ski, store, onUnlock: showKnown });
-                    chapters.push(chapter);
-                    chapter.attach(view.quest, {placeholder: 'loading chapter' + chapter.number + '...'});
-                    chapter.addLink(view.chapterlist);
-                    joint.push(chapter.fetch().then(chapter => {
-                        chapter.draw();
-                    }));
-                }
-                Promise.all(joint).then( () => {
-                    if (linkedTo) {
-                        const target = document.getElementById(linkedTo);
-                        if (target)
-                            target.scrollIntoView();
-                    }
-                });
-            });
-    }
+    loadQuests({
+      baseUrl: questDir,
+      index: 'index.json',
+
+      indexBox: view.chapterlist,
+      contentBox: view.quest,
+      inventoryBox: view.known,
+
+      store,
+
+      linkedTo: linkedTo,
+
+      chapterList: chapters,
+      onLoad: () => { console.log('Quests loaded') },
+    });
 
     function initMenu() {
         const menu = new Hamburger(view.menu);
@@ -105,13 +87,6 @@
             if (confirm('Are you sure you want to start over?'))
                 demolish();
         });
-    }
-
-    function showKnown() {
-        view.known.innerHTML = '';
-        const terms = ski.getTerms();
-        for (const entry of Object.keys(terms).sort().map(x => [x, terms[x]]))
-            append(view.known, 'div', {content: `<dt>${entry[0]}</dt><dd>= ${showTerm(entry[1])}</dd>`});
     }
 
     function demolish() {
