@@ -282,11 +282,11 @@ ul.term-list li {
     height: 20em;
 }
 
-.error {
+.ski-eval-error {
     color: red;
 }
 
-.success {
+.ski-eval-success {
     color: green;
 }
 

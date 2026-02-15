@@ -43,7 +43,7 @@ class EvalBox {
     this.view = {};
     this.view.parent  = options.parent;
     this.view.scroll  = options.scroll ?? options.parent; // containing scrollable element, may != parent
-    this.view.main    = append(options.parent, 'ol', { class: ['eval-box'] });
+    this.view.main    = append(options.parent, 'ol', { class: ['ski-eval-box'] });
   }
 
   /**
@@ -105,7 +105,7 @@ class EvalBox {
       this.timer = null;
     }
     if (reason)
-      this.print(reason, { class: ['error'], line: '' });
+      this.print(reason, { class: ['ski-eval-error'], line: '' });
     this.onStop();
   }
 
@@ -126,7 +126,7 @@ class EvalBox {
       // could've just used next().done but that creates one extra iteration
       // finished execution, congratulations
       if (this.view.last)
-        this.view.last.classList.add('success');
+        this.view.last.classList.add('ski-eval-success');
       return this.stop();
     }
 
@@ -165,7 +165,7 @@ class EvalBox {
       line.innerHTML = text;
     else {
       append(line, 'span', {
-        class: options.class ?? ['line-text'],
+        class: options.class ?? ['ski-eval-line-text'],
         color: options.color,
         content: (text),
       });
