@@ -67,5 +67,30 @@ describe( 'Expr.fold', () => {
       'Church:5',
     ]);
     expect(ret).to.equal(true);
-  })
+  });
+
+  it('can prune branches', () => {
+    const trace = [];
+    const ret = expr.fold(false, (acc, e) => {
+      trace.push(e.constructor.name + ':' + e.toString());
+      if (e instanceof SKI.classes.Alias)
+        return SKI.control.prune(true);
+      return null;
+    });
+    expect(trace).to.deep.equal([
+      'Lambda:x->x(5 Ky)(Mz)',
+      'App:x(5 Ky)(Mz)',
+      'App:x(5 Ky)',
+      'FreeVar:x',
+      'App:5 Ky',
+      'App:5 K',
+      'Church:5',
+      'Native:K',
+      'FreeVar:y',
+      'App:Mz',
+      'Alias:M',
+      'FreeVar:z'
+    ]);
+    expect(ret).to.equal(true);
+  });
 });
