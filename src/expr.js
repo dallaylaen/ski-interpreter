@@ -9,11 +9,12 @@ const DEFAULTS = {
 
 /**
  * @template T
- * @typedef {T | { value: T?, action: string } | null} ActionWrapper
+ * @typedef {T | TraverseControl<T> | null} TraverseValue
  */
 const control = {
   descend: prepareWrapper('descend'),
   prune:   prepareWrapper('prune'),
+  redo:    prepareWrapper('redo'),
   stop:    prepareWrapper('stop'),
 };
 
@@ -116,7 +117,7 @@ class Expr {
    * @experimental
    * @template T
    * @param {T} initial
-   * @param {(acc: T, expr: Expr) => ActionWrapper<T>} combine
+   * @param {(acc: T, expr: Expr) => TraverseValue<T>} combine
    * @returns {T}
    */
 
@@ -675,15 +676,15 @@ class App extends Expr {
 
   _fold (initial, combine) {
     const [value = initial, action = 'descend'] = unwrap(combine(initial, this));
-    if (action === 'prune')
+    if (action === control.prune)
       return value;
-    if (action === 'stop')
+    if (action === control.stop)
       return control.stop(value);
     const [fValue = value, fAction = 'descend'] = unwrap(this.fun._fold(value, combine));
-    if (fAction === 'stop')
+    if (fAction === control.stop)
       return control.stop(fValue);
     const [aValue = fValue, aAction = 'descend'] = unwrap(this.arg._fold(fValue, combine));
-    if (aAction === 'stop')
+    if (aAction === control.stop)
       return control.stop(aValue);
     return aValue;
   }
@@ -1002,12 +1003,12 @@ class Lambda extends Expr {
 
   _fold (initial, combine) {
     const [value = initial, action = 'descend'] = unwrap(combine(initial, this));
-    if (action === 'prune')
+    if (action === control.prune)
       return value;
-    if (action === 'stop')
+    if (action === control.stop)
       return control.stop(value);
     const [iValue, iAction] = unwrap(this.impl._fold(value, combine));
-    if (iAction === 'stop')
+    if (iAction === control.stop)
       return control.stop(iValue);
     return iValue ?? value;
   }
@@ -1151,6 +1152,16 @@ class Alias extends Named {
     this.invoke = waitn(impl, this.arity);
   }
 
+  /**
+   * @property {boolean} [outdated] - whether the alias is outdated
+   *     and should be replaced with its definition when encountered.
+   * @property {boolean} [terminal] - whether the alias should behave like a standalone term
+   *     // TODO better name?
+   * @property {boolean} [proper] - whether the alias is a proper combinator (i.e. contains no free variables or constants)
+   * @property {number} [arity] - the number of arguments the alias waits for before expanding
+   * @property {Expr} [canonical] - equivalent lambda term.
+   */
+
   weight () {
     return this.terminal ? 1 : this.impl.weight();
   }
@@ -1164,13 +1175,13 @@ class Alias extends Named {
   }
 
   _fold (initial, combine) {
-    const [value = initial, action = 'descend'] = unwrap(combine(initial, this));
-    if (action === 'prune')
+    const [value = initial, action] = unwrap(combine(initial, this));
+    if (action === control.prune)
       return value;
-    if (action === 'stop')
+    if (action === control.stop)
       return control.stop(value);
     const [iValue, iAction] = unwrap(this.impl._fold(value, combine));
-    if (iAction === 'stop')
+    if (iAction === control.stop)
       return control.stop(iValue);
     return iValue ?? value;
   }
@@ -1188,7 +1199,7 @@ class Alias extends Named {
   // DO NOT REMOVE TYPE or tsc chokes with
   //       TS2527: The inferred type of 'Alias' references an inaccessible 'this' type.
   /**
-   * @return {{expr: Expr, steps: number}}
+   * @return {{expr: Expr, steps: number, changed: boolean}}
    */
   step () {
     // arity known = waiting for args to expand

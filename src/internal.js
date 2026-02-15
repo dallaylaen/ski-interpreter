@@ -67,39 +67,57 @@ function restrict (set, spec) {
   return out;
 }
 
-class ActionWrapper {
+class TraverseControl {
   /**
+   * @desc A wrapper for values returned by fold/traverse callbacks
+   *       which instructs the traversal to alter its behavior while
+   *       retaining the value in question.
+   *
+   *       This class is instantiated internally be `SKI.control.*` functions,
+   *       and is not intended to be used directly by client code.
+   *
    * @template T
    * @param {T} value
-   * @param {string} action
+   * @param {function(T): TraverseControl<T>} decoration
    */
-  constructor (value, action) {
+  constructor (value, decoration) {
     this.value = value;
-    this.action = action;
+    this.decoration = decoration;
   }
 }
 
 /**
  * @private
  * @template T
- * @param {T|ActionWrapper<T>} value
- * @returns {[T?, string|undefined]}
+ * @param {T|TraverseControl<T>|null} value
+ * @returns {[T?, function|undefined]}
  */
 function unwrap (value) {
-  if (value instanceof ActionWrapper)
-    return [value.value ?? undefined, value.action];
+  // `?? undefined` so that null is not 'an object'
+  if (value instanceof TraverseControl)
+    return [value.value ?? undefined, value.decoration];
   return [value ?? undefined, undefined];
 }
 
 /**
  *
+ * @desc Prepare a self-referencing wrapper function for use as a fold/traverse control decorator.
+ *
+ *       If `fun` is created by `prepareWrapper`, then
+ *       unwrap(fun(x)) will always return exactly [x, fun], and the second value can be checked with ===.
+ *
+ *       An optional name can be given for debugging purposes.
+ *
  * @private
  * @template T
- * @param {string} action
- * @returns {function(T): ActionWrapper<T>}
+ * @param {string} [name]
+ * @returns {function(T): TraverseControl<T>}
  */
-function prepareWrapper (action) {
-  return value => new ActionWrapper(value, action);
+function prepareWrapper (name) {
+  const fun = value => new TraverseControl(value, fun);
+  fun.name = name;
+  fun.toString = () => 'TraverseControl::' + name;
+  return fun;
 }
 
 module.exports = { Tokenizer, restrict, unwrap, prepareWrapper };
