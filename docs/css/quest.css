@@ -105,6 +105,7 @@
 .ski-quest-completion {
     background-color: lightgreen;
     border-radius: 0.2em;
+    height: inherit;
 }
 
 .ski-quest-control {
@@ -129,12 +130,13 @@
 
 /* TODO rename to ski-quest-* */
 .content-table a {
-    display: block;
+    display: flex;
     text-decoration: inherit;
     color: #444444;
     padding: 0.3em;
     border: 1px dotted #444444;
     border-radius: 0.3em;
+    margin-right: 0.3em;
 }
 
 .content-table a:hover {
