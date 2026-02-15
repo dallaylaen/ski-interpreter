@@ -43,13 +43,14 @@ function loadQuests(options) {
 
   const chapters = options.chapterList ?? [];
 
-  const onUnlock = () => {
-    //engine.maybeAdd(term);
-    //if (store)
-     // store.save('engine', engine);
+  const onUnlock = (term) => {
+    engine.maybeAdd(term.name, term.impl);
+    if (store)
+      store.save('engine', engine);
     if (options.inventoryBox)
       showKnown(engine, options.inventoryBox);
-    // options.onUnlock?();
+    if (options.onUnlock)
+      options.onUnlock(term);
   };
 
   fetch(link(options.index))
@@ -156,9 +157,8 @@ class QuestBox {
 
   onSolved (result) {
     if (this.impl.meta.unlock && result) {
-      this.engine.maybeAdd(this.impl.meta.unlock, result.expr.expand());
-      this.store.save('engine', this.engine);
-      this.chapter?.onUnlock(new SKI.classes.Alias(this.impl.meta.unlock, result.expr.expand()));
+      const term = new SKI.classes.Alias(this.impl.meta.unlock, result.expr.expand());
+      this.chapter?.onUnlock(term);
     }
     if (this.chapter)
       this.chapter.addSolved(this.impl.id);
