@@ -579,6 +579,44 @@ class Expr {
   }
 
   /**
+   * @desc Returns a string representation of the expression tree, with indentation to show structure.
+   *
+   *       Applications are flattened to avoid excessive nesting.
+   *       Variables include ids to distinguish different instances of the same variable name.
+   *
+   *       May be useful for debugging.
+   *
+   * @returns {string}
+   *
+   * @example
+   * > console.log(ski.parse('C 5 x (x->x x)').diag())
+   * App:
+   *   Native: C
+   *   Church: 5
+   *   FreeVar: x[53]
+   *   Lambda (x[54]):
+   *     App:
+   *       FreeVar: x[54]
+   *       FreeVar: x[54]
+   */
+  diag () {
+    const rec = (e, indent) => {
+      if (e instanceof App)
+        return [indent + 'App:', ...e.unroll().flatMap(s => rec(s, indent + '  '))];
+      if (e instanceof Lambda)
+        return [`${indent}Lambda (${e.arg}[${e.arg.id}]):`, ...rec(e.impl, indent + '  ')];
+      if (e instanceof Alias)
+        return [`Alias (${e.name}):`, ...rec(e.impl, indent + '  ')];
+      if (e instanceof FreeVar)
+        return [`${indent}FreeVar: ${e.name}[${e.id}]`];
+      return [`${indent}${e.constructor.name}: ${e}`];
+    }
+
+    const out = rec(this, '');
+    return out.join('\n');
+  }
+
+  /**
    * @desc Convert the expression to a JSON-serializable format.
    * @returns {string}
    */
