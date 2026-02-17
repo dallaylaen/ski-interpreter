@@ -345,6 +345,8 @@ h1 img {
     margin: 1ex;
 }
 
+/* history */
+
 .history-main {
     background-color: lightgray;
     padding: 0 4px 4px 4px;
@@ -362,7 +364,14 @@ h1 img {
     margin: 0;
     padding: 0.2em;
 }
+
 .history-item {
+    margin: 0.2em;
+}
+
+.history-item:hover {
+    background: #F3F3F3;
+    cursor: pointer;
 }
 
 .note code {
@@ -375,7 +384,6 @@ h1 img {
 .big {
     font-size: 2em;
 }
-
 
 .control {
     /* display: inline-block; */
