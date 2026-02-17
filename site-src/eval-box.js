@@ -1,4 +1,3 @@
-
 'use strict';
 
 const { append } = require('./html-util');
@@ -165,7 +164,7 @@ class EvalBox {
       line.innerHTML = text;
     else {
       append(line, 'span', {
-        class: options.class ?? ['ski-eval-line-text'],
+        class: options.class ?? ['ski-eval-line'],
         color: options.color,
         content: (text),
       });

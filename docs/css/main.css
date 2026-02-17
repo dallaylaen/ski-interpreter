@@ -282,6 +282,15 @@ ul.term-list li {
     height: 20em;
 }
 
+.ski-eval-box {
+    font-family: monospace;
+    overflow-wrap: break-word;
+}
+
+.ski-eval-line {
+
+}
+
 .ski-eval-error {
     color: red;
 }
