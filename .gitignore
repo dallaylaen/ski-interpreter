@@ -13,4 +13,7 @@ prof.txt
 *.orig
 *.rej
 *.tgz
+*.log
+
+# lib is now built by `npm build` and only used for dist
 lib
