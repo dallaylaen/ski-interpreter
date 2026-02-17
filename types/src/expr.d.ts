@@ -377,6 +377,28 @@ export class Expr {
      */
     private _format;
     /**
+     * @desc Returns a string representation of the expression tree, with indentation to show structure.
+     *
+     *       Applications are flattened to avoid excessive nesting.
+     *       Variables include ids to distinguish different instances of the same variable name.
+     *
+     *       May be useful for debugging.
+     *
+     * @returns {string}
+     *
+     * @example
+     * > console.log(ski.parse('C 5 x (x->x x)').diag())
+     * App:
+     *   Native: C
+     *   Church: 5
+     *   FreeVar: x[53]
+     *   Lambda (x[54]):
+     *     App:
+     *       FreeVar: x[54]
+     *       FreeVar: x[54]
+     */
+    diag(): string;
+    /**
      * @desc Convert the expression to a JSON-serializable format.
      * @returns {string}
      */
