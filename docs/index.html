@@ -13,6 +13,64 @@
     <link rel="prefetch" href="img/mock2.png">
     <script src="build/js/ski-interpreter.min.js"></script>
     <script src="build/js/util.min.js"></script>
+    <style>
+        /* page layout only */
+        body {
+            display: grid;
+            grid-template-columns: 70% 30%;
+            grid-template-rows: auto 1fr 0 auto auto;
+            grid-template-areas:
+                "header header"
+                "teletype info"
+                "history-placeholder history-placeholder"
+                "prompt prompt"
+                "footer footer";
+            padding: 0;
+            margin: 0;
+            height: 100vh;
+        }
+        header {
+            grid-area: header;
+        }
+        #teletype {
+            grid-area: teletype;
+            padding: 0.3em;
+            overflow-y: auto;
+        }
+        #info {
+            overflow: auto;
+            grid-area: info;
+        }
+        #around-history {
+            grid-area: history-placeholder;
+            position: relative;
+        }
+        #prompt {
+            display: flex;
+            flex-direction: row;
+            grid-area: prompt;
+            font-size: 1rem;
+        }
+        footer {
+            grid-area: footer;
+            padding: 1px .5em;
+            margin-top: 1ex;
+            background: #F3F3F3;
+        }
+
+        #entry-field {
+            flex: 1 auto;
+        }
+        #history-main {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            z-index: 50; /* menu is 100, be below it */
+            height: 70vh;
+            overflow-y: auto;
+            background-color: lightgray;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -100,13 +158,16 @@
         <p class="caption">Term inventory:</p>
         <dl id="inventory" class="term-list"></dl>
     </div>
-    <form id="prompt" onsubmit="return run()">
+    <div id="around-history">
+        <div class="history-main" id="history-main" hidden></div>
+    </div>
+    <div id="prompt">
         <button id="history-show">H</button>
         <input id="entry-field">
         <button id="runstop-btn" type="submit"></button>
         <button id="to-ski" title="Convert to SKI basis">&rarr;SK</button>
         <button id="to-lambda" title="Attempt to find the shortest equivalent &lambda;-term">&rarr;&lambda;</button>
-    </form>
+    </div>
     <footer>
         <small>&copy;&thinsp;2024&thinsp;&ndash;&thinsp;2025
         <a href="https://github.com/dallaylaen" target="_blank">dallaylaen</a>
@@ -117,8 +178,12 @@
      *   References to static page elements
      */
     const view = util.grabView('inventory', 'teletype', 'help', 'menu',
-      'entryField', 'runstopBtn', 'toSki', 'toLambda');
+      'entryField', 'runstopBtn', 'toSki', 'toLambda', 'historyShow', 'historyMain');
     const store = new Store('playground');
+    const history = new History({
+      store: new Store('playground-history'),
+      limit: 10000,
+    }).load();
 
     /**
      *   Global state of the interpreter
@@ -153,6 +218,7 @@
     function setupMain() {
         view.entryField.addEventListener('keydown', onKey);
         view.entryField.addEventListener('input', saveInput);
+        view.historyShow.addEventListener('click', showHistory);
 
         const oldHash = util.readOldLink(window.location.search);
         if (oldHash) {
@@ -173,16 +239,16 @@
         }
         showInventory();
 
+        view.runstopBtn.addEventListener('click', ev => {
+            run();
+        });
+
         view.toSki.addEventListener('click', ev => {
-            ev.preventDefault();
             run({src: view.entryField.value, action: 'toSKI'});
-            return false;
         });
 
         view.toLambda.addEventListener('click', ev => {
-            ev.preventDefault();
             run({src: view.entryField.value, action: 'toLambda'});
-            return false;
         });
 
         greet = new EvalBox({parent: view.teletype})
@@ -274,6 +340,34 @@
      * Page-specific functions
      */
 
+    let historyVisible = false;
+
+    function showHistory() {
+      if (historyVisible) {
+        hideHistory();
+        return;
+      }
+      view.historyMain.innerHTML = '';
+      append(view.historyMain, 'h3', { class: ['history-title'], content: ' -- command history -- '});
+      const list = append(view.historyMain, 'ol', { class: ['history-list']});
+      for (const entry of history.list()) {
+        const item = append(list, 'li', { class: ['history-item'], content: entry });
+        item.addEventListener('click', ev => {
+          ev.preventDefault();
+          view.entryField.value = entry;
+          hideHistory();
+        });
+      }
+      view.historyMain.hidden = false;
+      historyVisible = true;
+    }
+
+    function hideHistory() {
+        view.historyMain.hidden = true;
+        view.historyMain.innerHTML = '';
+        historyVisible = false;
+    }
+
     function setFormat(options) {
       for (const key of Object.keys(options)) {
         if (options[key] === undefined)
@@ -328,6 +422,8 @@
             helpdiv.scrollIntoView();
             return false;
         }
+
+        history.push(src);
 
         createRunner(src, {action: options.action, id: ++evalId})?.start();
         return false;

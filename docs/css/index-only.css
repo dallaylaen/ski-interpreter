@@ -1,22 +1,7 @@
-body {
-    display: grid;
-    grid-template:
-             "header header" min-content
-             "teletype info" auto
-             "prompt prompt" min-content
-             "footer footer" min-content
-            / fit-content(69%) auto;
-}
+
 
 header, #teletype, #prompt {
     padding: 0 .5em;
-}
-
-footer {
-    padding: 1px .5em;
-    margin-top: 1ex;
-    background: #F3F3F3;
-    grid-area: footer;
 }
 
 footer::first-letter {
@@ -27,26 +12,11 @@ header {
     grid-area: header;
 }
 
-#teletype {
-    overflow: auto;
-    grid-area: teletype;
-    min-width: 25vw;
-}
 
-#info {
-    overflow: auto;
-    grid-area: info;
-}
 
-#prompt {
-    display: flex;
-    grid-area: prompt;
-    font-size: 1rem;
-}
 
-#entry-field {
-    flex: 1 auto;
-}
+
+
 
 #runstop-btn {
     flex: 0 auto;
@@ -74,4 +44,15 @@ header {
 p.caption {
     font-weight: bold;
     margin: 0;
+}
+
+
+
+.history-item {
+    margin: 0.2em;
+}
+
+.history-item:hover {
+    background: #F3F3F3;
+    cursor: pointer;
 }
