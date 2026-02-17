@@ -101,10 +101,11 @@
         <dl id="inventory" class="term-list"></dl>
     </div>
     <form id="prompt" onsubmit="return run()">
-        <input id="entryField">
-        <button id="runstopBtn" type="submit"></button>
-        <button id="toSKI" title="Convert to SKI basis">&rarr;SK</button>
-        <button id="toLambda" title="Attempt to find the shortest equivalent &lambda;-term">&rarr;&lambda;</button>
+        <button id="history-show">H</button>
+        <input id="entry-field">
+        <button id="runstop-btn" type="submit"></button>
+        <button id="to-ski" title="Convert to SKI basis">&rarr;SK</button>
+        <button id="to-lambda" title="Attempt to find the shortest equivalent &lambda;-term">&rarr;&lambda;</button>
     </form>
     <footer>
         <small>&copy;&thinsp;2024&thinsp;&ndash;&thinsp;2025
@@ -116,7 +117,7 @@
      *   References to static page elements
      */
     const view = util.grabView('inventory', 'teletype', 'help', 'menu',
-      'entryField', 'runstopBtn', 'toSKI', 'toLambda');
+      'entryField', 'runstopBtn', 'toSki', 'toLambda');
     const store = new Store('playground');
 
     /**
@@ -172,7 +173,7 @@
         }
         showInventory();
 
-        view.toSKI.addEventListener('click', ev => {
+        view.toSki.addEventListener('click', ev => {
             ev.preventDefault();
             run({src: view.entryField.value, action: 'toSKI'});
             return false;

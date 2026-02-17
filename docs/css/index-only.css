@@ -44,11 +44,11 @@ header {
     font-size: 1rem;
 }
 
-#entryField {
+#entry-field {
     flex: 1 auto;
 }
 
-#runstopBtn {
+#runstop-btn {
     flex: 0 auto;
     font-family: monospace;
     font-size: 120%;
@@ -58,7 +58,7 @@ header {
     padding: 0;
 }
 
-#runstopBtn::before {
+#runstop-btn::before {
     display: inline-block;
     vertical-align: 20%;
 
@@ -66,7 +66,7 @@ header {
     color: darkGreen;
 }
 
-#runstopBtn.running::before {
+#runstop-btn.running::before {
     content: '\25A0\FE0E';
     color: darkRed;
 }
