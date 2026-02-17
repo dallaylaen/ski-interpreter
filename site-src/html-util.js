@@ -11,8 +11,10 @@
  */
 function grabView (...ids) {
   const view = {};
-  for (const name of ids)
-    view[name] = document.getElementById(name);
+  for (const name of ids) {
+    const hyphen = name.replace(/[A-Z]/g, char => '-' + char.toLowerCase())
+    view[name] = document.getElementById(hyphen);
+  }
   return view;
 }
 
