@@ -15,51 +15,68 @@ class History {
    * @param {number} [options.limit]  Maximum number of history entries to keep.
    */
   constructor(options) {
+    if (!options.store)
+      throw new Error('History requires a Store instance');
     this.store = options.store;
-    this.limit = this.store.load('limit') ?? 100;
-    this.head = this.store.load('head') ?? 0;
-    this.tail = this.store.load('tail') ?? 0;
+    if (options.limit)
+      this.setlimit(options.limit);
+    this.current = undefined;
   }
 
   push(entry) {
+    if (entry === this.current)
+      return; // skip dupes
+    this.current = entry;
+
     // no atomic operations but at least reduce inconsistency window
-    this.store.save('head', this.head + 1);
-    this.store.save(`entry-${this.head}`, entry);
-    this.head += 1;
-    if (this.head - this.tail > this.limit) {
-      this.store.delete(`entry-${this.tail}`);
-      this.tail += 1;
-      this.store.save('tail', this.tail);
-    }
+    let head = this.store.load('head') ?? 0;
+    this.store.save('head', ++head);
+    this.store.save(`entry-${head - 1}`, entry);
+
+    this.trim();
   }
 
-  list() {
+  list(options) {
     const out = [];
-    for (let i = this.tail; i < this.head; i++) {
+    const head = this.store.load('head') ?? 0;
+    const tail = this.store.load('tail') ?? 0;
+    for (let i = tail; i < head; i++) {
       const entry = this.store.load(`entry-${i}`);
-      if (entry !== null)
+      if (entry !== null && (!out.length || entry !== out[out.length - 1]))
         out.push(entry);
     }
+    if (options.last !== undefined && options.last !== out[out.length - 1])
+      out.push(options.last);
     return out;
   }
 
   clear() {
-    for (let i = this.tail; i < this.head; i++) {
+    const head = this.store.load('head') ?? 0;
+    const tail = this.store.load('tail') ?? 0;
+    for (let i = tail; i < head; i++) {
       this.store.delete(`entry-${i}`);
     }
-    this.head = 0;
-    this.tail = 0;
-    this.store.save('head', this.head);
-    this.store.save('tail', this.tail);
+    this.store.save('head', 0);
+    this.store.save('tail', 0);
   }
 
   setlimit(n) {
-    this.limit = n;
+    if (typeof n !== 'number' || n <= 0)
+      throw new Error('History limit must be a positive number');
     this.store.save('limit', n);
-    while (this.head - this.tail > this.limit) {
-      this.store.delete(`entry-${this.tail}`);
-      this.tail += 1;
-      this.store.save('tail', this.tail);
+
+    // trim excess entries if new limit is smaller than current size
+    this.trim(n);
+  }
+
+  trim(limit) {
+    if (limit === undefined)
+      limit = this.store.load('limit') ?? 100;
+    const head = this.store.load('head') ?? 0;
+    let tail = this.store.load('tail') ?? 0;
+    while (head - tail > limit) {
+      this.store.delete(`entry-${tail}`);
+      this.store.save('tail', ++tail);
     }
   }
 }
