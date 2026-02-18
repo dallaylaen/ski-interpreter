@@ -108,7 +108,16 @@ class EvalBox {
     this.onStop();
   }
 
-  // TODO pause() / resume()
+  /**
+   * @desc resume execution after stopping, if the sequence is not finished yet
+   */
+  resume() {
+    if (this.running || !this.seq)
+      return;
+    this.running = true;
+    this.onStart();
+    this.tick();
+  }
 
   tick () {
     if (!this.running) return;
@@ -126,6 +135,7 @@ class EvalBox {
       // finished execution, congratulations
       if (this.view.last)
         this.view.last.classList.add('ski-eval-success');
+      this.seq = null; // allow GC + prevent resuming
       return this.stop();
     }
 
