@@ -1,4 +1,4 @@
-export type TraverseValue<T> = T | TraverseControl<T> | null;
+export type TraverseValue<T_1> = T_1 | TraverseControl<T_1> | null;
 export type Partial = Expr | ((arg0: Expr) => Partial);
 /**
  * @typedef {Expr | function(Expr): Partial} Partial
@@ -61,7 +61,7 @@ export class Expr {
      * @param {(acc: T, expr: Expr) => TraverseValue<T>} combine
      * @returns {T}
      */
-    fold<T>(initial: T, combine: (acc: T, expr: Expr) => TraverseValue<T>): T;
+    fold<T_1>(initial: T_1, combine: (acc: T_1, expr: Expr) => TraverseValue<T_1>): T_1;
     /**
      * @template T
      * @param {T} initial
@@ -646,12 +646,18 @@ export class Church extends Native {
 declare const native: {
     [key: string]: Native;
 };
-declare namespace control {
-    let descend: (arg0: any) => any;
-    let prune: (arg0: any) => any;
-    let redo: (arg0: any) => any;
-    let stop: (arg0: any) => any;
-}
+/**
+ * @template T
+ * @typedef {T | TraverseControl<T> | null} TraverseValue
+ */
+/**
+ * @desc Control primitives for fold() and traverse() methods.
+ * @template T
+ * @type {{[name: string]: function(T): TraverseControl<T>}}
+ */
+declare const control: {
+    [name: string]: (arg0: T) => TraverseControl<T>;
+};
 /**
  * @desc  Sort a list in such a way that dependent terms come after the (named) terms they depend on.
  *        If env is given, only terms listed there are taken into account.

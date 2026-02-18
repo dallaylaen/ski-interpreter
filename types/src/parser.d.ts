@@ -24,7 +24,8 @@ export class SKI {
     };
     hasNumbers: boolean;
     hasLambdas: boolean;
-    allow: any;
+    /** @type {Set<string>} */
+    allow: Set<string>;
     /**
      * @desc Declare a new term
      * If the first argument is an Alias, it is added as is.
@@ -45,16 +46,33 @@ export class SKI {
      * @return {SKI} chainable
      */
     add(term: typeof classes.Alias | string, impl?: string | typeof classes.Expr | ((arg0: typeof classes.Expr) => Partial), note?: string): SKI;
-    _named(term: any, impl: any): classes.Alias | classes.Native;
-    maybeAdd(name: any, impl: any): this;
+    /**
+     * @desc Internal helper for add() that creates an Alias or Native term from the given arguments.
+     * @param {Alias|string} term
+     * @param {string|Expr|function(Expr):Partial} impl
+     * @returns {Native|Alias}
+     * @private
+     */
+    private _named;
+    /**
+     * @desc Declare a new term if it is not known, otherwise just allow it.
+     *       Currently only used by quests.
+     *       Use with caution, this function may change its signature, behavior, or even be removed in the future.
+     *
+     * @experimental
+     * @param {string|Alias} name
+     * @param {string|Expr|function(Expr):Partial} impl
+     * @returns {SKI}
+     */
+    maybeAdd(name: string | typeof classes.Alias, impl: string | typeof classes.Expr | ((arg0: typeof classes.Expr) => Partial)): SKI;
     /**
      * @desc Declare and remove multiple terms at once
      *       term=impl adds term
      *       term= removes term
-     * @param {string[]]} list
+     * @param {string[]} list
      * @return {SKI} chainable
      */
-    bulkAdd(list: any): SKI;
+    bulkAdd(list: string[]): SKI;
     /**
      * Restrict the interpreter to given terms. Terms prepended with '+' will be added
      * and terms preceeded with '-' will be removed.
@@ -92,44 +110,46 @@ export class SKI {
      */
     declare(): string[];
     /**
-     *
+     * @template T
      * @param {string} source
      * @param {Object} [options]
      * @param {{[keys: string]: Expr}} [options.env]
-     * @param {any} [options.scope]
+     * @param {T} [options.scope]
      * @param {boolean} [options.numbers]
      * @param {boolean} [options.lambdas]
      * @param {string} [options.allow]
      * @return {Expr}
      */
-    parse(source: string, options?: {
+    parse<T_1>(source: string, options?: {
         env?: {
             [keys: string]: typeof classes.Expr;
         };
-        scope?: any;
+        scope?: T_1;
         numbers?: boolean;
         lambdas?: boolean;
         allow?: string;
     }): typeof classes.Expr;
     /**
-     *
+     * @desc Parse a single line of source code, without splitting it into declarations.
+     *       Internal, always use parse() instead.
+     * @template T
      * @param {String} source S(KI)I
      * @param {{[keys: string]: Expr}} env
      * @param {Object} [options]
      * @param {{[keys: string]: Expr}} [options.env] - unused, see 'env' argument
-     * @param {any} [options.scope]
+     * @param {T} [options.scope]
      * @param {boolean} [options.numbers]
      * @param {boolean} [options.lambdas]
      * @param {string} [options.allow]
      * @return {Expr} parsed expression
      */
-    parseLine(source: string, env?: {
+    parseLine<T_1>(source: string, env?: {
         [keys: string]: typeof classes.Expr;
     }, options?: {
         env?: {
             [keys: string]: typeof classes.Expr;
         };
-        scope?: any;
+        scope?: T_1;
         numbers?: boolean;
         lambdas?: boolean;
         allow?: string;
@@ -159,9 +179,11 @@ export namespace SKI {
      *          x instanceof FreeVar; // true
      *          x.apply(y).apply(z); // x(y)(z)
      *
+     * @template T
+     * @param {T} [scope] - optional context to bind the generated variables to
      * @return {{[key: string]: FreeVar}}
      */
-    export function vars(context?: {}): {
+    export function vars<T_1>(scope?: T_1): {
         [key: string]: typeof import("./expr").FreeVar;
     };
     /**
@@ -173,10 +195,10 @@ export namespace SKI {
     export { classes };
     export { native };
     export let control: {
-        descend: (arg0: any) => any;
-        prune: (arg0: any) => any;
-        redo: (arg0: any) => any;
-        stop: (arg0: any) => any;
+        descend: (arg0: T) => TraverseControl<T>;
+        prune: (arg0: T) => TraverseControl<T>;
+        redo: (arg0: T) => TraverseControl<T>;
+        stop: (arg0: T) => TraverseControl<T>;
     };
 }
 import classes = require("./expr");
