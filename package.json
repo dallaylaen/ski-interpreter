@@ -9,6 +9,7 @@
     "education",
     "interpreter"
   ],
+  "type": "commonjs",
   "main": "lib/ski-interpreter.cjs.js",
   "module": "lib/ski-interpreter.esm.js",
   "exports": {
