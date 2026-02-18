@@ -11,6 +11,11 @@ const DEFAULTS = {
  * @template T
  * @typedef {T | TraverseControl<T> | null} TraverseValue
  */
+/**
+ * @desc Control primitives for fold() and traverse() methods.
+ * @template T
+ * @type {{[name: string]: function(T): TraverseControl<T>}}
+ */
 const control = {
   descend: prepareWrapper('descend'),
   prune:   prepareWrapper('prune'),

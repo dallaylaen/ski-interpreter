@@ -75,6 +75,7 @@ class SKI {
     this.known = { ...native };
     this.hasNumbers = true;
     this.hasLambdas = true;
+    /** @type {Set<string>} */
     this.allow = new Set(Object.keys(this.known));
 
     // Import terms, if any. Omit native ones
@@ -134,6 +135,13 @@ class SKI {
     return this;
   }
 
+  /**
+   * @desc Internal helper for add() that creates an Alias or Native term from the given arguments.
+   * @param {Alias|string} term
+   * @param {string|Expr|function(Expr):Partial} impl
+   * @returns {Native|Alias}
+   * @private
+   */
   _named (term, impl) {
     if (term instanceof Alias)
       return new Alias(term.name, term.impl, { canonize: true });
@@ -151,6 +159,16 @@ class SKI {
     throw new Error('add(): impl must be an Expr, a string, or a function with a signature Expr => ... => Expr');
   }
 
+  /**
+   * @desc Declare a new term if it is not known, otherwise just allow it.
+   *       Currently only used by quests.
+   *       Use with caution, this function may change its signature, behavior, or even be removed in the future.
+   *
+   * @experimental
+   * @param {string|Alias} name
+   * @param {string|Expr|function(Expr):Partial} impl
+   * @returns {SKI}
+   */
   maybeAdd (name, impl) {
     if (this.known[name])
       this.allow.add(name);
@@ -163,7 +181,7 @@ class SKI {
    * @desc Declare and remove multiple terms at once
    *       term=impl adds term
    *       term= removes term
-   * @param {string[]]} list
+   * @param {string[]} list
    * @return {SKI} chainable
    */
   bulkAdd (list) {
@@ -314,11 +332,11 @@ class SKI {
   }
 
   /**
-   *
+   * @template T
    * @param {string} source
    * @param {Object} [options]
    * @param {{[keys: string]: Expr}} [options.env]
-   * @param {any} [options.scope]
+   * @param {T} [options.scope]
    * @param {boolean} [options.numbers]
    * @param {boolean} [options.lambdas]
    * @param {string} [options.allow]
@@ -365,12 +383,14 @@ class SKI {
   }
 
   /**
-   *
+   * @desc Parse a single line of source code, without splitting it into declarations.
+   *       Internal, always use parse() instead.
+   * @template T
    * @param {String} source S(KI)I
    * @param {{[keys: string]: Expr}} env
    * @param {Object} [options]
    * @param {{[keys: string]: Expr}} [options.env] - unused, see 'env' argument
-   * @param {any} [options.scope]
+   * @param {T} [options.scope]
    * @param {boolean} [options.numbers]
    * @param {boolean} [options.lambdas]
    * @param {string} [options.allow]
@@ -464,15 +484,16 @@ class SKI {
  *          x instanceof FreeVar; // true
  *          x.apply(y).apply(z); // x(y)(z)
  *
+ * @template T
+ * @param {T} [scope] - optional context to bind the generated variables to
  * @return {{[key: string]: FreeVar}}
  */
-
-SKI.vars = function (context = {}) {
+SKI.vars = function (scope = {}) {
   const cache = {};
   return new Proxy({}, {
     get: (target, name) => {
       if (!(name in cache))
-        cache[name] = new FreeVar(name, context);
+        cache[name] = new FreeVar(name, scope);
       return cache[name];
     }
   });
@@ -495,6 +516,16 @@ for (const name in native)
 
 SKI.classes = classes;
 SKI.native = native;
+/**
+ * @desc Traverse control functions, used by Expr.traverse() and Expr.fold()
+ * @template T
+ * @type {{
+ *    descend: function(T): TraverseControl<T>,
+ *    prune: function(T): TraverseControl<T>,
+ *    redo: function(T): TraverseControl<T>,
+ *    stop: function(T): TraverseControl<T>
+ * }}
+ */
 SKI.control = Expr.control;
 
 module.exports = { SKI };
