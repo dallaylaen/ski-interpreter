@@ -1,6 +1,6 @@
 'use strict';
 
-const { Expr, Alias, FreeVar } = require('./expr')
+const { Expr, Alias, FreeVar } = require('./expr');
 
 /**
  * @desc  Extra utilities that do not belong in the core.
@@ -137,6 +137,20 @@ function deepFormat (obj, options = {}) {
   return out;
 }
 
+/**
+ * @desc  Given an expression and a hash of named terms,
+ *        return a semicolon-separated string that declares said expression
+ *        unambiguously.
+ *
+ * @example
+ * var expr = ski.parse("T=CI; V=BCT; V x y");
+ * SKI.extras.declare(expr, expr.context.env);
+ * // 'B; C; I; T=CI; V=BC(T); x=; y=; Vx y'
+ *
+ * @param {Expr} expr
+ * @param {{[s: string]: Named}} [env]
+ * @returns {string}
+ */
 function declare (expr, env) {
   const res = Expr.extras.toposort([expr], env);
 

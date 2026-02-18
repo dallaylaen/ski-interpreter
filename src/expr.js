@@ -120,12 +120,18 @@ class Expr {
    * @param {(acc: T, expr: Expr) => TraverseValue<T>} combine
    * @returns {T}
    */
-
   fold (initial, combine) {
     const [value, _] = unwrap(this._fold(initial, combine));
     return value ?? initial;
   }
 
+  /**
+   * @template T
+   * @param {T} initial
+   * @param {(acc: T, expr: Expr) => TraverseValue<T>} combine
+   * @returns {TraverseValue<T>}
+   * @private
+   */
   _fold (initial, combine) {
     return combine(initial, this);
   }
@@ -934,7 +940,9 @@ class Native extends Named {
     // try to bootstrap and infer some of our properties
     const guess = (opt.canonize ?? true) ? this.infer() : { normal: false };
 
+    /** @type {number} */
     this.arity = opt.arity || guess.arity || 1;
+    /** @type {string} */
     this.note = opt.note ?? guess.expr?.format({ terse: true, html: true, lambda: ['', ' &mapsto; ', ''] });
   }
 
@@ -1127,6 +1135,7 @@ class Church extends Native {
 
     super(name, impl, { arity: 2, canonize: false, note: name });
 
+    /** @type {number} */
     this.n = p;
     this.arity = 2;
   }
@@ -1150,10 +1159,6 @@ function waitn (expr, n) {
   return arg => n <= 1 ? expr.apply(arg) : waitn(expr.apply(arg), n - 1);
 }
 
-/**
- * @class
- * @extends Named
- */
 class Alias extends Named {
   /**
    * @desc A named alias for an existing expression.
