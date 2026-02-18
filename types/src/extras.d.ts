@@ -54,5 +54,21 @@ export function search(seed: Expr[], options: {
  * @returns {any}
  */
 export function deepFormat(obj: any, options?: object): any;
-export function declare(expr: any, env: any): string;
+/**
+ * @desc  Given an expression and a hash of named terms,
+ *        return a semicolon-separated string that declares said expression
+ *        unambiguously.
+ *
+ * @example
+ * var expr = ski.parse("T=CI; V=BCT; V x y");
+ * SKI.extras.declare(expr, expr.context.env);
+ * // 'B; C; I; T=CI; V=BC(T); x=; y=; Vx y'
+ *
+ * @param {Expr} expr
+ * @param {{[s: string]: Named}} [env]
+ * @returns {string}
+ */
+export function declare(expr: Expr, env?: {
+    [s: string]: Named;
+}): string;
 import { Expr } from "./expr";

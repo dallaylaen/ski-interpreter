@@ -62,7 +62,14 @@ export class Expr {
      * @returns {T}
      */
     fold<T>(initial: T, combine: (acc: T, expr: Expr) => TraverseValue<T>): T;
-    _fold(initial: any, combine: any): any;
+    /**
+     * @template T
+     * @param {T} initial
+     * @param {(acc: T, expr: Expr) => TraverseValue<T>} combine
+     * @returns {TraverseValue<T>}
+     * @private
+     */
+    private _fold;
     /**
      * @desc rough estimate of the term's complexity
      * @return {number}
@@ -449,6 +456,7 @@ export class App extends Expr {
     };
     traverse(change: any): Expr;
     any(predicate: any): any;
+    _fold(initial: any, combine: any): any;
     subst(search: any, replace: any): Expr;
     /**
      * @return {{expr: Expr, steps: number}}
@@ -534,6 +542,7 @@ export class Lambda extends Expr {
     invoke(arg: any): Expr;
     traverse(change: any): Expr | Lambda;
     any(predicate: any): any;
+    _fold(initial: any, combine: any): any;
     subst(search: any, replace: any): Lambda;
     _rski(options: any): any;
     diff(other: any, swap?: boolean): string;
@@ -564,14 +573,12 @@ export class Native extends Named {
         apply?: (arg0: Expr) => (Expr | null);
     });
     invoke: Partial;
-    arity: any;
-    note: any;
+    /** @type {number} */
+    arity: number;
+    /** @type {string} */
+    note: string;
     _rski(options: any): Expr | this;
 }
-/**
- * @class
- * @extends Named
- */
 export class Alias extends Named {
     /**
      * @desc A named alias for an existing expression.
@@ -605,6 +612,7 @@ export class Alias extends Named {
     invoke: (arg: any) => any;
     traverse(change: any): any;
     any(predicate: any): any;
+    _fold(initial: any, combine: any): any;
     subst(search: any, replace: any): any;
     _infer(options: any, preArgs?: any[], steps?: number): {
         normal: boolean;
@@ -628,8 +636,8 @@ export class Church extends Native {
      * @param {number} n
      */
     constructor(n: number);
-    n: any;
-    arity: number;
+    /** @type {number} */
+    n: number;
     diff(other: any, swap?: boolean): string;
 }
 /**
