@@ -177,7 +177,7 @@ describe('Quest', () => {
     // console.log(flattenExpr(pass));
 
     expect(pass.exception).to.equal(undefined, 'verified without exception');
-    expect(pass.weight).to.equal(4 + 4 + 3);
+    expect(pass.weight).to.equal(4 + 3);
 
     expect(pass.pass).to.equal(true);
 
@@ -229,6 +229,8 @@ describe('Quest', () => {
 
     JSON.stringify(failing); // doesn't die, TODO proper test
   });
+
+  // TODO it ('calculates weight of solution with aliases', () => {});
   /*
 
   // TODO uncomment & make pass

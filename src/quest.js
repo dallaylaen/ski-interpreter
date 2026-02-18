@@ -211,7 +211,11 @@ class Quest {
         numbers: spec.numbers ?? this.restrict.numbers,
         lambdas: spec.lambdas ?? this.restrict.lambdas,
       });
-      weight += impl.weight();
+      const arsenal = { ...this.engine.getTerms(), ...jar };
+      weight += impl.fold(0, (a, e) => {
+        if (e instanceof SKI.classes.Named && arsenal[e.name] === e)
+          return SKI.control.prune( a + 1);
+      });
       const expr = impl instanceof FreeVar
         ? impl
         : new Alias(spec.fancy ?? spec.name, impl, { terminal: true, canonize: false });
