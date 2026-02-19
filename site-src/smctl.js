@@ -7,7 +7,7 @@
  */
 class SMCtl {
   // State machine toggle for menus and such
-  constructor(options = {}) {
+  constructor (options = {}) {
     this.onchange = [];
     this.check = options.check ?? (any => true);
     if (options.onchange)
@@ -23,7 +23,7 @@ class SMCtl {
     this.load(); // set without saving
   }
 
-  set(value, nosave=false) {
+  set (value, nosave = false) {
     if (!this.check(value))
       throw new Error('SMCtl: invalid value ' + value);
     for (const cb of this.onchange)
@@ -33,11 +33,11 @@ class SMCtl {
       this.save(value);
   }
 
-  get() {
+  get () {
     return this.value;
   }
 
-  addAction(cb) {
+  addAction (cb) {
     this.onchange.push(cb);
   }
 }

@@ -85,8 +85,7 @@ class Hamburger {
   }
 
   // flags: [ [label, callback, selected?], ... ]
-  addFlags(label, flags) {
-    const state = {};
+  addFlags (label, flags) {
     const li = this.appendLi();
     append(li, 'span', { content: label });
     for (const [label, smctl] of flags) {
@@ -113,7 +112,7 @@ class Hamburger {
   }
 
   show () {
-    if(currentHamburger)
+    if (currentHamburger)
       currentHamburger.hide();
     currentHamburger = this;
     this.hidden = false;

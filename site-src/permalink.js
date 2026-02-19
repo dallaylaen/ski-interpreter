@@ -30,14 +30,14 @@ function readlink (hash) {
   return { expr, decls };
 }
 
-function readOldLink(location) {
+function readOldLink (location) {
 // recover old style links via ?code=...&terms=...
 // via redirect to hash consumable by readlink()
   const params = new URLSearchParams(location);
   if (params.has('code') || params.has('terms')) {
     const code = params.get('code') ?? '';
     const terms = params.get('terms').split(',');
-    console.log("Migrating old-style link to new-style hash, code =", code, "terms =", terms);
+    console.log('Migrating old-style link to new-style hash, code =', code, 'terms =', terms);
     const reworkTerms = terms
       .map(s => s.split(':').map(decodeURIComponent).join('='))
       .join(';');
@@ -45,4 +45,4 @@ function readOldLink(location) {
   }
 }
 
-module.exports = { permalink, readlink, readOldLink, };
+module.exports = { permalink, readlink, readOldLink };

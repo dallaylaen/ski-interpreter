@@ -14,7 +14,7 @@ class History {
    * @param {Store} options.store  The Store instance to use for saving history.
    * @param {number} [options.limit]  Maximum number of history entries to keep.
    */
-  constructor(options) {
+  constructor (options) {
     if (!options.store)
       throw new Error('History requires a Store instance');
     this.store = options.store;
@@ -23,7 +23,7 @@ class History {
     this.current = undefined;
   }
 
-  push(entry) {
+  push (entry) {
     if (entry === this.current)
       return; // skip dupes
     this.current = entry;
@@ -36,7 +36,7 @@ class History {
     this.trim();
   }
 
-  list(options) {
+  list (options) {
     const out = [];
     const head = this.store.load('head') ?? 0;
     const tail = this.store.load('tail') ?? 0;
@@ -50,17 +50,17 @@ class History {
     return out;
   }
 
-  clear() {
+  clear () {
     const head = this.store.load('head') ?? 0;
     const tail = this.store.load('tail') ?? 0;
-    for (let i = tail; i < head; i++) {
+    for (let i = tail; i < head; i++)
       this.store.delete(`entry-${i}`);
-    }
+
     this.store.save('head', 0);
     this.store.save('tail', 0);
   }
 
-  setlimit(n) {
+  setlimit (n) {
     if (typeof n !== 'number' || n <= 0)
       throw new Error('History limit must be a positive number');
     this.store.save('limit', n);
@@ -69,7 +69,7 @@ class History {
     this.trim(n);
   }
 
-  trim(limit) {
+  trim (limit) {
     if (limit === undefined)
       limit = this.store.load('limit') ?? 100;
     const head = this.store.load('head') ?? 0;

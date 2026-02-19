@@ -6,10 +6,10 @@
 
 'use strict';
 
-const util = require ('./html-util');
-const { EvalBox } = require ('./eval-box');
-const { permalink, readlink, readOldLink } = require ('./permalink');
-const { Store } = require ('./store');
+const util = require('./html-util');
+const { EvalBox } = require('./eval-box');
+const { permalink, readlink, readOldLink } = require('./permalink');
+const { Store } = require('./store');
 const { SMCtl } = require('./smctl');
 const { Hamburger } = require('./hamburger');
 const { History } = require('./history');

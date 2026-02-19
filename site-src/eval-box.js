@@ -20,7 +20,7 @@ class EvalBox {
    *      parent?: Element,
    * }} options
    */
-  constructor (options={}) {
+  constructor (options = {}) {
     // logic setup
     // TODO if expr is given, store it (= was parsed eslewhere)
     this.options    = options;
@@ -53,7 +53,7 @@ class EvalBox {
    * @param {string|Expr|[src: string, expr: Expr]} arg
    * @return this
    */
-  set(arg) {
+  set (arg) {
     if (typeof arg === 'string') {
       this.src = arg;
       this.expr = this.engine.parse(arg);
@@ -67,9 +67,9 @@ class EvalBox {
       // assume it's an Expr
       this.expr = arg;
       this.src = arg.format();
-    } else {
+    } else
       throw new Error('EvalBox.set() expects a string, Expr, or [string, Expr]');
-    }
+
     return this;
   }
 
@@ -78,7 +78,7 @@ class EvalBox {
    * @param {string} [src] Set new source code to run
    * @return EvalBox this
    */
-  start(src){
+  start (src) {
     if (this.running)
       this.stop();
 
@@ -111,7 +111,7 @@ class EvalBox {
   /**
    * @desc resume execution after stopping, if the sequence is not finished yet
    */
-  resume() {
+  resume () {
     if (this.running || !this.seq)
       return;
     this.running = true;
@@ -124,9 +124,8 @@ class EvalBox {
     const { value, done } = this.seq.next();
     // we're checking both done and value.final because some SKI operations know when they end and some don't
 
-    if (value) {
-      this.print(value.expr.format(this.format),{line: value.steps});
-    }
+    if (value)
+      this.print(value.expr.format(this.format), { line: value.steps });
 
     this.onStep(value, done || value.final);
 
@@ -144,14 +143,14 @@ class EvalBox {
     this.timer = setTimeout(() => this.tick(), this.delay);
   }
 
-  remove() {
+  remove () {
     if (this.view.parent) {
       this.view.parent.removeChild(this.view.main);
       this.view.parent = null;
     }
   }
 
-  clear() {
+  clear () {
     this.stop();
     this.view.main.innerHTML = '';
   }
@@ -160,7 +159,7 @@ class EvalBox {
     this.height = height;
   }
 
-  print(text, options = {}) {
+  print (text, options = {}) {
     const line = append(this.view.main, 'li', options);
     if (options.line !== 0 && !options.line)
       line.style['list-style'] = 'none';
@@ -174,8 +173,8 @@ class EvalBox {
       line.innerHTML = text;
     else {
       append(line, 'span', {
-        class: options.class ?? ['ski-eval-line'],
-        color: options.color,
+        class:   options.class ?? ['ski-eval-line'],
+        color:   options.color,
         content: (text),
       });
 

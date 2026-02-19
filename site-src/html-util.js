@@ -4,7 +4,7 @@
 
 'use strict';
 
-  /**
+/**
  * Locate static element with specific ids and return a hash of them.
  * @param {String} ids
  * @return {{}}
@@ -51,7 +51,7 @@ function traverse (node, func) {
     traverse(child, func);
 }
 
-function custom(html) {
+function custom (html) {
   const gantry = document.createElement('div');
   gantry.innerHTML = html.replace(/^[^<]*|[^>]*$/gs, ''); // omit text outside root element
   if (gantry.childNodes.length !== 1)
@@ -71,7 +71,7 @@ function custom(html) {
   return { ...out, elem };
 }
 
-function tpl(name) {
+function tpl (name) {
   // read <script type="text/template" id="name">
   const script = document.getElementById(name);
   if (!script)
@@ -112,4 +112,4 @@ function decode (s) {
   return decodeURIComponent(('' + s).replace(/\+/g, ' '));
 }
 
-module.exports = { append, custom, decode, encode, grabView, sanitize, tpl, traverse, };
+module.exports = { append, custom, decode, encode, grabView, sanitize, tpl, traverse };
