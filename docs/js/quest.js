@@ -10,88 +10,110 @@
 
 /* global SKI, EvalBox, append */
 
-/**
- * @desc Load quests from server and display them. Options:
- * @param {{
- *   index: string, // URL to fetch quest list from
- *   baseUrl?: string, // root URL to fetch quest data from, default 'data/quests/'
- *   // page elements to attach to:
- *   indexBox: HTMLElement, // element to attach chapter list to
- *   contentBox: HTMLElement, // element to attach chapter content to
- *   inventoryBox: HTMLElement, // element to attach inventory to
- *   // extra stuff
- *   linkedTo?: string, // id of element to scroll into view after loading
- *   store: Store, // TODO move out into callbacks, also make async
- *   engine?: SKI, // defautl = new SKI()
- *   onLoad?: function, // callback for when quests are loaded, gets list of Chapter objects as argument
- *   onSolved?: function, // callback for when a quest is solved
- *   onFailed?: function, // callback for when a quest is attempted but not solved
- *   onUnlock?: function, // callback for when a quest is solved and unlocks something in the engine
- *   chapterList?: Chapter[], // optional write-only list for observability only
- * }} options
- */
 // eslint-disable-next-line no-unused-vars
-function loadQuests(options) {
-  const root = options.baseUrl ?? '.';
-  const link = str => (str.match(/^\w+:\/\//) || str.match(/^[/.]/)) ? str : root + '/' + str;
+class QuestPage {
+  /**
+   * @desc Load quests from server and display them. Options:
+   * @param {{
+   *   index: string, // URL to fetch quest list from
+   *   baseUrl?: string, // root URL to fetch quest data from, default 'data/quests/'
+   *   // page elements to attach to:
+   *   indexBox: HTMLElement, // element to attach chapter list to
+   *   contentBox: HTMLElement, // element to attach chapter content to
+   *   inventoryBox: HTMLElement, // element to attach inventory to
+   *   // extra stuff
+   *   linkedTo?: string, // id of element to scroll into view after loading
+   *   store: Store, // TODO move out into callbacks, also make async
+   *   engine?: SKI, // defautl = new SKI()
+   *   onLoad?: function, // callback for when quests are loaded, gets list of Chapter objects as argument
+   *   onSolved?: function, // callback for when a quest is solved
+   *   onFailed?: function, // callback for when a quest is attempted but not solved
+   *   onUnlock?: function, // callback for when a quest is solved and unlocks something in the engine
+   *   chapterList?: Chapter[], // optional write-only list for observability only
+   * }} options
+   */
+  constructor (options) {
+    this.view = {};
 
-  const store = options.store;
-  const engine = options.engine ?? new SKI(store.load('engine') ?? { annotate: true, allow: 'SKI' });
+    this.root = options.baseUrl ?? '.';
+    this.store = options.store;
+    this.engine = options.engine ?? new SKI(this.store.load('engine') ?? { annotate: true, allow: 'SKI' });
 
-  if (options.inventoryBox)
-    showKnown(engine, options.inventoryBox);
+    if (options.inventoryBox) {
+      this.view.inventory = options.inventoryBox;
+      this.showKnown();
+    }
+    this.view.content = options.contentBox;
+    this.view.index = options.indexBox;
 
-  const chapters = options.chapterList ?? [];
+    this._onSolved = options.onSolved;
+    this._onFailed = options.onFailed;
+    this._onUnlock = options.onUnlock;
 
-  const onUnlock = (term) => {
-    engine.maybeAdd(term.name, term.impl);
-    if (store)
-      store.save('engine', engine);
-    if (options.inventoryBox)
-      showKnown(engine, options.inventoryBox);
-    if (options.onUnlock)
-      options.onUnlock(term);
-  };
+    this.chapters = [];
+  }
 
-  fetch(link(options.index))
-    .then(resp => resp.json())
-    .then(list => {
-      let chapterId = 0;
-      const joint = [];
-      for (const item of list) {
-        const chapter = new Chapter({
-          number: ++chapterId,
-          link: link(item),
-          engine,
-          store,
-          onUnlock,
-          onSolved: options.onSolved,
-          onFailed: options.onFailed,
+  load (index, linkedTo, onLoad) {
+    // TODO convert link into this.root
+
+    fetch(this.mkLink(index))
+      .then(resp => resp.json())
+      .then(list => {
+        let chapterId = 0;
+        this.chapters = [];
+        const joint = [];
+        for (const item of list) {
+          const chapter = new Chapter({
+            number:   ++chapterId,
+            link:     this.mkLink(item),
+            engine:   this.engine,
+            store:    this.store,
+            onUnlock: x => this.onUnlock(x),
+            onSolved: x => this._onSolved(x),
+            onFailed: x => this._onFailed(x),
+          });
+          this.chapters.push(chapter);
+          chapter.attach(this.view.content, { placeholder: 'loading chapter' + chapter.number + '...' });
+          chapter.addLink(this.view.index);
+          joint.push(chapter.fetch().then(chapter => {
+            chapter.draw();
+          }));
+        }
+        Promise.all(joint).then(() => {
+          if (linkedTo) {
+            const target = document.getElementById(linkedTo);
+            if (target)
+              target.scrollIntoView();
+          }
+          if (onLoad)
+            onLoad(this);
         });
-        chapters.push(chapter);
-        chapter.attach(options.contentBox, { placeholder: 'loading chapter' + chapter.number + '...' });
-        chapter.addLink(options.indexBox);
-        joint.push(chapter.fetch().then(chapter => {
-          chapter.draw();
-        }));
-      }
-      Promise.all(joint).then(() => {
-        if (options.linkedTo) {
-          const target = document.getElementById(options.linkedTo);
-          if (target)
-            target.scrollIntoView();
-        };
-        options.onLoad?.(chapters);
       });
-    });
-}
+  }
 
-function showKnown(ski, elem) {
-  // TODO ul, li
-  elem.innerHTML = '';
-  const terms = ski.getTerms();
-  for (const entry of Object.keys(terms).sort().map(x => [x, terms[x]]))
-    append(elem, 'div', {content: `<dt>${entry[0]}</dt><dd>= ${showTerm(entry[1])}</dd>`});
+  mkLink (str) {
+    return (str.match(/^\w+:\/\//) || str.match(/^[/.]/)) ? str : this.root + '/' + str;
+  }
+
+  onUnlock (term) {
+    this.engine.maybeAdd(term.name, term.impl);
+    if (this.store)
+      this.store.save('engine', this.engine);
+    this.showKnown();
+    if (this._onUnlock)
+      this._onUnlock(term);
+  }
+
+  showKnown () {
+    // TODO ul, li
+    if (!this.view.inventory)
+      return;
+    const elem = this.view.inventory;
+    elem.innerHTML = '';
+    const terms = this.engine.getTerms();
+    for (const entry of Object.keys(terms).sort().map(x => [x, terms[x]]))
+      append(elem, 'div', { content: `<dt>${entry[0]}</dt><dd>= ${showTerm(entry[1])}</dd>` });
+  }
 }
 
 class QuestBox {
@@ -460,4 +482,8 @@ function showhide (element, show) {
   if (show === undefined)
     show = element.hidden;
   element.hidden = !show;
+}
+
+function showTerm (term) {
+  return term.note ?? (term.impl ?? term).format({ html: true, lambda: ['', ' &mapsto; ', ''] });
 }

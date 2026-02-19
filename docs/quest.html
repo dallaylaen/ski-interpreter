@@ -23,12 +23,6 @@
                "footer footer footer";
         }
     </style>
-    <script>
-        // TODO: move elsewhere
-        function showTerm(term) {
-            return term.note ?? (term.impl ?? term).format({html: true, lambda: ['', ' &mapsto; ', '']});
-        }
-    </script>
 </head>
 <body>
     <header id="top" class="layout" style="grid-area: header;">
@@ -71,9 +65,8 @@
 
     initMenu();
 
-    loadQuests({
+    const page = new QuestPage({
       baseUrl: baseUrl,
-      index: indexUrl,
 
       indexBox: view.chapterlist,
       contentBox: view.quest,
@@ -81,11 +74,11 @@
 
       store,
 
-      linkedTo: linkedTo,
 
-      chapterList: chapters,
-      // onLoad: () => { console.log('Quests loaded') },
+      // onLoad: ,
     });
+
+    page.load(indexUrl, linkedTo, () => { console.log('Quests loaded') });
 
     function initMenu() {
         const menu = new Hamburger(view.menu);
