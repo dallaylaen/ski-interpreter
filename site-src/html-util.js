@@ -5,10 +5,14 @@
 'use strict';
 
 /**
- * Locate static elements with specific ids and them as hash.
+ * @desc Locate static elements with specific ids and them as hash.
  * camelCase ids are converted to hyphen-case for aesthetic reason.
- * @param {String} ids
- * @return {{}}
+ *
+ * @param {string} ids
+ * @return {{[id: string]: HTMLElement}}
+ *
+ * @example
+ * // given <div id="foo-bar"></div>, grabView('fooBar') will return { fooBar: HTMLDivElement }
  */
 function grabView (...ids) {
   const view = {};
@@ -37,7 +41,7 @@ function grabView (...ids) {
  * // create <div class="foo bar" style="color: red">Hello</div> and append to body
  * append(document.body, 'div', { class: ['foo', 'bar'], content: 'Hello', color: 'red' });
  */
-function append (parent, tagname, options = {}, decorate) {
+function append (parent, tagname, options = {}, decorate = null) {
   const child = document.createElement(tagname);
   if (options.class)
     child.classList.add(...options.class);
@@ -63,34 +67,6 @@ function traverse (node, func) {
   func(node);
   for (const child of node.childNodes)
     traverse(child, func);
-}
-
-function custom (html) {
-  const gantry = document.createElement('div');
-  gantry.innerHTML = html.replace(/^[^<]*|[^>]*$/gs, ''); // omit text outside root element
-  if (gantry.childNodes.length !== 1)
-    throw new Error('Custom HTML element must have exactly one root node');
-  const elem = gantry.childNodes[0];
-
-  const out = {};
-  traverse(elem, node => {
-    // extract data-handle attributes
-    const handle = node.getAttribute && node.getAttribute('data-handle');
-    if (!handle)
-      return;
-    if (out[handle])
-      throw new Error(`Duplicate data-handle attribute: ${handle}`);
-    out[handle] = node;
-  });
-  return { ...out, elem };
-}
-
-function tpl (name) {
-  // read <script type="text/template" id="name">
-  const script = document.getElementById(name);
-  if (!script)
-    throw new Error(`Template not found: ${name}`);
-  return script.innerHTML;
 }
 
 /**
@@ -131,4 +107,4 @@ function decode (s) {
   return decodeURIComponent(('' + s).replace(/\+/g, ' '));
 }
 
-module.exports = { append, custom, decode, encode, grabView, sanitize, tpl, traverse };
+module.exports = { append, decode, encode, grabView, sanitize, traverse };
