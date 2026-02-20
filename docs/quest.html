@@ -66,19 +66,16 @@
     initMenu();
 
     const page = new QuestPage({
+      store,
+
       baseUrl: baseUrl,
 
       indexBox: view.chapterlist,
       contentBox: view.quest,
       inventoryBox: view.known,
-
-      store,
-
-
-      // onLoad: ,
     });
 
-    page.load(indexUrl, linkedTo, () => { console.log('Quests loaded') });
+    page.load(indexUrl, linkedTo, () => { console.log('Loaded quests from ' + indexUrl) });
 
     function initMenu() {
         const menu = new Hamburger(view.menu);
@@ -86,16 +83,11 @@
         menu.addLink('introduction', 'intro.html', '_blank');
         menu.addLink('combinatory logic', 'https://en.wikipedia.org/wiki/Combinatory_logic', '_blank');
         menu.addAction('<span class="danger">&cross; erase progress</span>', () => {
-            if (confirm('Are you sure you want to start over?'))
-                demolish();
+            if (confirm('Are you sure you want to start over?')) {
+                page.demolish();
+                window.location.reload();
+            }
         });
-    }
-
-    function demolish() {
-        for (const key of store.scan()) {
-            store.delete(key);
-        };
-        window.location.reload();
     }
 
 </script>

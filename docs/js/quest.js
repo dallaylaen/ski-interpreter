@@ -114,6 +114,13 @@ class QuestPage {
     for (const entry of Object.keys(terms).sort().map(x => [x, terms[x]]))
       append(elem, 'div', { content: `<dt>${entry[0]}</dt><dd>= ${showTerm(entry[1])}</dd>` });
   }
+
+  demolish() {
+    for (const key of this.store.scan()) {
+      this.store.delete(key);
+    };
+    // TODO reset engine, chapters, and quest boxes
+  }
 }
 
 class QuestBox {
