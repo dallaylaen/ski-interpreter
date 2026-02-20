@@ -57,8 +57,6 @@
     if (custom)
         console.log(`Loading quests from ${indexUrl} with base URL ${baseUrl}`);
 
-    const store = new Store(custom ? 'quest-'+custom : 'quest-page');
-
     const view = util.grabView('quest', 'known', 'chapterlist', 'menu');
     const linkedTo = window.location.hash.slice(1);
     const chapters = []; // for debugging only
@@ -66,7 +64,7 @@
     initMenu();
 
     const page = new QuestPage({
-      store,
+      storePrefix: 'quest-' + (custom ? custom : 'page'),
 
       baseUrl: baseUrl,
 

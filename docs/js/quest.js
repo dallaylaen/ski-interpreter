@@ -8,7 +8,7 @@
  * @requires append
  */
 
-/* global SKI, EvalBox, append */
+/* global SKI, EvalBox, append, Store */
 
 // eslint-disable-next-line no-unused-vars
 class QuestPage {
@@ -17,6 +17,7 @@ class QuestPage {
    * @param {{
    *   index: string, // URL to fetch quest list from
    *   baseUrl?: string, // root URL to fetch quest data from, default 'data/quests/'
+   *   storePrefix?: string, // prefix for localStorage keys, required unless 'store' object itself is provided
    *   // page elements to attach to:
    *   indexBox: HTMLElement, // element to attach chapter list to
    *   contentBox: HTMLElement, // element to attach chapter content to
@@ -34,9 +35,11 @@ class QuestPage {
    */
   constructor (options) {
     this.view = {};
-
     this.root = options.baseUrl ?? '.';
-    this.store = options.store;
+
+    if (!options.store && !options.storePrefix)
+      throw new Error('No storePrefix provided');
+    this.store = options.store ?? new Store(options.storePrefix);
     this.engine = options.engine ?? new SKI(this.store.load('engine') ?? { annotate: true, allow: 'SKI' });
 
     if (options.inventoryBox) {
