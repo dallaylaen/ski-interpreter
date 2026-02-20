@@ -1,19 +1,24 @@
 'use strict';
 
 /**
- * @desc Quest page logic.
  * @requires SKI
  * @requires Store
  * @requires EvalBox
  * @requires append
  */
-
 /* global SKI, EvalBox, append, Store */
 
 // eslint-disable-next-line no-unused-vars
 class QuestPage {
   /**
-   * @desc Load quests from server and display them. Options:
+   * @desc  A collection of combinatory logic quests organized into chapters
+   *        and attached to specific elements for display.
+   *
+   *        Quest progress is saved in the localStorage under a given prefix.
+   *
+   *        The engine is also saved and loaded from the store,
+   *        so that unlocked terms persist across sessions and can be used in later quests.
+   *
    * @param {{
    *   index: string, // URL to fetch quest list from
    *   baseUrl?: string, // root URL to fetch quest data from, default 'data/quests/'
@@ -26,11 +31,11 @@ class QuestPage {
    *   linkedTo?: string, // id of element to scroll into view after loading
    *   store: Store, // TODO move out into callbacks, also make async
    *   engine?: SKI, // defautl = new SKI()
-   *   onLoad?: function, // callback for when quests are loaded, gets list of Chapter objects as argument
+   *   onLoad?: function, // callback for when quests are loaded, gets list of QuestChapter objects as argument
    *   onSolved?: function, // callback for when a quest is solved
    *   onFailed?: function, // callback for when a quest is attempted but not solved
    *   onUnlock?: function, // callback for when a quest is solved and unlocks something in the engine
-   *   chapterList?: Chapter[], // optional write-only list for observability only
+   *   chapterList?: QuestChapter[], // optional write-only list for observability only
    * }} options
    */
   constructor (options) {
@@ -66,7 +71,7 @@ class QuestPage {
         this.chapters = [];
         const joint = [];
         for (const item of list) {
-          const chapter = new Chapter({
+          const chapter = new QuestChapter({
             number:   ++chapterId,
             link:     this.mkLink(item),
             engine:   this.engine,
@@ -132,7 +137,7 @@ class QuestBox {
    * @param {QuestSpec} spec
    * @param {{
    *   engine?: SKI,
-   *   chapter?: Chapter,
+   *   chapter?: QuestChapter,
    *   number?: number,
    *   store?: Store,
    * }}options
@@ -325,7 +330,7 @@ class QuestBox {
   }
 }
 
-class Chapter {
+class QuestChapter {
   /**
    * @desc A collection of quests, typically related,
    *       with a title and intro text. Optionally numbered, too.
