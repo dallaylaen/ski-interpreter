@@ -5,7 +5,8 @@
 'use strict';
 
 /**
- * Locate static element with specific ids and return a hash of them.
+ * Locate static elements with specific ids and them as hash.
+ * camelCase ids are converted to hyphen-case for aesthetic reason.
  * @param {String} ids
  * @return {{}}
  */
@@ -14,19 +15,30 @@ function grabView (...ids) {
   for (const name of ids) {
     const hyphen = name.replace(/[A-Z]/g, char => '-' + char.toLowerCase())
     view[name] = document.getElementById(hyphen);
+    if (!view[name])
+      throw new Error(`View element not found: ${hyphen}`);
   }
   return view;
 }
 
 /**
- * Attach a child element to the given parent and return the child.
- * @param parent
- * @param type
- * @param {{class: string[]?, content: string?, hidden: boolean?}} options
+ * Create a new HTMLElement and append it to parent, if given.
+ * @param parent - parent element to append to, or null to create an unattached element
+ * @param tagname - tag name of the element to create
+ * @param {object} options
+ * @param {string[]} [options.class] - array of class names to add
+ * @param {string} [options.content] - innerHTML content to set (not escaped whatsoever)
+ * @param {boolean} [options.hidden] - whether to set hidden attribute
+ * @param {string} [options.color] - color to set for the element
+ * @param {(elem: HTMLElement) => void} decorate - do more stuff on element before returning it
  * @return {HTMLElement}
+ *
+ * @example
+ * // create <div class="foo bar" style="color: red">Hello</div> and append to body
+ * append(document.body, 'div', { class: ['foo', 'bar'], content: 'Hello', color: 'red' });
  */
-function append (parent, type, options = {}) {
-  const child = document.createElement(type);
+function append (parent, tagname, options = {}, decorate) {
+  const child = document.createElement(tagname);
   if (options.class)
     child.classList.add(...options.class);
   if (options.content !== undefined)
@@ -37,6 +49,8 @@ function append (parent, type, options = {}) {
     child.style.color = options.color;
   if (parent)
     parent.appendChild(child);
+  if (decorate)
+    decorate(child);
   return child;
 }
 
@@ -79,6 +93,11 @@ function tpl (name) {
   return script.innerHTML;
 }
 
+/**
+ * Escape HTML special characters in a string.
+ * @param text
+ * @returns {string}
+ */
 function sanitize (text) {
   if (typeof text !== 'string')
     text = '' + text;
