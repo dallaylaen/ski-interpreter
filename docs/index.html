@@ -480,11 +480,10 @@
      * @returns {EvalBox}
      */
     function createRunner(src, options={}) {
-        const container = util.custom(util.tpl('tpl-eval-box'));
-        view.teletype.appendChild(container.elem);
+        const container = evalFrame({parent: view.teletype, id: options.id});
 
         const runner = new EvalBox({
-            parent:  container.main,
+            parent:  container.content,
             scroll:  view.teletype,
             height:  evalOptions.height,
             delay:   evalOptions.delay,
@@ -525,16 +524,41 @@
         return null;
     }
 
-    function showInventory() {
-        // TODO should not be here but still
-        if (autosave)
-            store.save('engine', ski);
+    /**
+     * @desc Create decorative and control elements for EvalBox to be attached to
+     * @return {{
+     *     main: HTMLElement,
+     *     content: HTMLElement,
+     *     permalink: HTMLElement,
+     *     src: HTMLElement,
+     *     steps: HTMLElement,
+     *     footer: HTMLElement,
+     *  }}
+     */
 
-        view.inventory.innerHTML = '';
-        const list = ski.getTerms();
-        for (let name of Object.keys(list).filter(s => s.match(/^[a-z_]/i)).sort()) {
-            const entry = list[name];
-            const entryDiv = append(view.inventory, 'div');
+    function evalFrame(options = {}) {
+      const main = append(options.parent, 'div', {class: ['console']});
+      const header = append(main, 'div', {class: ['con-header']});
+      const permalink = append(header, 'a', {class: ['permalink'], content: '#' + options.id},
+          e => { e.target = '_blank'; });
+      append(header, 'span', {content: ' '}); // spacer
+      const src = append(header, 'span', {class: ['src'], content: options.src});
+      const steps = append(header, 'span', {class: ['steps', 'float-right'], content: '-'});
+      const content = append(main, 'div', {}); // no class here because EvalBox has enough
+      const footer = append(main, 'div', {class: ['con-footer']});
+      return {main, content, permalink, src, steps, footer};
+    }
+
+    function showInventory() {
+      // TODO should not be here but still
+      if (autosave)
+        store.save('engine', ski);
+
+      view.inventory.innerHTML = '';
+      const list = ski.getTerms();
+      for (let name of Object.keys(list).filter(s => s.match(/^[a-z_]/i)).sort()) {
+        const entry = list[name];
+        const entryDiv = append(view.inventory, 'div');
             const entrySpan = append(entryDiv, 'a', {class: ['term-def', 'ellipsis']} );
             entrySpan.href = "#";
             entrySpan.onclick = event => insertInventoryItem(name);
@@ -589,22 +613,6 @@
         return false;
     }
 
-</script>
-
-<script language="text/html" id="tpl-eval-box">
-    /*
-    <div class="console">
-        <div class="con-header">
-            <a data-handle="permalink" href="#" target="_blank"></a>
-            <span data-handle="src"></span>
-            <span data-handle="steps" class="float-right">-</span>
-        </div>
-        <div data-handle="main" class="ski-eval-box">
-        </div>
-        <div class="con-footer">
-        </div>
-    </div>
-    */
 </script>
 
 </body>
