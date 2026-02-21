@@ -100,23 +100,22 @@ function unwrap (value) {
 }
 
 /**
- *
  * @desc Prepare a self-referencing wrapper function for use as a fold/traverse control decorator.
  *
  *       If `fun` is created by `prepareWrapper`, then
  *       unwrap(fun(x)) will always return exactly [x, fun], and the second value can be checked with ===.
  *
- *       An optional name can be given for debugging purposes.
+ *       An optional label can be provided for debugging purposes.
  *
  * @private
  * @template T
- * @param {string} [name]
+ * @param {string} [label]
  * @returns {function(T): TraverseControl<T>}
  */
-function prepareWrapper (name) {
+function prepareWrapper (label) {
   const fun = value => new TraverseControl(value, fun);
-  fun.name = name;
-  fun.toString = () => 'TraverseControl::' + name;
+  fun.label = label;
+  fun.toString = () => 'TraverseControl::' + label;
   return fun;
 }
 
