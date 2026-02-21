@@ -5,6 +5,35 @@ const { Store } = require('./store');
 const { EvalBox } = require('./eval-box');
 const { append } = require('./html-util')
 
+/**
+ * @cssClass ski-quest-box - container for an individual quest, with title, description, input, and result display
+ * @cssSelector .ski-quest-box h3 - quest title
+ * @cssClass ski-quest-chapter - container for a chapter, with title and intro
+ * @cssSelector .ski-quest-chapter h2 - chapter title, click to show/hide content
+ * @cssSelector .ski-quest-chapter code - how to display code snippets in quest and chapter intros
+ * @cssClass ski-quest-chapter-content - container for quests in a chapter, can be hidden by clicking chapter title
+ * @cssClass ski-quest-chapter-intro - chapter introduction text
+ * @cssClass ski-quest-comment - comments, make them fainter or something
+ * @cssClass ski-quest-progressbar - a progress bar in the chapter list, showing how much of the chapter is solved
+ *           Set background [color], and don't touch margin/padding which are adjusted by quest code
+ * @cssClass ski-quest-control - for controls in the result display, like "show steps"
+ * @cssClass ski-quest-display - results of a quest solution attempt
+ * @cssClass ski-quest-error
+ * @cssClass ski-quest-float-right
+ * @cssClass ski-quest-hint - a self-revealing spoiler
+ * @cssClass ski-quest-index - container for chapter list
+ * @cssSelector .ski-quest-index a - chapter links in the index.
+ *      Display is forced to flex for progress bars to work, be careful!
+ * @cssClass ski-quest-intro - introduction text in individual quests
+ * @cssClass ski-quest-inventory - element containing all unlocked terms
+ * @cssClass ski-quest-label - label for an input field
+ * @cssClass ski-quest-input - container for input elements
+ * @cssSelector .ski-quest-input input[type="text"] - input fields for quest solutions
+ * @cssSelector .ski-quest-input button - button to submit quest solution
+ * @cssClass ski-quest-term-def
+ * @cssClass ski-quest-term-name
+ */
+
 class QuestPage {
   /**
    * @desc  A collection of combinatory logic quests organized into chapters
@@ -48,7 +77,8 @@ class QuestPage {
       this.showKnown();
     }
     this.view.content = options.contentBox;
-    this.view.index = options.indexBox;
+    if (options.indexBox)
+      this.view.index = append(options.indexBox, 'div', { class: ['ski-quest-index'] });
 
     this._onSolved = options.onSolved;
     this._onFailed = options.onFailed;
@@ -101,7 +131,8 @@ class QuestPage {
       });
       this.chapters.push(chapter);
       chapter.attach(this.view.content, { placeholder: 'loading chapter' + chapter.number + '...' });
-      chapter.addLink(this.view.index);
+      if (this.view.index)
+        chapter.addLink(this.view.index);
       joint.push(chapter.fetch().then(chapter => {
         chapter.draw();
       }));
@@ -244,13 +275,13 @@ class QuestBox {
     this.view.stat = append(title, 'span', { class: ['ski-quest-float-right'] });
 
     const descr = append(body, 'div');
-    append(descr, 'div', { content: cat(this.impl.intro), class: ['ski-quest-note'] });
+    append(descr, 'div', { content: cat(this.impl.intro), class: ['ski-quest-intro'] });
     if (this.impl.meta.hint)
       hint(descr, ' Hint:...', ' Hint: ' + this.impl.meta.hint);
 
     this.view.display = append(body, 'div', { class: ['ski-quest-display'], content: '.....' });
 
-    this.view.solution = append(body, 'div', { class: ['ski-quest-solution'] });
+    this.view.solution = append(body, 'div', { class: ['ski-quest-input'] });
 
     this.drawInput(this.view.solution);
 
@@ -460,10 +491,13 @@ class QuestChapter {
   }
 
   addLink (element) {
-    const link = append(element, 'a');
+    const link = append(element, 'a', {}, e => {
+      e.href = '#' + this.id;
+      e.style.display = 'flex'; // hardcoded flex for progress bar to work, don't rely on user's css
+    });
     link.href = '#' + this.id;
     this.view.link = link;
-    this.view.progressbar = append(link, 'span', { class: ['ski-quest-completion'] });
+    this.view.progressbar = append(link, 'span', { class: ['ski-quest-progressbar'] });
     this.view.linkText = append(link, 'span', { content: 'Chapter ' + this.number + '...' });
   }
 
