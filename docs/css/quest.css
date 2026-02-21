@@ -41,7 +41,7 @@
     text-decoration: inherit;
 }
 
-.ski-quest-chapter .ski-quest-note {
+.ski-quest-chapter .ski-quest-intro {
     margin: 1ex;
 }
 
@@ -52,7 +52,7 @@
     white-space: nowrap;
 }
 
-.ski-quest-box .ski-quest-note {
+.ski-quest-box .ski-quest-intro {
     border: 1px solid goldenrod;
     border-radius: 0.5em;
     padding: 0 0.5em;
@@ -72,7 +72,7 @@
     font-size: small;
 }
 
-.console {
+.ski-eval-box {
     color: black;
     background-color: lightgray;
     border: 1px solid black;
@@ -102,7 +102,7 @@
     cursor: pointer;
 }
 
-.ski-quest-completion {
+.ski-quest-progressbar {
     background-color: lightgreen;
     border-radius: 0.2em;
     height: inherit;
@@ -130,7 +130,6 @@
 
 /* TODO rename to ski-quest-* */
 .content-table a {
-    display: flex;
     text-decoration: inherit;
     color: #444444;
     padding: 0.3em;
