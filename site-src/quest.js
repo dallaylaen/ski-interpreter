@@ -57,13 +57,20 @@ class QuestPage {
     this.chapters = [];
   }
 
-  load (index, linkedTo, onLoad) {
+  /**
+   * @desc Load quest list from given index URL, then load and draw chapters.
+   * @param {string} index URL to fetch the quest list from
+   * @param {string} [linkedTo] id of quest to scroll into view after loading, if matches
+   * @param {function} onLoad callback for when quests are loaded, gets self as argument
+   */
+  loadFromIndex (index, linkedTo, onLoad) {
+    // TODO update this.root based on index URL
     fetch(this.mkLink(index))
       .then(resp => resp.json())
       .then(list => this.loadChapters(list))
-      .then(chapters => {
+      .then(self => {
         if (onLoad)
-          onLoad(chapters);
+          onLoad(self);
         if (linkedTo) {
           const target = document.getElementById(linkedTo);
           if (target)
@@ -72,28 +79,34 @@ class QuestPage {
       });
   }
 
-  async loadChapters(list) {
+  /**
+   * @desc Load and draw chapters from a given list of chapter specs.
+   * @param list
+   * @returns {Promise<QuestPage>}
+   */
+  async loadChapters (list) {
     let chapterId = 0;
     this.chapters = [];
     const joint = [];
     for (const item of list) {
+      // TODO if item is an object, skip fetch and use it directly, returning `resolve`
       const chapter = new QuestChapter({
-        number: ++chapterId,
-        link: this.mkLink(item),
-        engine: this.engine,
-        store: this.store,
+        number:   ++chapterId,
+        link:     this.mkLink(item),
+        engine:   this.engine,
+        store:    this.store,
         onUnlock: x => this.onUnlock(x),
         onSolved: x => this._onSolved(x),
         onFailed: x => this._onFailed(x),
       });
       this.chapters.push(chapter);
-      chapter.attach(this.view.content, {placeholder: 'loading chapter' + chapter.number + '...'});
+      chapter.attach(this.view.content, { placeholder: 'loading chapter' + chapter.number + '...' });
       chapter.addLink(this.view.index);
       joint.push(chapter.fetch().then(chapter => {
         chapter.draw();
       }));
     }
-    return Promise.all(joint);
+    return Promise.all(joint).then(() => this);
   }
 
   mkLink (str) {
@@ -120,10 +133,10 @@ class QuestPage {
       append(elem, 'div', { content: `<dt>${entry[0]}</dt><dd>= ${showTerm(entry[1])}</dd>` });
   }
 
-  demolish() {
-    for (const key of this.store.scan()) {
+  demolish () {
+    for (const key of this.store.scan())
       this.store.delete(key);
-    };
+
     // TODO reset engine, chapters, and quest boxes
   }
 }
