@@ -58,41 +58,42 @@ class QuestPage {
   }
 
   load (index, linkedTo, onLoad) {
-    // TODO convert link into this.root
-
     fetch(this.mkLink(index))
       .then(resp => resp.json())
-      .then(list => {
-        let chapterId = 0;
-        this.chapters = [];
-        const joint = [];
-        for (const item of list) {
-          const chapter = new QuestChapter({
-            number:   ++chapterId,
-            link:     this.mkLink(item),
-            engine:   this.engine,
-            store:    this.store,
-            onUnlock: x => this.onUnlock(x),
-            onSolved: x => this._onSolved(x),
-            onFailed: x => this._onFailed(x),
-          });
-          this.chapters.push(chapter);
-          chapter.attach(this.view.content, { placeholder: 'loading chapter' + chapter.number + '...' });
-          chapter.addLink(this.view.index);
-          joint.push(chapter.fetch().then(chapter => {
-            chapter.draw();
-          }));
+      .then(list => this.loadChapters(list))
+      .then(chapters => {
+        if (onLoad)
+          onLoad(chapters);
+        if (linkedTo) {
+          const target = document.getElementById(linkedTo);
+          if (target)
+            target.scrollIntoView();
         }
-        Promise.all(joint).then(() => {
-          if (linkedTo) {
-            const target = document.getElementById(linkedTo);
-            if (target)
-              target.scrollIntoView();
-          }
-          if (onLoad)
-            onLoad(this);
-        });
       });
+  }
+
+  async loadChapters(list) {
+    let chapterId = 0;
+    this.chapters = [];
+    const joint = [];
+    for (const item of list) {
+      const chapter = new QuestChapter({
+        number: ++chapterId,
+        link: this.mkLink(item),
+        engine: this.engine,
+        store: this.store,
+        onUnlock: x => this.onUnlock(x),
+        onSolved: x => this._onSolved(x),
+        onFailed: x => this._onFailed(x),
+      });
+      this.chapters.push(chapter);
+      chapter.attach(this.view.content, {placeholder: 'loading chapter' + chapter.number + '...'});
+      chapter.addLink(this.view.index);
+      joint.push(chapter.fetch().then(chapter => {
+        chapter.draw();
+      }));
+    }
+    return Promise.all(joint);
   }
 
   mkLink (str) {
