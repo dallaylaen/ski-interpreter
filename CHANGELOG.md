@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2026-02-22
+
+### Added
+
+- `Expr.diag()` outputs an expression as an indented tree (breadth-first) with class names and variables labeled for deduplication.
+- `lib/ski-quest.min.js` bundle to create quest pages.
+- The [playground](https://dallaylaen.github.io/ski-interpreter/playground.html) gets history!
+
+### Fixed
+
+- Greatly improved type definitions.
+- Quests calculate solution complexity via `fold()`.
+
 ## [2.2.0] - 2026-02-14
 
 ### BREAKING CHANGES
@@ -20,6 +33,7 @@ that give the initial expression when applied
 from left to right: `((a, b), (c, d)) => [a, b, (c, d)]`
 - Parser: Support for chained assignments (`'foo=bar=baz'` expressions)
 - Parser: Support for multi-line comment syntax (`/* comments */`)
+- `SKI_REPL=1 node -r @dallaylaen/ski-interpreter` will now start a REPL with the `SKI` class available globally.
 
 ### Changed
 
