@@ -123,14 +123,19 @@ class QuestPage {
   }
 
   showKnown () {
-    // TODO ul, li
     if (!this.view.inventory)
       return;
-    const elem = this.view.inventory;
-    elem.innerHTML = '';
+    this.view.inventory.innerHTML = '';
+    const ul = append(this.view.inventory, 'ul', {class: ['ski-quest-inventory'] });
     const terms = this.engine.getTerms();
-    for (const entry of Object.keys(terms).sort().map(x => [x, terms[x]]))
-      append(elem, 'div', { content: `<dt>${entry[0]}</dt><dd>= ${showTerm(entry[1])}</dd>` });
+    for (const entry of Object.keys(terms).sort().map(x => [x, terms[x]])) {
+      const li = append(ul, 'li', {}, e => {
+        e.dataset.skiTerm = entry[0];
+      });
+      append(li, 'span', { content: entry[0], class: ['ski-quest-term-name'] });
+      append(li, 'span', { content: ': ' });
+      append(li, 'span', { content: showTerm(entry[1]), class: ['ski-quest-term-def'] });
+    }
   }
 
   demolish () {
