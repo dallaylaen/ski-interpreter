@@ -72,7 +72,7 @@
       inventoryBox: view.known,
     });
 
-    page.load(indexUrl, linkedTo, () => { console.log('Loaded quests from ' + indexUrl) });
+    page.loadFromIndex(indexUrl, linkedTo, () => { console.log('Loaded quests from ' + indexUrl) });
 
     function initMenu() {
         const menu = new Hamburger(view.menu);
