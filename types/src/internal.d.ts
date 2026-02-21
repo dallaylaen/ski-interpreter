@@ -32,20 +32,19 @@ export function restrict(set: Set<string>, spec?: string): Set<string>;
  */
 export function unwrap<T>(value: T | TraverseControl<T> | null): [T?, Function | undefined];
 /**
- *
  * @desc Prepare a self-referencing wrapper function for use as a fold/traverse control decorator.
  *
  *       If `fun` is created by `prepareWrapper`, then
  *       unwrap(fun(x)) will always return exactly [x, fun], and the second value can be checked with ===.
  *
- *       An optional name can be given for debugging purposes.
+ *       An optional label can be provided for debugging purposes.
  *
  * @private
  * @template T
- * @param {string} [name]
+ * @param {string} [label]
  * @returns {function(T): TraverseControl<T>}
  */
-export function prepareWrapper<T>(name?: string): (arg0: T) => TraverseControl<T>;
+export function prepareWrapper<T>(label?: string): (arg0: T) => TraverseControl<T>;
 declare class TraverseControl {
     /**
      * @desc A wrapper for values returned by fold/traverse callbacks
