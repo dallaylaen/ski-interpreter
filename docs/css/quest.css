@@ -146,3 +146,21 @@
 .content-table a~a {
     margin-top: 0.2em;
 }
+
+/* inventory */
+.ski-quest-inventory ul {
+    padding: 0;
+    font-family: monospace;
+}
+
+.ski-quest-inventory ul li {
+    list-style-type: none;
+    // no padding
+    padding: 0;
+    margin: 0.2em 0;
+}
+
+.ski-quest-term-name {
+    font-weight: bold;
+    color: indigo;
+}
