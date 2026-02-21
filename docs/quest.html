@@ -70,6 +70,17 @@
       indexBox: view.chapterlist,
       contentBox: view.quest,
       inventoryBox: view.known,
+
+      onUnlock: term => {
+        const affected = document.querySelectorAll('[data-ski-term="' + term + '"]')[0];
+        if (affected)
+          animateBackground(affected, {
+            interval: 100,
+            color: [0, 255, 0],
+            wave: [0.2, 0.4, 0.6, 0.8, 1, 0.8, 0.6, 0.4, 0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            fadeTime: 60000,
+          });
+      }
     });
 
     page.loadFromIndex(indexUrl, linkedTo, () => { console.log('Loaded quests from ' + indexUrl) });
@@ -85,6 +96,28 @@
                 window.location.reload();
             }
         });
+    }
+
+    /* pure eye candy */
+
+    function animateBackground(element, options={}) {
+        const stripes = [...(options.wave ?? [0.2, 0.5, 0.8, 1, 0.8, 0.5, 0.2, 0, 0, 0, 0, 0])];
+      // TODO split opt.color into RBG
+        const color = options.color ?? [0, 255, 0];
+        let fade = 1;
+        const fatestep = (options.interval ?? 100) / (options.fadeTime || 5000);
+
+        const tim = setInterval(() => {
+          element.style.backgroundImage = 'linear-gradient(120deg, '
+            + stripes.map(s => 'rgba(' + color.join(',') + ',' + s * fade + ')').join(', ')
+            + ')';
+          if (fade <= 0) {
+            clearInterval(tim);
+            return;
+          }
+          stripes.unshift(stripes.pop());
+          fade -= fatestep;
+        }, options.interval ?? 100);
     }
 
 </script>
