@@ -28,7 +28,9 @@
     "build-cjs": "npx esbuild --bundle --sourcemap --format=cjs ./index.js --outfile=lib/ski-interpreter.cjs.js",
     "build-esm": "npx esbuild --bundle --sourcemap --format=esm ./index.js --outfile=lib/ski-interpreter.esm.js",
     "build-site": "npx esbuild --bundle ./site-src/index.js --outfile=docs/build/js/util.min.js --minify --sourcemap",
-    "build": "npm run lint && npm run types && npm run test && npm run build-cjs && npm run build-esm && npm run build-web && npm run build-site"
+    "build-quest": "npx esbuild --bundle --sourcemap ./site-src/index-quest.js --outfile=docs/build/js/ski-quest.min.js",
+    "build-all": "npm run build-cjs && npm run build-esm && npm run build-web && npm run build-quest",
+    "build": "npm run lint && npm run types && npm run test && npm run build-all"
   },
   "files": [
     "package.json",

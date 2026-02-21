@@ -1,14 +1,10 @@
 'use strict';
 
-/**
- * @requires SKI
- * @requires Store
- * @requires EvalBox
- * @requires append
- */
-/* global SKI, EvalBox, append, Store */
+const { SKI } = require('../index');
+const { Store } = require('./store');
+const { EvalBox } = require('./eval-box');
+const { append } = require('./html-util')
 
-// eslint-disable-next-line no-unused-vars
 class QuestPage {
   /**
    * @desc  A collection of combinatory logic quests organized into chapters
@@ -502,3 +498,5 @@ function showhide (element, show) {
 function showTerm (term) {
   return term.note ?? (term.impl ?? term).format({ html: true, lambda: ['', ' &mapsto; ', ''] });
 }
+
+module.exports = { QuestPage, QuestChapter, QuestBox };
