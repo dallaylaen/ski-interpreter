@@ -1,0 +1,122 @@
+{
+  "cKg6FHW9": {
+    "comment": "lazy x y -> x x",
+    "accepted": [
+      [
+        "SBK"
+      ]
+    ],
+    "rejected": [
+      [
+        "BK(WI)"
+      ]
+    ]
+  },
+  "lNUrDS4M" : {
+    "comment": "SK => I quest",
+    "accepted": [
+      [
+        "SKK"
+      ],
+      [
+        "SK(SK)"
+      ]
+    ],
+    "rejected": [
+      [
+        "SK"
+      ],
+      [
+        "WK"
+      ],
+      [
+        "I"
+      ],
+      [
+        "Kx"
+      ]
+    ]
+  },
+  "O3BfTzg2": {
+    "accepted": [
+      [
+        "KI"
+      ]
+    ]
+  },
+  "YAN4Mxrt": {
+    "accepted": [
+      [
+        "BC(CI)SK"
+      ]
+    ]
+  },
+  "azxJgdmk": {
+    "accepted": [
+      [
+        "WI(W(B(SI)))"
+      ]
+    ]
+  },
+  "0aFCHGH0": {
+    "accepted": [
+      [
+        "WI(B(S(BSC))(BC(C(K(WI)))))"
+      ]
+    ],
+    "rejected": [
+      [
+        "WI(W(B(SI)))"
+      ]
+    ]
+  },
+  "FYutDKYw": {
+    "accepted": [
+      [
+        "CI(SB)"
+      ]
+    ]
+  },
+  "BkuOGuwe": {
+    "accepted": [
+      [
+        "BBBC(BC(CI))  (C(B(CI))(SB))  (K(KI) )I "
+      ]
+    ]
+  },
+  "E2nhX4bs": {
+    "accepted": [
+      [
+        "BS(C(BB))"
+      ]
+    ]
+  },
+  "uGAfI2SW": {
+    "accepted": [
+      [
+        "CI lst"
+      ]
+    ]
+  },
+  "e1NlHHr6": {
+    "accepted": [
+      [
+        "B(C(BC(CI))nil) (B lst)"
+      ]
+    ]
+  },
+  "bmXggXLn": {
+    "accepted": [
+      [
+        "BBBC(BC(CI)) (C(BK)) I _"
+      ]
+    ]
+  },
+  "RtjKvs82": {
+    "accepted": [
+      [
+        "BBBC(BC(CI)) (B(CB)lst) I nil"
+      ]
+    ]
+  }
+}
