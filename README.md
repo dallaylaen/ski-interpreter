@@ -68,15 +68,18 @@ all free variables are bound.
 This page contains small tasks of increasing complexity.
 Each task requires the user to build a combinator with specific properties.
 
-# CLI
-
-REPL comes with the package as [bin/ski.js](bin/ski.js).
-
 # Installation
 
 ```bash
 npm install @dallaylaen/ski-interpreter
 ```
+
+# CLI
+
+REPL comes with the package as [bin/ski.js](bin/ski.js).
+
+Running `SKI_REPL=1 node -r @dallaylaen/ski-interpreter/bin/ski.js`
+will start a node shell with the `SKI` class available as a global variable.
 
 # Usage
 
@@ -149,6 +152,10 @@ const lambdaSteps = [...skiExpr.toLambda()];
 The `format` methods of the `Expr` class supports
 a number of options, see [the source code](src/expr.js) for details.
 
+`expr.diag()` will instead output indented
+expression tree (breadth-first) with class information
+and variables labeled for disambiguation.
+
 ## Variable scoping
 
 By default, parsed free variables are global and equal to any other variable with the same name.
@@ -183,6 +190,9 @@ expr.traverse(e => e.equals(SKI.I) ? SKI.S.apply(SKI.K, SKI.K) : null);
 // replaces all I's with S K K
 // here a returned `Expr` object replaces the subexpression,
 // whereas `null` means "leave it alone and descend if possible"
+
+expr.fold(0, (acc, e) => acc + (e.equals(SKI.K) ? acc+1 : acc));
+// counts the number of K's in the expression
 ```
 
 ## Test cases
@@ -208,6 +218,17 @@ q.check('K(K(y x))') // nope! the variable scopes won't match
 ```
 
 See [quest page data](docs/quest-data/) for more examples.
+
+# Package contents
+
+* `lib/ski-interpreter.cjs.js` - main entry point for Node.js;
+* `lib/ski-interpreter.esm.js` - main entry point for ES modules;
+* `lib/ski-interpreter.min.js` - minified version for browsers;
+* `lib/ski-quest.min.js` - script with the interpreter
+plus `QuestBox`, `QuestChapter`, and `QuestPage` classes
+for building interactive quest pages from JSON-encoded quest data;
+* `bin/ski.js` - a CLI REPL;
+* `types` - TypeScript type definitions.
 
 # Thanks
 
