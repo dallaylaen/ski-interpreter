@@ -62,7 +62,6 @@
       ],
       "input": "Y",
       "unlock": "Y",
-      "solution": "WI(W(B(SI)))",
       "comment": "Implementing meaningful tests for Y is damn hard I should say...",
       "cases": [
         [ "Y (Kx)", "x" ],
@@ -82,16 +81,12 @@
         "<p>Make a variant of <code>Y</code>, <code>Z</code>, that doesn't start until there's some input:",
         "<code>Z f x = f (Z f) x</code>.</p>"
       ],
-      "solution": "WI(B(S(BSC))(BC(C(K(WI)))))",
       "unlock": "Z",
       "input": "Z",
       "cases": [
         [ { "max": 200 },"Z f", "Z f" ],
         [ "Z f x", "f (Z f) x" ],
         [ "Z (Kx) y", "x y" ]
-      ],
-      "wrong": [
-        "WI(W(B(SI)))"
       ]
     }
   ]

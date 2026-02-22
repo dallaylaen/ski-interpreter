@@ -51,7 +51,6 @@
       ],
       "hint": "This can be done by applying <code>inc</code> m times to n",
       "input": "phi",
-      "solution": "CI(SB)",
       "cases": [
         [ "phi 0 0 + 0", "0" ],
         [ "phi 5 0 + 0", "5" ],
@@ -107,7 +106,6 @@
         "<p>This cannot be done by passing just 2 arguments to a number (prove it!),",
         "however, 3 should suffice.</p>"
       ],
-      "solution": "BBBC(BC(CI))  (C(B(CI))(SB))  (K(KI) )I ",
       "unlock": "dec",
       "input": "phi",
       "cases": [

@@ -28,7 +28,6 @@
         "<code>list a (something) f z</code> evaluates to <code>f a (something f z)</code>.",
         "Find <code>list</code>."
       ],
-      "solution": "BS(C(BB))",
       "input": "list",
       "cases": [
         ["list head tail f x", "f head (tail f x)"]
@@ -64,8 +63,7 @@
         ["cat (lst a nil) nil", "lst a nil"],
         ["cat (lst a nil) (lst b nil)", "lst a (lst b nil)"],
         ["cat (lst a(lst b nil)) (lst c(lst d nil))", "lst a (lst b (lst c (lst d nil)))"]
-      ],
-      "solution": "CI lst"
+      ]
     },
     {
       "id": "e1NlHHr6",
@@ -81,8 +79,7 @@
         ["map f nil", "nil"],
         ["map f (lst a nil) g y", "g (f a) y"],
         ["map f (lst a(lst b (lst c nil))) g y", "g (f a) (g (f b) (g (f c) y))"]
-      ],
-      "solution": "B(C(BC(CI))nil) (B lst)"
+      ]
     },
     {
       "id": "bmXggXLn",
@@ -97,8 +94,7 @@
         ["last (lst a nil)", "a"],
         ["last (lst a(lst b nil))", "b"],
         ["last (lst a(lst b(lst c nil)))", "c"]
-      ],
-      "solution": "BBBC(BC(CI)) (C(BK)) I _"
+      ]
     },
     {
       "id": "SltEHvuL",
@@ -141,7 +137,6 @@
         "You are given 2 functions: <code>lst</code> and <code>nil</code>. ",
         "Reverse a list."
       ],
-      "solution": "BBBC(BC(CI)) (B(CB)lst) I nil",
       "env": ["nil=KI", "lst=BS(C(BB))"],
       "input": "rev",
       "cases": [
