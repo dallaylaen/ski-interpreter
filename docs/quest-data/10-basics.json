@@ -23,7 +23,6 @@
       ],
       "unlock": "I",
       "allow": "SKI",
-      "solution": "KI",
       "input": "phi",
       "cases": [
         [ "phi x y", "y" ]

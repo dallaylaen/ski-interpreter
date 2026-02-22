@@ -71,6 +71,10 @@ const { Expr, FreeVar, Alias, Lambda } = SKI.classes;
  * }} QuestSpec
  */
 
+/**
+ * @typedef {{ accepted?: string[][], rejected?: string[][] }} SelfCheck
+ */
+
 class Quest {
   /**
    * @description A combinator problem with a set of test cases for the proposed solution.
@@ -250,6 +254,35 @@ class Quest {
     } catch (e) {
       return { pass: false, details: [], exception: e, steps: 0, input };
     }
+  }
+
+  /**
+   * @desc Verify that solutions that are expected to pass/fail do so.
+   * @param {SelfCheck|{[key: string]: SelfCheck}} dataset
+   * @return {{shouldPass: {input: string[], result: QuestResult}[], shouldFail: {input: string[], result: QuestResult}[]} | null}
+   */
+  selfCheck (dataset) {
+    // dataset is either a SelfCheck object or a hash of { quest_id: SelfCheck }
+    if (typeof dataset === 'object' && !Array.isArray(dataset?.accepted) && !Array.isArray(dataset?.rejected)) {
+      // dataset is a hash of { quest_id: SelfCheck } so extract data
+      if (!this.id || !dataset[this.id])
+        return null; // no self-check data for this quest, skip
+    }
+
+    const { accepted = [], rejected = [] } = dataset[this.id] ?? dataset;
+
+    const ret = { shouldPass: [], shouldFail: [] };
+    for (const input of accepted) {
+      const result = this.check(...input);
+      if (!result.pass)
+        ret.shouldPass.push({ input, result });
+    }
+    for (const input of rejected) {
+      const result = this.check(...input);
+      if (result.pass)
+        ret.shouldFail.push({ input, result });
+    }
+    return (ret.shouldFail.length + ret.shouldPass.length) ? ret : null; // return null if all good
   }
 
   /**

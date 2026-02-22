@@ -34,6 +34,10 @@ export type QuestResult = {
     steps: number;
     weight?: number;
 };
+export type SelfCheck = {
+    accepted?: string[][];
+    rejected?: string[][];
+};
 /**
  * @typedef {{
  *   pass: boolean,
@@ -98,6 +102,9 @@ export type QuestResult = {
  *    intro?: string|string[], // multiple strings will be concatenated with spaces
  * }} QuestSpec
  */
+/**
+ * @typedef {{ accepted?: string[][], rejected?: string[][] }} SelfCheck
+ */
 export class Quest {
     /**
      * @description A combinator problem with a set of test cases for the proposed solution.
@@ -160,6 +167,23 @@ export class Quest {
      * @return {QuestResult}
      */
     check(...input: string): QuestResult;
+    /**
+     * @desc Verify that solutions that are expected to pass/fail do so.
+     * @param {SelfCheck|{[key: string]: SelfCheck}} dataset
+     * @return {{shouldPass: {input: string[], result: QuestResult}[], shouldFail: {input: string[], result: QuestResult}[]} | null}
+     */
+    selfCheck(dataset: SelfCheck | {
+        [key: string]: SelfCheck;
+    }): {
+        shouldPass: {
+            input: string[];
+            result: QuestResult;
+        }[];
+        shouldFail: {
+            input: string[];
+            result: QuestResult;
+        }[];
+    } | null;
     /**
        *
        * @return {TestCase[]}

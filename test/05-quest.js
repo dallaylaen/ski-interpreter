@@ -230,6 +230,55 @@ describe('Quest', () => {
     JSON.stringify(failing); // doesn't die, TODO proper test
   });
 
+  it('can self-check via a solution hash', () => {
+    const quest = new Quest({
+      id:    'foo1337',
+      input: 'phi',
+      allow: 'SK',
+      cases: [
+        ['phi x', 'x'],
+      ],
+    });
+
+    const dataset = {
+      foo1337: {
+        accepted: [
+          ['SKK'],
+          ['SK(SK)'],
+        ],
+        rejected: [
+          ['K x'],
+          ['I'],
+          ['SK'],
+        ],
+      },
+    };
+
+    expect(quest.selfCheck(dataset)).to.equal(null, 'should pass with correct dataset');
+    expect(quest.selfCheck(dataset.foo1337)).to.equal(null, 'should pass with correct dataset (partial)');
+
+    const badset = {
+      foo1337: {
+        accepted: [
+          ['SKK'],
+          ['Kx'],
+          ['WK'],
+        ],
+        rejected: [
+          ['SKK'],
+          ['I'],
+        ],
+      },
+    };
+
+    const result = quest.selfCheck(badset);
+    expect(result).to.be.an('object');
+    expect(Object.keys(result).sort()).to.deep.equal(['shouldFail', 'shouldPass']);
+
+    expect(result.shouldPass.map(i => i.input)).to.deep.equal([['Kx'], ['WK']]);
+    expect(result.shouldFail.map(i => i.input)).to.deep.equal([['SKK']]);
+  });
+
   // TODO it ('calculates weight of solution with aliases', () => {});
   /*
 

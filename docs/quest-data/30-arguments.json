@@ -78,9 +78,6 @@
       "cases": [
         [ "phi x y", "x x" ],
         [ {"max": 20}, "phi (SII)", "phi (SII)"]
-      ],
-      "wrong": [
-        "BK(WI)"
       ]
     },
     {
