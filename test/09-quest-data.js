@@ -3,14 +3,23 @@ const fs = require('node:fs').promises;
 const path = require('node:path');
 
 const { Tokenizer } = require('../src/internal');
-const { Quest } = require('../index');
+const { SKI } = require('../index');
+const { Quest } = SKI;
 
 const dir = path.join(__dirname, '../docs/quest-data/');
+const solutionsPath = path.join(__dirname, '../data/quest-solutions.json');
 
 const uniqQuest = new Set();
 const uniqChapter = new Set();
 
+let questSolutions = {};
+
 describe('quest-data', () => {
+  before(async () => {
+    questSolutions = await fs.readFile(solutionsPath)
+      .then(data => JSON.parse(data));
+  });
+
   it('has index', async () => {
     const index = await fs.readFile(path.join(dir, 'index.json'))
       .then(data => JSON.parse(data));
@@ -89,19 +98,22 @@ function verifyChapter (entry, n) {
           expect(new Date(date)).to.be.within(new Date('2024-07-15'), new Date());
         });
 
-        for (const wrong of quest.wrong ?? []) {
-          it('fails on wrong solution: ' + wrong, () => {
-            const result = q.check(wrong);
-            expect(result.pass).to.equal(false);
-            // TODO check error details but later
-          });
-        }
         it('has unique id', () => {
           const id = q.meta.id;
           expect(typeof id).to.equal('string');
           expect(id).to.match(/\S/);
           expect(uniqQuest.has(id)).to.equal(false, 'quest id is unique: ' + id);
           uniqQuest.add(id);
+        });
+
+        it('passes passing and fails failing solutions, if given', () => {
+          const nope = q.selfCheck(questSolutions);
+          if (nope !== null) {
+            // if selfCheck returns _anything_, produce a valid expected/actual diff;
+            // but then fail anyway, because an empty object is also wrong.
+            expect(SKI.extras.deepFormat(nope)).to.deep.equal({});
+            expect(nope).to.equal(null);
+          }
         });
       });
     }
