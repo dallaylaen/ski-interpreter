@@ -21,9 +21,8 @@ const { append } = require('./html-util')
  * @cssClass ski-quest-error
  * @cssClass ski-quest-float-right
  * @cssClass ski-quest-hint - a self-revealing spoiler
- * @cssClass ski-quest-index - container for chapter list
- * @cssSelector .ski-quest-index a - chapter links in the index.
- *      Display is forced to flex for progress bars to work, be careful!
+ * @cssClass ski-quest-nav - container for chapter navigation.
+ * @cssClass ski-quest-nav-item - individual chapter links inside ski-quest-nav.
  * @cssClass ski-quest-intro - introduction text in individual quests
  * @cssClass ski-quest-inventory - element containing all unlocked terms
  * @cssClass ski-quest-label - label for an input field
@@ -78,7 +77,7 @@ class QuestPage {
     }
     this.view.content = options.contentBox;
     if (options.indexBox)
-      this.view.index = append(options.indexBox, 'div', { class: ['ski-quest-index'] });
+      this.view.index = append(options.indexBox, 'div', { class: ['ski-quest-nav'] });
 
     this._onSolved = options.onSolved;
     this._onFailed = options.onFailed;
@@ -491,12 +490,13 @@ class QuestChapter {
   }
 
   addLink (element) {
-    const link = append(element, 'a', {}, e => {
-      e.href = '#' + this.id;
-      e.style.display = 'flex'; // hardcoded flex for progress bar to work, don't rely on user's css
+    // create an extra wrapper to allow messing with link's layout w/o interfering with the progress bar inside it
+    const wrapper = append(element, 'div', { class: ['ski-quest-nav-item'] });
+    const link = append(wrapper, 'a', {}, e => {
+      e.style.display = 'flex'; // force flex for progress bar to work, don't rely on css
     });
     link.href = '#' + this.id;
-    this.view.link = link;
+    this.view.link = wrapper;
     this.view.progressbar = append(link, 'span', { class: ['ski-quest-progressbar'] });
     this.view.linkText = append(link, 'span', { content: 'Chapter ' + this.number + '...' });
   }
