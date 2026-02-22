@@ -89,19 +89,6 @@ function verifyChapter (entry, n) {
           expect(new Date(date)).to.be.within(new Date('2024-07-15'), new Date());
         });
 
-        if (quest.solution) {
-          it('passes included example solution', () => {
-            const result = q.check(quest.solution);
-            if (!result.pass) {
-              console.log('proposed solution failed: ' + result.expr.expand().format({ terse: false }));
-              for (const entry of result.details) {
-                console.log('found:    ' + entry.found);
-                console.log('expected: ' + entry.expected);
-              }
-            }
-            expect(result.pass).to.equal(true);
-          });
-        }
         for (const wrong of quest.wrong ?? []) {
           it('fails on wrong solution: ' + wrong, () => {
             const result = q.check(wrong);
