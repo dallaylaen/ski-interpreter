@@ -48,6 +48,10 @@ class Expr {
   }
 
   /**
+   * @property {number} [arity] - number of arguments the term is waiting for (if known)
+   */
+
+  /**
    * @desc apply self to zero or more terms and return the resulting term,
    * without performing any calculations whatsoever
    * @param {Expr} args
@@ -648,9 +652,8 @@ class App extends Expr {
 
     this.arg = arg;
     this.fun = fun;
-    this.final = false;
-    this.arity = this.fun.arity > 0 ? this.fun.arity - 1 : 0;
   }
+  /** @property {boolean} [final] */
 
   weight () {
     return this.fun.weight() + this.arg.weight();
