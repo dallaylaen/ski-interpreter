@@ -18,6 +18,7 @@ describe('Expr.format: literal', () => {
   check('K 2 S', {}, 'K 2 S');
   check('5 x y', {}, '5 x y');
   check('5 SK', {}, '5 SK');
+  check('5 SK', { html: true, redex: ['<b>', '</b>'] }, '<b>5</b> SK');
 });
 
 describe('Expr.format: round-trip', () => {

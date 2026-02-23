@@ -1123,28 +1123,26 @@ class Lambda extends Expr {
   }
 }
 
-class Church extends Native {
+class Church extends Expr {
   /**
    * @desc Church numeral representing non-negative integer n:
    *      n f x = f(f(...(f x)...)) with f applied n times.
    * @param {number} n
    */
   constructor (n) {
-    const p = Number.parseInt(n);
-    if (!(p >= 0))
+    n = Number.parseInt(n);
+    if (!(n >= 0))
       throw new Error('Church number must be a non-negative integer');
-    const name = '' + p;
-    const impl = x => y => {
+    super();
+    this.invoke = x => y => {
       let expr = y;
-      for (let i = p; i-- > 0; )
+      for (let i = n; i-- > 0; )
         expr = x.apply(expr);
       return expr;
     };
 
-    super(name, impl, { arity: 2, canonize: false, note: name });
-
     /** @type {number} */
-    this.n = p;
+    this.n = n;
     this.arity = 2;
   }
 
@@ -1158,8 +1156,18 @@ class Church extends Native {
       : '[' + this.n + ' != ' + other.n + ']';
   }
 
+  _rski (options) {
+    return this.infer().expr._rski(options);
+  }
+
   _unspaced (arg) {
     return false;
+  }
+
+  _format (options, nargs) {
+    return nargs >= 2
+      ? options.redex[0] + this.n + options.redex[1]
+      : this.n + '';
   }
 }
 
