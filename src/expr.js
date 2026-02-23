@@ -97,6 +97,20 @@ class Expr {
    * @returns {Expr|null}
    */
   traverse (change) {
+    const [expr, _] = unwrap(this._traverse(change));
+    return expr;
+  }
+
+  _traverse_redo (change) {
+    let action;
+    let expr = this;
+    do
+      [expr, action] = unwrap(expr._traverse(change));
+    while (expr && action === control.redo);
+    return expr;
+  }
+
+  _traverse (change) {
     return change(this);
   }
 
@@ -708,18 +722,24 @@ class App extends Expr {
     };
   }
 
-  traverse (change) {
-    const replaced = change(this);
-    if (replaced instanceof Expr)
-      return replaced;
+  _traverse (change) {
+    const [expr, action] = unwrap(change(this));
+    if (action === control.stop)
+      return control.stop(expr);
+    if (expr || action === control.prune)
+      return expr;
 
-    const fun = this.fun.traverse(change);
-    const arg = this.arg.traverse(change);
+    const [fun, fAction] = unwrap(this.fun._traverse_redo(change));
+    if (fAction === control.stop)
+      return control.stop(fun ? fun.apply(this.arg) : null);
 
-    if (!fun && !arg)
-      return null; // no changes
+    const [arg, aAction] = unwrap(this.arg._traverse_redo(change));
 
-    return (fun ?? this.fun).apply(arg ?? this.arg);
+    const final = (fun || arg) ? (fun ?? this.fun).apply(arg ?? this.arg) : null;
+    if (aAction === control.stop)
+      return control.stop(final);
+
+    return final;
   }
 
   any (predicate) {
@@ -1037,18 +1057,19 @@ class Lambda extends Expr {
     return this.impl.subst(this.arg, arg) ?? this.impl;
   }
 
-  traverse (change) {
-    const replaced = change(this);
-    if (replaced instanceof Expr)
-      return replaced;
+  _traverse (change) {
+    const [expr, action] = unwrap(change(this));
+    if (action === control.stop)
+      return control.stop(expr);
+    if (expr || action === control.prune)
+      return expr;
 
     // alas no proper shielding of self.arg is possible
-    const impl = this.impl.traverse(change);
+    const [impl, iAction] = unwrap(this.impl._traverse_redo(change));
 
-    if (!impl)
-      return null; // no changes
+    const final = impl ? new Lambda(this.arg, impl) : null;
 
-    return new Lambda(this.arg, impl);
+    return iAction === control.stop ? control.stop(final) : final;
   }
 
   any (predicate) {
@@ -1225,8 +1246,14 @@ class Alias extends Named {
     return this.terminal ? 1 : this.impl.weight();
   }
 
-  traverse (change) {
-    return change(this) ?? this.impl.traverse(change);
+  _traverse (change) {
+    const [expr, action] = unwrap(change(this));
+    if (action === control.stop)
+      return control.stop(expr);
+    if (expr || action === control.prune)
+      return expr;
+
+    return this.impl._traverse_redo(change);
   }
 
   any (predicate) {
