@@ -109,7 +109,9 @@ class Expr {
       prev = expr;
       [expr, action] = unwrap(expr._traverse(change));
     } while (expr && action === control.redo);
-    return prev === this ? expr : expr ?? prev; // TODO ugly
+    if (!expr && prev !== this)
+      expr = prev; // we were in redo at least once
+    return action ? action(expr) : expr;
   }
 
   _traverse (change) {
