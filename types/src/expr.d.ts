@@ -5,6 +5,18 @@ export type Partial = Expr | ((arg0: Expr) => Partial);
  */
 export class Expr {
     /**
+     *  @descr A combinatory logic expression.
+     *
+     *  Applications, variables, and other terms like combinators per se
+     *  are subclasses of this class.
+     *
+     *  @abstract
+     *  @property {{
+     *    scope?: any,
+     *    env?: { [key: string]: Expr },
+     *    src?: string,
+     *    parser: object,
+     *  }} [context]
      * @property {number} [arity] - number of arguments the term is waiting for (if known)
      */
     /**
