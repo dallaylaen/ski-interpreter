@@ -41,13 +41,6 @@ class Expr {
    *    src?: string,
    *    parser: object,
    *  }} [context]
-   */
-  constructor () {
-    if (new.target === Expr)
-      throw new Error('Attempt to instantiate abstract class Expr');
-  }
-
-  /**
    * @property {number} [arity] - number of arguments the term is waiting for (if known)
    */
 
@@ -187,6 +180,7 @@ class Expr {
    * @return {number}
    */
   weight () {
+    // TODO remove in next breaking release
     return 1;
   }
 
