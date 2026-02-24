@@ -5,6 +5,9 @@ export type Partial = Expr | ((arg0: Expr) => Partial);
  */
 export class Expr {
     /**
+     * @property {number} [arity] - number of arguments the term is waiting for (if known)
+     */
+    /**
      * @desc apply self to zero or more terms and return the resulting term,
      * without performing any calculations whatsoever
      * @param {Expr} args
@@ -428,8 +431,6 @@ export class App extends Expr {
     constructor(fun: Expr, arg: Expr);
     arg: Expr;
     fun: Expr;
-    final: boolean;
-    arity: number;
     _infer(options: any, preArgs?: any[], steps?: number): {
         normal: boolean;
         steps: number;
@@ -466,6 +467,7 @@ export class App extends Expr {
         steps: number;
     };
     invoke(arg: any): Partial;
+    final: boolean;
     _rski(options: any): Expr | this;
     diff(other: any, swap?: boolean): string;
     _braced(first: any): boolean;
@@ -629,16 +631,21 @@ export class Alias extends Named {
     _rski(options: any): Expr;
     _braced(first: any): boolean;
 }
-export class Church extends Native {
+export class Church extends Expr {
     /**
      * @desc Church numeral representing non-negative integer n:
      *      n f x = f(f(...(f x)...)) with f applied n times.
      * @param {number} n
      */
     constructor(n: number);
+    invoke: (x: any) => (y: any) => any;
     /** @type {number} */
     n: number;
+    arity: number;
     diff(other: any, swap?: boolean): string;
+    _rski(options: any): Expr;
+    _unspaced(arg: any): boolean;
+    _format(options: any, nargs: any): any;
 }
 /**
  * @type {{[key: string]: Native}}
