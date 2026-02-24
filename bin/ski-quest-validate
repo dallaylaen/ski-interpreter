@@ -65,16 +65,15 @@ async function validateQuests (solutionFile, chapterFiles, options) {
     // Handle both array and object formats
     const chapter = Array.isArray(chapterData) ? { content: chapterData } : chapterData;
 
-    if (!quiet) {
+    if (!quiet)
       console.log(`\n=== ${chapterFile} ===`);
-    }
 
     // Verify chapter metadata
     const chapterErrors = verifyChapter(chapter, chapterFile, quiet);
     if (chapterErrors.length > 0) {
-      for (const error of chapterErrors) {
+      for (const error of chapterErrors)
         console.error(`  Chapter error: ${error}`);
-      }
+
       failCount++;
       continue;
     }
@@ -92,7 +91,7 @@ async function validateQuests (solutionFile, chapterFiles, options) {
     for (let i = 0; i < content.length; i++) {
       const questData = content[i];
       let quest;
-      let questErr = null;
+      const questErr = null;
 
       try {
         quest = new Quest(questData);
@@ -104,9 +103,9 @@ async function validateQuests (solutionFile, chapterFiles, options) {
 
       const questErrors = verifyQuest(quest, questData, verbose);
       if (questErrors.length > 0) {
-        for (const error of questErrors) {
+        for (const error of questErrors)
           console.error(`  Quest [${i}] ${quest.id}: ${error}`);
-        }
+
         failCount++;
         continue;
       }
@@ -123,30 +122,30 @@ async function validateQuests (solutionFile, chapterFiles, options) {
       const selfCheckResult = quest.selfCheck(questSolutions);
       if (selfCheckResult !== null) {
         const errors = [];
-        for (const item of selfCheckResult.shouldPass) {
+        for (const item of selfCheckResult.shouldPass)
           errors.push(`  Solution should pass but failed: ${item.input.join(' ')}`);
-        }
-        for (const item of selfCheckResult.shouldFail) {
+
+        for (const item of selfCheckResult.shouldFail)
           errors.push(`  Solution should fail but passed: ${item.input.join(' ')}`);
-        }
+
         if (errors.length > 0) {
-          for (const error of errors) {
+          for (const error of errors)
             console.error(`  Quest [${i}] ${quest.meta.id}: ${error}`);
-          }
+
           failCount++;
           continue;
         }
       }
 
-      if (!quiet) {
+      if (!quiet)
         console.log(`  Quest [${i}] ${quest.meta.id}: OK`);
-      }
+
       passCount++;
     }
   }
 
   if (!quiet) {
-    console.log(`\n=== Summary ===`);
+    console.log('\n=== Summary ===');
     console.log(`Passed: ${passCount}`);
     console.log(`Failed: ${failCount}`);
   }
@@ -164,22 +163,19 @@ function verifyChapter (chapter, filename, quiet) {
   }
 
   // Only require chapter id and name if they're not already metadata-only chapters
-  if (typeof chapter.id !== 'string') {
+  if (typeof chapter.id !== 'string')
     errors.push('missing or non-string chapter id');
-  }
 
-  if (typeof chapter.name !== 'string') {
+  if (typeof chapter.name !== 'string')
     errors.push('missing or non-string chapter name');
-  }
 
-  if (chapter.intro && typeof chapter.intro !== 'string' && !Array.isArray(chapter.intro)) {
+  if (chapter.intro && typeof chapter.intro !== 'string' && !Array.isArray(chapter.intro))
     errors.push('invalid chapter intro (should be string or array)');
-  } else if (chapter.intro) {
+  else if (chapter.intro) {
     const intro = Array.isArray(chapter.intro) ? chapter.intro.join(' ') : chapter.intro;
     const htmlErrors = checkHtml(intro);
-    if (htmlErrors.length > 0) {
+    if (htmlErrors.length > 0)
       errors.push(`invalid HTML in intro: ${htmlErrors[0]}`);
-    }
   }
 
   return errors;
@@ -188,48 +184,43 @@ function verifyChapter (chapter, filename, quiet) {
 function verifyQuest (quest, originalData, verbose) {
   const errors = [];
 
-  if (typeof quest.name !== 'string') {
+  if (typeof quest.name !== 'string')
     errors.push('missing or non-string quest name');
-  }
 
-  if (typeof quest.intro !== 'string') {
+  if (typeof quest.intro !== 'string')
     errors.push('missing or non-string quest intro');
-  } else {
+  else {
     const htmlErrors = checkHtml(quest.intro);
-    if (htmlErrors.length > 0) {
+    if (htmlErrors.length > 0)
       errors.push(`invalid HTML in intro: ${htmlErrors[0]}`);
-    }
   }
 
   // Verify metadata
   const date = quest.meta.created_at;
-  if (!date || typeof date !== 'string') {
+  if (!date || typeof date !== 'string')
     errors.push('missing or non-string created_at date');
-  } else {
+  else {
     try {
       const d = new Date(date);
-      if (!(d instanceof Date) || isNaN(d)) {
+      if (!(d instanceof Date) || isNaN(d))
         errors.push('invalid created_at date format');
-      }
+
       const minDate = new Date('2024-07-15');
-      if (d < minDate) {
+      if (d < minDate)
         errors.push(`created_at date is before 2024-07-15: ${date}`);
-      }
-      if (d > new Date()) {
+
+      if (d > new Date())
         errors.push(`created_at date is in the future: ${date}`);
-      }
     } catch (err) {
       errors.push('invalid created_at date');
     }
   }
 
-  if (typeof quest.meta.id !== 'string' || !quest.meta.id.match(/\S/)) {
+  if (typeof quest.meta.id !== 'string' || !quest.meta.id.match(/\S/))
     errors.push('missing or invalid quest id');
-  }
 
-  if (quest.cases.length < 1) {
+  if (quest.cases.length < 1)
     errors.push('quest has no test cases');
-  }
 
   return errors;
 }
@@ -239,17 +230,17 @@ function checkHtml (text) {
   // We'll use a simple regex-based tokenizer
   const tagPattern = /<\/?[a-z][a-z_0-9]*[^>]*>/gi;
   const entities = /&[A-Za-z_0-9#]+;/g;
-  
+
   let match;
   const stack = [];
   const errors = [];
-  let lastIndex = 0;
+  const lastIndex = 0;
 
   // Extract all tags using regex
   const allMatches = [];
   while ((match = tagPattern.exec(text)) !== null) {
     allMatches.push({
-      tag: match[0],
+      tag:   match[0],
       index: match.index
     });
   }
@@ -262,21 +253,20 @@ function checkHtml (text) {
         errors.push(`Unexpected closing tag: ${tag}`);
         continue;
       }
-      
+
       // Extract tag name from closing tag
       const closeMatch = tag.match(/^<\/([a-z][a-z_0-9]*)/i);
       if (!closeMatch) {
         errors.push(`Invalid closing tag: ${tag}`);
         continue;
       }
-      
+
       const closeName = closeMatch[1];
       const openName = stack[stack.length - 1];
-      
-      if (closeName.toLowerCase() !== openName.toLowerCase()) {
+
+      if (closeName.toLowerCase() !== openName.toLowerCase())
         errors.push(`Mismatched closing tag: </${closeName}> does not match <${openName}>`);
-      }
-      
+
       stack.pop();
     } else {
       // Opening tag (check if it's self-closing)
@@ -285,20 +275,18 @@ function checkHtml (text) {
         errors.push(`Invalid opening tag: ${tag}`);
         continue;
       }
-      
+
       const tagName = openMatch[1];
-      
+
       // Check if it's a self-closing tag (ends with />)
-      if (!tag.endsWith('/>')) {
+      if (!tag.endsWith('/>'))
         stack.push(tagName);
-      }
     }
   }
 
   // Check for unclosed tags
-  if (stack.length > 0) {
+  if (stack.length > 0)
     errors.push(`Unclosed tags: ${stack.map(t => `<${t}>`).join(', ')}`);
-  }
 
   return errors;
 }
