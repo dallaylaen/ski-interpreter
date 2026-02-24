@@ -1,0 +1,271 @@
+#!/usr/bin/env node
+
+const fs = require('node:fs/promises');
+const path = require('node:path');
+const cac = require('cac');
+
+const { SKI } = require('../index');
+const { Quest } = SKI;
+const { Tokenizer } = require('../src/internal');
+
+const cli = cac('ski-quest-validate');
+
+cli
+  .command('[solutionFile] [...chapterFiles]', 'Validate quest data and solutions')
+  .option('-q, --quiet', 'Quiet mode, only show errors')
+  .option('-v, --verbose', 'Verbose output')
+  .action(async (solutionFile, chapterFiles, options) => {
+    try {
+      if (!solutionFile || !chapterFiles || chapterFiles.length === 0) {
+        cli.outputHelp();
+        process.exit(1);
+      }
+      const result = await validateQuests(solutionFile, chapterFiles, options);
+      process.exit(result ? 0 : 1);
+    } catch (err) {
+      console.error('Error:', err.message);
+      process.exit(2);
+    }
+  });
+
+cli.help();
+cli.version('1.0.0');
+
+cli.parse();
+
+async function validateQuests (solutionFile, chapterFiles, options) {
+  const { quiet, verbose } = options;
+
+  // Load solutions
+  let questSolutions = {};
+  try {
+    const solutionData = await fs.readFile(solutionFile, 'utf8');
+    questSolutions = JSON.parse(solutionData);
+  } catch (err) {
+    console.error(`Failed to load solutions from ${solutionFile}:`, err.message);
+    return false;
+  }
+
+  let passCount = 0;
+  let failCount = 0;
+  const uniqQuest = new Set();
+  const uniqChapter = new Set();
+
+  // Process each chapter file
+  for (const chapterFile of chapterFiles) {
+    let chapterData;
+    try {
+      const content = await fs.readFile(chapterFile, 'utf8');
+      chapterData = JSON.parse(content);
+    } catch (err) {
+      console.error(`Failed to load chapter ${chapterFile}:`, err.message);
+      failCount++;
+      continue;
+    }
+
+    // Handle both array and object formats
+    const chapter = Array.isArray(chapterData) ? { content: chapterData } : chapterData;
+
+    if (!quiet) {
+      console.log(`\n=== ${chapterFile} ===`);
+    }
+
+    // Verify chapter metadata
+    const chapterErrors = verifyChapter(chapter, chapterFile, quiet);
+    if (chapterErrors.length > 0) {
+      for (const error of chapterErrors) {
+        console.error(`  Chapter error: ${error}`);
+      }
+      failCount++;
+      continue;
+    }
+
+    // Check uniqueness
+    if (uniqChapter.has(chapter.id)) {
+      console.error(`  Chapter error: duplicate chapter id: ${chapter.id}`);
+      failCount++;
+      continue;
+    }
+    uniqChapter.add(chapter.id);
+
+    // Validate each quest
+    const content = chapter.content ?? [];
+    for (let i = 0; i < content.length; i++) {
+      const questData = content[i];
+      let quest;
+      let questErr = null;
+
+      try {
+        quest = new Quest(questData);
+      } catch (err) {
+        console.error(`  Quest [${i}] ${questData.id ?? 'unknown'}: Failed to create quest: ${err.message}`);
+        failCount++;
+        continue;
+      }
+
+      const questErrors = verifyQuest(quest, questData, verbose);
+      if (questErrors.length > 0) {
+        for (const error of questErrors) {
+          console.error(`  Quest [${i}] ${quest.id}: ${error}`);
+        }
+        failCount++;
+        continue;
+      }
+
+      // Check quest ID uniqueness
+      if (uniqQuest.has(quest.meta.id)) {
+        console.error(`  Quest [${i}] ${quest.meta.id}: duplicate quest id`);
+        failCount++;
+        continue;
+      }
+      uniqQuest.add(quest.meta.id);
+
+      // Verify solutions if provided
+      const selfCheckResult = quest.selfCheck(questSolutions);
+      if (selfCheckResult !== null) {
+        const errors = [];
+        for (const item of selfCheckResult.shouldPass) {
+          errors.push(`  Solution should pass but failed: ${item.input.join(' ')}`);
+        }
+        for (const item of selfCheckResult.shouldFail) {
+          errors.push(`  Solution should fail but passed: ${item.input.join(' ')}`);
+        }
+        if (errors.length > 0) {
+          for (const error of errors) {
+            console.error(`  Quest [${i}] ${quest.meta.id}: ${error}`);
+          }
+          failCount++;
+          continue;
+        }
+      }
+
+      if (!quiet) {
+        console.log(`  Quest [${i}] ${quest.meta.id}: OK`);
+      }
+      passCount++;
+    }
+  }
+
+  if (!quiet) {
+    console.log(`\n=== Summary ===`);
+    console.log(`Passed: ${passCount}`);
+    console.log(`Failed: ${failCount}`);
+  }
+
+  return failCount === 0;
+}
+
+function verifyChapter (chapter, filename, quiet) {
+  const errors = [];
+
+  // If content is not an array or is empty, skip chapter validation
+  if (!Array.isArray(chapter.content) || chapter.content.length === 0) {
+    errors.push('missing or empty chapter content');
+    return errors;
+  }
+
+  // Only require chapter id and name if they're not already metadata-only chapters
+  if (typeof chapter.id !== 'string') {
+    errors.push('missing or non-string chapter id');
+  }
+
+  if (typeof chapter.name !== 'string') {
+    errors.push('missing or non-string chapter name');
+  }
+
+  if (chapter.intro && typeof chapter.intro !== 'string' && !Array.isArray(chapter.intro)) {
+    errors.push('invalid chapter intro (should be string or array)');
+  } else if (chapter.intro) {
+    const intro = Array.isArray(chapter.intro) ? chapter.intro.join(' ') : chapter.intro;
+    const htmlErrors = checkHtml(intro);
+    if (htmlErrors.length > 0) {
+      errors.push(`invalid HTML in intro: ${htmlErrors[0]}`);
+    }
+  }
+
+  return errors;
+}
+
+function verifyQuest (quest, originalData, verbose) {
+  const errors = [];
+
+  if (typeof quest.name !== 'string') {
+    errors.push('missing or non-string quest name');
+  }
+
+  if (typeof quest.intro !== 'string') {
+    errors.push('missing or non-string quest intro');
+  } else {
+    const htmlErrors = checkHtml(quest.intro);
+    if (htmlErrors.length > 0) {
+      errors.push(`invalid HTML in intro: ${htmlErrors[0]}`);
+    }
+  }
+
+  // Verify metadata
+  const date = quest.meta.created_at;
+  if (!date || typeof date !== 'string') {
+    errors.push('missing or non-string created_at date');
+  } else {
+    try {
+      const d = new Date(date);
+      if (!(d instanceof Date) || isNaN(d)) {
+        errors.push('invalid created_at date format');
+      }
+      const minDate = new Date('2024-07-15');
+      if (d < minDate) {
+        errors.push(`created_at date is before 2024-07-15: ${date}`);
+      }
+      if (d > new Date()) {
+        errors.push(`created_at date is in the future: ${date}`);
+      }
+    } catch (err) {
+      errors.push('invalid created_at date');
+    }
+  }
+
+  if (typeof quest.meta.id !== 'string' || !quest.meta.id.match(/\S/)) {
+    errors.push('missing or invalid quest id');
+  }
+
+  if (quest.cases.length < 1) {
+    errors.push('quest has no test cases');
+  }
+
+  return errors;
+}
+
+function checkHtml (text) {
+  const tokenizer = new Tokenizer('</?[a-z][a-z_0-9]*[^>]*>', '[^<>&]+', '&[A-Za-z_0-9#]+;');
+  const tokens = tokenizer.split(text);
+  const stack = [];
+  const errors = [];
+
+  for (const tok of tokens) {
+    if (tok[0] === '<') {
+      if (tok[1] === '/') {
+        if (!stack.length) {
+          errors.push(`Unexpected closing tag: ${tok}`);
+          continue;
+        }
+        const tag = stack.pop();
+        if ('</' + tag + '>' !== tok) {
+          errors.push(`Mismatched closing tag: ${tok} vs </${tag}>`);
+        }
+      } else {
+        const match = tok.match(/^<([a-z][a-z_0-9]*)/);
+        if (!match) {
+          errors.push(`Invalid tag: ${tok}`);
+          continue;
+        }
+        stack.push(match[1]);
+      }
+    }
+  }
+
+  if (stack.length) {
+    errors.push(`Unclosed tags: ${stack.join(', ')}`);
+  }
+
+  return errors;
+}
