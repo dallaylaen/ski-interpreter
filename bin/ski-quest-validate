@@ -10,16 +10,23 @@ const { Quest } = SKI;
 const cli = cac('ski-quest-validate');
 
 cli
-  .command('[solutionFile] [...chapterFiles]', 'Validate quest data and solutions')
+  .command('[...chapterFiles]', 'Validate quest data and solutions')
+  .option('-s, --solutions <file>', 'Path to quest solutions file')
   .option('-q, --quiet', 'Quiet mode, only show errors')
   .option('-v, --verbose', 'Verbose output')
-  .action(async (solutionFile, chapterFiles, options) => {
+  .action(async (chapterFiles, options) => {
     try {
-      if (!solutionFile || !chapterFiles || chapterFiles.length === 0) {
+      // If no files provided, read from STDIN
+      if (!chapterFiles || chapterFiles.length === 0) {
+        chapterFiles = await readFromStdin();
+      }
+
+      if (!chapterFiles || chapterFiles.length === 0) {
         cli.outputHelp();
         process.exit(1);
       }
-      const result = await validateQuests(solutionFile, chapterFiles, options);
+
+      const result = await validateQuests(options.solutions, chapterFiles, options);
       process.exit(result ? 0 : 1);
     } catch (err) {
       console.error('Error:', err.message);
@@ -32,17 +39,43 @@ cli.version('1.0.0');
 
 cli.parse();
 
+async function readFromStdin () {
+  const lines = [];
+  const stdin = process.stdin;
+
+  // Check if stdin is a TTY (interactive terminal)
+  if (stdin.isTTY) {
+    return null; // No input provided interactively
+  }
+
+  return new Promise((resolve, reject) => {
+    stdin.setEncoding('utf8');
+    stdin.on('data', chunk => {
+      lines.push(chunk);
+    });
+    stdin.on('end', () => {
+      const input = lines.join('').trim();
+      // Split by whitespace to get individual file paths
+      const files = input.split(/\s+/).filter(f => f.length > 0);
+      resolve(files.length > 0 ? files : null);
+    });
+    stdin.on('error', reject);
+  });
+}
+
 async function validateQuests (solutionFile, chapterFiles, options) {
   const { quiet, verbose } = options;
 
-  // Load solutions
+  // Load solutions if provided
   let questSolutions = {};
-  try {
-    const solutionData = await fs.readFile(solutionFile, 'utf8');
-    questSolutions = JSON.parse(solutionData);
-  } catch (err) {
-    console.error(`Failed to load solutions from ${solutionFile}:`, err.message);
-    return false;
+  if (solutionFile) {
+    try {
+      const solutionData = await fs.readFile(solutionFile, 'utf8');
+      questSolutions = JSON.parse(solutionData);
+    } catch (err) {
+      console.error(`Failed to load solutions from ${solutionFile}:`, err.message);
+      return false;
+    }
   }
 
   let passCount = 0;
