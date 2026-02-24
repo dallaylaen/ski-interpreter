@@ -86,14 +86,23 @@ class Expr {
   /**
    * @desc Traverse the expression tree, applying change() to each node.
    *       If change() returns an Expr, the node is replaced with that value.
-   *       Otherwise, the node is descended further (if applicable)
-   *       or left unchanged.
+   *       A null/undefined value is interpreted as
+   *       "descend further if applicable, or leave the node unchanged".
+   *
+   *       Returned values may be decorated:
+   *
+   *       SKI.control.prune will suppress further descending even if nothing was returned
+   *       SKI.control.stop will terminate further changes.
+   *       SKI.control.redo will apply the callback to the returned subtree, recursively.
+   *
+   *       Note that if redo was applied at least once to a subtree, a null return from the same subtree
+   *       will be replaced by the last non-null value returned.
    *
    *       The traversal order is leftmost-outermost (LO), i.e. the same order as reduction steps are taken.
    *
    *       Returns null if no changes were made, or the new expression otherwise.
    *
-   * @param {(e:Expr) => (Expr|null)} change
+   * @param {(e:Expr) => TraverseValue<Expr>} change
    * @returns {Expr|null}
    */
   traverse (change) {
@@ -101,6 +110,11 @@ class Expr {
     return expr;
   }
 
+  /**
+   * @private
+   * @param {(e:Expr) => TraverseValue<Expr>} change
+   * @returns {TraverseValue<Expr>}
+   */
   _traverse_redo (change) {
     let action;
     let expr = this;
@@ -114,6 +128,11 @@ class Expr {
     return action ? action(expr) : expr;
   }
 
+  /**
+   * @private
+   * @param {(e:Expr) => TraverseValue<Expr>} change
+   * @returns {TraverseValue<Expr>}
+   */
   _traverse (change) {
     return change(this);
   }
