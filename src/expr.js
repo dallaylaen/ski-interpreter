@@ -97,17 +97,19 @@ class Expr {
    * @returns {Expr|null}
    */
   traverse (change) {
-    const [expr, _] = unwrap(this._traverse(change));
+    const [expr, _] = unwrap(this._traverse_redo(change));
     return expr;
   }
 
   _traverse_redo (change) {
     let action;
     let expr = this;
-    do
+    let prev;
+    do {
+      prev = expr;
       [expr, action] = unwrap(expr._traverse(change));
-    while (expr && action === control.redo);
-    return expr;
+    } while (expr && action === control.redo);
+    return prev === this ? expr : expr ?? prev; // TODO ugly
   }
 
   _traverse (change) {
@@ -1251,7 +1253,7 @@ class Alias extends Named {
     if (action === control.stop)
       return control.stop(expr);
     if (expr || action === control.prune)
-      return expr;
+      return action ? action(expr) : expr;
 
     return this.impl._traverse_redo(change);
   }
