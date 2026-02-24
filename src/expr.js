@@ -635,7 +635,7 @@ class Expr {
       if (e instanceof Lambda)
         return [`${indent}Lambda (${e.arg}[${e.arg.id}]):`, ...rec(e.impl, indent + '  ')];
       if (e instanceof Alias)
-        return [`Alias (${e.name}):`, ...rec(e.impl, indent + '  ')];
+        return [`${indent}Alias (${e.name}):`, ...rec(e.impl, indent + '  ')];
       if (e instanceof FreeVar)
         return [`${indent}FreeVar: ${e.name}[${e.id}]`];
       return [`${indent}${e.constructor.name}: ${e}`];
