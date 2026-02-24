@@ -27,17 +27,38 @@ export class Expr {
     /**
      * @desc Traverse the expression tree, applying change() to each node.
      *       If change() returns an Expr, the node is replaced with that value.
-     *       Otherwise, the node is descended further (if applicable)
-     *       or left unchanged.
+     *       A null/undefined value is interpreted as
+     *       "descend further if applicable, or leave the node unchanged".
+     *
+     *       Returned values may be decorated:
+     *
+     *       SKI.control.prune will suppress further descending even if nothing was returned
+     *       SKI.control.stop will terminate further changes.
+     *       SKI.control.redo will apply the callback to the returned subtree, recursively.
+     *
+     *       Note that if redo was applied at least once to a subtree, a null return from the same subtree
+     *       will be replaced by the last non-null value returned.
      *
      *       The traversal order is leftmost-outermost (LO), i.e. the same order as reduction steps are taken.
      *
      *       Returns null if no changes were made, or the new expression otherwise.
      *
-     * @param {(e:Expr) => (Expr|null)} change
+     * @param {(e:Expr) => TraverseValue<Expr>} change
      * @returns {Expr|null}
      */
-    traverse(change: (e: Expr) => (Expr | null)): Expr | null;
+    traverse(change: (e: Expr) => TraverseValue<Expr>): Expr | null;
+    /**
+     * @private
+     * @param {(e:Expr) => TraverseValue<Expr>} change
+     * @returns {TraverseValue<Expr>}
+     */
+    private _traverse_redo;
+    /**
+     * @private
+     * @param {(e:Expr) => TraverseValue<Expr>} change
+     * @returns {TraverseValue<Expr>}
+     */
+    private _traverse;
     /**
      * @desc Returns true if predicate() is true for any subterm of the expression, false otherwise.
      *
@@ -455,7 +476,7 @@ export class App extends Expr {
         normal: boolean;
         steps: number;
     };
-    traverse(change: any): Expr;
+    _traverse(change: any): any;
     any(predicate: any): any;
     _fold(initial: any, combine: any): any;
     subst(search: any, replace: any): Expr;
@@ -542,7 +563,7 @@ export class Lambda extends Expr {
         steps: number;
     };
     invoke(arg: any): Expr;
-    traverse(change: any): Expr | Lambda;
+    _traverse(change: any): any;
     any(predicate: any): any;
     _fold(initial: any, combine: any): any;
     subst(search: any, replace: any): Lambda;
@@ -612,7 +633,7 @@ export class Alias extends Named {
     terminal: any;
     canonical: any;
     invoke: (arg: any) => any;
-    traverse(change: any): any;
+    _traverse(change: any): any;
     any(predicate: any): any;
     _fold(initial: any, combine: any): any;
     subst(search: any, replace: any): any;
