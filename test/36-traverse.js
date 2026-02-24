@@ -94,4 +94,18 @@ describe('SKI.traverse', () => {
     expect(bare.any(e => e instanceof Alias)).to.equal(false, 'No aliases in bare');
     bare.expect(expr);
   });
+
+  it('can extract equivalent terms', () => {
+    const expr = ski.parse('(S(S(KS)K) (S(S(KS)K) (SK)))');
+    const terms = [SKI.native['+'], SKI.church(0)];
+    const short = expr.traverse(e => {
+      const canon = e.infer().expr;
+      for (const t of terms) {
+        if (canon.equals(t.infer().expr))
+          return t;
+      }
+    });
+
+    expect(short + '').to.equal('+(+ 0)');
+  });
 });
