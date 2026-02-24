@@ -4,9 +4,8 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const cac = require('cac');
 
-const { SKI } = require('../index');
+const { SKI } = require('../lib/ski-interpreter.cjs');
 const { Quest } = SKI;
-const { Tokenizer } = require('../src/internal');
 
 const cli = cac('ski-quest-validate');
 
@@ -236,35 +235,69 @@ function verifyQuest (quest, originalData, verbose) {
 }
 
 function checkHtml (text) {
-  const tokenizer = new Tokenizer('</?[a-z][a-z_0-9]*[^>]*>', '[^<>&]+', '&[A-Za-z_0-9#]+;');
-  const tokens = tokenizer.split(text);
+  // HTML tag pattern: <tagname attr="value"> or </tagname>
+  // We'll use a simple regex-based tokenizer
+  const tagPattern = /<\/?[a-z][a-z_0-9]*[^>]*>/gi;
+  const entities = /&[A-Za-z_0-9#]+;/g;
+  
+  let match;
   const stack = [];
   const errors = [];
+  let lastIndex = 0;
 
-  for (const tok of tokens) {
-    if (tok[0] === '<') {
-      if (tok[1] === '/') {
-        if (!stack.length) {
-          errors.push(`Unexpected closing tag: ${tok}`);
-          continue;
-        }
-        const tag = stack.pop();
-        if ('</' + tag + '>' !== tok) {
-          errors.push(`Mismatched closing tag: ${tok} vs </${tag}>`);
-        }
-      } else {
-        const match = tok.match(/^<([a-z][a-z_0-9]*)/);
-        if (!match) {
-          errors.push(`Invalid tag: ${tok}`);
-          continue;
-        }
-        stack.push(match[1]);
+  // Extract all tags using regex
+  const allMatches = [];
+  while ((match = tagPattern.exec(text)) !== null) {
+    allMatches.push({
+      tag: match[0],
+      index: match.index
+    });
+  }
+
+  // Process each tag with a push-down automaton (stack-based approach)
+  for (const { tag } of allMatches) {
+    if (tag[1] === '/') {
+      // Closing tag
+      if (stack.length === 0) {
+        errors.push(`Unexpected closing tag: ${tag}`);
+        continue;
+      }
+      
+      // Extract tag name from closing tag
+      const closeMatch = tag.match(/^<\/([a-z][a-z_0-9]*)/i);
+      if (!closeMatch) {
+        errors.push(`Invalid closing tag: ${tag}`);
+        continue;
+      }
+      
+      const closeName = closeMatch[1];
+      const openName = stack[stack.length - 1];
+      
+      if (closeName.toLowerCase() !== openName.toLowerCase()) {
+        errors.push(`Mismatched closing tag: </${closeName}> does not match <${openName}>`);
+      }
+      
+      stack.pop();
+    } else {
+      // Opening tag (check if it's self-closing)
+      const openMatch = tag.match(/^<([a-z][a-z_0-9]*)/i);
+      if (!openMatch) {
+        errors.push(`Invalid opening tag: ${tag}`);
+        continue;
+      }
+      
+      const tagName = openMatch[1];
+      
+      // Check if it's a self-closing tag (ends with />)
+      if (!tag.endsWith('/>')) {
+        stack.push(tagName);
       }
     }
   }
 
-  if (stack.length) {
-    errors.push(`Unclosed tags: ${stack.join(', ')}`);
+  // Check for unclosed tags
+  if (stack.length > 0) {
+    errors.push(`Unclosed tags: ${stack.map(t => `<${t}>`).join(', ')}`);
   }
 
   return errors;
