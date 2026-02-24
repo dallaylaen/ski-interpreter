@@ -496,7 +496,7 @@ class QuestChapter {
       e.style.display = 'flex'; // force flex for progress bar to work, don't rely on css
     });
     link.href = '#' + this.id;
-    this.view.link = wrapper;
+    this.view.link = link;
     this.view.progressbar = append(link, 'span', { class: ['ski-quest-progressbar'] });
     this.view.linkText = append(link, 'span', { content: 'Chapter ' + this.number + '...' });
   }
