@@ -107,7 +107,7 @@ function verifyChapter (entry, n) {
         });
 
         it('passes passing and fails failing solutions, if given', () => {
-          const nope = q.selfCheck(questSolutions);
+          const nope = q.verifySolutions(questSolutions);
           if (nope !== null) {
             // if selfCheck returns _anything_, produce a valid expected/actual diff;
             // but then fail anyway, because an empty object is also wrong.

@@ -254,8 +254,8 @@ describe('Quest', () => {
       },
     };
 
-    expect(quest.selfCheck(dataset)).to.equal(null, 'should pass with correct dataset');
-    expect(quest.selfCheck(dataset.foo1337)).to.equal(null, 'should pass with correct dataset (partial)');
+    expect(quest.verifySolutions(dataset)).to.equal(null, 'should pass with correct dataset');
+    expect(quest.verifySolutions(dataset.foo1337)).to.equal(null, 'should pass with correct dataset (partial)');
 
     const badset = {
       foo1337: {
@@ -271,12 +271,71 @@ describe('Quest', () => {
       },
     };
 
-    const result = quest.selfCheck(badset);
+    const result = quest.verifySolutions(badset);
     expect(result).to.be.an('object');
     expect(Object.keys(result).sort()).to.deep.equal(['shouldFail', 'shouldPass']);
 
     expect(result.shouldPass.map(i => i.input)).to.deep.equal([['Kx'], ['WK']]);
     expect(result.shouldFail.map(i => i.input)).to.deep.equal([['SKK']]);
+  });
+
+  it('can self-check metadata', () => {
+    const quest = new Quest({
+      id:    [],
+      name:  42,
+      intro: [
+        '<p>This is a quest with bad metadata.'
+      ],
+      input: 'phi',
+      cases: [
+        ['phi x', 'x'],
+      ],
+    });
+
+    const seen = new Set();
+    const result = quest.verify({ seen, date: new Date('2026-01-01') });
+    expect(result).to.be.an('object');
+
+    const { name, intro, date, ...rest } = result;
+    expect(name).to.match(/not a string/i);
+    expect(intro).to.match(/unclosed tags.*\bp\b/i);
+    expect(date).to.match(/invalid date/i);
+    expect(rest).to.deep.equal({});
+  });
+
+  it('can self-check but in groups', () => {
+    const group = new Quest.Group({
+      id:      'group1',
+      intro:   'This is a <b>group',
+      content: [
+        {
+          id:    'test1337',
+          name:  42,
+          intro: [
+            '<p>This is a quest with bad metadata.'
+          ],
+          input: 'phi',
+          cases: [
+            ['phi x', 'x'],
+          ],
+        }
+      ]
+    });
+
+    const seen = new Set();
+    const result = group.verify({ seen, date: new Date('2026-01-01') });
+    expect(result).to.be.an('object');
+
+    const { name, intro, content, ...rest } = result;
+    expect(name).to.match(/missing/i);
+    expect(intro).to.match(/unclosed tags.*\bb\b/i);
+    expect(rest).to.deep.equal({}, 'no unexpected findings');
+
+    expect([...seen]).to.deep.equal(['group1', 'test1337'], 'both group and quest ids should be seen');
+
+    expect(content).to.be.an('array').with.lengthOf(1);
+    expect(content[0]).to.be.an('object');
+    expect(content[0].intro).to.match(/unclosed.*\bp\b/i);
   });
 
   // TODO it ('calculates weight of solution with aliases', () => {});

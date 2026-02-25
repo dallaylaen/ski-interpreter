@@ -256,12 +256,29 @@ class Quest {
     }
   }
 
+  verify (options) {
+    const findings = this.verifyMeta(options);
+    if (options.solutions) {
+      const solCheck = this.verifySolutions(options.solutions);
+      if (solCheck)
+        findings.solutions = solCheck;
+    }
+    if (options.seen) {
+      if (!this.id)
+        findings.seen = 'No id in quest ' + (this.name ?? '(unnamed)');
+      if (options.seen.has(this.id))
+        findings.seen = 'Duplicate quest id ' + this.id;
+      options.seen.add(this.id); // mutating but who cares
+    }
+    return Object.keys(findings).length ? findings : null;
+  }
+
   /**
    * @desc Verify that solutions that are expected to pass/fail do so.
    * @param {SelfCheck|{[key: string]: SelfCheck}} dataset
    * @return {{shouldPass: {input: string[], result: QuestResult}[], shouldFail: {input: string[], result: QuestResult}[]} | null}
    */
-  selfCheck (dataset) {
+  verifySolutions (dataset) {
     // dataset is either a SelfCheck object or a hash of { quest_id: SelfCheck }
     if (typeof dataset === 'object' && !Array.isArray(dataset?.accepted) && !Array.isArray(dataset?.rejected)) {
       // dataset is a hash of { quest_id: SelfCheck } so extract data
@@ -283,6 +300,25 @@ class Quest {
         ret.shouldFail.push({ input, result });
     }
     return (ret.shouldFail.length + ret.shouldPass.length) ? ret : null; // return null if all good
+  }
+
+  verifyMeta (options = {}) {
+    const findings = {};
+
+    for (const field of ['name', 'intro']) {
+      const found = checkHtml(this[field]);
+      if (found)
+        findings[field] = found;
+    }
+    if (options.date) {
+      const date = new Date(this.meta.created_at);
+      if (isNaN(date))
+        findings.date = 'invalid date format: ' + this.meta.created_at;
+      else if (date < new Date('2024-07-15') || date > new Date())
+        findings.date = 'date out of range: ' + this.meta.created_at;
+    }
+
+    return findings;
   }
 
   /**
@@ -457,6 +493,34 @@ class Subst {
   }
 }
 
+// corresponds to "chapter" in the quest page
+class Group {
+  constructor (options) {
+    this.name = options.name;
+    this.intro = list2str(options.intro);
+    this.id = options.id;
+
+    // TODO don't die on failed quests
+    if (options.content)
+      this.content = options.content.map( c => c instanceof Quest ? c : new Quest(c) );
+  }
+
+  verify (options) {
+    const findings = {};
+    const id = checkId(this.id, options.seen);
+    if (id)
+      findings[this.id] = id;
+    for (const field of ['name', 'intro']) {
+      const found = checkHtml(this[field]);
+      if (found)
+        findings[field] = found;
+    }
+
+    findings.content = this.content.map(q => q.verify(options));
+    return findings;
+  }
+}
+
 /**
  * @desc Concatenate long strings represented as arrays, or just pass along if already string or undefined.
  * @param {string|Array<string>|undefined} str
@@ -467,5 +531,47 @@ function list2str (str) {
     return str;
   return Array.isArray(str) ? str.join(' ') : '' + str;
 }
+
+function checkId (id, seen) {
+  if (id === undefined)
+    return 'missing';
+  if (typeof id !== 'string' && typeof id !== 'number' )
+    return 'is a ' + typeof id;
+  if (seen) {
+    if (seen.has(id))
+      return 'duplicate id ' + id;
+    seen.add(id);
+  }
+  // return nothing = success
+}
+
+function checkHtml (str) {
+  if (str === undefined)
+    return 'missing';
+  if (typeof str !== 'string')
+    return 'not a string but ' + typeof str;
+
+  // very basic check for unclosed tags, just to catch common mistakes in the quest text
+  const tagStack = [];
+  const tagRegex = /<\/?([a-z]+)(?:\s[^>]*)?>/gi;
+  let match;
+  while ((match = tagRegex.exec(str)) !== null) {
+    const [fullTag, tagName] = match;
+    if (fullTag.startsWith('</')) {
+      // Closing tag
+      if (tagStack.length === 0 || tagStack.pop() !== tagName)
+        return (`Unmatched closing tag: </${tagName}>`);
+    } else {
+      // Opening tag
+      tagStack.push(tagName);
+    }
+  }
+  if (tagStack.length > 0)
+    return (`Unclosed tags: ${tagStack.join(', ')}`);
+
+  return null; // No issues found
+}
+
+Quest.Group = Group;
 
 module.exports = { Quest };
