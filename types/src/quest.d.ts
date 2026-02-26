@@ -167,12 +167,15 @@ export class Quest {
      * @return {QuestResult}
      */
     check(...input: string): QuestResult;
+    verify(options: any): {
+        date: string;
+    };
     /**
      * @desc Verify that solutions that are expected to pass/fail do so.
      * @param {SelfCheck|{[key: string]: SelfCheck}} dataset
      * @return {{shouldPass: {input: string[], result: QuestResult}[], shouldFail: {input: string[], result: QuestResult}[]} | null}
      */
-    selfCheck(dataset: SelfCheck | {
+    verifySolutions(dataset: SelfCheck | {
         [key: string]: SelfCheck;
     }): {
         shouldPass: {
@@ -184,11 +187,17 @@ export class Quest {
             result: QuestResult;
         }[];
     } | null;
+    verifyMeta(options?: {}): {
+        date: string;
+    };
     /**
        *
        * @return {TestCase[]}
        */
     show(): TestCase[];
+}
+export namespace Quest {
+    export { Group };
 }
 declare class Case {
     /**
@@ -221,6 +230,16 @@ declare class Case {
      * @return {CaseResult}
      */
     check(...expr: typeof import("./expr").Expr): CaseResult;
+}
+declare class Group {
+    constructor(options: any);
+    name: any;
+    intro: string;
+    id: any;
+    content: any;
+    verify(options: any): {
+        content: any;
+    };
 }
 import { SKI } from "./parser";
 declare class Subst {
