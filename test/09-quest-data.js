@@ -1,8 +1,15 @@
+/**
+ * @desc Tests the quest data in docs/quest-data, ensuring it can be loaded and verified without errors.
+ *       Also checks for unique quest and chapter IDs, and that all quests have titles, descriptions, and valid dates.
+ *       If quest-solutions.json is present, also verifies that quests pass their expected solutions.
+ *
+ *       Mostly written by Claude Haiku 4.5.
+ */
+
 const { expect } = require('chai');
 const fs = require('node:fs').promises;
 const path = require('node:path');
 
-const { Tokenizer } = require('../src/internal');
 const { SKI } = require('../index');
 const { Quest } = SKI;
 
@@ -46,51 +53,74 @@ describe('quest-data', () => {
 
 function verifyChapter (entry, n) {
   describe('chapter ' + n + ' ' + (entry.link ?? 'empty'), () => {
-    it('has uniques id', () => {
+    let group, err;
+    try {
+      group = new Quest.Group(entry);
+    } catch (e) {
+      err = e;
+    }
+
+    it('is a quest group', () => {
+      if (err)
+        throw err;
+      expect(group).to.be.instanceof(Quest.Group, 'A Quest.Group was generated');
+      expect(Array.isArray(group.content)).to.equal(true, 'Content is an array');
+    });
+
+    if (!(group instanceof Quest.Group))
+      return;
+
+    it('has unique chapter id', () => {
       expect(entry.id).to.be.a('string');
       expect(uniqChapter.has(entry.id)).to.equal(false, 'chapter id is unique: ' + entry.id);
       uniqChapter.add(entry.id);
     });
-    it('has title', async () => {
-      expect(typeof entry.name).to.equal('string');
-    });
-    it('has description', async () => {
-      const intro = Array.isArray(entry.intro) ? entry.intro : [entry.intro];
-      for (const s of intro)
-        expect(typeof s).to.equal('string');
-      const html = intro.join(' ');
-      checkHtml(html);
-    });
-    const content = entry.content;
 
-    expect(Array.isArray(content)).to.equal(true, 'Content must be an array');
+    it('has title', () => {
+      expect(typeof group.name).to.equal('string');
+    });
 
-    for (let i = 0; i < content.length; i++) {
-      const quest = content[i];
-      describe('quest ' + entry.link + ' [' + i + '] ' + content[i].id, async () => {
-        let q, err;
-        try {
-          q = new Quest(quest)
-        } catch (e) {
-          err = e;
-          // do nothing, will be rejected later
-        }
+    it('has description', () => {
+      expect(typeof group.intro).to.equal('string');
+    });
+
+    it('passes group verify() checks', () => {
+      const seenIds = new Set();
+      const findings = group.verify({
+        date:      true,
+        solutions: questSolutions,
+        seen:      seenIds
+      });
+
+      // Filter out nulls from content array - they represent quests with no errors
+      const contentErrors = findings.content?.filter(item => item !== null);
+      const hasContentErrors = contentErrors && contentErrors.length > 0;
+      const hasOtherErrors = Object.keys(findings).some(key => key !== 'content' && findings[key]);
+
+      if (hasOtherErrors || hasContentErrors) {
+        // Format findings for better error display
+        const formatted = SKI.extras.deepFormat(findings);
+        expect(formatted).to.deep.equal({}, 'All group verification checks should pass');
+      }
+    });
+
+    // Detailed tests for each quest in the group
+    for (let i = 0; i < group.content.length; i++) {
+      const q = group.content[i];
+      describe('quest ' + entry.link + ' [' + i + '] ' + q.id, async () => {
         it('is a quest', () => {
-          if (err)
-            throw err;
           expect(q).to.be.instanceof(Quest, 'A quest was generated');
           expect(q.cases.length).to.be.within(1, Infinity, 'At least 1 case');
         });
-        if (!(q instanceof Quest))
-          return;
-        console.log(q.meta);
+
         it('has title', () => {
           expect(typeof q.name).to.equal('string');
         });
+
         it('has description', () => {
           expect(typeof q.intro).to.equal('string');
-          checkHtml(q.intro);
         });
+
         it('has date', () => {
           const date = q.meta.created_at;
           expect(date).to.be.a('string');
@@ -106,10 +136,18 @@ function verifyChapter (entry, n) {
           uniqQuest.add(id);
         });
 
+        it('passes quest verify() checks', () => {
+          const findings = q.verify({
+            date:      true,
+            solutions: questSolutions
+          });
+          expect(findings).to.equal(null, 'Quest should pass all verification checks');
+        });
+
         it('passes passing and fails failing solutions, if given', () => {
           const nope = q.verifySolutions(questSolutions);
           if (nope !== null) {
-            // if selfCheck returns _anything_, produce a valid expected/actual diff;
+            // if verifySolutions returns _anything_, produce a valid expected/actual diff;
             // but then fail anyway, because an empty object is also wrong.
             expect(SKI.extras.deepFormat(nope)).to.deep.equal({});
             expect(nope).to.equal(null);
@@ -118,29 +156,4 @@ function verifyChapter (entry, n) {
       });
     }
   });
-}
-
-function checkHtml (text) {
-  const tokenizer = new Tokenizer('</?[a-z][a-z_0-9]*[^>]*>', '[^<>&]+', '&[A-Za-z_0-9#]+;');
-
-  const tokens = tokenizer.split(text);
-  const stack = [];
-  for (const tok of tokens) {
-    if (tok[0] === '<') {
-      if (tok[1] === '/') {
-        if (!stack.length)
-          throw new Error('Unexpected closing tag: ' + tok);
-        const tag = stack.pop();
-        if ('</' + tag + '>' !== tok)
-          throw new Error('Mismatched closing tag: ' + tok + ' vs ' + tag);
-      } else {
-        const match = tok.match(/^<([a-z][a-z_0-9]*)/);
-        if (!match)
-          throw new Error('Invalid tag: ' + tok);
-        stack.push(match[1]);
-      }
-    }
-  }
-  if (stack.length)
-    throw new Error('Unclosed tags: ' + stack.join(', '));
 }
