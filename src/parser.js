@@ -360,7 +360,7 @@ class SKI {
 
       const def = item.match(/^([A-Z]|[a-z][a-z_0-9]*)\s*=(.*)$/s);
       if (def && def[2] === '')
-        expr = new FreeVar(def[1], options.scope ?? SKI);
+        expr = new FreeVar(def[1], options.scope ?? FreeVar.global);
       else
         expr = this.parseLine(item, jar, options);
 
@@ -414,7 +414,7 @@ class SKI {
     const empty = new Empty();
     /** @type {Expr[]} */
     const stack = [empty];
-    const context = options.scope || SKI; // default is global unbound vars
+    const context = options.scope || FreeVar.global; // default is global unbound vars
 
     // TODO each token should carry along its position in source
     for (const c of tokens) {

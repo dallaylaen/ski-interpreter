@@ -921,6 +921,8 @@ class FreeVar extends Named {
    * If a scope object is given, however, two variables with the same name and scope
    * are considered identical.
    *
+   * By convention, FreeVar.global is a constant denoting a global unbound variable.
+   *
    * @param {string} name - name of the variable
    * @param {any} scope - an object representing where the variable belongs to.
    */
@@ -958,6 +960,8 @@ class FreeVar extends Named {
     return options.var[0] + name + options.var[1];
   }
 }
+
+FreeVar.global = ['global'];
 
 class Native extends Named {
   /**
