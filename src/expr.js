@@ -153,26 +153,33 @@ class Expr {
    *
    *       Returns null if no changes were made, or the new expression otherwise.
    *
+   * @param {{
+   * }} [options]
    * @param {(e:Expr) => TraverseValue<Expr>} change
    * @returns {Expr|null}
    */
-  traverse (change) {
-    const [expr, _] = unwrap(this._traverse_redo(change));
+  traverse (options, change) {
+    if (typeof options === 'function') {
+      change = options;
+      options = {};
+    }
+    const [expr, _] = unwrap(this._traverse_redo(options, change));
     return expr;
   }
 
   /**
    * @private
+   * @param {Object} options
    * @param {(e:Expr) => TraverseValue<Expr>} change
    * @returns {TraverseValue<Expr>}
    */
-  _traverse_redo (change) {
+  _traverse_redo (options, change) {
     let action;
     let expr = this;
     let prev;
     do {
       prev = expr;
-      [expr, action] = unwrap(expr._traverse(change));
+      [expr, action] = unwrap(expr._traverse(options, change));
     } while (expr && action === control.redo);
     if (!expr && prev !== this)
       expr = prev; // we were in redo at least once
@@ -181,10 +188,11 @@ class Expr {
 
   /**
    * @private
+   * @param {Object} options
    * @param {(e:Expr) => TraverseValue<Expr>} change
    * @returns {TraverseValue<Expr>}
    */
-  _traverse (change) {
+  _traverse (options, change) {
     return change(this);
   }
 
@@ -805,18 +813,18 @@ class App extends Expr {
     };
   }
 
-  _traverse (change) {
+  _traverse (options, change) {
     const [expr, action] = unwrap(change(this));
     if (action === control.stop)
       return control.stop(expr);
     if (expr || action === control.prune)
       return expr;
 
-    const [fun, fAction] = unwrap(this.fun._traverse_redo(change));
+    const [fun, fAction] = unwrap(this.fun._traverse_redo(options, change));
     if (fAction === control.stop)
       return control.stop(fun ? fun.apply(this.arg) : null);
 
-    const [arg, aAction] = unwrap(this.arg._traverse_redo(change));
+    const [arg, aAction] = unwrap(this.arg._traverse_redo(options, change));
 
     const final = (fun || arg) ? (fun ?? this.fun).apply(arg ?? this.arg) : null;
     if (aAction === control.stop)
@@ -1137,7 +1145,7 @@ class Lambda extends Expr {
     return this.impl.subst(this.arg, arg) ?? this.impl;
   }
 
-  _traverse (change) {
+  _traverse (options, change) {
     const [expr, action] = unwrap(change(this));
     if (action === control.stop)
       return control.stop(expr);
@@ -1145,7 +1153,7 @@ class Lambda extends Expr {
       return expr;
 
     // alas no proper shielding of self.arg is possible
-    const [impl, iAction] = unwrap(this.impl._traverse_redo(change));
+    const [impl, iAction] = unwrap(this.impl._traverse_redo(options, change));
 
     const final = impl ? new Lambda(this.arg, impl) : null;
 
@@ -1318,14 +1326,14 @@ class Alias extends Named {
     return this.terminal ? 1 : this.impl.weight();
   }
 
-  _traverse (change) {
+  _traverse (options, change) {
     const [expr, action] = unwrap(change(this));
     if (action === control.stop)
       return control.stop(expr);
     if (expr || action === control.prune)
       return action ? action(expr) : expr;
 
-    return this.impl._traverse_redo(change);
+    return this.impl._traverse_redo(options, change);
   }
 
   any (predicate) {
