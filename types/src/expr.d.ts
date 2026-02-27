@@ -104,26 +104,34 @@ export class Expr {
      *       Note that if redo was applied at least once to a subtree, a null return from the same subtree
      *       will be replaced by the last non-null value returned.
      *
-     *       The traversal order is leftmost-outermost (LO), i.e. the same order as reduction steps are taken.
+     *       The traversal order is leftmost-outermost, unless options.order = 'leftmost-innermost' is specified.
+     *       Short aliases 'LO' and 'LI' (case-sensitive) are also accepted.
      *
      *       Returns null if no changes were made, or the new expression otherwise.
      *
+     * @param {{
+     *   order?: 'LO' | 'LI' | 'leftmost-outermost' | 'leftmost-innermost',
+     * }} [options]
      * @param {(e:Expr) => TraverseValue<Expr>} change
      * @returns {Expr|null}
      */
-    traverse(change: (e: Expr) => TraverseValue<Expr>): Expr | null;
+    traverse(options?: {
+        order?: "LO" | "LI" | "leftmost-outermost" | "leftmost-innermost";
+    }, change: (e: Expr) => TraverseValue<Expr>): Expr | null;
     /**
      * @private
+     * @param {Object} options
      * @param {(e:Expr) => TraverseValue<Expr>} change
      * @returns {TraverseValue<Expr>}
      */
     private _traverse_redo;
     /**
      * @private
+     * @param {Object} options
      * @param {(e:Expr) => TraverseValue<Expr>} change
      * @returns {TraverseValue<Expr>}
      */
-    private _traverse;
+    private _traverse_descend;
     /**
      * @desc Returns true if predicate() is true for any subterm of the expression, false otherwise.
      *
@@ -262,13 +270,6 @@ export class Expr {
         expr: Expr;
         steps: number;
     }>;
-    /**
-     * @desc Internal method for toSKI, which performs one step of the conversion.
-     * @param {{max: number, steps: number}} options
-     * @returns {Expr}
-     * @private
-     */
-    private _rski;
     /**
      * Replace all instances of plug in the expression with value and return the resulting expression,
      * or null if no changes could be made.
@@ -521,7 +522,7 @@ export class App extends Expr {
         normal: boolean;
         steps: number;
     };
-    _traverse(change: any): any;
+    _traverse_descend(options: any, change: any): any;
     any(predicate: any): any;
     _fold(initial: any, combine: any): any;
     subst(search: any, replace: any): Expr;
@@ -534,7 +535,6 @@ export class App extends Expr {
     };
     invoke(arg: any): Partial;
     final: boolean;
-    _rski(options: any): Expr | this;
     diff(other: any, swap?: boolean): string;
     _braced(first: any): boolean;
     _format(options: any, nargs: any): string;
@@ -613,11 +613,10 @@ export class Lambda extends Expr {
         steps: number;
     };
     invoke(arg: any): Expr;
-    _traverse(change: any): any;
+    _traverse_descend(options: any, change: any): any;
     any(predicate: any): any;
     _fold(initial: any, combine: any): any;
     subst(search: any, replace: any): Lambda;
-    _rski(options: any): any;
     diff(other: any, swap?: boolean): string;
     _format(options: any, nargs: any): string;
     _braced(first: any): boolean;
@@ -645,7 +644,6 @@ export class Native extends Named {
         canonize?: boolean;
     });
     invoke: Partial;
-    _rski(options: any): any;
 }
 export class Alias extends Named {
     /**
@@ -674,7 +672,7 @@ export class Alias extends Named {
     impl: Expr;
     terminal: any;
     invoke: (arg: any) => any;
-    _traverse(change: any): any;
+    _traverse_descend(options: any, change: any): any;
     any(predicate: any): any;
     _fold(initial: any, combine: any): any;
     subst(search: any, replace: any): any;
@@ -690,7 +688,7 @@ export class Alias extends Named {
         proper: boolean;
     };
     diff(other: any, swap?: boolean): any;
-    _rski(options: any): Expr;
+    _rski(options: any): any;
     _braced(first: any): boolean;
 }
 export class Church extends Expr {
