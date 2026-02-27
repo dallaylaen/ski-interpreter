@@ -72,13 +72,13 @@ class Expr {
    * @param {Object} options
    * @param {string} [options.note] - a brief description what the term does
    * @param {number} [options.arity] - number of arguments the term is waiting for (if known)
-   * @param {string} [options.fancyName] - how to display in html mode, e.g. &phi; instead of 'f'
+   * @param {string} [options.fancy] - how to display in html mode, e.g. &phi; instead of 'f'
    * @param {boolean} [options.canonize] - whether to try to infer the properties
    * @param {number} [options.max] - maximum number of steps for inference, if canonize is true
    * @param {number} [options.maxArgs] - maximum number of arguments for inference, if canonize is true
    * @return {this}
    */
-  _setup (options) {
+  _setup (options = {}) {
     // TODO better name
 
     if (options.fancy !== undefined)
@@ -1281,7 +1281,7 @@ class Alias extends Named {
       throw new Error('Attempt to create an alias for a non-expression: ' + impl);
     this.impl = impl;
 
-    this._setup({ canonize: true, ...options });
+    this._setup(options);
     this.terminal = options.terminal ?? this.props?.proper;
     this.invoke = waitn(impl, this.arity ?? 0);
   }
