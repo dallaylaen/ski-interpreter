@@ -1,6 +1,7 @@
 'use strict';
 
 const { Expr, Alias, FreeVar } = require('./expr');
+const { Quest } = require('./quest');
 
 /**
  * @desc  Extra utilities that do not belong in the core.
@@ -124,6 +125,11 @@ function search (seed, options, predicate) {
 function deepFormat (obj, options = {}) {
   if (obj instanceof Expr)
     return obj.format(options);
+  // TODO for quests, use toJSON when it's ready
+  if (obj instanceof Quest)
+    return 'Quest(' + obj.name + ')';
+  if (obj instanceof Quest.Case)
+    return 'Quest.Case';
   if (Array.isArray(obj))
     return obj.map(deepFormat);
   if (typeof obj !== 'object' || obj === null || obj.constructor !== Object)

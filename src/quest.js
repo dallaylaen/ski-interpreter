@@ -573,5 +573,6 @@ function checkHtml (str) {
 }
 
 Quest.Group = Group;
+Quest.Case = Case;
 
 module.exports = { Quest };
