@@ -12,7 +12,6 @@ const ORDER = {
   'leftmost-innermost': 'LI',
   LO:                   'LO',
   LI:                   'LI',
-  '':                   'LO',
 };
 
 /**
@@ -173,7 +172,7 @@ class Expr {
       change = options;
       options = {};
     }
-    const order = ORDER[options.order ?? ''];
+    const order = ORDER[options.order ?? 'LO'];
     if (order === undefined)
       throw new Error('Unknown traversal order: ' + options.order);
     const [expr, _] = unwrap(this._traverse_redo({ order }, change));
@@ -388,7 +387,7 @@ class Expr {
     const seen = new Set(); // prine irreducible
     let steps = 0;
     while (expr) {
-      const next = expr.traverse(e => {
+      const next = expr.traverse({ order: 'LI' }, e => {
         if (seen.has(e))
           return null;
         if (e instanceof App && e.fun instanceof Lambda) {
@@ -418,28 +417,36 @@ class Expr {
    */
   * toSKI (options = {}) {
     // TODO options.max is not actually max, it's the number of steps in one iteration
-    let steps = 0;
-    let expr = this;
-    while (true) {
-      const opt = { max: options.max ?? 1, steps: 0 };
-      const next = expr._rski(opt);
-      const final = opt.steps === 0;
-      yield { expr, steps, final };
-      if (final)
-        break;
-      expr = next;
-      steps += opt.steps;
-    }
-  }
+    // get rid of non-lambdas
+    let expr = this.traverse(e => {
+      if (e instanceof FreeVar || e instanceof App || e instanceof Lambda || e instanceof Alias)
+        return null;
+      // TODO infer failed for atomic term? die...
+      return e.infer().expr;
+    }) ?? this;
 
-  /**
-   * @desc Internal method for toSKI, which performs one step of the conversion.
-   * @param {{max: number, steps: number}} options
-   * @returns {Expr}
-   * @private
-   */
-  _rski (options) {
-    return this;
+    let steps = 0;
+    while (expr) {
+      const next = expr.traverse({ order: 'LI' }, e => {
+        if (!(e instanceof Lambda) || (e.impl instanceof Lambda))
+          return null; // continue
+        if (e.impl === e.arg)
+          return control.stop(native.I);
+        if (!e.impl.any(t => t === e.arg))
+          return control.stop(native.K.apply(e.impl));
+        // TODO use real assert here. e.impl contains e.arg and also isn't e.arg, in MUST be App.
+        if (!(e.impl instanceof App))
+          throw new Error('toSKI: assert failed: lambda body is of unexpected type ' + e.impl.constructor.name );
+        // eta-reduction: body === (not e.arg) (e.arg)
+        if (e.impl.arg === e.arg && !e.impl.fun.any(t => t === e.arg))
+          return control.stop(e.impl.fun);
+        // last resort, go S
+        return control.stop(native.S.apply(new Lambda(e.arg, e.impl.fun), new Lambda(e.arg, e.impl.arg)));
+      })
+      yield { expr, steps, final: !next };
+      steps++;
+      expr = next;
+    }
   }
 
   /**
@@ -920,12 +927,6 @@ class App extends Expr {
     return [...this.fun.unroll(), this.arg];
   }
 
-  _rski (options) {
-    if (options.steps >= options.max)
-      return this;
-    return this.fun._rski(options).apply(this.arg._rski(options));
-  }
-
   diff (other, swap = false) {
     if (!(other instanceof App))
       return super.diff(other, swap);
@@ -1071,16 +1072,6 @@ class Native extends Named {
 
     this._setup({ canonize: true, ...opt });
   }
-
-  _rski (options) {
-    if (this === native.I || this === native.K || this === native.S || (options.steps >= options.max))
-      return this;
-    const canon = this.infer().expr;
-    if (!canon)
-      return this;
-    options.steps++;
-    return canon._rski(options);
-  }
 }
 
 // predefined global combinator list
@@ -1185,29 +1176,6 @@ class Lambda extends Expr {
       return null;
     const change = this.impl.subst(search, replace);
     return change ? new Lambda(this.arg, change) : null;
-  }
-
-  _rski (options) {
-    const impl = this.impl._rski(options);
-    if (options.steps >= options.max)
-      return new Lambda(this.arg, impl);
-    options.steps++;
-    if (impl === this.arg)
-      return native.I;
-    if (!impl.any(e => e === this.arg))
-      return native.K.apply(impl);
-    if (impl instanceof App) {
-      const { fun, arg } = impl;
-      // try eta reduction
-      if (arg === this.arg && !fun.any(e => e === this.arg))
-        return fun._rski(options);
-      // fall back to S
-      return native.S.apply(
-        (new Lambda(this.arg, fun))._rski(options),
-        (new Lambda(this.arg, arg))._rski(options)
-      );
-    }
-    throw new Error('Don\'t know how to convert to SKI' + this);
   }
 
   diff (other, swap = false) {
