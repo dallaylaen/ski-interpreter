@@ -1,121 +1,234 @@
 #!/usr/bin/env -S node --stack-size=20600
 
 const fs = require('node:fs/promises');
+const { Command } = require('commander');
 
 const { SKI } = require('../lib/ski-interpreter.cjs');
+const { Quest } = require('../src/quest.js');
 
-const [myname, options, positional] = parseArgs(process.argv);
+const program = new Command();
 
-if (options.help) {
-  console.error(myname + ': usage: ' + myname + '[-q | -v ] -e <expression>');
-  process.exit(1);
-}
+program
+  .name('ski')
+  .description('Simple Kombinator Interpreter - a combinatory logic & lambda calculus parser and interpreter')
+  .version('2.2.1');
 
-if ((typeof options.e === 'string' && positional.length) > 0 || positional.length > 1) {
-  console.error(myname + ': either -e <expr> or exactly one filename must be given');
-  process.exit(1);
-}
+// REPL subcommand
+program
+  .command('repl')
+  .description('Start interactive REPL')
+  .option('--verbose', 'Show all evaluation steps')
+  .action((options) => {
+    startRepl(options.verbose);
+  });
 
-const ski = new SKI();
+// Eval subcommand
+program
+  .command('eval <expression>')
+  .description('Evaluate a single expression')
+  .option('--verbose', 'Show all evaluation steps')
+  .action((expression, options) => {
+    evaluateExpression(expression, options.verbose);
+  });
 
-if (options.e === undefined && !positional.length) {
-  // interactive console
+// File subcommand
+program
+  .command('file <filepath>')
+  .description('Evaluate expressions from a file')
+  .option('--verbose', 'Show all evaluation steps')
+  .action((filepath, options) => {
+    evaluateFile(filepath, options.verbose);
+  });
+
+// Quest-check subcommand
+program
+  .command('quest-check <files...>')
+  .description('Check quest files for validity')
+  .option('--solution <file>', 'Load solutions from file')
+  .action((files, options) => {
+    questCheck(files, options.solution);
+  });
+
+// Default to REPL if no command provided
+program
+  .showHelpAfterError(true)
+  .parse(process.argv);
+
+if (!process.argv.slice(2).length)
+  startRepl(false);
+
+function startRepl (verbose) {
   const readline = require('readline');
+  const ski = new SKI();
+
   const rl = readline.createInterface({
     input:    process.stdin,
     output:   process.stdout,
     prompt:   '> ',
     terminal: true,
   });
-  if (!options.q)
-    console.log('Welcome to SKI interactive shell. Known combinators: ' + ski.showRestrict());
+
+  console.log('Welcome to SKI interactive shell. Known combinators: ' + ski.showRestrict());
+
   rl.on('line', str => {
-    const flag = str.match(/^\s*([-+])([qvt])\s*$/);
-    if (flag)
-      options[flag[2]] = flag[1] === '+';
-    else {
-      runLine(err => {
-        console.log('' + err)
-      })(str);
+    if (str.match(/\S/)) {
+      if (str.startsWith('!'))
+        handleCommand(str, ski);
+      else {
+        processLine(str, ski, verbose, err => {
+          console.log('' + err);
+        });
+      }
     }
     rl.prompt();
   });
-  rl.once('close', () => {
-    if (!options.q)
-      console.log('Bye, and may your bird fly high!');
-    process.exit(0)
-  });
-  rl.prompt();
-} else {
-  const prom = positional.length > 0
-    ? fs.readFile(positional[0], 'utf8')
-    : Promise.resolve(options.e);
 
-  prom.then(runLine(err => { console.error('' + err); process.exit(3) })).catch(err => {
-    console.error(myname + ': ' + err);
-    process.exit(2);
+  rl.once('close', () => {
+    console.log('Bye, and may thy bird fly high!');
+    process.exit(0);
+  });
+
+  rl.prompt();
+}
+
+function evaluateExpression (expression, verbose) {
+  const ski = new SKI();
+  processLine(expression, ski, verbose, err => {
+    console.error('' + err);
+    process.exit(3);
   });
 }
 
-function runLine (onErr) {
-  return function (source) {
-    if (!source.match(/\S/))
-      return 0; // nothing to see here
-    try {
-      const expr = ski.parse(source);
+function evaluateFile (filepath, verbose) {
+  const ski = new SKI();
+  fs.readFile(filepath, 'utf8')
+    .then(source => {
+      processLine(source, ski, verbose, err => {
+        console.error('' + err);
+        process.exit(3);
+      });
+    })
+    .catch(err => {
+      console.error('ski: ' + err);
+      process.exit(2);
+    });
+}
 
-      const t0 = new Date();
-      for (const state of expr.walk()) {
-        if (state.final && !options.q)
-          console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
-        if (options.v || state.final)
-          console.log('' + state.expr.format({ terse: options.t }));
-        if (state.final && expr instanceof SKI.classes.Alias)
-          ski.add(expr.name, state.expr);
-      }
-      return 0;
-    } catch (err) {
-      onErr(err);
-      return 1;
+function processLine (source, ski, verbose, onErr) {
+  if (!source.match(/\S/))
+    return; // nothing to see here
+
+  try {
+    const expr = ski.parse(source);
+    const t0 = new Date();
+    const isAlias = expr instanceof SKI.classes.Alias;
+    const aliasName = isAlias ? expr.name : null;
+
+    for (const state of expr.walk()) {
+      if (state.final)
+        console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
+
+      if (verbose || state.final)
+        console.log('' + state.expr.format());
+
+      if (state.final && isAlias && aliasName)
+        ski.add(aliasName, state.expr);
     }
+  } catch (err) {
+    onErr(err);
   }
 }
 
-function parseArgs (argv) {
-  const [_, script, ...list] = argv;
+async function questCheck (files, solutionFile) {
+  try {
+    // Load solutions if provided
+    let solutions = null;
+    if (solutionFile) {
+      const data = await fs.readFile(solutionFile, 'utf8');
+      solutions = JSON.parse(data);
+    }
 
-  const todo = {
-    '--':     () => { pos.push(...list) },
-    '--help': () => { opt.help = true },
-    '-q':     () => { opt.q = true },
-    '-v':     () => { opt.v = true },
-    '-c':     () => { opt.t = false },
-    '-t':     () => { opt.t = true },
-    '-e':     () => {
-      if (list.length < 1)
-        throw new Error('option -e requires an argument');
-      opt.e = list.shift();
+    // Load and verify each quest file
+    let hasErrors = false;
+    const seenIds = new Set();
+
+    for (const file of files) {
+      try {
+        const data = await fs.readFile(file, 'utf8');
+        const questData = JSON.parse(data);
+
+        // Handle both single quest objects and quest groups
+        const entry = Array.isArray(questData) ? { content: questData } : questData;
+
+        try {
+          const group = new Quest.Group(entry);
+
+          // Verify the group
+          const findings = group.verify({
+            date: true,
+            solutions,
+            seen: seenIds
+          });
+
+          // Check for errors
+          const hasGroupErrors = Object.keys(findings).some(key => {
+            if (key === 'content') {
+              const contentErrors = findings.content?.filter(item => item !== null);
+              return contentErrors && contentErrors.length > 0;
+            }
+            return findings[key];
+          });
+
+          if (hasGroupErrors) {
+            hasErrors = true;
+            console.error(`Error in ${file}:`);
+            console.error(JSON.stringify(findings, null, 2));
+          } else
+            console.log(`✓ ${file}`);
+        } catch (err) {
+          hasErrors = true;
+          console.error(`Error parsing quest group in ${file}:`, err.message);
+        }
+      } catch (err) {
+        hasErrors = true;
+        console.error(`Error reading file ${file}:`, err.message);
+      }
+    }
+
+    // Exit with appropriate code
+    process.exit(hasErrors ? 1 : 0);
+  } catch (err) {
+    console.error('Error in quest-check:', err.message);
+    process.exit(2);
+  }
+}
+
+function handleCommand (input, ski) {
+  const parts = input.trim().split(/\s+/);
+  const cmd = parts[0];
+
+  const dispatch = {
+    '!ls': () => {
+      const terms = ski.getTerms();
+      const list = Object.keys(terms).sort();
+      for (const name of list) {
+        const term = terms[name];
+        if (term instanceof SKI.classes.Alias)
+          console.log(`  ${name} = ${term.impl}`);
+        else if (term instanceof SKI.classes.Native)
+          console.log(`  ${name} ${term.props?.expr ?? '(native)'}`);
+      }
     },
+    '!help': () => {
+      console.log('Available commands:');
+      console.log('  !ls    - List term inventory');
+      console.log('  !help  - Show this help message');
+    },
+    '': () => {
+      console.log(`Unknown command: ${cmd}`);
+      console.log('Type !help for available commands.');
+    }
   };
 
-  // TODO replace with a relevant dependency
-  const pos = [];
-  const opt = {};
-
-  while (list.length > 0) {
-    const next = list.shift();
-
-    if (!next.match(/^-/)) {
-      pos.push(next);
-      continue;
-    }
-
-    const action = todo[next];
-    if (typeof action !== 'function')
-      throw new Error('Unknown option ' + next + '; see ski.js --help');
-
-    action();
-  }
-
-  return [script, opt, pos];
+  (dispatch[cmd] || dispatch[''])(...parts.slice(1));
 }
