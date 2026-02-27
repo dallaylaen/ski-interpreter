@@ -17,11 +17,9 @@ describe('Expr.toLambda', () => {
   checkTerm('BC(CI)', 'a->b->c->c a b');
   checkTerm('T=CI; 5 (Ty) x', 'x y y y y y');
 
-  /*
-    TODO these 2 fail!
-    checkTerm("5 K I", "a->b->c->d->e->f->f");
-    checkTerm("SB(SB(SB(SB(SB(KI))))) K I", "a->b->c->d->e->f->f");
-    */
+  checkTerm('5 K I', 'a->b->c->d->e->f->f');
+  checkTerm('SB(SB(SB(SB(SB(KI))))) K I', 'a->b->c->d->e->f->f');
+
   // quine
   checkTerm('SII(C(K(WI)))', '(x->x x) (x->y->x x)');
 

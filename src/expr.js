@@ -352,7 +352,7 @@ class Expr {
    * @return {IterableIterator<{expr: Expr, steps?: number, comment?: string}>}
    */
   * toLambda (options = {}) {
-    const expr = this.traverse(e => {
+    let expr = this.traverse(e => {
       if (e instanceof FreeVar || e instanceof App || e instanceof Lambda || e instanceof Alias)
         return null; // no change
       const guess = e.infer({ max: options.max, maxArgs: options.maxArgs });
@@ -360,7 +360,25 @@ class Expr {
         throw new Error('Failed to infer an equivalent  lambda term for ' + e);
       return guess.expr;
     }) ?? this;
-    yield * simplifyLambda(expr, options);
+    const seen = new Set(); // prine irreducible
+    let steps = 0;
+    while (expr) {
+      const next = expr.traverse(e => {
+        if (seen.has(e))
+          return null;
+        if (e instanceof App && e.fun instanceof Lambda) {
+          const guess = e.infer({ max: options.max, maxArgs: options.maxArgs });
+          steps += guess.steps;
+          if (!guess.normal) {
+            seen.add(e);
+            return null;
+          }
+          return control.stop(guess.expr);
+        }
+      });
+      yield { expr, steps };
+      expr = next;
+    }
   }
 
   /**
@@ -1442,65 +1460,6 @@ function maybeLambda (args, expr, caps = {}) {
 
 function nthvar (n) {
   return new FreeVar('abcdefgh'[n] ?? 'x' + n);
-}
-
-/**
- * @private
- * @param {Expr} expr
- * @param {{max?: number, maxArgs?: number}} options
- * @param {number} maxWeight
- * @yields {{expr: Expr, steps?: number, comment?: string}}
- */
-function * simplifyLambda (expr, options = {}, state = { steps: 0 }) {
-  // expr is a lambda, free variable, or an application thereof
-  // we want to find an equivalent lambda term with less weight
-  // which we do sequentially from leaves to the root of the AST
-
-  yield { expr, steps: state.steps, comment: '(self)' };
-
-  // short-circuit
-  if (expr.freeOnly())
-    return;
-
-  let maxWeight = expr.weight();
-
-  if (expr instanceof Lambda) {
-    for (const term of simplifyLambda(expr.impl, options, state)) {
-      const candidate = new Lambda(expr.arg, term.expr);
-      if (candidate.weight() < maxWeight) {
-        maxWeight = candidate.weight();
-        yield { expr: candidate, steps: state.steps, comment: '(lambda)' + term.comment };
-      }
-    }
-  }
-
-  // fun * arg Descartes product
-  if (expr instanceof App) {
-    // try to split into fun+arg, then try canonization but exposing each step
-    let { fun, arg } = expr;
-
-    for (const term of simplifyLambda(fun, options, state)) {
-      const candidate = term.expr.apply(arg);
-      if (candidate.weight() < maxWeight) {
-        maxWeight = candidate.weight();
-        fun = term.expr;
-        yield { expr: candidate, steps: state.steps, comment: '(fun)' + term.comment };
-      }
-    }
-
-    for (const term of simplifyLambda(arg, options, state)) {
-      const candidate = fun.apply(term.expr);
-      if (candidate.weight() < maxWeight) {
-        maxWeight = candidate.weight();
-        yield { expr: candidate, steps: state.steps, comment: '(arg)' + term.comment };
-      }
-    }
-  }
-
-  const canon = expr.infer({ max: options.max, maxArgs: options.maxArgs });
-  state.steps += canon.steps;
-  if (canon.expr && canon.expr.weight() < maxWeight)
-    yield { expr: canon.expr, steps: state.steps, comment: '(canonical)' };
 }
 
 /**
