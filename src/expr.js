@@ -7,6 +7,14 @@ const DEFAULTS = {
   maxArgs: 32,
 };
 
+const ORDER = {
+  'leftmost-outermost': 'LO',
+  'leftmost-innermost': 'LI',
+  LO:                   'LO',
+  LI:                   'LI',
+  '':                   'LO',
+};
+
 /**
  * @template T
  * @typedef {T | TraverseControl<T> | null} TraverseValue
@@ -149,11 +157,13 @@ class Expr {
    *       Note that if redo was applied at least once to a subtree, a null return from the same subtree
    *       will be replaced by the last non-null value returned.
    *
-   *       The traversal order is leftmost-outermost (LO), i.e. the same order as reduction steps are taken.
+   *       The traversal order is leftmost-outermost, unless options.order = 'leftmost-innermost' is specified.
+   *       Short aliases 'LO' and 'LI' (case-sensitive) are also accepted.
    *
    *       Returns null if no changes were made, or the new expression otherwise.
    *
    * @param {{
+   *   order?: 'LO' | 'LI' | 'leftmost-outermost' | 'leftmost-innermost',
    * }} [options]
    * @param {(e:Expr) => TraverseValue<Expr>} change
    * @returns {Expr|null}
@@ -163,7 +173,10 @@ class Expr {
       change = options;
       options = {};
     }
-    const [expr, _] = unwrap(this._traverse_redo(options, change));
+    const order = ORDER[options.order ?? ''];
+    if (order === undefined)
+      throw new Error('Unknown traversal order: ' + options.order);
+    const [expr, _] = unwrap(this._traverse_redo({ order }, change));
     return expr;
   }
 
@@ -179,7 +192,10 @@ class Expr {
     let prev;
     do {
       prev = expr;
-      [expr, action] = unwrap(expr._traverse(options, change));
+      const next = options.order === 'LI'
+        ? expr._traverse_descend(options, change) ?? change(expr)
+        : change(expr) ?? expr._traverse_descend(options, change);
+      [expr, action] = unwrap(next);
     } while (expr && action === control.redo);
     if (!expr && prev !== this)
       expr = prev; // we were in redo at least once
@@ -192,8 +208,9 @@ class Expr {
    * @param {(e:Expr) => TraverseValue<Expr>} change
    * @returns {TraverseValue<Expr>}
    */
-  _traverse (options, change) {
-    return change(this);
+
+  _traverse_descend (options, change) {
+    return null;
   }
 
   /**
@@ -813,13 +830,7 @@ class App extends Expr {
     };
   }
 
-  _traverse (options, change) {
-    const [expr, action] = unwrap(change(this));
-    if (action === control.stop)
-      return control.stop(expr);
-    if (expr || action === control.prune)
-      return expr;
-
+  _traverse_descend (options, change) {
     const [fun, fAction] = unwrap(this.fun._traverse_redo(options, change));
     if (fAction === control.stop)
       return control.stop(fun ? fun.apply(this.arg) : null);
@@ -829,7 +840,6 @@ class App extends Expr {
     const final = (fun || arg) ? (fun ?? this.fun).apply(arg ?? this.arg) : null;
     if (aAction === control.stop)
       return control.stop(final);
-
     return final;
   }
 
@@ -1145,13 +1155,7 @@ class Lambda extends Expr {
     return this.impl.subst(this.arg, arg) ?? this.impl;
   }
 
-  _traverse (options, change) {
-    const [expr, action] = unwrap(change(this));
-    if (action === control.stop)
-      return control.stop(expr);
-    if (expr || action === control.prune)
-      return expr;
-
+  _traverse_descend (options, change) {
     // alas no proper shielding of self.arg is possible
     const [impl, iAction] = unwrap(this.impl._traverse_redo(options, change));
 
@@ -1326,13 +1330,7 @@ class Alias extends Named {
     return this.terminal ? 1 : this.impl.weight();
   }
 
-  _traverse (options, change) {
-    const [expr, action] = unwrap(change(this));
-    if (action === control.stop)
-      return control.stop(expr);
-    if (expr || action === control.prune)
-      return action ? action(expr) : expr;
-
+  _traverse_descend (options, change) {
     return this.impl._traverse_redo(options, change);
   }
 

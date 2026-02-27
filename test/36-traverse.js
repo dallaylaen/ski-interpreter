@@ -10,7 +10,7 @@ describe('SKI.traverse', () => {
   ski.add('V', 'BCT');
   const expr = ski.parse('S(x->5 x K)(V(Wf))');
 
-  it('visits all nodes in pre-order', () => {
+  it('visits all nodes in leftmost-outermost order by default', () => {
     const nodes = [];
     expr.traverse(e => {
       if (!(e instanceof SKI.classes.App))
@@ -28,6 +28,30 @@ describe('SKI.traverse', () => {
       'T',
       'C',
       'I',
+      'W',
+      'f',
+    ]);
+  });
+
+  it('can visit nodes in leftmost-innermost order', () => {
+    const nodes = [];
+    expr.traverse({ order: 'leftmost-innermost' }, e => {
+      if (!(e instanceof SKI.classes.App))
+        nodes.push(e.format({ terse: false }));
+    });
+
+    expect(nodes).to.deep.equal([
+      'S',
+      '5',
+      'x',
+      'K',
+      'x->5(x)(K)',
+      'B',
+      'C',
+      'C',
+      'I',
+      'T',
+      'V',
       'W',
       'f',
     ]);
