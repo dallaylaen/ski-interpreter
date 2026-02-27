@@ -27,6 +27,22 @@ const control = {
  * @typedef {Expr | function(Expr): Partial} Partial
  */
 
+/**
+ * @typedef {{
+ *   normal: boolean,      // whether the term becomes irreducible after receiving a number of arguments.
+ *                         // if false, other properties may be missing.
+ *   proper: boolean,      // whether the irreducible form is only contains its arguments. implies normal.
+ *   arity?: number,       // the number of arguments that is sufficient to reach the normal form
+ *                         // absent unless normal.
+ *   discard?: boolean,    // whether the term (or subterms, unless proper) can discard arguments.
+ *   duplicate?: boolean,  // whether the term (or subterms, unless proper) can duplicate arguments.
+ *   skip?: Set<number>,   // indices of arguments that are discarded. nonempty inplies discard.
+ *   dup?: Set<number>,    // indices of arguments that are duplicated. nonempty implies duplicate.
+ *   expr?: Expr,          // canonical form containing lambdas, applications, and variables, if any
+ *   steps?: number,       // number of steps taken to obtain the aforementioned information, if applicable
+ * }} TermInfo
+ */
+
 class Expr {
   /**
    *  @descr A combinatory logic expression.
@@ -42,7 +58,49 @@ class Expr {
    *    parser: object,
    *  }} [context]
    * @property {number} [arity] - number of arguments the term is waiting for (if known)
+   * @property {string} [note] - a brief description what the term does
+   * @property {string} [fancyName] - how to display in html mode, e.g. &phi; instead of 'f'
+   *                Typically only applicable to descendants of Named.
+   * @property {TermInfo} [props] - properties inferred from the term's behavior
    */
+
+  /**
+   *
+   * @desc Define properties of the term based on user supplied options and/or inference results.
+   *       Typically useful for declaring Native and Alias terms.
+   * @private
+   * @param {Object} options
+   * @param {string} [options.note] - a brief description what the term does
+   * @param {number} [options.arity] - number of arguments the term is waiting for (if known)
+   * @param {string} [options.fancyName] - how to display in html mode, e.g. &phi; instead of 'f'
+   * @param {boolean} [options.canonize] - whether to try to infer the properties
+   * @param {number} [options.max] - maximum number of steps for inference, if canonize is true
+   * @param {number} [options.maxArgs] - maximum number of arguments for inference, if canonize is true
+   * @return {this}
+   */
+  _setup (options) {
+    // TODO better name
+
+    if (options.fancy !== undefined)
+      this.fancyName = options.fancyName;
+
+    if (options.note !== undefined)
+      this.note = options.note;
+
+    if (options.arity !== undefined)
+      this.arity = options.arity;
+
+    if (options.canonize) {
+      const guess = this.infer(options);
+      if (guess.normal) {
+        this.arity = this.arity ?? guess.arity;
+        this.note = this.note ?? guess.expr.format({ html: true, lambda: ['', ' &mapsto; ', ''] });
+        delete guess.steps;
+        this.props = guess;
+      }
+    }
+    return this;
+  }
 
   /**
    * @desc apply self to zero or more terms and return the resulting term,
@@ -197,17 +255,7 @@ class Expr {
    *       Use toLambda() if you want to get a lambda term in any case.
    *
    * @param {{max?: number, maxArgs?: number}} options
-   * @return {{
-   *    normal: boolean,
-   *    steps: number,
-   *    expr?: Expr,
-   *    arity?: number,
-   *    proper?: boolean,
-   *    discard?: boolean,
-   *    duplicate?: boolean,
-   *    skip?: Set<number>,
-   *    dup?: Set<number>,
-   * }}
+   * @return {TermInfo}
    */
   infer (options = {}) {
     const max = options.max ?? DEFAULTS.max;
@@ -978,21 +1026,14 @@ class Native extends Named {
    *
    * @param {String} name
    * @param {Partial} impl
-   * @param {{note?: string, arity?: number, canonize?: boolean, apply?: function(Expr):(Expr|null) }} [opt]
+   * @param {{note?: string, arity?: number, canonize?: boolean }} [opt]
    */
   constructor (name, impl, opt = {}) {
     super(name);
     // setup essentials
     this.invoke  = impl;
 
-    // TODO infer lazily (on demand, only once); app capabilities such as discard and duplicate
-    // try to bootstrap and infer some of our properties
-    const guess = (opt.canonize ?? true) ? this.infer() : { normal: false };
-
-    /** @type {number} */
-    this.arity = opt.arity || guess.arity || 1;
-    /** @type {string} */
-    this.note = opt.note ?? guess.expr?.format({ terse: true, html: true, lambda: ['', ' &mapsto; ', ''] });
+    this._setup({ canonize: true, ...opt });
   }
 
   _rski (options) {
@@ -1240,17 +1281,9 @@ class Alias extends Named {
       throw new Error('Attempt to create an alias for a non-expression: ' + impl);
     this.impl = impl;
 
-    if (options.note)
-      this.note = options.note;
-
-    const guess = options.canonize
-      ? impl.infer({ max: options.max, maxArgs: options.maxArgs })
-      : { normal: false };
-    this.arity = (guess.proper && guess.arity) || 0;
-    this.proper = guess.proper ?? false;
-    this.terminal = options.terminal ?? this.proper;
-    this.canonical = guess.expr;
-    this.invoke = waitn(impl, this.arity);
+    this._setup({ canonize: true, ...options });
+    this.terminal = options.terminal ?? this.props?.proper;
+    this.invoke = waitn(impl, this.arity ?? 0);
   }
 
   /**
