@@ -198,6 +198,7 @@ export class Quest {
 }
 export namespace Quest {
     export { Group };
+    export { Case };
 }
 declare class Case {
     /**

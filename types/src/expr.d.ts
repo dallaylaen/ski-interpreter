@@ -1,7 +1,37 @@
 export type TraverseValue<T_1> = T_1 | TraverseControl<T_1> | null;
 export type Partial = Expr | ((arg0: Expr) => Partial);
 /**
+ * : boolean,      // whether the irreducible form is only contains its arguments. implies normal.
+ *   arity?: number,       // the number of arguments that is sufficient to reach the normal form
+ *                         // absent unless normal.
+ *   discard?: boolean,    // whether the term (or subterms, unless proper) can discard arguments.
+ *   duplicate?: boolean,  // whether the term (or subterms, unless proper) can duplicate arguments.
+ *   skip?: Set<number>,   // indices of arguments that are discarded. nonempty inplies discard.
+ *   dup?: Set<number>,    // indices of arguments that are duplicated. nonempty implies duplicate.
+ *   expr?: Expr,          // canonical form containing lambdas, applications, and variables, if any
+ *   steps?: number,       // number of steps taken to obtain the aforementioned information, if applicable
+ * }} TermInfo
+ */
+export type proper = {
+    normal: boolean;
+};
+/**
  * @typedef {Expr | function(Expr): Partial} Partial
+ */
+/**
+ * @typedef {{
+ *   normal: boolean,      // whether the term becomes irreducible after receiving a number of arguments.
+ *                         // if false, other properties may be missing.
+ *   proper: boolean,      // whether the irreducible form is only contains its arguments. implies normal.
+ *   arity?: number,       // the number of arguments that is sufficient to reach the normal form
+ *                         // absent unless normal.
+ *   discard?: boolean,    // whether the term (or subterms, unless proper) can discard arguments.
+ *   duplicate?: boolean,  // whether the term (or subterms, unless proper) can duplicate arguments.
+ *   skip?: Set<number>,   // indices of arguments that are discarded. nonempty inplies discard.
+ *   dup?: Set<number>,    // indices of arguments that are duplicated. nonempty implies duplicate.
+ *   expr?: Expr,          // canonical form containing lambdas, applications, and variables, if any
+ *   steps?: number,       // number of steps taken to obtain the aforementioned information, if applicable
+ * }} TermInfo
  */
 export class Expr {
     /**
@@ -18,7 +48,30 @@ export class Expr {
      *    parser: object,
      *  }} [context]
      * @property {number} [arity] - number of arguments the term is waiting for (if known)
+     * @property {string} [note] - a brief description what the term does
+     * @property {string} [fancyName] - how to display in html mode, e.g. &phi; instead of 'f'
+     *                Typically only applicable to descendants of Named.
+     * @property {TermInfo} [props] - properties inferred from the term's behavior
      */
+    /**
+     *
+     * @desc Define properties of the term based on user supplied options and/or inference results.
+     *       Typically useful for declaring Native and Alias terms.
+     * @private
+     * @param {Object} options
+     * @param {string} [options.note] - a brief description what the term does
+     * @param {number} [options.arity] - number of arguments the term is waiting for (if known)
+     * @param {string} [options.fancy] - how to display in html mode, e.g. &phi; instead of 'f'
+     * @param {boolean} [options.canonize] - whether to try to infer the properties
+     * @param {number} [options.max] - maximum number of steps for inference, if canonize is true
+     * @param {number} [options.maxArgs] - maximum number of arguments for inference, if canonize is true
+     * @return {this}
+     */
+    private _setup;
+    fancyName: any;
+    note: any;
+    arity: any;
+    props: TermInfo;
     /**
      * @desc apply self to zero or more terms and return the resulting term,
      * without performing any calculations whatsoever
@@ -124,32 +177,12 @@ export class Expr {
      *       Use toLambda() if you want to get a lambda term in any case.
      *
      * @param {{max?: number, maxArgs?: number}} options
-     * @return {{
-     *    normal: boolean,
-     *    steps: number,
-     *    expr?: Expr,
-     *    arity?: number,
-     *    proper?: boolean,
-     *    discard?: boolean,
-     *    duplicate?: boolean,
-     *    skip?: Set<number>,
-     *    dup?: Set<number>,
-     * }}
+     * @return {TermInfo}
      */
     infer(options?: {
         max?: number;
         maxArgs?: number;
-    }): {
-        normal: boolean;
-        steps: number;
-        expr?: Expr;
-        arity?: number;
-        proper?: boolean;
-        discard?: boolean;
-        duplicate?: boolean;
-        skip?: Set<number>;
-        dup?: Set<number>;
-    };
+    }): TermInfo;
     /**
      *
      * @param {{max: number, maxArgs: number, index: number}} options
@@ -531,6 +564,8 @@ export class FreeVar extends Named {
      * If a scope object is given, however, two variables with the same name and scope
      * are considered identical.
      *
+     * By convention, FreeVar.global is a constant denoting a global unbound variable.
+     *
      * @param {string} name - name of the variable
      * @param {any} scope - an object representing where the variable belongs to.
      */
@@ -539,6 +574,9 @@ export class FreeVar extends Named {
     scope: any;
     diff(other: any, swap?: boolean): string;
     subst(search: any, replace: any): any;
+}
+export namespace FreeVar {
+    let global: string[];
 }
 export class Lambda extends Expr {
     /**
@@ -599,20 +637,15 @@ export class Native extends Named {
      *
      * @param {String} name
      * @param {Partial} impl
-     * @param {{note?: string, arity?: number, canonize?: boolean, apply?: function(Expr):(Expr|null) }} [opt]
+     * @param {{note?: string, arity?: number, canonize?: boolean }} [opt]
      */
     constructor(name: string, impl: Partial, opt?: {
         note?: string;
         arity?: number;
         canonize?: boolean;
-        apply?: (arg0: Expr) => (Expr | null);
     });
     invoke: Partial;
-    /** @type {number} */
-    arity: number;
-    /** @type {string} */
-    note: string;
-    _rski(options: any): Expr | this;
+    _rski(options: any): any;
 }
 export class Alias extends Named {
     /**
@@ -639,11 +672,7 @@ export class Alias extends Named {
         terminal?: boolean;
     });
     impl: Expr;
-    note: string;
-    arity: any;
-    proper: any;
     terminal: any;
-    canonical: any;
     invoke: (arg: any) => any;
     _traverse(change: any): any;
     any(predicate: any): any;
@@ -676,7 +705,7 @@ export class Church extends Expr {
     n: number;
     arity: number;
     diff(other: any, swap?: boolean): string;
-    _rski(options: any): Expr;
+    _rski(options: any): any;
     _unspaced(arg: any): boolean;
     _format(options: any, nargs: any): any;
 }

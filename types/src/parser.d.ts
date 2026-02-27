@@ -42,10 +42,14 @@ export class SKI {
      *
      * @param {Alias|String} term
      * @param {String|Expr|function(Expr):Partial} [impl]
-     * @param {String} [note]
+     * @param {object|string} [options]
+     * @param {string} [options.note] - optional annotation for the term, default is auto-generated if this.annotate is true
+     * @param {boolean} [options.canonize] - whether to canonize the term's implementation, default is this.annotate
+     * @param {boolean} [options.fancy] - alternative HTML-friendly name for the term
+     * @param {number} [options.arity] - custom arity for the term, default is inferred from the implementation
      * @return {SKI} chainable
      */
-    add(term: typeof classes.Alias | string, impl?: string | typeof classes.Expr | ((arg0: typeof classes.Expr) => Partial), note?: string): SKI;
+    add(term: typeof classes.Alias | string, impl?: string | typeof classes.Expr | ((arg0: typeof classes.Expr) => Partial), options?: object | string): SKI;
     /**
      * @desc Internal helper for add() that creates an Alias or Native term from the given arguments.
      * @param {Alias|string} term
