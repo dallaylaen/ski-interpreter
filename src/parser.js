@@ -113,19 +113,20 @@ class SKI {
    *
    * @param {Alias|String} term
    * @param {String|Expr|function(Expr):Partial} [impl]
-   * @param {String} [note]
+   * @param {object|string} [options]
+   * @param {string} [options.note] - optional annotation for the term, default is auto-generated if this.annotate is true
+   * @param {boolean} [options.canonize] - whether to canonize the term's implementation, default is this.annotate
+   * @param {boolean} [options.fancy] - alternative HTML-friendly name for the term
+   * @param {number} [options.arity] - custom arity for the term, default is inferred from the implementation
    * @return {SKI} chainable
    */
-  add (term, impl, note ) {
+  add (term, impl, options ) {
     term = this._named(term, impl);
 
-    if (this.annotate && note === undefined) {
-      const guess = term.infer();
-      if (guess.expr)
-        note = guess.expr.format({ terse: true, html: true, lambda: ['', ' &mapsto; ', ''] });
-    }
-    if (note !== undefined)
-      term.note = note;
+    // backward compat
+    if (typeof options === 'string')
+      options = { note: options, canonize: false };
+    term._setup({ canonize: this.annotate, ...options });
 
     if (this.known[term.name])
       this.known[term.name].outdated = true;
