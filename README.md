@@ -76,7 +76,29 @@ npm install @dallaylaen/ski-interpreter
 
 # CLI
 
-REPL comes with the package as [bin/ski.js](bin/ski.js).
+[bin/ski.js](bin/ski.js) - also available as `npx ski` - contains several subcommands:
+
+## Subcommands
+
+* **`repl`** - Start an interactive REPL
+  * `--verbose` - Show all evaluation steps
+  * Built-in commands (type `!help` in REPL):
+    * `!ls` - List all defined terms
+    * `!help` - Show available commands
+
+* **`eval <expression>`** - Evaluate a single expression
+  * `--verbose` - Show all evaluation steps
+  * Example: `ski eval "S K K x"`
+
+* **`file <filepath>`** - Evaluate expressions from a file
+  * `--verbose` - Show all evaluation steps
+  * Example: `ski file script.ski`
+
+* **`quest-check <files...>`** - Validate quest definition files
+  * `--solution <file>` - Load solutions from a JSON file for verification
+  * Example: `ski quest-check quest1.json quest2.json --solution solutions.json`
+
+If no subcommand is provided, help is displayed.
 
 Running `SKI_REPL=1 node -r @dallaylaen/ski-interpreter/bin/ski.js`
 will start a node shell with the `SKI` class available as a global variable.
