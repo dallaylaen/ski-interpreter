@@ -192,19 +192,10 @@ export class Expr {
         maxArgs?: number;
     }): TermInfo;
     /**
-     *
-     * @param {{max: number, maxArgs: number, index: number}} options
-     * @param {FreeVar[]} preArgs
-     * @param {number} steps
-     * @returns {{
-     *    normal: boolean,
-     *    steps: number,
-     *    expr?: Expr,
-     *    arity?: number,
-     *    skip?: Set<number>,
-     *    dup?: Set<number>,
-     *    duplicate, discard, proper: boolean
-     * }
+     * @desc Internal method for infer(), which performs the actual inference.
+     * @param {{max: number, maxArgs: number}} options
+     * @param {number} nargs - var index to avoid name clashes
+     * @returns {TermInfo}
      * @private
      */
     private _infer;
@@ -498,30 +489,6 @@ export class App extends Expr {
     constructor(fun: Expr, arg: Expr);
     arg: Expr;
     fun: Expr;
-    _infer(options: any, preArgs?: any[], steps?: number): {
-        normal: boolean;
-        steps: number;
-        expr?: Expr;
-        arity?: number;
-        skip?: Set<number>;
-        dup?: Set<number>;
-        duplicate: any;
-        discard: any;
-        proper: boolean;
-    } | {
-        normal: boolean;
-        steps: number;
-    } | {
-        expr: Expr;
-        arity?: number;
-        skip?: Set<number>;
-        dup?: Set<number>;
-        duplicate?: any;
-        discard?: any;
-        proper: boolean;
-        normal: boolean;
-        steps: number;
-    };
     _traverse_descend(options: any, change: any): any;
     any(predicate: any): any;
     _fold(initial: any, combine: any): any;
@@ -598,20 +565,6 @@ export class Lambda extends Expr {
     arg: FreeVar;
     impl: Expr;
     arity: number;
-    _infer(options: any, preArgs?: any[], steps?: number): {
-        normal: boolean;
-        steps: number;
-        expr?: Expr;
-        arity?: number;
-        skip?: Set<number>;
-        dup?: Set<number>;
-        duplicate: any;
-        discard: any;
-        proper: boolean;
-    } | {
-        normal: boolean;
-        steps: number;
-    };
     invoke(arg: any): Expr;
     _traverse_descend(options: any, change: any): any;
     any(predicate: any): any;
@@ -676,19 +629,7 @@ export class Alias extends Named {
     any(predicate: any): any;
     _fold(initial: any, combine: any): any;
     subst(search: any, replace: any): any;
-    _infer(options: any, preArgs?: any[], steps?: number): {
-        normal: boolean;
-        steps: number;
-        expr?: Expr;
-        arity?: number;
-        skip?: Set<number>;
-        dup?: Set<number>;
-        duplicate: any;
-        discard: any;
-        proper: boolean;
-    };
     diff(other: any, swap?: boolean): any;
-    _rski(options: any): any;
     _braced(first: any): boolean;
 }
 export class Church extends Expr {
@@ -703,11 +644,12 @@ export class Church extends Expr {
     n: number;
     arity: number;
     diff(other: any, swap?: boolean): string;
-    _rski(options: any): any;
     _unspaced(arg: any): boolean;
     _format(options: any, nargs: any): any;
 }
 /**
+ * @desc List of predefined native combinators.
+ * This is required for toSKI() to work, otherwise could as well have been in parser.js.
  * @type {{[key: string]: Native}}
  */
 declare const native: {
