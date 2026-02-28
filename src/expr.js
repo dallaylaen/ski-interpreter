@@ -609,22 +609,28 @@ class Expr {
 
   /**
    * @desc Assert expression equality. Can be used in tests.
-   * @param {Expr} expected
+   *
+   * `this` is the expected value and the argument is the actual one.
+   * Mnemonic: the expected value is always a combinator, the actual one may be anything.
+   *
+   * @param {Expr} actual
    * @param {string} comment
    */
-  expect (expected, comment = '') {
+  expect (actual, comment = '') {
     comment = comment ? comment + ': ' : '';
-    if (!(expected instanceof Expr))
-      throw new Error(comment + 'attempt to expect a combinator to equal something else: ' + expected);
-    const diff = this.diff(expected);
+    if (!(actual instanceof Expr)) {
+      throw new Error(comment + 'Expected a combinator but found '
+        + actual?.constructor?.name ?? typeof actual);
+    }
+    const diff = this.diff(actual);
     if (!diff)
       return; // all good
 
-    // TODO wanna use AssertionError but webpack doesn't recognize it
+    // TODO wanna use AssertionError but browser doesn't recognize it
     // still the below hack works for mocha-based tests.
     const poorMans = new Error(comment + diff);
-    poorMans.expected = expected + '';
-    poorMans.actual = this + '';
+    poorMans.expected = this.diag();
+    poorMans.actual = actual.diag();
     throw poorMans;
   }
 
@@ -758,8 +764,9 @@ class Expr {
         return [indent + 'App:', ...e.unroll().flatMap(s => rec(s, indent + '  '))];
       if (e instanceof Lambda)
         return [`${indent}Lambda (${e.arg}[${e.arg.id}]):`, ...rec(e.impl, indent + '  ')];
+      // no indent increase so that a diff between diags is consistent with how `equals` works.
       if (e instanceof Alias)
-        return [`${indent}Alias (${e.name}):`, ...rec(e.impl, indent + '  ')];
+        return [`${indent}Alias (${e.name}): \\`, ...rec(e.impl, indent)];
       if (e instanceof FreeVar)
         return [`${indent}FreeVar: ${e.name}[${e.id}]`];
       return [`${indent}${e.constructor.name}: ${e}`];
