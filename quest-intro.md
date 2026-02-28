@@ -83,6 +83,8 @@ This validates metadata, checks for duplicate IDs, and verifies that any known s
 
 ## Further Reading
 
-- Core logic: `src/quest.js`
-- UI/rendering: `site-src/quest.js`
-- Working example: `example/quest.html` and `example/example-quests.json`
+- Examples: [html file](example/quest.html) and [json file](example/example-quests.json)
+- Core logic: [src/quest.js](src/quest.js)
+- Rendering logic: [site-src/quest.js](site-src/quest.js)
+
+
