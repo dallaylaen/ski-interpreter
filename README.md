@@ -176,12 +176,38 @@ const lambdaSteps = [...skiExpr.toLambda()];
 
 ## Fancy formatting
 
-The `format` methods of the `Expr` class supports
-a number of options, see [the source code](src/expr.js) for details.
+`expr.format(options?)` converts an expression to a string with fine-grained
+control over notation. Called without arguments it is equivalent to
+`expr.toString()`.
 
-`expr.diag()` will instead output indented
-expression tree (breadth-first) with class information
-and variables labeled for disambiguation.
+```javascript
+const expr = ski.parse('S K K');
+
+expr.format()                        // 'S K K'  (default, terse)
+expr.format({ terse: false })        // 'S(K)(K)' — every argument gets parentheses
+expr.format({ html: true })          // HTML-safe: free vars wrapped in <var>,
+                                     // '->' becomes '-&gt;', fancyName used when set
+
+// Custom lambda notation
+expr.format({ lambda: ['', '=>', ''], terse: false })    // JavaScript style
+expr.format({ lambda: ['&lambda;', '.', ''] })           // math style
+expr.format({ lambda: ['(', '->', ')'], around: ['(', ')'], brackets: ['', ''] })
+                                                         // Lisp style, still parseable
+
+// Redex highlighting (e.g. for step-by-step HTML output)
+ski.parse('I x').format({ html: true, redex: ['<b>', '</b>'] })
+// '<b>I</b> <var>x</var>'
+
+// inventory: show listed aliases by name, expand everything else
+const { T } = ski.getTerms();
+expr.format({ inventory: { T } })    // keeps T as 'T', expands any other aliases
+```
+
+The `brackets`, `var`, `around`, and `redex` options each take a `[open, close]`
+pair of strings; `lambda` takes a `[prefix, separator, suffix]` triple.
+
+`expr.diag()` will instead output an indented expression tree (breadth-first)
+with class information and variables labeled for disambiguation.
 
 ## Variable scoping
 
