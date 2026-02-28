@@ -1,5 +1,7 @@
 # Simple Kombinator Interpreter
 
+> **A humane tooling for inhuman logic**
+
 This package contains a
 [combinatory logic](https://en.wikipedia.org/wiki/Combinatory_logic)
 and [lambda calculus](https://en.wikipedia.org/wiki/Lambda_calculus)
@@ -49,11 +51,12 @@ back to human readable form.
 
 # Execution strategy
 
-Applications and native terms use normal strategy, i.e. the first term in the tree
+Applications and native terms use leftmost-outermost strategy, i.e. the first term in the tree
 that has enough arguments is executed and the step ends there.
 
-Lambda terms are lazy, i.e. the body is not touched until
-all free variables are bound.
+Lambda terms are lazy, i.e. the body is not touched whatsoever
+until all the free variables are bound.
+This is consistent with combinator behavior under LO order.
 
 # Playground
 
@@ -62,11 +65,13 @@ all free variables are bound.
   * all of the above features (except comparison and JS-native terms) in your browser
   * expressions have permalinks
   * can configure verbosity and execution speed
+  * switchable visual highlighting of redexes and outline of subexpressions
 
 * [Quests](https://dallaylaen.github.io/ski-interpreter/quest.html)
 
-This page contains small tasks of increasing complexity.
+This page contains small combinatory logic exercises of increasing (hopefully) diffuculty.
 Each task requires the user to build a combinator with specific properties.
+New combinators are unlocked as the user progresses.
 
 # Installation
 
