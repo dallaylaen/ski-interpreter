@@ -620,7 +620,7 @@ class Expr {
     comment = comment ? comment + ': ' : '';
     if (!(actual instanceof Expr)) {
       throw new Error(comment + 'Expected a combinator but found '
-        + actual?.constructor?.name ?? typeof actual);
+        + (actual?.constructor?.name ?? typeof actual));
     }
     const diff = this.diff(actual);
     if (!diff)
