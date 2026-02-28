@@ -40,6 +40,22 @@ program
     evaluateFile(filepath, options.verbose);
   });
 
+// Search subcommand
+program
+  .command('search <target> <terms...>')
+  .description('Search for an expression equivalent to target using known terms')
+  .action((target, terms) => {
+    searchExpression(target, terms);
+  });
+
+// Extract subcommand
+program
+  .command('extract <target> <terms...>')
+  .description('Rewrite target expression using known terms where possible')
+  .action((target, terms) => {
+    extractExpression(target, terms);
+  });
+
 // Quest-check subcommand
 program
   .command('quest-check <files...>')
@@ -201,6 +217,64 @@ async function questCheck (files, solutionFile) {
     console.error('Error in quest-check:', err.message);
     process.exit(2);
   }
+}
+
+function searchExpression (targetStr, termStrs) {
+  const ski = new SKI();
+  const jar = {};
+  const target = ski.parse(targetStr, { vars: jar });
+  const seed = termStrs.map(s => ski.parse(s, { vars: jar }));
+
+  const { expr } = target.infer();
+  if (!expr) {
+    console.error('target expression is not normalizable: ' + target);
+    process.exit(1);
+  }
+
+  const res = SKI.extras.search(seed, { tries: 10_000_000, depth: 100 }, (e, p) => {
+    if (!p.expr)
+      return -1;
+    if (p.expr.equals(expr))
+      return 1;
+    return 0;
+  });
+
+  if (res.expr) {
+    console.log(`Found ${res.expr} after ${res.total} tries.`);
+    process.exit(0);
+  } else {
+    console.error(`No equivalent expression found for ${target} after ${res.total} tries.`);
+    process.exit(1);
+  }
+}
+
+function extractExpression (targetStr, termStrs) {
+  const ski = new SKI();
+  const expr = ski.parse(targetStr);
+  const pairs = termStrs
+    .map(s => ski.parse(s))
+    .map(e => [e.infer().expr, e]);
+
+  const uncanonical = pairs.filter(pair => !pair[0]);
+  if (uncanonical.length) {
+    console.error('Some expressions could not be canonized: '
+      + uncanonical.map(p => p[1].toString()).join(', '));
+    process.exit(1);
+  }
+
+  const replaced = expr.traverse(e => {
+    const canon = e.infer().expr;
+    for (const [lambda, term] of pairs) {
+      if (canon.equals(lambda))
+        return term;
+    }
+    return null;
+  });
+
+  if (replaced)
+    console.log(replaced.toString());
+  else
+    console.log('// unchanged');
 }
 
 function handleCommand (input, ski) {
