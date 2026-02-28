@@ -31,6 +31,13 @@ const control = {
 };
 
 /**
+ * @desc List of predefined native combinators.
+ * This is required for toSKI() to work, otherwise could as well have been in parser.js.
+ * @type {{[key: string]: Native}}
+ */
+const native = {};
+
+/**
  * @typedef {Expr | function(Expr): Partial} Partial
  */
 
@@ -282,59 +289,51 @@ class Expr {
    * @return {TermInfo}
    */
   infer (options = {}) {
-    const max = options.max ?? DEFAULTS.max;
-    const maxArgs = options.maxArgs ?? DEFAULTS.maxArgs;
-    const out = this._infer({ max, maxArgs, index: 0 });
-    return out;
+    return this._infer({
+      max:     options.max ?? DEFAULTS.max,
+      maxArgs: options.maxArgs ?? DEFAULTS.maxArgs,
+    }, 0);
   }
 
-  /**
-   *
-   * @param {{max: number, maxArgs: number, index: number}} options
-   * @param {FreeVar[]} preArgs
-   * @param {number} steps
-   * @returns {{
-   *    normal: boolean,
-   *    steps: number,
-   *    expr?: Expr,
-   *    arity?: number,
-   *    skip?: Set<number>,
-   *    dup?: Set<number>,
-   *    duplicate, discard, proper: boolean
-   * }
-   * @private
-   */
-  _infer (options, preArgs = [], steps = 0) {
-    if (preArgs.length > options.maxArgs || steps > options.max)
-      return { normal: false, steps };
-
-    // happy case
-    if (this.freeOnly()) {
-      return {
-        normal: true,
-        steps,
-        ...maybeLambda(preArgs, this),
-      };
+  _infer (options, nargs) {
+    const probe = [];
+    let steps = 0;
+    let expr = this;
+    // eslint-disable-next-line no-labels
+    main: for (let i = 0; i < options.maxArgs; i++) {
+      const next = expr.run({ max: options.max - steps });
+      // console.log(`infer step ${i}, expr = ${expr}, probe = [${probe}]: `, next);
+      steps += next.steps;
+      if (!next.final)
+        break;
+      if (firstVar(next.expr)) {
+        // can't append more variables, return or recurse
+        expr = next.expr;
+        if (!expr.any(e => !(e instanceof FreeVar || e instanceof App)))
+          return maybeLambda(probe, expr, { steps });
+        const list = expr.unroll();
+        let discard = false;
+        let duplicate = false;
+        const acc = [];
+        for (let j = 1; j < list.length; j++) {
+          const sub = list[j]._infer(options, nargs + i); // avoid name clashes
+          steps += sub.steps;
+          if (!sub.expr)
+            // eslint-disable-next-line no-labels
+            break main; // press f to pay respects
+          if (sub.discard)
+            discard = true;
+          if (sub.duplicate)
+            duplicate = true;
+          acc.push(sub.expr);
+        }
+        return maybeLambda(probe, list[0].apply(...acc), { discard, duplicate, steps });
+      }
+      const push = nthvar(nargs + i);
+      probe.push(push);
+      expr = next.expr.apply(push);
     }
-
-    // try reaching the normal form
-    const next = this.run({ max: (options.max - steps) / 3 });
-    steps += next.steps;
-    if (!next.final)
-      return { normal: false, steps };
-
-    // normal form != this, redo exercise
-    if (next.steps !== 0)
-      return next.expr._infer(options, preArgs, steps);
-
-    // adding more args won't help, bail out
-    // if we're an App, the App's _infer will take care of further args
-    if (this.unroll()[0] instanceof FreeVar)
-      return { normal: false, steps };
-
-    // try adding more arguments, maybe we'll get a normal form then
-    const push = nthvar(preArgs.length + options.index);
-    return this.apply(push)._infer(options, [...preArgs, push], steps);
+    return { normal: false, proper: false, steps };
   }
 
   /**
@@ -788,55 +787,6 @@ class App extends Expr {
     return this.fun.weight() + this.arg.weight();
   }
 
-  _infer (options, preArgs = [], steps = 0) {
-    if (preArgs.length > options.maxArgs || steps > options.max)
-      return { normal: false, steps };
-
-    /*
-     * inside and App there are 3 main possibilities:
-     * 1) The parent infer() actually is able to do the job. Then we just proxy the result.
-     * 2) Both `fun` and `arg` form good enough lambda terms. Then lump them together & return.
-     * 3) We literally have no idea, so we just pick the shortest defined term from the above.
-     */
-
-    const proxy = super._infer(options, preArgs, steps);
-    if (proxy.normal)
-      return proxy;
-    steps = proxy.steps; // reimport extra iterations
-
-    const [first, ...list] = this.unroll();
-    if (!(first instanceof FreeVar))
-      return { normal: false, steps }
-    // TODO maybe do it later
-
-    let discard = false;
-    let duplicate = false;
-    const out = [];
-    for (const term of list) {
-      const guess = term._infer({
-        ...options,
-        maxArgs: options.maxArgs - preArgs.length,
-        max:     options.max - steps,
-        index:   preArgs.length + options.index,
-      });
-      steps += guess.steps;
-      if (!guess.normal)
-        return { normal: false, steps };
-      out.push(guess.expr);
-      discard = discard || guess.discard;
-      duplicate = duplicate || guess.duplicate;
-    }
-
-    return {
-      normal: true,
-      steps,
-      ...maybeLambda(preArgs, first.apply(...out), {
-        discard,
-        duplicate,
-      }),
-    };
-  }
-
   _traverse_descend (options, change) {
     const [fun, fAction] = unwrap(this.fun._traverse_redo(options, change));
     if (fAction === control.stop)
@@ -1074,16 +1024,6 @@ class Native extends Named {
   }
 }
 
-// predefined global combinator list
-// it is required by toSKI method, otherwise it could've as well be in parse.js
-/**
- * @type {{[key: string]: Native}}
- */
-const native = {};
-function addNative (name, impl, opt) {
-  native[name] = new Native(name, impl, opt);
-}
-
 class Lambda extends Expr {
   /**
    * @desc Lambda abstraction of arg over impl.
@@ -1132,14 +1072,6 @@ class Lambda extends Expr {
 
   weight () {
     return this.impl.weight() + 1;
-  }
-
-  _infer (options, preArgs = [], steps = 0) {
-    if (preArgs.length > options.maxArgs)
-      return { normal: false, steps };
-
-    const push = nthvar(preArgs.length + options.index);
-    return this.invoke(push)._infer(options, [...preArgs, push], steps + 1);
   }
 
   invoke (arg) {
@@ -1324,10 +1256,6 @@ class Alias extends Named {
     return this.impl.subst(search, replace);
   }
 
-  _infer (options, preArgs = [], steps = 0) {
-    return this.impl._infer(options, preArgs, steps);
-  }
-
   // DO NOT REMOVE TYPE or tsc chokes with
   //       TS2527: The inferred type of 'Alias' references an inaccessible 'this' type.
   /**
@@ -1366,6 +1294,10 @@ class Alias extends Named {
 // ----- Expr* classes end here -----
 
 // declare native combinators
+
+function addNative (name, impl, opt) {
+  native[name] = new Native(name, impl, opt);
+}
 addNative('I', x => x);
 addNative('K', x => _ => x);
 addNative('S', x => y => z => x.apply(z, y.apply(z)));
@@ -1385,6 +1317,13 @@ addNative(
 
 // utility functions dependent on Expr* classes, in alphabetical order
 
+function firstVar (expr) {
+  // yay premature optimization
+  while (expr instanceof App)
+    expr = expr.fun;
+  return expr instanceof FreeVar;
+}
+
 /**
  * @private
  * @given a list of free variables, an expression, and some capabilities of the context,
@@ -1395,7 +1334,7 @@ addNative(
  * @param {FreeVar[]} args
  * @param {Expr} expr
  * @param {object} caps
- * @returns {{expr: Expr, arity?: number, skip?: Set<number>, dup?: Set<number>, duplicate?, discard?, proper: boolean}}
+ * @returns {TermInfo}
  */
 function maybeLambda (args, expr, caps = {}) {
   const count = new Array(args.length).fill(0);
@@ -1422,8 +1361,10 @@ function maybeLambda (args, expr, caps = {}) {
   }
 
   return {
+    normal:    true,
+    steps:     caps.steps,
     expr:      args.length ? new Lambda(args, expr) : expr,
-    ...(caps.synth ? {} : { arity: args.length }),
+    arity:     args.length,
     ...(skip.size ? { skip } : {}),
     ...(dup.size ? { dup } : {}),
     duplicate: !!dup.size  || caps.duplicate || false,
