@@ -287,6 +287,7 @@ for building interactive quest pages from JSON-encoded quest data;
 
 * [@ivanaxe](https://github.com/ivanaxe) for luring me into [icfpc 2011](http://icfpc2011.blogspot.com/2011/06/task-description-contest-starts-now.html) where I was introduced to combinators.
 * [@akuklev](https://github.com/akuklev) for explaining functional programming to me so many times that I actually got some idea.
+* [One happy fellow](https://github.com/happyfellow-one) whose [riddle](https://blog.happyfellow.dev/a-riddle/) trolled me into writing an early `traverse` prototype.
 
 # Prior art and inspiration
 
