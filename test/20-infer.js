@@ -306,16 +306,16 @@ function describeTerm (term, expected, lambda, options = {}) {
           expect(canon).to.be.an.instanceOf(SKI.classes.Expr);
         });
         it('is idempotent', () => {
-          canon.infer().expr.expect(canon);
+          canon.expect(canon.infer().expr);
         });
         it('is back parseable', () => {
-          ski.parse('' + canon).expect(canon);
+          canon.expect(ski.parse('' + canon));
         });
       }
 
       if (lambda) {
         it('produces exactly expected result ' + lambda, () => {
-          canon.expect(ski.parse(lambda));
+          ski.parse(lambda).expect(canon);
         });
       }
     } catch (err) {

@@ -43,7 +43,7 @@ describe('Expr.walk', () => {
         expr = expr.step().expr; // keep up with the execution
         if (state.final) {
           end = true;
-          expr.expect(ski.parse(result));
+          ski.parse(result).expect(expr);
         }
       }
     });

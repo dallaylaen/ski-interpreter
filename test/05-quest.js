@@ -76,8 +76,8 @@ describe('Quest', () => {
     expect(never.pass).to.equal(false);
     expect(never.details.map(i => i.pass ? 1 : 0).join('')).to.equal('1110');
     expect(never.steps).to.be.within(1, 100);
-    never.expr.expect(never.input[0]);
-    never.expr.expect(quest.engine.parse('K(K(KI))'));
+    quest.engine.parse('K(K(KI))').expect(never.input[0]);
+    never.input[0].expect(never.expr);
   });
 
   it('rejects bad specs', () => {

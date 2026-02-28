@@ -75,7 +75,19 @@ describe( 'SKI', () => {
   it('Can parse basic applications', () => {
     const ski = new SKI();
     const expr = ski.parseLine('x z (y z)');
-    console.log(expr.format({ terse: false }));
+    expect(expr).to.be.an.instanceOf(SKI.classes.App);
+    expect(expr.fun).to.be.an.instanceOf(SKI.classes.App);
+    expect(expr.fun.fun).to.be.an.instanceOf(SKI.classes.FreeVar);
+    expect(expr.fun.fun.name).to.equal('x');
+    expect(expr.fun.arg).to.be.an.instanceOf(SKI.classes.FreeVar);
+    expect(expr.fun.arg.name).to.equal('z');
+    expect(expr.arg).to.be.an.instanceOf(SKI.classes.App);
+    expect(expr.arg.fun).to.be.an.instanceOf(SKI.classes.FreeVar);
+    expect(expr.arg.fun.name).to.equal('y');
+    expect(expr.arg.arg).to.be.an.instanceOf(SKI.classes.FreeVar);
+    expect(expr.arg.arg.name).to.equal('z');
+    // can't rely on format() so just str + replace
+    expect((expr + '').replaceAll(' ', '')).to.equal('xz(yz)');
   });
 
   it('Installed the basic terms correctly', () => {
@@ -188,10 +200,10 @@ describe('Expr.expect', () => {
     const expr1 = ski.parse('S');
     const expr2 = ski.parse('K');
     try {
-      expr1.expect(expr2);
+      expr2.expect(expr1);
     } catch (e) {
-      expect(e.expected).to.equal('K');
-      expect(e.actual).to.equal('S');
+      expect(e.expected).to.equal('Native: K');
+      expect(e.actual).to.equal('Native: S');
       return;
     }
     throw new Error('Expected an exception to be thrown');
@@ -207,6 +219,10 @@ describe('Expr.expect', () => {
     const expr1 = ski.parse('a->a a');
     const expr2 = ski.parse('x->x x');
     expr1.expect(expr2);
+  });
+
+  it('handles garbage', () => {
+    expect(() => SKI.K.expect([SKI.K])).to.throw(/Expected a combinator but found Array/);
   });
 });
 

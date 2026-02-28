@@ -65,7 +65,7 @@ describe( 'SKI', () => {
     expect(alias).to.be.instanceof(SKI.classes.Alias);
     ski.add(alias);
     const expr = ski.parse('T x y').run().expr;
-    expr.expect( ski.parse('y x'));
+    ski.parse('y x').expect(expr);
   });
 
   it('can auto-annotate proper terms', () => {

@@ -133,6 +133,6 @@ describe('more lambdas', () => {
     const ski = new SKI();
     ski.add('T', 'CI');
     const expr = ski.parse('x->K(Tx)');
-    expr.expand().expect( ski.parse('y->K(CIy)') );
+    ski.parse('y->K(CIy)').expect(expr);
   });
 });

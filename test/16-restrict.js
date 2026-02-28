@@ -31,7 +31,7 @@ describe( 'SKI.restrict', () => {
     ski.maybeAdd('B', 'S(KS)K');
     ski.maybeAdd('T', 'CI');
 
-    ski.parse('B').expand().expect(SKI.B);
-    ski.parse('T').expand().expect(SKI.C.apply(SKI.I));
+    SKI.B.expect(ski.parse('B'));
+    SKI.C.apply(SKI.I).expect(ski.parse('T'));
   });
 });

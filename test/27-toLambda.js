@@ -74,13 +74,12 @@ function checkTerm (startSrc, endSrc, options = {}) {
       }
       it('terminates at ' + endSrc, () => {
         expect(finished).to.equal(true, 'did not finish in 30 steps');
-        expect(expr).to.be.instanceOf(SKI.classes.Expr, 'found at least one expression');
-        expr.expect(end);
+        end.expect(expr);
       });
       it('is idempotent', () => {
         const again = [...expr.toLambda()];
         expect(again.length).to.equal(1, 'got further steps: ' + again.join('\n'));
-        again[0].expr.expect(expr, 'last step is indeed final');
+        end.expect(again[0].expr, 'last step is indeed final');
       });
     } catch (e) {
       it("doesn't die", () => {

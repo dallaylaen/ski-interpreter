@@ -44,7 +44,7 @@ describe('expression samples evaluate correctly', () => {
       const got = expr.run({ max: steps ? steps + 1 : undefined }); // 1 extra step for the "final" badge
       if (end !== undefined) {
         try {
-          got.expr.expect(ski.parse(end, { to_be_deleted: jar }));
+          ski.parse(end).expect(got.expr);
         } catch (e) {
           recheck(start, end, steps);
           throw e;

@@ -26,7 +26,7 @@ describe('SKI.extras.declare', () => {
 
     const str = SKI.extras.declare(expr, expr.context.env);
     const expr2 = new SKI().parse(str);
-    expr2.expect(expr);
+    expr.expect(expr2);
   });
 
   it('can recover enough info to rebuild the term', () => {
@@ -38,6 +38,6 @@ describe('SKI.extras.declare', () => {
 
     expect(expr2.run().expr + '').to.equal('f a b');
 
-    expr2.expect(expr);
+    expr.expect(expr2);
   });
 });

@@ -60,11 +60,6 @@ describe('SKI.equals', () => {
     expect(SKI.church(1).equals(SKI.I)).to.equal(false);
   });
 
-  it('can throw on term mismatch if needed', () => {
-    expect( () => SKI.S.expect(SKI.I) ).to.throw( /\bS\b *!= *\bI\b/ );
-    // TODO add test for expected/actual being present
-  });
-
   const eqCases = [
     ['x', 'x'],
     ['S', 'S'],

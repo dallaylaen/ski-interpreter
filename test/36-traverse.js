@@ -116,7 +116,7 @@ describe('SKI.traverse', () => {
 
     // console.log(bare.diag());
     expect(bare.any(e => e instanceof Alias)).to.equal(false, 'No aliases in bare');
-    bare.expect(expr);
+    expr.expect(bare);
   });
 
   it('can extract equivalent terms', () => {
