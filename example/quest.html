@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Example Quests - Simple Kombinator Interpreter</title>
+    <script src="../docs/build/js/ski-quest.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 1em;
+        }
+        #inventory {
+            border: 1px solid #ccc;
+            padding: 0.5em 1em;
+            margin-bottom: 1em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Example Quests</h1>
+
+    <div id="inventory">
+        <b>Inventory</b>
+        <ul id="known"></ul>
+    </div>
+
+    <div id="quest"></div>
+
+<script>
+    const page = new QuestPage({
+        storePrefix: 'example-quests',
+        baseUrl: '.',
+        contentBox:   document.getElementById('quest'),
+        inventoryBox: document.getElementById('known'),
+    });
+
+    page.loadChapters(['example-quests.json']);
+</script>
+</body>
+</html>

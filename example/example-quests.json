@@ -1,0 +1,83 @@
+{
+  "id": "dull6XUf",
+  "created_at": "2026-02-27T00:00:00",
+  "name": "Example quests",
+  "intro": "<p>A small template collection of combinatory logic exercises. Feel free to use this file as a starting point for your own quest chapter.</p>",
+  "content": [
+    {
+      "id": "YpgCLTl8",
+      "created_at": "2026-02-27T00:00:00",
+      "name": "I from SK",
+      "intro": [
+        "<p>The identity combinator <code>I</code> satisfies <code>I x = x</code>.",
+        "It can actually be derived from <code>S</code> and <code>K</code> alone &mdash;",
+        "no built-in <code>I</code> needed.</p>",
+        "<p>Find a term built only from <code>S</code> and <code>K</code> that behaves like <code>I</code>.</p>"
+      ],
+      "hint": "Think about what <code>S K K x</code> reduces to.",
+      "allow": "SK",
+      "input": "phi",
+      "cases": [
+        [ "phi x", "x" ],
+        [ "phi (K x y)", "K x y" ]
+      ]
+    },
+    {
+      "id": "vQsBd85P",
+      "created_at": "2026-02-27T00:00:00",
+      "name": "NAND for K/KI",
+      "intro": [
+        "<p>Using the Church encoding, <code>K</code> represents <b>true</b> and <code>KI</code> represents <b>false</b>.</p>",
+        "<p>Implement <code>nand</code>: it should return <code>K</code> (true) for every pair of inputs",
+        "except when <i>both</i> are <code>K</code> (true), in which case it returns <code>KI</code> (false).</p>",
+        "<p>Apply the result to <code>true</code> and <code>false</code> witnesses to observe it.</p>"
+      ],
+      "input": "phi",
+      "cases": [
+        [ "phi K     K     true false", "false" ],
+        [ "phi (KI)  K     true false", "true"  ],
+        [ "phi K     (KI)  true false", "true"  ],
+        [ "phi (KI)  (KI)  true false", "true"  ]
+      ]
+    },
+    {
+      "id": "IgVco9YW",
+      "created_at": "2026-02-27T00:00:00",
+      "name": "Linear basis from I and your own combinator",
+      "intro": [
+        "<p>It can be shown that <code>I</code>, <code>B</code>, and <code>C</code> (or <code>T</code>)",
+        "form a complete basis for <i>linear</i> combinators &mdash; those that use every argument",
+        "exactly once.</p>",
+        "<p>Surprisingly, <code>B</code> and <code>C</code> can be merged into a single combinator.",
+        "Your task is to <i>declare</i> such a combinator <code>P</code> (lambdas are allowed here),",
+        "and then <i>prove</i> the basis is complete by implementing <code>B</code> and <code>T</code>",
+        "using only <code>I</code> and your <code>P</code>.</p>"
+      ],
+      "input": [
+        {
+          "name": "P",
+          "lambdas": true,
+          "allow": "I-I",
+          "note": "Declare your own linear combinator (lambdas allowed, no built-ins)."
+        },
+        {
+          "name": "B",
+          "lambdas": false,
+          "allow": "I",
+          "note": "Implement <code>B a b c = a (b c)</code> using <code>P</code> and <code>I</code>."
+        },
+        {
+          "name": "T",
+          "lambdas": false,
+          "allow": "I",
+          "note": "Implement <code>T a b = b a</code> using <code>P</code> and <code>I</code>."
+        }
+      ],
+      "cases": [
+        [ { "caps": { "linear": true } }, "P" ],
+        [ "B a b c", "a (b c)" ],
+        [ "T a b", "b a" ]
+      ]
+    }
+  ]
+}

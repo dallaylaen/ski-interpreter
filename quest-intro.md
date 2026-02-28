@@ -1,0 +1,86 @@
+# Creating Quests
+
+Quests are defined in JSON chapter files and loaded by the quest UI.
+
+## Structure
+
+A chapter file contains a single object with a `content` array of quest objects:
+
+```json
+{
+  "id": "unique-chapter-id",
+  "name": "Chapter Name",
+  "intro": "<p>HTML introduction.</p>",
+  "content": [ ...quests ]
+}
+```
+
+Each quest has:
+
+| Field | Required | Description |
+|---|---|---|
+| `id` | yes | Unique string identifier |
+| `name` | yes | Display name |
+| `intro` | yes | HTML description (string or array of strings) |
+| `input` | yes | Placeholder name (string) or array of input specs |
+| `cases` | yes | Array of test cases |
+| `allow` | no | Restrict allowed combinators, e.g. `"SK"` or `"I-I"` |
+| `hint` | no | Spoiler hint shown on demand |
+| `unlock` | no | Term name to add to the inventory when solved |
+
+## Test Cases
+
+**Reduction equality** — reduce the expression and compare to expected:
+```json
+["x a b", "a"]
+```
+
+**Property check** — verify structural properties of the reduced expression:
+```json
+[{"caps": {"linear": true}}, "x a b"]
+```
+
+Supported `caps` properties: `linear`, `affine`, `normal`, `proper`, `discard`, `duplicate`, `arity`.
+
+## Multiple Inputs
+
+When a quest takes more than one input, set `input` to an array of input specs:
+
+```json
+"input": [
+  {"name": "f", "note": "the function"},
+  {"name": "x", "lambdas": true, "note": "the argument"}
+]
+```
+
+Each spec can override global `allow`, `numbers`, and `lambdas` settings.
+
+## Loading in the Browser
+
+See `example/quest.html` for a minimal setup. The key call is:
+
+```js
+const page = new QuestPage({
+  storePrefix: 'my-quests',
+  baseUrl: '.',
+  contentBox: document.getElementById('quest'),
+  inventoryBox: document.getElementById('known'),
+});
+page.loadChapters(['my-quests.json']);
+```
+
+## Verifying Quests
+
+Run the checker against your chapter file:
+
+```sh
+./bin/ski.js quest-check my-quests.json
+```
+
+This validates metadata, checks for duplicate IDs, and verifies that any known solutions pass all cases.
+
+## Further Reading
+
+- Core logic: `src/quest.js`
+- UI/rendering: `site-src/quest.js`
+- Working example: `example/quest.html` and `example/example-quests.json`
