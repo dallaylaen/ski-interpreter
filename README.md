@@ -239,7 +239,7 @@ q.check('K'); // fail
 q.check('K(K(y x))') // nope! the variable scopes won't match
 ```
 
-See [quest page data](docs/quest-data/) for more examples.
+See also [the quest guide](./docs/quest-intro.md) for more details on building your own quests or even interactive quest pages.
 
 # Package contents
 

@@ -1,6 +1,8 @@
-# Creating Quests
+# CREATING QUESTS
 
-Quests are defined in JSON chapter files and loaded by the quest UI.
+A **quest** is a puzzle that asks the player to find an expression that satisfies certain conditions. Quests are organized into **chapters**, which can be loaded in the browser or verified with the command-line checker.
+
+This project includes a [quest page](https://dallaylaen.github.io/ski-interpreter/quest.html) with a number of quests but everyone can make their own! This document describes the format of chapter files and how to create and verify them.
 
 ## Structure
 
