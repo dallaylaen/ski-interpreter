@@ -295,13 +295,6 @@ class Expr {
     }, 0);
   }
 
-  /**
-   * @desc Internal method for infer(), which performs the actual inference.
-   * @param {{max: number, maxArgs: number}} options
-   * @param {number} nargs - var index to avoid name clashes
-   * @returns {TermInfo}
-   * @private
-   */
   _infer (options, nargs) {
     const probe = [];
     let steps = 0;
@@ -1176,6 +1169,10 @@ class Church extends Expr {
       : '[' + this.n + ' != ' + other.n + ']';
   }
 
+  _rski (options) {
+    return this.infer().expr._rski(options);
+  }
+
   _unspaced (arg) {
     return false;
   }
@@ -1276,6 +1273,10 @@ class Alias extends Named {
     if (this === other)
       return null;
     return other.diff(this.impl, !swap);
+  }
+
+  _rski (options) {
+    return this.impl._rski(options);
   }
 
   _braced (first) {
