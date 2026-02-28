@@ -323,7 +323,10 @@ class Expr {
         let duplicate = false;
         const acc = [];
         for (let j = 1; j < list.length; j++) {
-          const sub = list[j]._infer(options, nargs + i); // avoid name clashes
+          const sub = list[j]._infer(
+            { maxArgs: options.maxArgs - nargs, max: options.max - steps }, // limit recursion
+            nargs + i // avoid variable name clashes
+          );
           steps += sub.steps;
           if (!sub.expr)
             // eslint-disable-next-line no-labels
