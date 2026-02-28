@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-02-28
+
+### BREAKING CHANGES
+
+- `ski.js` CLI interface changed (see below)
+- Quest page css changes (see below)
+- `diag()` does not indent `Alias` to reduce diffs
+- Swapped `Expr.expect()` arguments: expected.expect(actual).
+Mnemonic: expected is always an expr, actual may be whatever.
+
+### Added
+
+- `Quest.Group` class and `Quest.verify()` for quest self-check capability.
+- `Quest.selfCheck({ accepted: ..., rejected: ... })` replaces the homegrown `solution` mechanism.
+- `{order: LI|LO}` option to `Expr.traverse()` for left-innermost / left-outermost traversal order.
+- `FreeVar.global` constant as an explicit replacement for the `context=SKI` convention.
+- `TermInfo` typedef for `infer()` results.
+- CLI (`bin/ski.js`) rewritten with `commander`, now supports subcommands: `repl`, `eval`, `file`, `quest-check`.
+- Quest authoring guide added to docs.
+- `expr.expect(actual)` now returns `diag()` as -actual / +expected.
+
+### Fixed
+
+- `infer()` now limits recursion depth to prevent stack overflows (#10).
+- Alias indentation in `diag()` output corrected.
+- Quest page links fixed after previous rewrite.
+- Aliases are no longer canonized without an explicit request.
+
+### Changed
+
+- `toLambda()` and `toSKI()` rewritten using left-innermost traverse.
+- `Church` is now a descendant of `Expr` instead of `Native` (minor speedup).
+- `Expr.constructor` removed for a minor speedup.
+- `parser.add()` now accepts an options object in place of a plain note string.
+- Quest solutions moved to `data/quest-solutions.json`; removed from quest-data.
+- Quest nav items use stable `.ski-quest-nav-item` class instead of fragile `.ski-quest-index a`.
+
 ## [2.2.1] - 2026-02-22
 
 ### Added
