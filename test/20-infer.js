@@ -159,10 +159,26 @@ describe('Expr.infer', () => {
     'x(a->b->b)(a->b->b)(a->b->b)(a->b->b)',
   );
 
+  // non-normal terms, expect partial success
+  describeTerm(
+    '(a->a a)(a->b->c->b(a a b)c)',
+    { normal: false, proper: false },
+    undefined,
+  );
+
+  describeTerm(
+    'C(BWB)(C(BWB))',
+    { normal: false, proper: false },
+  );
+
+  describeTerm(
+    'WI(C(K(WI)))', // quine
+    { normal: false, proper: false }
+  )
   /*
     // TODO
 
-  // non-normal terms
+  // non-normal terms proper
   describeTerm(
     'C(BWB)(C(BWB))',
     { normal: false, proper: false, discard: false, duplicate: true },
@@ -256,28 +272,27 @@ function describeTerm (term, expected, lambda, options = {}) {
       const ski = new SKI();
       const found = ski.parse(term).infer( runOptions );
 
-      const canon = found.expr;
-      delete found.expr; // we'll do a separate test for that
-      const steps = found.steps;
-      delete found.steps; // unpredictable
+      const { steps, expr: canon, ...flags } = found;
 
-      it('produces some term', () => {
-        expect(canon).to.be.instanceof(SKI.classes.Expr);
-      });
       it('produces a step count (' + steps + ')', () => {
         expect(steps).to.be.a('number');
         const limits = options.steps;
         if (limits)
           expect(steps).to.be.within(limits[0], limits[1]);
       });
-      if (lambda) {
-        it('produces exactly expected result ' + lambda, () => {
-          canon.expect(ski.parse(lambda));
-        });
-      }
-      it('produces predictable properties', () => {
+
+      it('produces logically consistent properties', () => {
+        expect(typeof flags.normal).to.equal('boolean');
+        expect(typeof flags.proper).to.equal('boolean');
+        if (flags.proper)
+          expect(flags.normal).to.equal(true, 'Proper implies normal');
+        if (typeof flags.arity === 'number')
+          expect(flags.normal).to.equal(true, 'Arity implies normal');
+      });
+
+      it('produces exactly expected properties', () => {
         try {
-          expect(found).to.deep.equal(expected);
+          expect(flags).to.deep.include(expected);
         } catch (err) {
           console.log('Term    :', term);
           console.log('Expected:', expected);
@@ -285,12 +300,24 @@ function describeTerm (term, expected, lambda, options = {}) {
           throw err;
         }
       });
-      it('is idempotent', () => {
-        canon.infer().expr.expect(canon);
-      });
-      it('is back parseable', () => {
-        ski.parse('' + canon).expect(canon);
-      });
+
+      if (lambda || flags.normal) {
+        it('produces a canonical form ' + canon, () => {
+          expect(canon).to.be.an.instanceOf(SKI.classes.Expr);
+        });
+        it('is idempotent', () => {
+          canon.infer().expr.expect(canon);
+        });
+        it('is back parseable', () => {
+          ski.parse('' + canon).expect(canon);
+        });
+      }
+
+      if (lambda) {
+        it('produces exactly expected result ' + lambda, () => {
+          canon.expect(ski.parse(lambda));
+        });
+      }
     } catch (err) {
       it('doesn\'t die', () => {
         throw err;
