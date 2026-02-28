@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.1] - 2026-03-01
+
+### Fixed
+- Links in documentation.
+
+### Added
+- `ski.js extract <expression> <term> ...` - rewrite the given expression to an equivalent using provided terms where possible.
+- `ski.js search <expression> <term> ...` - brute-force search for an expression equivalent to the given one using the provided terms.
+
 ## [2.3.0] - 2026-02-28
 
 ### BREAKING CHANGES
