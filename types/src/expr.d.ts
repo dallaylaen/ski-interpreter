@@ -368,10 +368,14 @@ export class Expr {
     diff(other: Expr, swap?: boolean): string | null;
     /**
      * @desc Assert expression equality. Can be used in tests.
-     * @param {Expr} expected
+     *
+     * `this` is the expected value and the argument is the actual one.
+     * Mnemonic: the expected value is always a combinator, the actual one may be anything.
+     *
+     * @param {Expr} actual
      * @param {string} comment
      */
-    expect(expected: Expr, comment?: string): void;
+    expect(actual: Expr, comment?: string): void;
     /**
      * @desc Returns string representation of the expression.
      *       Same as format() without options.
