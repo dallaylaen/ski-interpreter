@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    /* Allow mixing .js and .ts files */
+    "allowJs": true,
+    /* Do not type-check existing .js files */
+    "checkJs": false,
+
+    /* Keep CommonJS modules as-is */
+    "module": "commonjs",
+    "moduleResolution": "node",
+
+    /* Modern enough target, adjust as needed */
+    "target": "ES2019",
+
+    /* Do not emit — esbuild handles the build */
+    "noEmit": true,
+
+    /* Enable strict checks for new .ts files */
+    "strict": true,
+
+    /* Allow default imports from CJS modules */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* Source files live here */
+    "baseUrl": ".",
+
+    /* Pick up the existing hand-written declarations */
+    "typeRoots": ["./node_modules/@types"],
+    "paths": {}
+  },
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "index.js",
+    "bin/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "lib",
+    "docs",
+    "coverage"
+  ]
+}
+
