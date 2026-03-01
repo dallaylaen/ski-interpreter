@@ -169,4 +169,23 @@ function declare (expr, env) {
   }).join('; ');
 }
 
-module.exports = { search, deepFormat, declare };
+/**
+ * @experimental
+ * @desc  Fold an application tree bottom to top.
+ *        For each subtree, the function is given the term in the root position and
+ *        a list of the results of folding its arguments.
+ *
+ *        E,g, fold('x y (z t)', f) results in f(x, [f(y, []), f(z, [f(t, [])])])
+ *
+ * @template T
+ * @param {Expr} expr
+ * @param {(head: Expr, tail: T[]) => T} fun
+ * @return {T}
+ */
+
+function foldr (expr, fun) {
+  const [head, ...tail] = expr.unroll();
+  return fun(head, tail.map(e => foldr(e, fun)));
+}
+
+module.exports = { search, deepFormat, declare, foldr };
