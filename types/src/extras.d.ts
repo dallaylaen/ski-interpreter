@@ -71,4 +71,18 @@ export function deepFormat(obj: any, options?: object): any;
 export function declare(expr: Expr, env?: {
     [s: string]: Named;
 }): string;
+/**
+ * @experimental
+ * @desc  Fold an application tree bottom to top.
+ *        For each subtree, the function is given the term in the root position and
+ *        a list of the results of folding its arguments.
+ *
+ *        E,g, fold('x y (z t)', f) results in f(x, [f(y, []), f(z, [f(t, [])])])
+ *
+ * @template T
+ * @param {Expr} expr
+ * @param {(head: Expr, tail: T[]) => T} fun
+ * @return {T}
+ */
+export function foldr<T>(expr: Expr, fun: (head: Expr, tail: T[]) => T): T;
 import { Expr } from "./expr";
