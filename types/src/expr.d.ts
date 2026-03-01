@@ -160,6 +160,31 @@ export class Expr {
      */
     fold<T_1>(initial: T_1, combine: (acc: T_1, expr: Expr) => TraverseValue<T_1>): T_1;
     /**
+     * @experimental
+     * @desc  Fold an application tree bottom to top.
+     *        For each subtree, the function is given the term in the root position and
+     *        a list of the results of folding its arguments.
+     *
+     *        E.g. fold('x y (z t)', f) results in f(x, [f(y, []), f(z, [f(t, [])])])
+     *
+     * @example expr.foldBottomUp((head, tail) => {
+     *    if (head.arity && head.arity <= tail.length) {
+     *      return '(<span class="redex">'
+     *          + head + ' '
+     *          + tail.slice(0, head.arity).join(' ')
+     *          + '</span>'
+     *          + tail.slice(head.arity).join(' ')
+     *          + ')';
+     *    } else {
+     *       return '(' + head + ' ' + tail.join(' ') + ')';
+     *    }
+     * });
+     * @template T
+     * @param {(head: Expr, tail: T[]) => T} fun
+     * @return {T}
+     */
+    foldBottomUp<T_1>(fun: (head: Expr, tail: T_1[]) => T_1): T_1;
+    /**
      * @template T
      * @param {T} initial
      * @param {(acc: T, expr: Expr) => TraverseValue<T>} combine
