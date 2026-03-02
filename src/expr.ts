@@ -1,0 +1,1479 @@
+'use strict';
+
+import { unwrap, prepareWrapper, TraverseValue } from './internal';
+
+const DEFAULTS = {
+  max:     1000,
+  maxArgs: 32,
+};
+
+const ORDER = {
+  'leftmost-outermost': 'LO',
+  'leftmost-innermost': 'LI',
+  LO:                   'LO',
+  LI:                   'LI',
+};
+
+/**
+ * @desc Control primitives for fold() and traverse() methods.
+ */
+const control = {
+  descend: prepareWrapper('descend'),
+  prune:   prepareWrapper('prune'),
+  redo:    prepareWrapper('redo'),
+  stop:    prepareWrapper('stop'),
+};
+
+/**
+ * @desc List of predefined native combinators.
+ * This is required for toSKI() to work, otherwise could as well have been in parser.js.
+ * @type {{[key: string]: Native}}
+ */
+const native: {[key: string]: Native} = {};
+
+/**
+ * @typedef {Expr | function(Expr): Partial} Partial
+ */
+
+/**
+ * @typedef {{
+ *   normal: boolean,      // whether the term becomes irreducible after receiving a number of arguments.
+ *                         // if false, other properties may be missing.
+ *   proper: boolean,      // whether the irreducible form is only contains its arguments. implies normal.
+ *   arity?: number,       // the number of arguments that is sufficient to reach the normal form
+ *                         // absent unless normal.
+ *   discard?: boolean,    // whether the term (or subterms, unless proper) can discard arguments.
+ *   duplicate?: boolean,  // whether the term (or subterms, unless proper) can duplicate arguments.
+ *   skip?: Set<number>,   // indices of arguments that are discarded. nonempty inplies discard.
+ *   dup?: Set<number>,    // indices of arguments that are duplicated. nonempty implies duplicate.
+ *   expr?: Expr,          // canonical form containing lambdas, applications, and variables, if any
+ *   steps?: number,       // number of steps taken to obtain the aforementioned information, if applicable
+ * }} TermInfo
+ */
+
+export type TermInfo = {
+  normal: boolean,
+  proper: boolean,
+  arity?: number,
+  discard?: boolean,
+  duplicate?: boolean,
+  skip?: Set<number>,
+  dup?: Set<number>,
+  expr?: Expr,
+  steps?: number,
+}
+
+export type Invocation = Expr | ((arg: Expr) => Invocation);
+export type Step = { expr: Expr, steps: number, changed: boolean };
+export type Run = { expr: Expr, steps: number, final: boolean };
+export type RunOptions = { max?: number, steps?: number, throw?: boolean };
+
+export type FormatOptions = {
+    terse?: boolean,
+    html?: boolean,
+    brackets?: [string, string],
+    space?: string,
+    var?: [string, string],
+    lambda?: [string, string, string],
+    around?: [string, string],
+    redex?: [string, string],
+    inventory?: { [key: string]: Expr },
+}
+
+type TraverseOptions = {order?: 'LO' | 'LI' | 'leftmost-outermost' | 'leftmost-innermost'};
+type TraverseCallback = (e:Expr) => TraverseValue<Expr>;
+
+export class Expr {
+  static control = control;
+  static native = native;
+  /**
+   *  @descr A combinatory logic expression.
+   *
+   *  Applications, variables, and other terms like combinators per se
+   *  are subclasses of this class.
+   *
+   *  @abstract
+   *  @property {{
+   *    scope?: any,
+   *    env?: { [key: string]: Expr },
+   *    src?: string,
+   *    parser: object,
+   *  }} [context]
+   * @property {number} [arity] - number of arguments the term is waiting for (if known)
+   * @property {string} [note] - a brief description what the term does
+   * @property {string} [fancyName] - how to display in html mode, e.g. &phi; instead of 'f'
+   *                Typically only applicable to descendants of Named.
+   * @property {TermInfo} [props] - properties inferred from the term's behavior
+   */
+  context?: {
+    scope?: any,
+    env?: { [key: string]: Expr },
+    src?: string,
+    parser: object,
+  }
+  arity?: number;
+  note?: string;
+  props?: TermInfo;
+
+  /**
+   *
+   * @desc Define properties of the term based on user supplied options and/or inference results.
+   *       Typically useful for declaring Native and Alias terms.
+   * @private
+   * @param {Object} options
+   * @param {string} [options.note] - a brief description what the term does
+   * @param {number} [options.arity] - number of arguments the term is waiting for (if known)
+   * @param {string} [options.fancy] - how to display in html mode, e.g. &phi; instead of 'f'
+   * @param {boolean} [options.canonize] - whether to try to infer the properties
+   * @param {number} [options.max] - maximum number of steps for inference, if canonize is true
+   * @param {number} [options.maxArgs] - maximum number of arguments for inference, if canonize is true
+   * @return {this}
+   */
+  _setup (options: { note?: string, arity?: number, fancy?: string, canonize?: boolean, max?: number, maxArgs?: number, } = {}) {
+    // TODO better name
+
+    if (options.fancy !== undefined && this instanceof Named)
+      this.fancyName = options.fancy;
+
+    if (options.note !== undefined)
+      this.note = options.note;
+
+    if (options.arity !== undefined)
+      this.arity = options.arity;
+
+    if (options.canonize) {
+      const guess = this.infer(options);
+      if (guess.normal) {
+        this.arity = this.arity ?? guess.arity;
+        this.note = this.note ?? guess.expr.format({ html: true, lambda: ['', ' &mapsto; ', ''] });
+        delete guess.steps;
+        this.props = guess;
+      }
+    }
+    return this;
+  }
+
+  /**
+   * @desc apply self to zero or more terms and return the resulting term,
+   * without performing any calculations whatsoever
+   * @param {Expr} args
+   * @return {Expr}
+   */
+  apply (...args: Expr[]): Expr {
+    let expr: Expr = this;
+    for (const arg of args)
+      expr = new App(expr, arg);
+    return expr;
+  }
+
+  /**
+   * @desc Replace all aliases in the expression with their definitions, recursively.
+   * @return {Expr}
+   */
+  expand (): Expr {
+    return this.traverse(e => {
+      if (e instanceof Alias)
+        return e.impl.expand();
+    }) ?? this;
+  }
+
+  /**
+   * @desc Returns true if the expression contains only free variables and applications, false otherwise.
+   * @returns {boolean}
+   */
+  freeOnly ():boolean {
+    // TODO remove in a breaking release
+    return !this.any(e => !(e instanceof FreeVar || e instanceof App));
+  }
+
+  /**
+   * @desc Traverse the expression tree, applying change() to each node.
+   *       If change() returns an Expr, the node is replaced with that value.
+   *       A null/undefined value is interpreted as
+   *       "descend further if applicable, or leave the node unchanged".
+   *
+   *       Returned values may be decorated:
+   *
+   *       SKI.control.prune will suppress further descending even if nothing was returned
+   *       SKI.control.stop will terminate further changes.
+   *       SKI.control.redo will apply the callback to the returned subtree, recursively.
+   *
+   *       Note that if redo was applied at least once to a subtree, a null return from the same subtree
+   *       will be replaced by the last non-null value returned.
+   *
+   *       The traversal order is leftmost-outermost, unless options.order = 'leftmost-innermost' is specified.
+   *       Short aliases 'LO' and 'LI' (case-sensitive) are also accepted.
+   *
+   *       Returns null if no changes were made, or the new expression otherwise.
+   *
+   * @param {{
+   *   order?: 'LO' | 'LI' | 'leftmost-outermost' | 'leftmost-innermost',
+   * }} [options]
+   * @param {(e:Expr) => TraverseValue<Expr>} change
+   * @returns {Expr|null}
+   */
+
+
+  traverse (
+    options: TraverseOptions | TraverseCallback,
+    change?: TraverseCallback
+  ): Expr | null {
+    if (typeof options === 'function') {
+      change = options;
+      options = {};
+    }
+    const order = ORDER[options.order ?? 'LO'];
+    if (order === undefined)
+      throw new Error('Unknown traversal order: ' + options.order);
+    const [expr, _] = unwrap(this._traverse_redo({ order }, change));
+    return expr;
+  }
+
+  /**
+   * @private
+   * @param {Object} options
+   * @param {(e:Expr) => TraverseValue<Expr>} change
+   * @returns {TraverseValue<Expr>}
+   */
+  _traverse_redo (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
+    let action;
+    let expr: Expr | undefined = this;
+    let prev;
+    do {
+      prev = expr;
+      const next: TraverseValue<Expr> = options.order === 'LI'
+        ? expr._traverse_descend(options, change) ?? change(expr)
+        : change(expr) ?? expr._traverse_descend(options, change);
+      [expr, action] = unwrap(next);
+    } while (expr && action === control.redo);
+    if (!expr && prev !== this)
+      expr = prev; // we were in redo at least once
+    return action ? action(expr) : expr;
+  }
+
+  /**
+   * @private
+   * @param {Object} options
+   * @param {(e:Expr) => TraverseValue<Expr>} change
+   * @returns {TraverseValue<Expr>}
+   */
+
+  _traverse_descend (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
+    return null;
+  }
+
+  /**
+   * @desc Returns true if predicate() is true for any subterm of the expression, false otherwise.
+   *
+   * @param {(e: Expr) => boolean} predicate
+   * @returns {boolean}
+   */
+  any (predicate: (e: Expr) => boolean): boolean {
+    return predicate(this);
+  }
+
+  /**
+   * @desc Fold the expression into a single value by recursively applying combine() to its subterms.
+   *       Nodes are traversed in leftmost-outermost order, i.e. the same order as reduction steps are taken.
+   *
+   * null or undefined return value from combine() means "keep current value and descend further".
+   *
+   * SKI.control provides primitives to control the folding flow:
+   *  - SKI.control.prune(value) means "use value and don't descend further into this branch";
+   *  - SKI.control.stop(value) means "stop folding immediately and return value".
+   *  - SKI.control.descend(value) is the default behavior, meaning "use value and descend further".
+   *
+   * This method is experimental and may change in the future.
+   *
+   * @experimental
+   * @template T
+   * @param {T} initial
+   * @param {(acc: T, expr: Expr) => TraverseValue<T>} combine
+   * @returns {T}
+   */
+  fold<T> (initial: T, combine: (acc: T, expr: Expr) => TraverseValue<T>): T {
+    const [value, _] = unwrap(this._fold(initial, combine));
+    return value ?? initial;
+  }
+
+  _fold<T> (initial:T, combine: (acc: T, expr: Expr) => TraverseValue<T>): TraverseValue<T> {
+    return combine(initial, this);
+  }
+
+  /**
+   * @experimental
+   * @desc  Fold an application tree bottom to top.
+   *        For each subtree, the function is given the term in the root position and
+   *        a list of the results of folding its arguments.
+   *
+   *        E.g. fold('x y (z t)', f) results in f(x, [f(y, []), f(z, [f(t, [])])])
+   *
+   * @example expr.foldBottomUp((head, tail) => {
+   *    if (head.arity && head.arity <= tail.length) {
+   *      return '(<span class="redex">'
+   *          + head + ' '
+   *          + tail.slice(0, head.arity).join(' ')
+   *          + '</span>'
+   *          + tail.slice(head.arity).join(' ')
+   *          + ')';
+   *    } else {
+   *       return '(' + head + ' ' + tail.join(' ') + ')';
+   *    }
+   * });
+   * @template T
+   * @param {(head: Expr, tail: T[]) => T} fun
+   * @return {T}
+   */
+  foldBottomUp<T> (fun: (head: Expr, tail: T[]) => T): T {
+    const [head, ...tail] = this.unroll();
+    return fun(head, tail.map(e => e.foldBottomUp(fun)));
+  }
+
+  /**
+   * @deprecated
+   * @desc rough estimate of the term's complexity
+   * Use fold(0, ...) with an appropriate combine function instead
+   */
+  weight (): number {
+    // TODO remove in next breaking release
+    return 1;
+  }
+
+  /**
+   * @desc Try to empirically find an equivalent lambda term for the expression,
+   *       returning also the term's arity and some other properties.
+   *
+   *       This is used internally when declaring a Native / Alias term,
+   *       unless {canonize: false} is used.
+   *
+   *       As of current it only recognizes terms that have a normal form,
+   *       perhaps after adding some variables. This may change in the future.
+   *
+   *       Use toLambda() if you want to get a lambda term in any case.
+   *
+   * @param {{max?: number, maxArgs?: number}} options
+   * @return {TermInfo}
+   */
+  infer (options : {max?: number, maxArgs?: number } = {}): TermInfo {
+    return this._infer({
+      max:     options.max ?? DEFAULTS.max,
+      maxArgs: options.maxArgs ?? DEFAULTS.maxArgs,
+    }, 0);
+  }
+
+  /**
+   * @desc Internal method for infer(), which performs the actual inference.
+   * @param {{max: number, maxArgs: number}} options
+   * @param {number} nargs - var index to avoid name clashes
+   * @returns {TermInfo}
+   * @private
+   */
+  _infer (options:{max: number, maxArgs: number}, nargs: number): TermInfo {
+    const probe:FreeVar[] = [];
+    let steps = 0;
+    let expr:Expr = this;
+    // eslint-disable-next-line no-labels
+    main: for (let i = 0; i < options.maxArgs; i++) {
+      const next = expr.run({ max: options.max - steps });
+      // console.log(`infer step ${i}, expr = ${expr}, probe = [${probe}]: `, next);
+      steps += next.steps;
+      if (!next.final)
+        break;
+      if (firstVar(next.expr)) {
+        // can't append more variables, return or recurse
+        expr = next.expr;
+        if (!expr.any(e => !(e instanceof FreeVar || e instanceof App)))
+          return maybeLambda(probe, expr, { steps });
+        const list = expr.unroll();
+        let discard = false;
+        let duplicate = false;
+        const acc = [];
+        for (let j = 1; j < list.length; j++) {
+          const sub = list[j]._infer(
+            { maxArgs: options.maxArgs - nargs, max: options.max - steps }, // limit recursion
+            nargs + i // avoid variable name clashes
+          );
+          steps += sub.steps;
+          if (!sub.expr)
+            // eslint-disable-next-line no-labels
+            break main; // press f to pay respects
+          if (sub.discard)
+            discard = true;
+          if (sub.duplicate)
+            duplicate = true;
+          acc.push(sub.expr);
+        }
+        return maybeLambda(probe, list[0].apply(...acc), { discard, duplicate, steps });
+      }
+      const push = nthvar(nargs + i);
+      probe.push(push);
+      expr = next.expr.apply(push);
+    }
+    return { normal: false, proper: false, steps };
+  }
+
+  /**
+   * @desc Expand an expression into a list of terms
+   * that give the initial expression when applied from left to right:
+   * ((a, b), (c, d)) => [a, b, (c, d)]
+   *
+   * This can be thought of as an opposite of apply:
+   * fun.apply(...arg).unroll() is exactly [fun, ...args]
+   * (even if ...arg is in fact empty).
+   *
+   * @returns {Expr[]}
+   */
+  unroll (): Expr[] {
+    // currently only used by infer() but may be useful
+    // to convert binary App trees to n-ary or smth
+    return [this];
+  }
+
+  /**
+   * @desc Returns a series of lambda terms equivalent to the given expression,
+   *       up to the provided computation steps limit,
+   *       in decreasing weight order.
+   *
+   *       Unlike infer(), this method will always return something,
+   *       even if the expression has no normal form.
+   *
+   *       See also Expr.walk() and Expr.toSKI().
+   *
+   * @param {{
+   *   max?: number,
+   *   maxArgs?: number,
+   *   varGen?: function(void): FreeVar,
+   *   steps?: number,
+   *   html?: boolean,
+   *   latin?: number,
+   * }} options
+   * @param {number} [maxWeight] - maximum allowed weight of terms in the sequence
+   * @return {IterableIterator<{expr: Expr, steps?: number, comment?: string}>}
+   */
+  * toLambda (options = {}) {
+    let expr:Expr | null = this.traverse(e => {
+      if (e instanceof FreeVar || e instanceof App || e instanceof Lambda || e instanceof Alias)
+        return null; // no change
+      const guess = e.infer({ max: options.max, maxArgs: options.maxArgs });
+      if (!guess.normal)
+        throw new Error('Failed to infer an equivalent lambda term for ' + e);
+      return guess.expr;
+    }) ?? this;
+    const seen = new Set(); // prune irreducible
+    let steps = 0;
+    while (expr) {
+      const next = expr.traverse({ order: 'LI' }, e => {
+        if (seen.has(e))
+          return null;
+        if (e instanceof App && e.fun instanceof Lambda) {
+          const guess = e.infer({ max: options.max, maxArgs: options.maxArgs });
+          steps += guess.steps;
+          if (!guess.normal) {
+            seen.add(e);
+            return null;
+          }
+          return control.stop(guess.expr);
+        }
+      });
+      yield { expr, steps };
+      expr = next;
+    }
+  }
+
+  /**
+   * @desc Rewrite the expression into S, K, and I combinators step by step.
+   *     Returns an iterator yielding the intermediate expressions,
+   *     along with the number of steps taken to reach them.
+   *
+   *     See also Expr.walk() and Expr.toLambda().
+   *
+   * @param {{max?: number}} [options]
+   * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
+   */
+  * toSKI (options = {}) {
+    // options are ignored completely, TODO remove
+    // get rid of non-lambdas
+    let expr:Expr|null = this.traverse(e => {
+      if (e instanceof FreeVar || e instanceof App || e instanceof Lambda || e instanceof Alias)
+        return null;
+      // TODO infer failed for atomic term? die...
+      return e.infer().expr;
+    }) ?? this;
+
+    let steps = 0;
+    while (expr) {
+      const next = expr.traverse({ order: 'LI' }, e => {
+        if (!(e instanceof Lambda) || (e.impl instanceof Lambda))
+          return null; // continue
+        if (e.impl === e.arg)
+          return control.stop(native.I);
+        if (!e.impl.any(t => t === e.arg))
+          return control.stop(native.K.apply(e.impl));
+        // TODO use real assert here. e.impl contains e.arg and also isn't e.arg, in MUST be App.
+        if (!(e.impl instanceof App))
+          throw new Error('toSKI: assert failed: lambda body is of unexpected type ' + e.impl.constructor.name );
+        // eta-reduction: body === (not e.arg) (e.arg)
+        if (e.impl.arg === e.arg && !e.impl.fun.any(t => t === e.arg))
+          return control.stop(e.impl.fun);
+        // last resort, go S
+        return control.stop(native.S.apply(new Lambda(e.arg, e.impl.fun), new Lambda(e.arg, e.impl.arg)));
+      })
+      yield { expr, steps, final: !next };
+      steps++;
+      expr = next;
+    }
+  }
+
+  /**
+   * Replace all instances of plug in the expression with value and return the resulting expression,
+   * or null if no changes could be made.
+   * Lambda terms and applications will never match if used as plug
+   * as they are impossible co compare without extensive computations.
+   * Typically used on variables but can also be applied to other terms, e.g. aliases.
+   * See also Expr.traverse().
+   * @param {Expr} search
+   * @param {Expr} replace
+   * @return {Expr|null}
+   */
+  subst (search:Expr, replace:Expr): Expr|null {
+    return this === search ? replace : null;
+  }
+
+  /**
+   * @desc Apply term reduction rules, if any, to the given argument.
+   * A returned value of null means no reduction is possible.
+   * A returned value of Expr means the reduction is complete and the application
+   *     of this and arg can be replaced with the result.
+   * A returned value of a function means that further arguments are needed,
+   *     and can be cached for when they arrive.
+   *
+   * This method is between apply() which merely glues terms together,
+   *     and step() which reduces the whole expression.
+   *
+   * foo.invoke(bar) is what happens inside foo.apply(bar).step() before
+   *     reduction of either foo or bar is attempted.
+   *
+   * The name 'invoke' was chosen to avoid confusion with either 'apply' or 'reduce'.
+   *
+   * @param {Expr} arg
+   * @returns {Partial | null}
+   */
+  invoke (arg:Expr): Invocation | null {
+    return null;
+  }
+
+  /**
+   * @desc iterate one step of a calculation.
+   * @return {{expr: Expr, steps: number, changed: boolean}}
+   */
+  step (): Step { return { expr: this, steps: 0, changed: false } }
+
+  /**
+   * @desc Run uninterrupted sequence of step() applications
+   *       until the expression is irreducible, or max number of steps is reached.
+   *       Default number of steps = 1000.
+   * @param {{max?: number, steps?: number, throw?: boolean}|Expr} [opt]
+   * @param {Expr} args
+   * @return {{expr: Expr, steps: number, final: boolean}}
+   */
+  run (opt? : RunOptions|Expr={}, ...args: Expr[]): Run {
+    if (opt instanceof Expr) {
+      args.unshift(opt);
+      opt = {};
+    }
+    let expr = args ? this.apply(...args) : this;
+    let steps = opt.steps ?? 0;
+    // make sure we make at least 1 step, to tell whether we've reached the normal form
+    const max = Math.max(opt.max ?? DEFAULTS.max, 1) + steps;
+    let final = false;
+    for (; steps < max; ) {
+      const next = expr.step();
+      if (!next.changed) {
+        final = true;
+        break;
+      }
+      steps += next.steps;
+      expr = next.expr;
+    }
+    if (opt.throw && !final)
+      throw new Error('Failed to compute expression in ' + max + ' steps');
+    return { final, steps, expr };
+  }
+
+  /**
+   * Execute step() while possible, yielding a brief description of events after each step.
+   * Mnemonics: like run() but slower.
+   * @param {{max?: number}} options
+   * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
+   */
+  * walk (options : { max?: number } = {}): IterableIterator<Run> {
+    const max = options.max ?? Infinity;
+    let steps = 0;
+    let expr:Expr = this;
+    let final = false;
+
+    while (steps < max) {
+      // 1. calculate
+      // 2. yield _unchanged_ expression
+      // 3. either advance or stop
+      const next = expr.step();
+      if (!next.changed)
+        final = true;
+      yield { expr, steps, final };
+      if (final)
+        break;
+      steps += next.steps;
+      expr = next.expr;
+    }
+  }
+
+  /**
+   * @desc True is the expressions are identical, false otherwise.
+   *       Aliases are expanded.
+   *       Bound variables in lambda terms are renamed consistently.
+   *       However, no reductions are attempted.
+   *
+   *       E.g. a->b->a == x->y->x is true, but a->b->a == K is false.
+   *
+   * @param {Expr} other
+   * @return {boolean}
+   */
+  equals (other:Expr):boolean {
+    return !this.diff(other);
+  }
+
+  /**
+   * @desc Recursively compare two expressions and return a string
+   *       describing the first point of difference.
+   *       Returns null if expressions are identical.
+   *
+   *       Aliases are expanded.
+   *       Bound variables in lambda terms are renamed consistently.
+   *       However, no reductions are attempted.
+   *
+   *       Members of the FreeVar class are considered different
+   *       even if they have the same name, unless they are the same object.
+   *       To somewhat alleviate confusion, the output will include
+   *       the internal id of the variable in square brackets.
+   *
+   * @example  "K(S != I)" is the result of comparing "KS" and "KI"
+   * @example  "S(K([x[13] != x[14]]))K"
+   *
+   * @param {Expr} other
+   * @param {boolean} [swap]  If true, the order of expressions is reversed in the output.
+   * @returns {string|null}
+   */
+  diff (other:Expr, swap = false) {
+    if (this === other)
+      return null;
+    if (other instanceof Alias)
+      return other.impl.diff(this, !swap);
+    return swap
+      ? '[' + other + ' != ' + this  + ']'
+      : '[' + this  + ' != ' + other + ']';
+  }
+
+  /**
+   * @desc Assert expression equality. Can be used in tests.
+   *
+   * `this` is the expected value and the argument is the actual one.
+   * Mnemonic: the expected value is always a combinator, the actual one may be anything.
+   *
+   * @param {Expr} actual
+   * @param {string} comment
+   */
+  expect (actual:Expr|object, comment = ''):void {
+    comment = comment ? comment + ': ' : '';
+    if (!(actual instanceof Expr)) {
+      throw new Error(comment + 'Expected a combinator but found '
+        + (actual?.constructor?.name ?? typeof actual));
+    }
+    const diff = this.diff(actual);
+    if (!diff)
+      return; // all good
+
+    // TODO wanna use AssertionError but browser doesn't recognize it
+    // still the below hack works for mocha-based tests.
+    const poorMans = new Error(comment + diff);
+    poorMans.expected = this.diag();
+    poorMans.actual = actual.diag();
+    throw poorMans;
+  }
+
+  /**
+   * @desc Returns string representation of the expression.
+   *       Same as format() without options.
+   * @return {string}
+   */
+  toString (): string {
+    return this.format();
+  }
+
+  /**
+   * @desc Whether the expression needs parentheses when printed.
+   * @param {boolean} [first] - whether this is the first term in a sequence
+   * @return {boolean}
+   */
+  _braced (first?:boolean): boolean {
+    return false;
+  }
+
+  /**
+   * @desc Whether the expression can be printed without a space when followed by arg.
+   * @param {Expr} arg
+   * @returns {boolean}
+   * @private
+   */
+  _unspaced (arg: Expr): boolean {
+    return this._braced(true);
+  }
+
+  /**
+   * @desc    Stringify the expression with fancy formatting options.
+   *          Said options mostly include wrappers around various constructs in form of ['(', ')'],
+   *          as well as terse and html flags that set up the defaults.
+   *          Format without options is equivalent to toString() and can be parsed back.
+   *
+   * @param   {Object} [options]  - formatting options
+   * @param   {boolean} [options.terse]   - whether to use terse formatting (omitting unnecessary spaces and parentheses)
+   * @param   {boolean} [options.html]    - whether to default to HTML tags & entities.
+   *                                If a named term has fancyName property set, it will be used instead of name in this mode.
+   * @param   {[string, string]} [options.brackets]  - wrappers for application arguments, typically ['(', ')']
+   * @param   {[string, string]} [options.var]       - wrappers for variable names
+   *                                (will default to &lt;var&gt; and &lt;/var&gt; in html mode).
+   * @param   {[string, string, string]} [options.lambda]    - wrappers for lambda abstractions, e.g. ['&lambda;', '.', '']
+   *                                where the middle string is placed between argument and body
+   *                                default is ['', '->', ''] or ['', '-&gt;', ''] for html
+   * @param   {[string, string]} [options.around]    - wrappers around (sub-)expressions.
+   *                                individual applications will not be wrapped, i.e. (a b c) but not ((a b) c)
+   * @param   {[string, string]} [options.redex]     - wrappers around the starting term(s) that have enough arguments to be reduced
+   * @param   {Object<string, Expr>} [options.inventory]     - if given, output aliases in the set as their names
+   *                                and any other aliases as the expansion of their definitions.
+   *                                The default is a cryptic and fragile mechanism dependent on a hidden mutable property.
+   * @returns {string}
+   *
+   * @example foo.format() // equivalent to foo.toString()
+   * @example foo.format({terse: false}) // spell out all parentheses
+   * @example foo.format({html: true}) // use HTML tags and entities
+   * @example foo.format({ around: ['(', ')'], brackets: ['', ''], lambda: ['(', '->', ')'] }) // lisp style, still back-parsable
+   * @exapmle foo.format({ lambda: ['&lambda;', '.', ''] }) // pretty-print for the math department
+   * @example foo.format({ lambda: ['', '=>', ''], terse: false }) // make it javascript
+   * @example foo.format({ inventory: { T } }) // use T as a named term, expand all others
+   *
+   */
+  format (options: FormatOptions = {}): string {
+    const fallback = options.html
+      ? {
+        brackets: ['(', ')'],
+        space:    ' ',
+        var:      ['<var>', '</var>'],
+        lambda:   ['', '-&gt;', ''],
+        around:   ['', ''],
+        redex:    ['', ''],
+      }
+      : {
+        brackets: ['(', ')'],
+        space:    ' ',
+        var:      ['', ''],
+        lambda:   ['', '->', ''],
+        around:   ['', ''],
+        redex:    ['', ''],
+      }
+    return this._format({
+      terse:     options.terse    ?? true,
+      brackets:  options.brackets ?? fallback.brackets,
+      space:     options.space    ?? fallback.space,
+      var:       options.var      ?? fallback.var,
+      lambda:    options.lambda   ?? fallback.lambda,
+      around:    options.around   ?? fallback.around,
+      redex:     options.redex    ?? fallback.redex,
+      inventory: options.inventory, // TODO better name
+      html:      options.html     ?? false,
+    }, 0);
+  }
+
+  /**
+   * @desc Internal method for format(), which performs the actual formatting.
+   * @param {Object} options
+   * @param {number} nargs
+   * @returns {string}
+   * @private
+   */
+  _format (options: FormatOptions, nargs: number): string {
+    throw new Error( 'No _format() method defined in class ' + this.constructor.name );
+  }
+
+  /**
+   * @desc Returns a string representation of the expression tree, with indentation to show structure.
+   *
+   *       Applications are flattened to avoid excessive nesting.
+   *       Variables include ids to distinguish different instances of the same variable name.
+   *
+   *       May be useful for debugging.
+   *
+   * @returns {string}
+   *
+   * @example
+   * > console.log(ski.parse('C 5 x (x->x x)').diag())
+   * App:
+   *   Native: C
+   *   Church: 5
+   *   FreeVar: x[53]
+   *   Lambda (x[54]):
+   *     App:
+   *       FreeVar: x[54]
+   *       FreeVar: x[54]
+   */
+  diag ():string {
+    const rec:(e: Expr, indent: string) => string[] = (e, indent) => {
+      if (e instanceof App)
+        return [indent + 'App:', ...e.unroll().flatMap(s => rec(s, indent + '  '))];
+      if (e instanceof Lambda)
+        return [`${indent}Lambda (${e.arg}[${e.arg.id}]):`, ...rec(e.impl, indent + '  ')];
+      // no indent increase so that a diff between diags is consistent with how `equals` works.
+      if (e instanceof Alias)
+        return [`${indent}Alias (${e.name}): \\`, ...rec(e.impl, indent)];
+      if (e instanceof FreeVar)
+        return [`${indent}FreeVar: ${e.name}[${e.id}]`];
+      return [`${indent}${e.constructor.name}: ${e}`];
+    }
+
+    const out = rec(this, '');
+    return out.join('\n');
+  }
+
+  /**
+   * @desc Convert the expression to a JSON-serializable format.
+   * @returns {string}
+   */
+  toJSON (): string | object {
+    return this.format();
+  }
+}
+
+export class App extends Expr {
+  /**
+   * @desc Application of fun() to args.
+   * Never ever use new App(fun, arg) directly, use fun.apply(...args) instead.
+   * @param {Expr} fun
+   * @param {Expr} arg
+   */
+
+  fun: Expr;
+  arg: Expr;
+  final?: boolean;
+
+  constructor (fun:Expr, arg:Expr) {
+    super();
+
+    this.arg = arg;
+    this.fun = fun;
+  }
+  /** @property {boolean} [final] */
+
+  weight () {
+    return this.fun.weight() + this.arg.weight();
+  }
+
+  _traverse_descend (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
+    const [fun, fAction] = unwrap(this.fun._traverse_redo(options, change));
+    if (fAction === control.stop)
+      return control.stop(fun ? fun.apply(this.arg) : null);
+
+    const [arg, aAction] = unwrap(this.arg._traverse_redo(options, change));
+
+    const final:Expr|null = (fun || arg) ? (fun ?? this.fun).apply(arg ?? this.arg) : null;
+    if (aAction === control.stop)
+      return control.stop(final);
+    return final;
+  }
+
+  any (predicate: (e: Expr) => boolean): boolean {
+    return predicate(this) || this.fun.any(predicate) || this.arg.any(predicate);
+  }
+
+  _fold<T> (initial:T, combine: (acc: T, expr: Expr) => TraverseValue<T>): TraverseValue<T> {
+    const [value = initial, action = 'descend'] = unwrap(combine(initial, this));
+    if (action === control.prune)
+      return value;
+    if (action === control.stop)
+      return control.stop(value);
+    const [fValue = value, fAction = 'descend'] = unwrap(this.fun._fold(value, combine));
+    if (fAction === control.stop)
+      return control.stop(fValue);
+    const [aValue = fValue, aAction = 'descend'] = unwrap(this.arg._fold(fValue, combine));
+    if (aAction === control.stop)
+      return control.stop(aValue);
+    return aValue;
+  }
+
+  subst (search: Expr, replace:Expr): Expr | null {
+    const fun = this.fun.subst(search, replace);
+    const arg = this.arg.subst(search, replace);
+
+    return (fun || arg) ? (fun ?? this.fun).apply(arg ?? this.arg) : null;
+  }
+
+  /**
+   * @return {{expr: Expr, steps: number}}
+   */
+
+  step (): Step {
+    // normal reduction order: first try root, then at most 1 step
+    if (!this.final) {
+      // try to apply rewriting rules, if applicable, at first
+      const partial = this.fun.invoke(this.arg);
+      if (partial instanceof Expr)
+        return { expr: partial, steps: 1, changed: true };
+      else if (typeof partial === 'function')
+        this.invoke = partial; // cache for next time
+
+      // descend into the leftmost term
+      const fun = this.fun.step();
+      if (fun.changed)
+        return { expr: fun.expr.apply(this.arg), steps: fun.steps, changed: true };
+
+      // descend into arg
+      const arg = this.arg.step();
+      if (arg.changed)
+        return { expr: this.fun.apply(arg.expr), steps: arg.steps, changed: true };
+
+      // mark as irreducible
+      this.final = true; // mark as irreducible at root
+    }
+
+    return { expr: this, steps: 0, changed: false };
+  }
+
+  invoke (arg:Expr): Invocation | null {
+    // propagate invocation towards the root term,
+    // caching partial applications as we go
+    const partial = this.fun.invoke(this.arg);
+    if (partial instanceof Expr)
+      return partial.apply(arg);
+    else if (typeof partial === 'function') {
+      this.invoke = partial;
+      return partial(arg);
+    } else {
+      // invoke = null => we're uncomputable, cache for next time
+      this.invoke = _ => null;
+      return null;
+    }
+  }
+
+  unroll (): Expr[] {
+    return [...this.fun.unroll(), this.arg];
+  }
+
+  diff (other: Expr, swap = false) {
+    if (!(other instanceof App))
+      return super.diff(other, swap);
+
+    const fun = this.fun.diff(other.fun, swap);
+    if (fun)
+      return fun + '(...)';
+    const arg = this.arg.diff(other.arg, swap);
+    if (arg)
+      return this.fun + '(' + arg + ')';
+    return null;
+  }
+
+  _braced (first?: boolean): boolean {
+    return !first;
+  }
+
+  _format (options:FormatOptions, nargs: number): string {
+    const fun = this.fun._format(options, nargs + 1);
+    const arg = this.arg._format(options, 0);
+    const wrap = nargs ? ['', ''] : options.around;
+    // TODO ignore terse for now
+    if (options.terse && !this.arg._braced(false))
+      return wrap[0] + fun + (this.fun._unspaced(this.arg) ? '' : options.space) + arg + wrap[1];
+    else
+      return wrap[0] + fun + options.brackets[0] + arg + options.brackets[1] + wrap[1];
+  }
+
+  _unspaced (arg) {
+    return this.arg._braced(false) ? true : this.arg._unspaced(arg);
+  }
+}
+
+export class Named extends Expr {
+  /**
+   * @desc An abstract class representing a term named 'name'.
+   *
+   * @param {String} name
+   */
+  name: string;
+  fancyName?: string;
+
+  constructor (name) {
+    super();
+    if (typeof name !== 'string' || name.length === 0)
+      throw new Error('Attempt to create a named term with improper name');
+    this.name = name;
+  }
+
+  _unspaced (arg: Expr): boolean {
+    return !!(
+      (arg instanceof Named) && (
+        (this.name.match(/^[A-Z+]$/) && arg.name.match(/^[a-z+]/i))
+          || (this.name.match(/^[a-z+]/i) && arg.name.match(/^[A-Z+]$/))
+      )
+    );
+  }
+
+  _format (options: FormatOptions, nargs: number): string {
+    // NOTE fancyName is not yet official and may change name or meaning
+    const name = options.html ? this.fancyName ?? this.name : this.name;
+    return this.arity !== undefined && this.arity > 0 && this.arity <= nargs
+      ? options.redex[0] + name + options.redex[1]
+      : name;
+  }
+}
+
+let freeId = 0;
+
+export class FreeVar extends Named {
+  /**
+   * @desc A named variable.
+   *
+   * Given the functional nature of combinatory logic, variables are treated
+   * as functions that we don't know how to evaluate just yet.
+   *
+   * By default, two different variables even with the same name are considered different.
+   * They display it via a hidden id property.
+   *
+   * If a scope object is given, however, two variables with the same name and scope
+   * are considered identical.
+   *
+   * By convention, FreeVar.global is a constant denoting a global unbound variable.
+   *
+   * @param {string} name - name of the variable
+   * @param {any} scope - an object representing where the variable belongs to.
+   */
+  scope?: object;
+  id: number;
+  constructor (name:string, scope?: object ) {
+    super(name);
+    this.id = ++freeId;
+    // TODO replace with null and scope??[notmatching] everywhere, but later
+    this.scope = scope === undefined ? this : scope;
+  }
+
+  weight () {
+    return 0;
+  }
+
+  diff (other:Expr, swap = false): string | null {
+    if (!(other instanceof FreeVar))
+      return super.diff(other, swap);
+    if (this.name === other.name && this.scope === other.scope)
+      return null;
+    const lhs = this.name + '[' + this.id + ']';
+    const rhs = other.name + '[' + other.id + ']';
+    return swap
+      ? '[' + rhs + ' != ' + lhs + ']'
+      : '[' + lhs + ' != ' + rhs + ']';
+  }
+
+  subst (search: Expr, replace: Expr): Expr | null {
+    if (search instanceof FreeVar && search.name === this.name && search.scope === this.scope)
+      return replace;
+    return null;
+  }
+
+  _format (options:FormatOptions, nargs: number): string {
+    const name = options.html ? this.fancyName ?? this.name : this.name;
+    return options.var[0] + name + options.var[1];
+  }
+
+  static global = ['global'];
+}
+
+export class Native extends Named {
+  /**
+   * @desc A named term with a known rewriting rule.
+   *       'impl' is a function with signature Expr => Expr => ... => Expr
+   *       (see typedef Partial).
+   *       This is how S, K, I, and company are implemented.
+   *
+   *       Note that as of current something like a=>b=>b(a) is not possible,
+   *       use full form instead: a=>b=>b.apply(a).
+   *
+   * @example new Native('K', x => y => x); // constant
+   * @example new Native('Y', function(f) { return f.apply(this.apply(f)); }); // self-application
+   *
+   * @param {String} name
+   * @param {Partial} impl
+   * @param {{note?: string, arity?: number, canonize?: boolean }} [opt]
+   */
+  constructor (name: string, impl: (e: Expr) => Invocation,
+    opt: {note?: string, arity?: number, canonize?: boolean } = {}) {
+    super(name);
+    // setup essentials
+    this.invoke  = impl;
+
+    this._setup({ canonize: true, ...opt });
+  }
+}
+
+export class Lambda extends Expr {
+  /**
+   * @desc Lambda abstraction of arg over impl.
+   *     Upon evaluation, all occurrences of 'arg' within 'impl' will be replaced
+   *     with the provided argument.
+   *
+   * Note that 'arg' will be replaced by a localized placeholder, so the original
+   * variable can be used elsewhere without interference.
+   * Listing symbols contained in the lambda will omit such placeholder.
+   *
+   * Legacy ([FreeVar], impl) constructor is supported but deprecated.
+   * It will create a nested lambda expression.
+   *
+   * @param {FreeVar} arg
+   * @param {Expr} impl
+   */
+  arg: FreeVar;
+  impl: Expr;
+  constructor (arg: FreeVar, impl: Expr) {
+    super();
+
+    if(!(arg instanceof FreeVar))
+        throw new Error('Lambda argument must be a FreeVar');
+
+    // localize argument variable and bind it to oneself
+    const local = new FreeVar(arg.name, this);
+    this.arg = local;
+    this.impl = impl.subst(arg, local) ?? impl;
+    this.arity = 1;
+  }
+
+  weight () {
+    return this.impl.weight() + 1;
+  }
+
+  invoke (arg: Expr): Expr {
+    return this.impl.subst(this.arg, arg) ?? this.impl;
+  }
+
+  _traverse_descend (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
+    // alas no proper shielding of self.arg is possible
+    const [impl, iAction] = unwrap(this.impl._traverse_redo(options, change));
+
+    const final = impl ? new Lambda(this.arg, impl) : null;
+
+    return iAction === control.stop ? control.stop(final) : final;
+  }
+
+  any (predicate: (e: Expr) => boolean): boolean {
+    return predicate(this) || this.impl.any(predicate);
+  }
+
+  _fold<T> (initial:T, combine: (acc: T, expr: Expr) => TraverseValue<T>): TraverseValue<T> {
+    const [value = initial, action = 'descend'] = unwrap(combine(initial, this));
+    if (action === control.prune)
+      return value;
+    if (action === control.stop)
+      return control.stop(value);
+    const [iValue, iAction] = unwrap(this.impl._fold(value, combine));
+    if (iAction === control.stop)
+      return control.stop(iValue);
+    return iValue ?? value;
+  }
+
+  subst (search: Expr, replace:Expr): Expr | null {
+    if (search === this.arg)
+      return null;
+    const change = this.impl.subst(search, replace);
+    return change ? new Lambda(this.arg, change) : null;
+  }
+
+  diff (other: Expr , swap = false): string | null {
+    if (!(other instanceof Lambda))
+      return super.diff(other, swap);
+
+    const t = new FreeVar('t'); // TODO better placeholder name
+
+    const diff = this.invoke(t).diff(other.invoke(t), swap);
+    if (diff)
+      return '(t->' + diff + ')'; // parentheses required to avoid ambiguity
+    return null;
+  }
+
+  _format (options: FormatOptions, nargs: number): string {
+    return (nargs > 0 ? options.brackets[0] : '')
+      + options.lambda[0]
+      + this.arg._format(options, 0) // TODO highlight redex if nargs > 0
+      + options.lambda[1]
+      + this.impl._format(options, 0) + options.lambda[2]
+      + (nargs > 0 ? options.brackets[1] : '');
+  }
+
+  _braced (first: boolean): boolean {
+    return true;
+  }
+}
+
+export class Church extends Expr {
+  /**
+   * @desc Church numeral representing non-negative integer n:
+   *      n f x = f(f(...(f x)...)) with f applied n times.
+   * @param {number} n
+   */
+  n: number;
+  constructor (n: number) {
+    n = Number.parseInt(n);
+    if (!(n >= 0))
+      throw new Error('Church number must be a non-negative integer');
+    super();
+    this.invoke = x => y => {
+      let expr = y;
+      for (let i = n; i-- > 0; )
+        expr = x.apply(expr);
+      return expr;
+    };
+
+    /** @type {number} */
+    this.n = n;
+    this.arity = 2;
+  }
+
+  diff (other:Expr, swap = false): string | null {
+    if (!(other instanceof Church))
+      return super.diff(other, swap);
+    if (this.n === other.n)
+      return null;
+    return swap
+      ? '[' + other.n + ' != ' + this.n + ']'
+      : '[' + this.n + ' != ' + other.n + ']';
+  }
+
+  _unspaced (arg: Expr): boolean {
+    return false;
+  }
+
+  _format (options: FormatOptions, nargs: number): string {
+    return nargs >= 2
+      ? options.redex[0] + this.n + options.redex[1]
+      : this.n + '';
+  }
+}
+
+function waitn (expr: Expr, n: number): Invocation {
+  return arg => n <= 1 ? expr.apply(arg) : waitn(expr.apply(arg), n - 1);
+}
+
+export class Alias extends Named {
+  /**
+   * @desc A named alias for an existing expression.
+   *
+   *     Upon evaluation, the alias expands into the original expression,
+   *     unless it has a known arity > 0 and is marked terminal,
+   *     in which case it waits for enough arguments before expanding.
+   *
+   *     A hidden mutable property 'outdated' is used to silently
+   *     replace the alias with its definition in all contexts.
+   *     This is used when declaring named terms in an interpreter,
+   *     to avoid confusion between old and new terms with the same name.
+   *
+   * @param {String} name
+   * @param {Expr} impl
+   * @param {{canonize?: boolean, max?: number, maxArgs?: number, note?: string, terminal?: boolean}} [options]
+   */
+  terminal?: boolean;
+  impl: Expr;
+  outdated?: boolean;
+
+  constructor (name: string, impl: Expr,
+    options : {canonize?: boolean, max?: number, maxArgs?: number, note?: string, terminal?: boolean} = {}) {
+    super(name);
+    if (!(impl instanceof Expr))
+      throw new Error('Attempt to create an alias for a non-expression: ' + impl);
+    this.impl = impl;
+
+    this._setup(options);
+    this.terminal = options.terminal ?? this.props?.proper;
+    this.invoke = waitn(impl, this.arity ?? 0);
+  }
+
+  /**
+   * @property {boolean} [outdated] - whether the alias is outdated
+   *     and should be replaced with its definition when encountered.
+   * @property {boolean} [terminal] - whether the alias should behave like a standalone term
+   *     // TODO better name?
+   * @property {boolean} [proper] - whether the alias is a proper combinator (i.e. contains no free variables or constants)
+   * @property {number} [arity] - the number of arguments the alias waits for before expanding
+   * @property {Expr} [canonical] - equivalent lambda term.
+   */
+
+  weight () {
+    return this.terminal ? 1 : this.impl.weight();
+  }
+
+  _traverse_descend (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
+    return this.impl._traverse_redo(options, change);
+  }
+
+  any (predicate: (e: Expr) => boolean): boolean {
+    return predicate(this) || this.impl.any(predicate);
+  }
+
+  _fold<T> (initial:T, combine: (acc: T, expr: Expr) => TraverseValue<T>): TraverseValue<T> {
+    const [value = initial, action] = unwrap(combine(initial, this));
+    if (action === control.prune)
+      return value;
+    if (action === control.stop)
+      return control.stop(value);
+    const [iValue, iAction] = unwrap(this.impl._fold(value, combine));
+    if (iAction === control.stop)
+      return control.stop(iValue);
+    return iValue ?? value;
+  }
+
+  subst (search: Expr, replace: Expr): Expr | null {
+    if (this === search)
+      return replace;
+    return this.impl.subst(search, replace);
+  }
+
+  // DO NOT REMOVE TYPE or tsc chokes with
+  //       TS2527: The inferred type of 'Alias' references an inaccessible 'this' type.
+  /**
+   * @return {{expr: Expr, steps: number, changed: boolean}}
+   */
+  step (): Step {
+    // arity known = waiting for args to expand
+    if ((this.arity ?? 0) > 0)
+      return { expr: this, steps: 0, changed: false };
+    // expanding is a change but it takes 0 steps
+    return { expr: this.impl, steps: 0, changed: true };
+  }
+
+  diff (other: Expr, swap = false): string | null {
+    if (this === other)
+      return null;
+    return other.diff(this.impl, !swap);
+  }
+
+  _braced (first: boolean): boolean {
+    return this.outdated ? this.impl._braced(first) : false;
+  }
+
+  _format (options: FormatOptions, nargs: number): string {
+    const outdated = options.inventory
+      ? options.inventory[this.name] !== this
+      : this.outdated;
+    return outdated ? this.impl._format(options, nargs) : super._format(options, nargs);
+  }
+}
+
+// ----- Expr* classes end here -----
+
+// declare native combinators
+
+// redeclare `native` type with `Native` class
+
+
+
+function addNative (name: string, impl: (arg: Expr) => Invocation, opt : {note?: string} = {}): void {
+  native[name] = new Native(name, impl, opt);
+}
+addNative('I', x => x);
+addNative('K', x => _ => x);
+addNative('S', x => y => z => x.apply(z, y.apply(z)));
+addNative('B', x => y => z => x.apply(y.apply(z)));
+addNative('C', x => y => z => x.apply(z).apply(y));
+addNative('W', x => y => x.apply(y).apply(y));
+
+addNative(
+  '+',
+  n => n instanceof Church
+    ? new Church(n.n + 1)
+    : f => x => f.apply(n.apply(f, x)),
+  {
+    note: 'Increase a Church numeral argument by 1, otherwise n => f => x => f(n f x)',
+  }
+);
+
+// utility functions dependent on Expr* classes, in alphabetical order
+
+function firstVar (expr: Expr) {
+  // yay premature optimization
+  while (expr instanceof App)
+    expr = expr.fun;
+  return expr instanceof FreeVar;
+}
+
+/**
+ * @private
+ * @given a list of free variables, an expression, and some capabilities of the context,
+ *        return either a lambda term, or the original expression if no lambda abstraction is needed,
+ *        plus some metadata about the term and the context.
+ *
+ *        Used by infer() internally.
+ * @param {FreeVar[]} args
+ * @param {Expr} expr
+ * @param {object} caps
+ * @returns {TermInfo}
+ */
+function maybeLambda (args: FreeVar[], expr: Expr, caps : {discard?: boolean, duplicate?: boolean, steps: number}): TermInfo {
+  const count = new Array(args.length).fill(0);
+  let proper = true;
+  expr.traverse(e => {
+    if (e instanceof FreeVar) {
+      const index = args.findIndex(a => a.name === e.name);
+      if (index >= 0) {
+        count[index]++;
+        return;
+      }
+    }
+    if (!(e instanceof App))
+      proper = false;
+    return undefined;
+  });
+
+  const skip : Set<number> = new Set();
+  const dup : Set<number> = new Set();
+  for (let i = 0; i < args.length; i++) {
+    if (count[i] === 0)
+      skip.add(i);
+    else if (count[i] > 1)
+      dup.add(i);
+  }
+
+  for (let i = args.length; i-- > 0; )
+    expr = new Lambda(args[i], expr);
+
+  return {
+    normal:    true,
+    steps:     caps.steps,
+    expr,
+    arity:     args.length,
+    ...(skip.size ? { skip } : {}),
+    ...(dup.size ? { dup } : {}),
+    duplicate: !!dup.size  || caps.duplicate || false,
+    discard:   !!skip.size || caps.discard   || false,
+    proper,
+  };
+}
+
+function nthvar (n: number): FreeVar {
+  return new FreeVar('abcdefgh'[n] ?? 'x' + n);
+}
+
+/**
+ * @desc collection of static constants and the main entry point
+ */
+export class Goodies {
+  static classes = { Alias, App, Church, Expr, FreeVar, Lambda, Named, Native, };
+  static control = control;
+  static native = native;
+  static B = native.B;
+  static C = native.C;
+  static I = native.I;
+  static K = native.K;
+  static S = native.S;
+  static W = native.W;
+}
+
