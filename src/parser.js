@@ -44,7 +44,10 @@ class PartialLambda extends Empty {
   }
 
   postParse () {
-    return new Lambda(this.terms, this.impl);
+    let expr = this.impl;
+    for (let i = this.terms.length; i-- > 0; )
+      expr = new Lambda(this.terms[i], expr);
+    return expr;
   }
 
   // uncomment if debugging with prints
