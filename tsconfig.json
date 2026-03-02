@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     /* Allow mixing .js and .ts files */
-    "allowJs": true,
+    "allowJs": false,
     /* Do not type-check existing .js files */
     "checkJs": false,
 
@@ -11,9 +11,10 @@
 
     /* Modern enough target, adjust as needed */
     "target": "ES2019",
+    "lib": ["ES2020"],
 
     /* Do not emit — esbuild handles the build */
-    "noEmit": true,
+    /* "noEmit": true, */
 
     /* Enable strict checks for new .ts files */
     "strict": true,
@@ -30,10 +31,9 @@
     "paths": {}
   },
   "include": [
-    "src/**/*",
-    "test/**/*",
+    "src/**/*.ts",
+    "test/**/*.ts",
     "index.js",
-    "bin/**/*"
   ],
   "exclude": [
     "node_modules",
