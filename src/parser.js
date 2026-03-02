@@ -9,6 +9,8 @@ const classes = require('./expr');
 const { Expr, Named, Native, Alias, FreeVar, Lambda, Church } = classes;
 const { native } = Expr;
 
+const { toposort } = require('./toposort');
+
 class Empty extends Expr {
   apply (...args) {
     return args.length ? args.shift().apply(...args) : this;
@@ -292,7 +294,7 @@ class SKI {
 
     // console.log(env);
 
-    const list = Expr.extras.toposort(undefined, env).list;
+    const list = toposort(undefined, env).list;
 
     const detour = new Map();
     if (Object.keys(needDetour).length) {
