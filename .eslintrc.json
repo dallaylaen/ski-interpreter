@@ -62,6 +62,9 @@
         "plugin:@typescript-eslint/recommended"
       ],
       "rules": {
+        "no-use-before-define": "off",
+        "@typescript-eslint/no-use-before-define": ["error", { "ignoreTypeReferences": true, "functions": false, "classes": false }],
+        "@typescript-eslint/no-unused-vars": ["error", { "args": "none", "varsIgnorePattern": "^_$|^reject$|^unused|^Expr$|^Lambda$|^FreeVar$|^Alias$|^App$|^Named$" }]
       }
     },
     {
