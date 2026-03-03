@@ -11,7 +11,7 @@
 
     /* Modern enough target, adjust as needed */
     "target": "ES2019",
-    "lib": ["ES2020"],
+    "lib": ["ES2020", "dom"],
 
     /* Do not emit — esbuild handles the build */
     /* "noEmit": true, */
