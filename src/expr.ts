@@ -17,7 +17,7 @@ const ORDER = {
 /**
  * @desc Control primitives for fold() and traverse() methods.
  */
-const control = {
+export const control = {
   descend: prepareWrapper('descend'),
   prune:   prepareWrapper('prune'),
   redo:    prepareWrapper('redo'),
@@ -29,7 +29,7 @@ const control = {
  * This is required for toSKI() to work, otherwise could as well have been in parser.js.
  * @type {{[key: string]: Native}}
  */
-const native: {[key: string]: Native} = {};
+export const native: {[key: string]: Native} = {};
 
 /**
  * @typedef {Expr | function(Expr): Partial} Partial
@@ -1462,18 +1462,4 @@ function nthvar (n: number): FreeVar {
   return new FreeVar('abcdefgh'[n] ?? 'x' + n);
 }
 
-/**
- * @desc collection of static constants and the main entry point
- */
-export class Goodies {
-  static classes = { Alias, App, Church, Expr, FreeVar, Lambda, Named, Native, };
-  static control = control;
-  static native = native;
-  static B = native.B;
-  static C = native.C;
-  static I = native.I;
-  static K = native.K;
-  static S = native.S;
-  static W = native.W;
-}
-
+export const classes = { Expr, App, Named, FreeVar, Native, Lambda, Church, Alias };

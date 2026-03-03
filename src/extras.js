@@ -2,6 +2,7 @@
 
 const { Expr, Alias, FreeVar } = require('./expr');
 const { Quest } = require('./quest');
+const { toposort } = require('./toposort');
 
 /**
  * @desc  Extra utilities that do not belong in the core.
@@ -158,7 +159,7 @@ function deepFormat (obj, options = {}) {
  * @returns {string}
  */
 function declare (expr, env) {
-  const res = Expr.extras.toposort([expr], env);
+  const res = toposort([expr], env);
 
   return res.list.map(s => {
     if (s instanceof Alias)
@@ -169,4 +170,4 @@ function declare (expr, env) {
   }).join('; ');
 }
 
-module.exports = { search, deepFormat, declare };
+module.exports = { search, deepFormat, declare, toposort };

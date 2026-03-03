@@ -3,9 +3,10 @@
  */
 'use strict';
 
-const { Tokenizer, restrict } = require('./internal');
-import { Goodies, Expr, FreeVar, Lambda, Church, Alias, Native } from './expr';
+import { Tokenizer, restrict } from './internal';
+import { Expr, FreeVar, Lambda, Church, Alias, Native, native } from './expr';
 
+// TODO js relic
 const { toposort } = require('./toposort');
 
 class Empty extends Expr {
@@ -63,7 +64,7 @@ const combChars = new Tokenizer(
   '[()]', '[A-Z]', '[a-z_][a-z_0-9]*', '\\b[0-9]+\\b', '->', '\\+'
 );
 
-export class SKI extends Goodies {
+export class Parser {
   /**
    *
    * @param {{
@@ -83,9 +84,8 @@ export class SKI extends Goodies {
   hasLambdas: boolean;
 
   constructor (options = {}) {
-    super();
     this.annotate = !!options.annotate;
-    this.known = { ...SKI.native };
+    this.known = { ...native };
     this.hasNumbers = true;
     this.hasLambdas = true;
     /** @type {Set<string>} */
@@ -292,7 +292,7 @@ export class SKI extends Goodies {
     // finally, remove the temporary aliases from the output
     const needDetour = {};
     let i = 1;
-    for (const name in SKI.native) {
+    for (const name in native) {
       if (!(env[name] instanceof Alias))
         continue;
       while ('tmp' + i in env)
@@ -501,21 +501,6 @@ export class SKI extends Goodies {
  * @param {T} [scope] - optional context to bind the generated variables to
  * @return {{[key: string]: FreeVar}}
  */
-static vars (scope: object = {}):{[s: string]: FreeVar} {
-  const cache:{[key:string]:FreeVar} = {};
-  return new Proxy({}, {
-    get: (target, name) => {
-      if (!(name in cache))
-        cache[name] = new FreeVar(name, scope);
-      return cache[name];
-    }
-  });
-};
 
-/**
- * Convert a number to Church encoding
- * @param {number} n
- * @return {Church}
- */
-  static church = (n: number) => new Church(n);
+
 }

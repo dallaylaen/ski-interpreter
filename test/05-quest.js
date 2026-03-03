@@ -1,5 +1,6 @@
 const { expect } = require('chai');
-const { SKI, Quest } = require('../index');
+const { SKI } = require('../index');
+const { Quest } = SKI;
 
 describe('Quest', () => {
   const reduct = item => item.start + ' -> ' + item.found + ' vs ' + item.expected;

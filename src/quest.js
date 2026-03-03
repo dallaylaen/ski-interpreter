@@ -1,5 +1,5 @@
-const { SKI } = require('./parser');
-const { Expr, FreeVar, Alias, Lambda } = SKI.classes;
+const { Parser } = require('./parser');
+const { Expr, FreeVar, Alias, Lambda, Named, control } = require('./expr');
 
 /**
  * @typedef {{
@@ -61,8 +61,8 @@ const { Expr, FreeVar, Alias, Lambda } = SKI.classes;
  *    allow?: string,
  *    numbers?: boolean,
  *    env?: string[],
- *    engine?: SKI,
- *    engineFull?: SKI,
+ *    engine?: Parser,
+ *    engineFull?: Parser,
  *
  *    // metadata, also any fields not listed here will go to quest.meta.???
  *    id?: string|number,
@@ -98,8 +98,8 @@ class Quest {
     const env = options.env ?? options.vars; // backwards compatibility
 
     //
-    this.engine = engine ?? new SKI();
-    this.engineFull = engineFull ?? new SKI();
+    this.engineFull = engineFull ?? new Parser();
+    this.engine = engine ?? this.engineFull;
     this.restrict = { allow, numbers: numbers ?? false, lambdas: lambdas ?? false };
     this.env = {};
 
@@ -110,11 +110,11 @@ class Quest {
     // to feed it later to every case's parser.
     for (const term of env ?? []) {
       const expr = this.engineFull.parse(term, { env: jar, scope: this });
-      if (expr instanceof SKI.classes.Alias)
+      if (expr instanceof Alias)
         this.env[expr.name] = new Alias(expr.name, expr.impl, { terminal: true, canonize: false });
         // Canonized aliases won't expand with insufficient arguments,
         // causing correct solutions to fail, so alas...
-      else if (expr instanceof SKI.classes.FreeVar)
+      else if (expr instanceof FreeVar)
         this.env[expr.name] = expr;
       else
         throw new Error('Unsupported given variable type: ' + term);
@@ -165,7 +165,7 @@ class Quest {
     if (typeof term.name !== 'string')
       throw new Error("quest 'input' field must be a string or a {name: string, ...} object");
 
-    term.placeholder = new SKI.classes.FreeVar(term.name);
+    term.placeholder = new FreeVar(term.name);
     // TODO more checks
     this.input.push(term);
   }
@@ -217,8 +217,8 @@ class Quest {
       });
       const arsenal = { ...this.engine.getTerms(), ...jar };
       weight += impl.fold(0, (a, e) => {
-        if (e instanceof SKI.classes.Named && arsenal[e.name] === e)
-          return SKI.control.prune( a + 1);
+        if (e instanceof Named && arsenal[e.name] === e)
+          return control.prune( a + 1);
       });
       const expr = impl instanceof FreeVar
         ? impl
@@ -337,7 +337,7 @@ class Case {
    *   max?: number,
    *   note?: string,
    *   env?: {[key:string]: Expr},
-   *   engine: SKI
+   *   engine: Parser
    * }} options
    */
   constructor (input, options) {
@@ -349,7 +349,7 @@ class Case {
   }
 
   parse (src) {
-    return new Subst(this.engine.parse(src, { env: this.env, scope: this }), this.input);
+    return new Subst(this.engine.parse(src, { env: this.env, scope: this,  }), this.input);
   }
 
   /**
@@ -368,7 +368,7 @@ class ExprCase extends Case {
    *    max?: number,
    *    note?: string,
    *    env?: {string: Expr},
-   *    engine?: SKI
+   *    engine?: Parser
    * }} options
    * @param {[e1: string, e2: string]} terms
    */
