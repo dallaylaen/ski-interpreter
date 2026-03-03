@@ -4,26 +4,24 @@
 'use strict';
 
 import { Tokenizer, restrict } from './internal';
-import { Expr, FreeVar, Lambda, Church, Alias, Native, native } from './expr';
-
-// TODO js relic
-const { toposort } = require('./toposort');
+import { Expr, FreeVar, Lambda, Church, Alias, Native, native, Invocation } from './expr';
+import { toposort } from './toposort';
 
 class Empty extends Expr {
   apply (...args: Expr[]):Expr {
-    return args.length > 0 ? args.shift().apply(...args) : this;
+    return args.length > 0 ? args.shift()!.apply(...args) : this;
   }
 
-  postParse () {
+  postParse (): Expr {
     throw new Error('Attempt to use empty expression () as a term');
   }
 }
 
 class PartialLambda extends Empty {
   impl: Expr;
-  terms: Expr[];
+  terms: FreeVar[];
   // TODO mutable! rewrite ro when have time
-  constructor (term: Expr, known = {}) {
+  constructor (term: Expr, _known = {}) {
     super();
     this.impl = new Empty();
     if (term instanceof FreeVar)
@@ -43,7 +41,7 @@ class PartialLambda extends Empty {
     return this;
   }
 
-  postParse () {
+  postParse (): Expr {
     let expr = this.impl;
     for (let i = this.terms.length; i-- > 0; )
       expr = new Lambda(this.terms[i], expr);
@@ -56,13 +54,36 @@ class PartialLambda extends Empty {
   } */
 }
 
-function postParse (expr) {
-  return expr.postParse ? expr.postParse() : expr;
+function postParse (expr: Expr): Expr {
+  return (expr as Empty).postParse ? (expr as Empty).postParse() : expr;
 }
 
 const combChars = new Tokenizer(
   '[()]', '[A-Z]', '[a-z_][a-z_0-9]*', '\\b[0-9]+\\b', '->', '\\+'
 );
+
+export type ParserOptions = {
+  allow?: string,
+  numbers?: boolean,
+  lambdas?: boolean,
+  terms?: { [key: string]: Expr | string } | string[],
+  annotate?: boolean,
+};
+
+export type ParseOptions = {
+  env?: { [key: string]: Expr },
+  scope?: object,
+  numbers?: boolean,
+  lambdas?: boolean,
+  allow?: string,
+};
+
+export type AddOptions = {
+  note?: string,
+  canonize?: boolean,
+  fancy?: string,
+  arity?: number,
+};
 
 export class Parser {
   /**
@@ -83,7 +104,7 @@ export class Parser {
   hasNumbers: boolean;
   hasLambdas: boolean;
 
-  constructor (options = {}) {
+  constructor (options: ParserOptions = {}) {
     this.annotate = !!options.annotate;
     this.known = { ...native };
     this.hasNumbers = true;
@@ -97,7 +118,7 @@ export class Parser {
     else if (options.terms) {
       for (const name in options.terms) {
         // Native terms already handled by allow
-        if (!options.terms[name].match(/^Native:/))
+        if (typeof options.terms[name] !== 'string' || !options.terms[name].match(/^Native:/))
           this.add(name, options.terms[name]);
       }
     }
@@ -133,18 +154,17 @@ export class Parser {
    * @param {number} [options.arity] - custom arity for the term, default is inferred from the implementation
    * @return {SKI} chainable
    */
-  add (term, impl, options ) {
-    term = this._named(term, impl);
+  add (term: Alias | string, impl?: Expr | string | ((arg: Expr) => Invocation), options?: AddOptions | string): this {
+    const named = this._named(term, impl);
 
     // backward compat
-    if (typeof options === 'string')
-      options = { note: options, canonize: false };
-    term._setup({ canonize: this.annotate, ...options });
+    const opts: AddOptions = typeof options === 'string' ? { note: options, canonize: false } : (options ?? {});
+    named._setup({ canonize: this.annotate, ...opts });
 
-    if (this.known[term.name])
-      this.known[term.name].outdated = true;
-    this.known[term.name] = term;
-    this.allow.add(term.name);
+    if (this.known[named.name])
+      (this.known[named.name] as Alias).outdated = true;
+    this.known[named.name] = named;
+    this.allow.add(named.name);
 
     return this;
   }
@@ -156,7 +176,7 @@ export class Parser {
    * @returns {Native|Alias}
    * @private
    */
-  _named (term, impl) {
+  _named (term: Alias | string, impl?: Expr | string | ((arg: Expr) => Invocation)): Native | Alias {
     if (term instanceof Alias)
       return new Alias(term.name, term.impl, { canonize: true });
     if (typeof term !== 'string')
@@ -183,7 +203,7 @@ export class Parser {
    * @param {string|Expr|function(Expr):Partial} impl
    * @returns {SKI}
    */
-  maybeAdd (name, impl) {
+  maybeAdd (name: string, impl: Expr | string | ((arg: Expr) => Invocation)): this {
     if (this.known[name])
       this.allow.add(name);
     else
@@ -198,7 +218,7 @@ export class Parser {
    * @param {string[]} list
    * @return {SKI} chainable
    */
-  bulkAdd (list) {
+  bulkAdd (list: string[]): this {
     for (const item of list) {
       const m = item.match(/^([A-Z]|[a-z][a-z_0-9]*)\s*=\s*(.*)$/s);
       // TODO check all declarations before applying any (but we might need earlier terms for parsing later ones)
@@ -223,7 +243,7 @@ export class Parser {
    * @param {string} spec
    * @return {SKI} chainable
    */
-  restrict (spec) {
+  restrict (spec: string): this {
     this.allow = restrict(this.allow, spec);
     return this;
   }
@@ -235,9 +255,9 @@ export class Parser {
    */
   showRestrict (spec = '+') {
     const out = [];
-    let prevShort = true;
+    let prevShort: boolean = true;
     for (const term of [...restrict(this.allow, spec)].sort()) {
-      const nextShort = term.match(/^[A-Z]$/);
+      const nextShort = !!term.match(/^[A-Z]$/);
       if (out.length && !(prevShort && nextShort))
         out.push(' ');
       out.push(term);
@@ -251,8 +271,8 @@ export class Parser {
    * @param {String} name
    * @return {SKI}
    */
-  remove (name) {
-    this.known[name].outdated = true;
+  remove (name: string): this {
+    (this.known[name] as Alias).outdated = true;
     delete this.known[name];
     this.allow.delete(name);
     return this;
@@ -262,8 +282,8 @@ export class Parser {
    *
    * @return {{[key:string]: Native|Alias}}
    */
-  getTerms () {
-    const out = {};
+  getTerms (): { [key: string]: Expr } {
+    const out: { [key: string]: Expr } = {};
     for (const name of Object.keys(this.known)) {
       if (this.allow.has(name))
         out[name] = this.known[name];
@@ -276,21 +296,19 @@ export class Parser {
    * Currently only Alias terms are serialized.
    * @returns {string[]}
    */
-  declare () {
+  declare (): string[] {
     // TODO accept argument to declare specific terms only
-    const env = this.getTerms();
-
-    // not serializing native terms, and we don't care about free vars
-    for (const name in env) {
-      if (!(env[name] instanceof Alias))
-        delete env[name];
+    const env: { [key: string]: Alias } = {};
+    for (const [name, term] of Object.entries(this.getTerms())) {
+      if (term instanceof Alias)
+        env[name] = term;
     }
 
     // avert conflicts if native terms were redefined:
     // create a temporary alias for each native term that was redefined;
     // replace usage of redefined term in subexpressions;
     // finally, remove the temporary aliases from the output
-    const needDetour = {};
+    const needDetour: { [key: string]: Alias } = {};
     let i = 1;
     for (const name in native) {
       if (!(env[name] instanceof Alias))
@@ -298,8 +316,8 @@ export class Parser {
       while ('tmp' + i in env)
         i++;
       const temp = new Alias('tmp' + i, env[name]);
-      needDetour[temp] = env[name];
-      env[temp] = temp;
+      needDetour[temp.name] = env[name];
+      env[temp.name] = temp;
       delete env[name];
     }
 
@@ -307,13 +325,13 @@ export class Parser {
 
     const list = toposort(undefined, env).list;
 
-    const detour = new Map();
+    const detour = new Map<Alias, Alias>();
     if (Object.keys(needDetour).length) {
       // replace aliases with their detoured counterparts.
       // we have to go recursive, otherwise an unrelated alias may be expanded to its impl
       // and name infos will be erased
-      const rework = expr => {
-        return expr.traverse(e => {
+      const rework = (expr: Expr): Expr => {
+        return expr.traverse((e: Expr) => {
           if (!(e instanceof Alias))
             return null; // continue
           const newAlias = detour.get(e);
@@ -323,24 +341,24 @@ export class Parser {
         }) ?? expr;
       };
 
-      for (let i = 0; i < list.length; i++) {
-        // upon processing list[i], only terms declared before it may be detoured
-        list[i] = rework(list[i], detour);
-        detour.set(needDetour[list[i].name], list[i]);
-        env[list[i].name] = list[i];
-        console.log(`list[${i}] = ${list[i].name}=${list[i].impl};`);
+      for (let j = 0; j < list.length; j++) {
+        // upon processing list[j], only terms declared before it may be detoured
+        list[j] = rework(list[j]);
+        detour.set(needDetour[(list[j] as Alias).name], list[j] as Alias);
+        env[(list[j] as Alias).name] = list[j] as Alias;
+        console.log(`list[${j}] = ${(list[j] as Alias).name}=${(list[j] as Alias).impl};`);
       }
       console.log('detour:', detour);
     }
 
     // console.log(res);
-    const out = list.map(e => needDetour[e]
-      ? e.name + '=' + needDetour[e].name + '=' + e.impl.format({ inventory: env })
-      : e.name + '=' + e.impl.format({ inventory: env })
+    const out = list.map(e => needDetour[(e as Alias).name]
+      ? (e as Alias).name + '=' + needDetour[(e as Alias).name].name + '=' + (e as Alias).impl.format({ inventory: env })
+      : (e as Alias).name + '=' + (e as Alias).impl.format({ inventory: env })
     );
 
     for (const [name, temp] of detour)
-      out.push(name + '=' + temp, temp + '=');
+      out.push((name as Alias).name + '=' + temp, temp + '=');
 
     return out;
   }
@@ -356,7 +374,7 @@ export class Parser {
    * @param {string} [options.allow]
    * @return {Expr}
    */
-  parse (source: string, options = {}): Expr {
+  parse (source: string, options: ParseOptions = {}): Expr {
     if (typeof source !== 'string')
       throw new Error('parse: source must be a string, got ' + typeof source);
 
@@ -367,7 +385,7 @@ export class Parser {
 
     const jar = { ...options.env };
 
-    let expr = new Empty();
+    let expr: Expr = new Empty();
     for (const item of lines) {
       if (expr instanceof Alias)
         expr.outdated = true;
@@ -410,7 +428,7 @@ export class Parser {
    * @param {string} [options.allow]
    * @return {Expr} parsed expression
    */
-  parseLine (source, env = {}, options = {}) {
+  parseLine (source: string, env: { [key: string]: Expr } = {}, options: ParseOptions = {}): Expr {
     const aliased = source.match(/^\s*([A-Z]|[a-z][a-z_0-9]*)\s*=\s*(.*)$/s);
     if (aliased)
       return new Alias(aliased[1], this.parseLine(aliased[2], env, options));
@@ -421,13 +439,13 @@ export class Parser {
       allow:   restrict(this.allow, options.allow),
     };
     // make sure '+' usage is in sync with numerals
-    opt.numbers ? opt.allow.add('+') : opt.allow.delete('+');
+    if (opt.numbers) opt.allow.add('+'); else opt.allow.delete('+');
 
     const tokens = combChars.split(source);
 
     const empty = new Empty();
     /** @type {Expr[]} */
-    const stack = [empty];
+    const stack: Expr[] = [empty];
     const context = options.scope || FreeVar.global; // default is global unbound vars
 
     // TODO each token should carry along its position in source
@@ -438,20 +456,20 @@ export class Parser {
       else if (c === ')') {
         if (stack.length < 2)
           throw new Error('unbalanced input: extra closing parenthesis' + source);
-        const x = postParse(stack.pop());
-        const f = stack.pop();
+        const x = postParse(stack.pop()!);
+        const f = stack.pop()!;
         stack.push(f.apply(x));
       } else if (c === '->') {
         if (!opt.lambdas)
           throw new Error('Lambdas not supported, allow them explicitly');
-        stack.push(new PartialLambda(stack.pop(), env));
+        stack.push(new PartialLambda(stack.pop()!));
       } else if (c.match(/^[0-9]+$/)) {
         if (!opt.numbers)
           throw new Error('Church numbers not supported, allow them explicitly');
-        const f = stack.pop();
-        stack.push(f.apply(new Church(c)));
+        const f = stack.pop()!;
+        stack.push(f.apply(new Church(Number.parseInt(c))));
       } else {
-        const f = stack.pop();
+        const f = stack.pop()!;
         if (!env[c] && this.known[c] && !opt.allow.has(c)) {
           throw new Error('Term \'' + c + '\' is not in the restricted set '
             + [...opt.allow].sort().join(' '));
@@ -467,7 +485,7 @@ export class Parser {
           + (stack.length - 1) + ' closing parenthesis:' + source);
     }
 
-    return postParse(stack.pop());
+    return postParse(stack.pop()!);
   }
 
   toJSON () {

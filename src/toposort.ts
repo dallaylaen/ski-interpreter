@@ -27,7 +27,7 @@ export function toposort (list:Expr[]|Expr|undefined, env: { [s: string]: Named 
   if (env) {
     // TODO check in[name].name === name
     if (!list)
-      list = Object.keys(env).sort().map(k => env[k]); // ensure deterministic order
+      list = Object.keys(env).sort().map(k => env![k]); // ensure deterministic order
   } else {
     if (!list)
       return { list: [], env: {} };
@@ -47,7 +47,7 @@ export function toposort (list:Expr[]|Expr|undefined, env: { [s: string]: Named 
     if (seen.has(term))
       return;
     term.fold(false, (acc:boolean, e:Expr):TraverseValue<boolean> => {
-      if (e !== term && e instanceof Named && env[e.name] === e) {
+      if (e !== term && e instanceof Named && env![e.name] === e) {
         rec(e);
         return control.prune(false);
       }

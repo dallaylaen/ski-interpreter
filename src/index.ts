@@ -1,4 +1,4 @@
-import { classes, native, control, FreeVar, Church, Native } from './expr';
+import { classes, native, control, FreeVar, Church } from './expr';
 import { Parser } from './parser';
 
 import { Quest } from './quest';

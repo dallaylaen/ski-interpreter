@@ -106,6 +106,7 @@ export class Expr {
    * @property {TermInfo} [props] - properties inferred from the term's behavior
    */
   context?: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scope?: any,
     env?: { [key: string]: Expr },
     src?: string,
@@ -146,7 +147,7 @@ export class Expr {
       const guess = this.infer(options);
       if (guess.normal) {
         this.arity = this.arity ?? guess.arity;
-        this.note = this.note ?? guess.expr.format({ html: true, lambda: ['', ' &mapsto; ', ''] });
+        this.note = this.note ?? guess.expr!.format({ html: true, lambda: ['', ' &mapsto; ', ''] });
         delete guess.steps;
         this.props = guess;
       }
@@ -161,6 +162,7 @@ export class Expr {
    * @return {Expr}
    */
   apply (...args: Expr[]): Expr {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let expr: Expr = this;
     for (const arg of args)
       expr = new App(expr, arg);
@@ -222,11 +224,11 @@ export class Expr {
       change = options;
       options = {};
     }
-    const order = ORDER[options.order ?? 'LO'];
+    const order = ORDER[options.order ?? 'LO'] as 'LO' | 'LI' | undefined;
     if (order === undefined)
       throw new Error('Unknown traversal order: ' + options.order);
-    const [expr, _] = unwrap(this._traverse_redo({ order }, change));
-    return expr;
+    const [expr] = unwrap(this._traverse_redo({ order }, change!));
+    return expr ?? null;
   }
 
   /**
@@ -237,6 +239,7 @@ export class Expr {
    */
   _traverse_redo (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
     let action;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let expr: Expr | undefined = this;
     let prev;
     do {
@@ -248,7 +251,7 @@ export class Expr {
     } while (expr && action === control.redo);
     if (!expr && prev !== this)
       expr = prev; // we were in redo at least once
-    return action ? action(expr) : expr;
+    return action ? action(expr!) : expr;
   }
 
   /**
@@ -258,7 +261,7 @@ export class Expr {
    * @returns {TraverseValue<Expr>}
    */
 
-  _traverse_descend (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
+  _traverse_descend (_options: TraverseOptions, _change: TraverseCallback): TraverseValue<Expr> {
     return null;
   }
 
@@ -292,7 +295,7 @@ export class Expr {
    * @returns {T}
    */
   fold<T> (initial: T, combine: (acc: T, expr: Expr) => TraverseValue<T>): T {
-    const [value, _] = unwrap(this._fold(initial, combine));
+    const [value] = unwrap(this._fold(initial, combine));
     return value ?? initial;
   }
 
@@ -371,6 +374,7 @@ export class Expr {
   _infer (options:{max: number, maxArgs: number}, nargs: number): TermInfo {
     const probe:FreeVar[] = [];
     let steps = 0;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let expr:Expr = this;
     // eslint-disable-next-line no-labels
     main: for (let i = 0; i < options.maxArgs; i++) {
@@ -393,7 +397,7 @@ export class Expr {
             { maxArgs: options.maxArgs - nargs, max: options.max - steps }, // limit recursion
             nargs + i // avoid variable name clashes
           );
-          steps += sub.steps;
+          steps += sub.steps ?? 0;
           if (!sub.expr)
             // eslint-disable-next-line no-labels
             break main; // press f to pay respects
@@ -450,7 +454,7 @@ export class Expr {
    * @param {number} [maxWeight] - maximum allowed weight of terms in the sequence
    * @return {IterableIterator<{expr: Expr, steps?: number, comment?: string}>}
    */
-  * toLambda (options = {}) {
+  * toLambda (options: { max?: number, maxArgs?: number } = {}) {
     let expr:Expr | null = this.traverse(e => {
       if (e instanceof FreeVar || e instanceof App || e instanceof Lambda || e instanceof Alias)
         return null; // no change
@@ -467,12 +471,12 @@ export class Expr {
           return null;
         if (e instanceof App && e.fun instanceof Lambda) {
           const guess = e.infer({ max: options.max, maxArgs: options.maxArgs });
-          steps += guess.steps;
+          steps += guess.steps ?? 0;
           if (!guess.normal) {
             seen.add(e);
             return null;
           }
-          return control.stop(guess.expr);
+          return control.stop(guess.expr) as TraverseValue<Expr>;
         }
       });
       yield { expr, steps };
@@ -490,7 +494,7 @@ export class Expr {
    * @param {{max?: number}} [options]
    * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
    */
-  * toSKI (options = {}) {
+  * toSKI (_options = {}) {
     // options are ignored completely, TODO remove
     // get rid of non-lambdas
     let expr:Expr|null = this.traverse(e => {
@@ -506,17 +510,17 @@ export class Expr {
         if (!(e instanceof Lambda) || (e.impl instanceof Lambda))
           return null; // continue
         if (e.impl === e.arg)
-          return control.stop(native.I);
+          return control.stop(native.I as Expr);
         if (!e.impl.any(t => t === e.arg))
-          return control.stop(native.K.apply(e.impl));
+          return control.stop(native.K.apply(e.impl)) as TraverseValue<Expr>;
         // TODO use real assert here. e.impl contains e.arg and also isn't e.arg, in MUST be App.
         if (!(e.impl instanceof App))
           throw new Error('toSKI: assert failed: lambda body is of unexpected type ' + e.impl.constructor.name );
         // eta-reduction: body === (not e.arg) (e.arg)
         if (e.impl.arg === e.arg && !e.impl.fun.any(t => t === e.arg))
-          return control.stop(e.impl.fun);
+          return control.stop(e.impl.fun) as TraverseValue<Expr>;
         // last resort, go S
-        return control.stop(native.S.apply(new Lambda(e.arg, e.impl.fun), new Lambda(e.arg, e.impl.arg)));
+        return control.stop(native.S.apply(new Lambda(e.arg, e.impl.fun), new Lambda(e.arg, e.impl.arg))) as TraverseValue<Expr>;
       })
       yield { expr, steps, final: !next };
       steps++;
@@ -558,7 +562,7 @@ export class Expr {
    * @param {Expr} arg
    * @returns {Partial | null}
    */
-  invoke (arg:Expr): Invocation | null {
+  invoke (_arg:Expr): Invocation | null {
     return null;
   }
 
@@ -576,7 +580,7 @@ export class Expr {
    * @param {Expr} args
    * @return {{expr: Expr, steps: number, final: boolean}}
    */
-  run (opt? : RunOptions|Expr = {}, ...args: Expr[]): Run {
+  run (opt : RunOptions|Expr = {}, ...args: Expr[]): Run {
     if (opt instanceof Expr) {
       args.unshift(opt);
       opt = {};
@@ -609,6 +613,7 @@ export class Expr {
   * walk (options : { max?: number } = {}): IterableIterator<Run> {
     const max = options.max ?? Infinity;
     let steps = 0;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let expr:Expr = this;
     let final = false;
 
@@ -663,7 +668,7 @@ export class Expr {
    * @param {boolean} [swap]  If true, the order of expressions is reversed in the output.
    * @returns {string|null}
    */
-  diff (other:Expr, swap = false) {
+  diff (other:Expr, swap = false): string | null {
     if (this === other)
       return null;
     if (other instanceof Alias)
@@ -694,7 +699,7 @@ export class Expr {
 
     // TODO wanna use AssertionError but browser doesn't recognize it
     // still the below hack works for mocha-based tests.
-    const poorMans = new Error(comment + diff);
+    const poorMans = new Error(comment + diff) as Error & { expected?: string, actual?: string };
     poorMans.expected = this.diag();
     poorMans.actual = actual.diag();
     throw poorMans;
@@ -714,7 +719,7 @@ export class Expr {
    * @param {boolean} [first] - whether this is the first term in a sequence
    * @return {boolean}
    */
-  _braced (first?:boolean): boolean {
+  _braced (_first?:boolean): boolean {
     return false;
   }
 
@@ -724,7 +729,7 @@ export class Expr {
    * @returns {boolean}
    * @private
    */
-  _unspaced (arg: Expr): boolean {
+  _unspaced (_arg: Expr): boolean {
     return this._braced(true);
   }
 
@@ -764,20 +769,20 @@ export class Expr {
   format (options: FormatOptions = {}): string {
     const fallback = options.html
       ? {
-        brackets: ['(', ')'],
+        brackets: ['(', ')']      as [string, string],
         space:    ' ',
-        var:      ['<var>', '</var>'],
-        lambda:   ['', '-&gt;', ''],
-        around:   ['', ''],
-        redex:    ['', ''],
+        var:      ['<var>', '</var>'] as [string, string],
+        lambda:   ['', '-&gt;', ''] as [string, string, string],
+        around:   ['', '']        as [string, string],
+        redex:    ['', '']        as [string, string],
       }
       : {
-        brackets: ['(', ')'],
+        brackets: ['(', ')']  as [string, string],
         space:    ' ',
-        var:      ['', ''],
-        lambda:   ['', '->', ''],
-        around:   ['', ''],
-        redex:    ['', ''],
+        var:      ['', '']    as [string, string],
+        lambda:   ['', '->', ''] as [string, string, string],
+        around:   ['', '']    as [string, string],
+        redex:    ['', '']    as [string, string],
       }
     return this._format({
       terse:     options.terse    ?? true,
@@ -799,7 +804,7 @@ export class Expr {
    * @returns {string}
    * @private
    */
-  _format (options: FormatOptions, nargs: number): string {
+  _format (_options: FormatOptions, _nargs: number): string {
     throw new Error( 'No _format() method defined in class ' + this.constructor.name );
   }
 
@@ -878,13 +883,13 @@ export class App extends Expr {
   _traverse_descend (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
     const [fun, fAction] = unwrap(this.fun._traverse_redo(options, change));
     if (fAction === control.stop)
-      return control.stop(fun ? fun.apply(this.arg) : null);
+      return control.stop(fun ? fun.apply(this.arg) : null) as TraverseValue<Expr>;
 
     const [arg, aAction] = unwrap(this.arg._traverse_redo(options, change));
 
     const final:Expr|null = (fun || arg) ? (fun ?? this.fun).apply(arg ?? this.arg) : null;
     if (aAction === control.stop)
-      return control.stop(final);
+      return control.stop(final) as TraverseValue<Expr>;
     return final;
   }
 
@@ -956,7 +961,7 @@ export class App extends Expr {
       return partial(arg);
     } else {
       // invoke = null => we're uncomputable, cache for next time
-      this.invoke = _ => null;
+      this.invoke = (_arg: Expr) => null;
       return null;
     }
   }
@@ -985,15 +990,15 @@ export class App extends Expr {
   _format (options:FormatOptions, nargs: number): string {
     const fun = this.fun._format(options, nargs + 1);
     const arg = this.arg._format(options, 0);
-    const wrap = nargs ? ['', ''] : options.around;
+    const wrap = nargs ? ['', ''] : options.around!;
     // TODO ignore terse for now
     if (options.terse && !this.arg._braced(false))
       return wrap[0] + fun + (this.fun._unspaced(this.arg) ? '' : options.space) + arg + wrap[1];
     else
-      return wrap[0] + fun + options.brackets[0] + arg + options.brackets[1] + wrap[1];
+      return wrap[0] + fun + options.brackets![0] + arg + options.brackets![1] + wrap[1];
   }
 
-  _unspaced (arg) {
+  _unspaced (arg: Expr): boolean {
     return this.arg._braced(false) ? true : this.arg._unspaced(arg);
   }
 }
@@ -1007,7 +1012,7 @@ export class Named extends Expr {
   name: string;
   fancyName?: string;
 
-  constructor (name) {
+  constructor (name: string) {
     super();
     if (typeof name !== 'string' || name.length === 0)
       throw new Error('Attempt to create a named term with improper name');
@@ -1027,7 +1032,7 @@ export class Named extends Expr {
     // NOTE fancyName is not yet official and may change name or meaning
     const name = options.html ? this.fancyName ?? this.name : this.name;
     return this.arity !== undefined && this.arity > 0 && this.arity <= nargs
-      ? options.redex[0] + name + options.redex[1]
+      ? options.redex![0] + name + options.redex![1]
       : name;
   }
 }
@@ -1083,9 +1088,9 @@ export class FreeVar extends Named {
     return null;
   }
 
-  _format (options:FormatOptions, nargs: number): string {
+  _format (options:FormatOptions, _nargs: number): string {
     const name = options.html ? this.fancyName ?? this.name : this.name;
-    return options.var[0] + name + options.var[1];
+    return options.var![0] + name + options.var![1];
   }
 
   static global = ['global'];
@@ -1163,7 +1168,7 @@ export class Lambda extends Expr {
 
     const final = impl ? new Lambda(this.arg, impl) : null;
 
-    return iAction === control.stop ? control.stop(final) : final;
+    return iAction === control.stop ? control.stop(final) as unknown as TraverseValue<Expr> : final;
   }
 
   any (predicate: (e: Expr) => boolean): boolean {
@@ -1178,7 +1183,7 @@ export class Lambda extends Expr {
       return control.stop(value);
     const [iValue, iAction] = unwrap(this.impl._fold(value, combine));
     if (iAction === control.stop)
-      return control.stop(iValue);
+      return control.stop(iValue) as unknown as TraverseValue<T>;
     return iValue ?? value;
   }
 
@@ -1202,15 +1207,15 @@ export class Lambda extends Expr {
   }
 
   _format (options: FormatOptions, nargs: number): string {
-    return (nargs > 0 ? options.brackets[0] : '')
-      + options.lambda[0]
+    return (nargs > 0 ? options.brackets![0] : '')
+      + options.lambda![0]
       + this.arg._format(options, 0) // TODO highlight redex if nargs > 0
-      + options.lambda[1]
-      + this.impl._format(options, 0) + options.lambda[2]
-      + (nargs > 0 ? options.brackets[1] : '');
+      + options.lambda![1]
+      + this.impl._format(options, 0) + options.lambda![2]
+      + (nargs > 0 ? options.brackets![1] : '');
   }
 
-  _braced (first: boolean): boolean {
+  _braced (_first: boolean): boolean {
     return true;
   }
 }
@@ -1223,7 +1228,7 @@ export class Church extends Expr {
    */
   n: number;
   constructor (n: number) {
-    n = Number.parseInt(n);
+    n = Number.parseInt(String(n));
     if (!(n >= 0))
       throw new Error('Church number must be a non-negative integer');
     super();
@@ -1249,13 +1254,13 @@ export class Church extends Expr {
       : '[' + this.n + ' != ' + other.n + ']';
   }
 
-  _unspaced (arg: Expr): boolean {
+  _unspaced (_arg: Expr): boolean {
     return false;
   }
 
   _format (options: FormatOptions, nargs: number): string {
     return nargs >= 2
-      ? options.redex[0] + this.n + options.redex[1]
+      ? options.redex![0] + this.n + options.redex![1]
       : this.n + '';
   }
 }
@@ -1294,7 +1299,7 @@ export class Alias extends Named {
 
     this._setup(options);
     this.terminal = options.terminal ?? this.props?.proper;
-    this.invoke = waitn(impl, this.arity ?? 0);
+    this.invoke = waitn(impl, this.arity ?? 0) as (arg: Expr) => Invocation;
   }
 
   /**
@@ -1327,7 +1332,7 @@ export class Alias extends Named {
       return control.stop(value);
     const [iValue, iAction] = unwrap(this.impl._fold(value, combine));
     if (iAction === control.stop)
-      return control.stop(iValue);
+      return control.stop(iValue) as unknown as TraverseValue<T>;
     return iValue ?? value;
   }
 
@@ -1378,7 +1383,7 @@ function addNative (name: string, impl: (arg: Expr) => Invocation, opt : {note?:
   native[name] = new Native(name, impl, opt);
 }
 addNative('I', x => x);
-addNative('K', x => _ => x);
+addNative('K', x => _y => x);
 addNative('S', x => y => z => x.apply(z, y.apply(z)));
 addNative('B', x => y => z => x.apply(y.apply(z)));
 addNative('C', x => y => z => x.apply(z).apply(y));

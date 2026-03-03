@@ -52,11 +52,13 @@ export function restrict (set:Set<string>, spec?: string) {
   if (!spec)
     return set;
   let out = new Set([...set]);
+  /* eslint-disable @typescript-eslint/no-use-before-define */
   const act : {[key: string]: (s: string) => void} = {
     '=': sym => { out = new Set([sym]); mode = '+'; },
     '+': sym => { out.add(sym); },
     '-': sym => { out.delete(sym); },
   };
+  /* eslint-enable @typescript-eslint/no-use-before-define */
 
   let mode = '=';
   for (const sym of tokRestrict.split(spec)) {
@@ -68,7 +70,9 @@ export function restrict (set:Set<string>, spec?: string) {
   return out;
 }
 
+// eslint-disable-next-line no-use-before-define
 export type TraverseDecorator<T> = (value: T) => TraverseControl<T>;
+// eslint-disable-next-line no-use-before-define
 export type TraverseValue<T> = T | TraverseControl<T> | null | undefined;
 
 export class TraverseControl<T> {
@@ -118,10 +122,9 @@ export function unwrap<T> (value: TraverseValue<T>): [T?, TraverseDecorator<T>?]
  * @param {string} [label]
  * @returns {function(T): TraverseControl<T>}
  */
-export function prepareWrapper<T> (label: string): TraverseDecorator<T> {
-  const fun: TraverseDecorator<T> = value => new TraverseControl(value, fun);
-  // @ts-ignore
-  fun.label = label;
+export function prepareWrapper (label: string): <T>(value: T) => TraverseControl<T> {
+  const fun = <T>(value: T) => new TraverseControl<T>(value, fun as TraverseDecorator<T>);
+  (fun as { label?: string }).label = label;
   fun.toString = () => 'TraverseControl::' + label;
   return fun;
 }

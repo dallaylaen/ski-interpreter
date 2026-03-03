@@ -1,6 +1,6 @@
 'use strict';
 
-import { Expr, Alias, FreeVar, FormatOptions, TermInfo } from './expr';
+import { Expr, Alias, FreeVar, Named, FormatOptions, TermInfo } from './expr';
 import { Quest } from './quest';
 import { toposort } from './toposort';
 
@@ -56,21 +56,22 @@ function search (seed: Expr[], options: SearchOptions, predicate: SearchCallback
   const hasSeen = infer && !options.noskip;
 
   // cache[i] = ith generation, 0 is empty
-  const cache = [[]];
+  const cache: Expr[][] = [[]];
   let total = 0;
   let probed = 0;
   const seen: {[s: string]: boolean} = {};
 
-  const maybeProbe = term => {
+  const maybeProbe = (term: Expr) => {
     total++;
     const props = infer ? term.infer({ max: options.max, maxArgs: options.maxArgs }) : null;
-    if (hasSeen && props.expr) {
-      if (seen[props.expr])
-        return { res: -1 };
-      seen[props.expr] = true;
+    if (hasSeen && props && props.expr) {
+      const key = String(props.expr);
+      if (seen[key])
+        return { res: -1 as number | undefined, props };
+      seen[key] = true;
     }
     probed++;
-    const res = predicate(term, props);
+    const res = predicate(term, props!);
     return { res, props };
   };
 
@@ -104,13 +105,13 @@ function search (seed: Expr[], options: SearchOptions, predicate: SearchCallback
           const term = a.apply(b);
           const { res, props } = maybeProbe(term);
 
-          if (res > 0)
+          if ((res ?? 0) > 0)
             return { expr: term, total, probed, gen, ...(options.retain ? { cache } : {}) };
-          else if (res < 0)
+          else if ((res ?? 0) < 0)
             continue;
 
           // if the term is not reducible, it is more likely to be a dead end, so we push it further away
-          const offset = infer
+          const offset = infer && props
             ? ((props.expr ? 0 : 3) + (props.dup ? 1 : 0) + (props.proper ? 0 : 1))
             : 0;
           if (!cache[gen + offset])
@@ -144,14 +145,14 @@ function deepFormat (obj: any, options : FormatOptions = {}): any {
   if (obj instanceof Quest.Case)
     return 'Quest.Case';
   if (Array.isArray(obj))
-    return obj.map(deepFormat);
+    return obj.map(item => deepFormat(item, options));
   if (typeof obj !== 'object' || obj === null || obj.constructor !== Object)
     return obj;
 
   // default = plain object
-  const out = {};
+  const out: { [key: string]: unknown } = {};
   for (const key in obj)
-    out[key] = deepFormat(obj[key]);
+    out[key] = deepFormat(obj[key], options);
 
   return out;
 }
