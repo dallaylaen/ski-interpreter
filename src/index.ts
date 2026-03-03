@@ -20,13 +20,13 @@ export class SKI extends Parser {
   static W = native.W;
 
   // variable generator shortcut
-  static vars (scope: object={}): { [key: string]: FreeVar } {
+  static vars (scope: object = {}): { [key: string]: FreeVar } {
     const vars: { [key: string]: FreeVar } = {};
     return new Proxy(vars, {
       get (target, prop: string) {
-        if (!(prop in target)) {
+        if (!(prop in target))
           target[prop] = new FreeVar(prop, scope);
-        }
+
         return target[prop];
       }
     });

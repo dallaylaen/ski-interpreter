@@ -118,11 +118,10 @@ export function unwrap<T> (value: TraverseValue<T>): [T?, TraverseDecorator<T>?]
  * @param {string} [label]
  * @returns {function(T): TraverseControl<T>}
  */
-export function prepareWrapper<T> (label: string): TraverseDecorator<T>{
+export function prepareWrapper<T> (label: string): TraverseDecorator<T> {
   const fun: TraverseDecorator<T> = value => new TraverseControl(value, fun);
   // @ts-ignore
   fun.label = label;
   fun.toString = () => 'TraverseControl::' + label;
   return fun;
 }
-

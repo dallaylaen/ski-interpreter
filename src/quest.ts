@@ -363,7 +363,7 @@ class Case {
   }
 
   parse (src) {
-    return new Subst(this.engine.parse(src, { env: this.env, scope: this,  }), this.input);
+    return new Subst(this.engine.parse(src, { env: this.env, scope: this  }), this.input);
   }
 
   /**
@@ -588,5 +588,3 @@ function checkHtml (str) {
 
 Quest.Group = Group;
 Quest.Case = Case;
-
-

@@ -111,6 +111,7 @@ export class Expr {
     src?: string,
     parser: object,
   }
+
   arity?: number;
   note?: string;
   props?: TermInfo;
@@ -212,7 +213,6 @@ export class Expr {
    * @param {(e:Expr) => TraverseValue<Expr>} change
    * @returns {Expr|null}
    */
-
 
   traverse (
     options: TraverseOptions | TraverseCallback,
@@ -576,7 +576,7 @@ export class Expr {
    * @param {Expr} args
    * @return {{expr: Expr, steps: number, final: boolean}}
    */
-  run (opt? : RunOptions|Expr={}, ...args: Expr[]): Run {
+  run (opt? : RunOptions|Expr = {}, ...args: Expr[]): Run {
     if (opt instanceof Expr) {
       args.unshift(opt);
       opt = {};
@@ -1139,8 +1139,8 @@ export class Lambda extends Expr {
   constructor (arg: FreeVar, impl: Expr) {
     super();
 
-    if(!(arg instanceof FreeVar))
-        throw new Error('Lambda argument must be a FreeVar');
+    if (!(arg instanceof FreeVar))
+      throw new Error('Lambda argument must be a FreeVar');
 
     // localize argument variable and bind it to oneself
     const local = new FreeVar(arg.name, this);
@@ -1189,7 +1189,7 @@ export class Lambda extends Expr {
     return change ? new Lambda(this.arg, change) : null;
   }
 
-  diff (other: Expr , swap = false): string | null {
+  diff (other: Expr, swap = false): string | null {
     if (!(other instanceof Lambda))
       return super.diff(other, swap);
 
@@ -1373,8 +1373,6 @@ export class Alias extends Named {
 // declare native combinators
 
 // redeclare `native` type with `Native` class
-
-
 
 function addNative (name: string, impl: (arg: Expr) => Invocation, opt : {note?: string} = {}): void {
   native[name] = new Native(name, impl, opt);

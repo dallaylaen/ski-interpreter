@@ -481,11 +481,11 @@ export class Parser {
     }
   }
 
-/**
+  /**
  *  Public static shortcuts to common functions (see also ./extras.js)
  */
 
-/**
+  /**
  * @desc Create a proxy object that generates variables on demand,
  *       with names corresponding to the property accessed.
  *       Different invocations will return distinct variables,
@@ -501,6 +501,4 @@ export class Parser {
  * @param {T} [scope] - optional context to bind the generated variables to
  * @return {{[key: string]: FreeVar}}
  */
-
-
 }
