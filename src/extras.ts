@@ -1,8 +1,8 @@
 'use strict';
 
-const { Expr, Alias, FreeVar } = require('./expr');
-const { Quest } = require('./quest');
-const { toposort } = require('./toposort');
+import { Expr, Alias, FreeVar, FormatOptions, TermInfo } from './expr';
+import { Quest } from './quest';
+import { toposort } from './toposort';
 
 /**
  * @desc  Extra utilities that do not belong in the core.
@@ -33,7 +33,21 @@ const { toposort } = require('./toposort');
  * @param {(e: Expr, props: {}) => number?} predicate
  * @return {{expr?: Expr, total: number, probed: number, gen: number, cache?: Expr[][]}}
  */
-function search (seed, options, predicate) {
+type SearchOptions = {
+  depth?: number;
+  tries?: number;
+  infer?: boolean;
+  maxArgs?: number;
+  max?: number;
+  noskip?: boolean;
+  retain?: boolean;
+  progress?: (info: { gen: number, total: number, probed: number, step: boolean }) => void;
+  progressInterval?: number;
+};
+type SearchCallback = (e: Expr, props: TermInfo) => (number | undefined);
+type SearchResult = { expr?: Expr, total: number, probed: number, gen: number, cache?: Expr[][] };
+
+function search (seed: Expr[], options: SearchOptions, predicate: SearchCallback): SearchResult {
   const {
     depth = 16,
     infer = true,
@@ -45,7 +59,7 @@ function search (seed, options, predicate) {
   const cache = [[]];
   let total = 0;
   let probed = 0;
-  const seen = {};
+  const seen: {[s: string]: boolean} = {};
 
   const maybeProbe = term => {
     total++;
@@ -62,7 +76,7 @@ function search (seed, options, predicate) {
 
   // sieve through the seed
   for (const term of seed) {
-    const { res } = maybeProbe(term);
+    const { res = 0 } = maybeProbe(term);
     if (res > 0)
       return { expr: term, total, probed, gen: 1 };
     else if (res < 0)
@@ -71,7 +85,7 @@ function search (seed, options, predicate) {
     cache[0].push(term);
   }
 
-  let lastProgress;
+  let lastProgress = 0;
 
   for (let gen = 1; gen < depth; gen++) {
     if (options.progress) {
@@ -81,7 +95,7 @@ function search (seed, options, predicate) {
     for (let i = 0; i < gen; i++) {
       for (const a of cache[gen - i - 1] || []) {
         for (const b of cache[i] || []) {
-          if (total >= options.tries)
+          if (total >= (options.tries ?? Infinity))
             return { total, probed, gen, ...(options.retain ? { cache } : {}) };
           if (options.progress && total - lastProgress >= progressInterval) {
             options.progress({ gen, total, probed, step: false });
@@ -118,12 +132,10 @@ function search (seed, options, predicate) {
  *       May be useful for debugging or diagnostic output.
  *
  * @experimental
- *
- * @param {any} obj
- * @param {object} [options] - see Expr.format()
- * @returns {any}
  */
-function deepFormat (obj, options = {}) {
+// yes allow any in this function, it's pattern matched into correct classes during traverse
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function deepFormat (obj: any, options : FormatOptions = {}): any {
   if (obj instanceof Expr)
     return obj.format(options);
   // TODO for quests, use toJSON when it's ready
@@ -158,7 +170,7 @@ function deepFormat (obj, options = {}) {
  * @param {{[s: string]: Named}} [env]
  * @returns {string}
  */
-function declare (expr, env) {
+function declare (expr: Expr, env: { [s: string]: Named } = {}): string {
   const res = toposort([expr], env);
 
   return res.list.map(s => {
@@ -170,4 +182,4 @@ function declare (expr, env) {
   }).join('; ');
 }
 
-module.exports = { search, deepFormat, declare, toposort };
+export const extras = { search, deepFormat, declare, toposort };

@@ -3,7 +3,7 @@ import { Parser } from './parser';
 
 const { Quest } = require ('./quest');
 const { toposort } = require ('./toposort');
-const extras = require ('./extras');
+import { extras } from './extras';
 extras.toposort = toposort;
 
 export class SKI extends Parser {
