@@ -1,81 +1,77 @@
-const { Parser } = require('./parser');
-const { Expr, FreeVar, Alias, Lambda, Named, control } = require('./expr');
+import { Parser } from './parser';
+import { Expr, FreeVar, Alias, Lambda, Named, control } from './expr';
 
-/**
- * @typedef {{
- *   pass: boolean,
- *   reason?: string,
- *   steps: number,
- *   start: Expr,
- *   found: Expr,
- *   expected: Expr,
- *   note?: string,
- *   args: Expr[],
- *   case: Case
- * }} CaseResult
- */
+export type CaseResult = {
+  pass: boolean,
+  reason?: string,
+  steps: number,
+  start: Expr,
+  found: Expr,
+  expected: Expr,
+  note?: string,
+  args: Expr[],
+  case: Case
+};
 
-/**
- * @typedef {{
- *   linear?: boolean,
- *   affine?: boolean,
- *   normal?: boolean,
- *   proper?: boolean,
- *   discard?: boolean,
- *   duplicate?: boolean,
- *   arity?: number,
- * }} Capability
- */
+export type Capability = {
+  linear?: boolean,
+  affine?: boolean,
+  normal?: boolean,
+  proper?: boolean,
+  discard?: boolean,
+  duplicate?: boolean,
+  arity?: number,
+};
 
-/**
- * @typedef {
- *   [string, string]
- *   | [{max?: number}, string, string]
- *   | [{caps: Capability, max?: number}, string]
- * } TestCase
- */
+export type TestCase =
+  [string, string]
+  | [{max?: number}, string, string]
+  | [{caps: Capability, max?: number}, string];
 
-/**
- * @typedef {string | {name: string, fancy?: string, allow?: string, numbers?: boolean, lambdas?: boolean}} InputSpec
- */
+export type InputSpec = {
+  name: string,
+  fancy?: string,
+  allow?: string,
+  numbers?: boolean,
+  lambdas?: boolean
+};
 
-/**
- * @typedef {{
- *   pass: boolean,
- *   details: CaseResult[],
- *   expr?: Expr,
- *   input: Expr[]|string[],
- *   exception?: Error,
- *   steps: number,
- *   weight?: number
- * }} QuestResult
- */
+export type QuestResult = {
+  pass: boolean,
+  details: CaseResult[],
+  expr?: Expr,
+  input: Expr[]|string[],
+  exception?: Error,
+  steps: number,
+  weight?: number
+};
 
-/**
- * @typedef {{
- *    input: InputSpec | InputSpec[],
- *    cases: TestCase[],
- *
- *    // the rest is optional
- *
- *    allow?: string,
- *    numbers?: boolean,
- *    env?: string[],
- *    engine?: Parser,
- *    engineFull?: Parser,
- *
- *    // metadata, also any fields not listed here will go to quest.meta.???
- *    id?: string|number,
- *    name?: string,
- *    intro?: string|string[], // multiple strings will be concatenated with spaces
- * }} QuestSpec
- */
+// metadata not typechecked as long as it's an object
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type QuestMeta = { [key: string]: any };
 
-/**
- * @typedef {{ accepted?: string[][], rejected?: string[][] }} SelfCheck
- */
+export type QuestSpec = {
+  input: string | InputSpec | (string | InputSpec)[],
+  cases: TestCase[],
 
-class Quest {
+  // the rest is optional
+
+  allow?: string,
+  numbers?: boolean,
+  lambdas?: boolean,
+  env?: string[],
+  engine?: Parser,
+  engineFull?: Parser,
+
+  // metadata, also any fields not listed here will go to quest.meta.???
+  id?: string | number,
+  name?: string,
+  intro?: string | string[], // multiple strings will be concatenated with spaces
+} & QuestMeta;
+
+export type SelfCheck = { accepted?: string[][], rejected?: string[][] };
+
+export class Quest {
   /**
    * @description A combinator problem with a set of test cases for the proposed solution.
    * @param {QuestSpec} options
@@ -93,9 +89,24 @@ class Quest {
    *                       //     despite having the same name.
    * quest.check('I');     // fail! I not in the allowed list.
    */
-  constructor (options) {
+  input: (InputSpec & {placeholder: FreeVar})[];
+  cases: Case[];
+
+  engineFull: Parser;
+  engine: Parser;
+  restrict: { allow?: string, numbers?: boolean, lambdas?: boolean };
+  env: { [key: string]: Expr };
+  envFull: { [key: string]: Expr };
+  id?: string | number;
+  name?: string
+  intro?: string;
+  // yes allow any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  meta?: QuestMeta;
+
+  constructor (options: QuestSpec) {
     const { input, cases, allow, numbers, lambdas, engine, engineFull, ...meta } = options;
-    const env = options.env ?? options.vars; // backwards compatibility
+    const env = options.env ?? []; // backwards compatibility
 
     //
     this.engineFull = engineFull ?? new Parser();
@@ -109,7 +120,7 @@ class Quest {
     // we suck all free variables + all term declarations from there into this.env
     // to feed it later to every case's parser.
     for (const term of env ?? []) {
-      const expr = this.engineFull.parse(term, { env: jar, scope: this });
+      const expr: Expr = this.engineFull.parse(term, { env: jar, scope: this });
       if (expr instanceof Alias)
         this.env[expr.name] = new Alias(expr.name, expr.impl, { terminal: true, canonize: false });
         // Canonized aliases won't expand with insufficient arguments,
@@ -325,9 +336,12 @@ class Quest {
      *
      * @return {TestCase[]}
      */
-  show () {
+  show ():Case[] {
     return [...this.cases];
   }
+
+  static Group: Function;
+  static Case: Function;
 }
 
 class Case {
@@ -575,4 +589,4 @@ function checkHtml (str) {
 Quest.Group = Group;
 Quest.Case = Case;
 
-module.exports = { Quest };
+

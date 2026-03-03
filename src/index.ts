@@ -1,7 +1,7 @@
 import { classes, native, control, FreeVar, Church, Native } from './expr';
 import { Parser } from './parser';
 
-const { Quest } = require ('./quest');
+import { Quest } from './quest';
 import { toposort } from './toposort';
 import { extras } from './extras';
 extras.toposort = toposort;

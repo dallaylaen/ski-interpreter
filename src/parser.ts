@@ -356,7 +356,7 @@ export class Parser {
    * @param {string} [options.allow]
    * @return {Expr}
    */
-  parse (source, options = {}) {
+  parse (source: string, options = {}): Expr {
     if (typeof source !== 'string')
       throw new Error('parse: source must be a string, got ' + typeof source);
 
