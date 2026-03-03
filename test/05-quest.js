@@ -122,11 +122,9 @@ describe('Quest', () => {
     expect(fail.details[0].reason).to.match(/in 20 steps/);
   });
 
-
-
   it('honors given vars 2', () => {
     const quest = new Quest({
-      env:  ['nil=KI', 'lst=BS(C(BB))'],
+      env:   ['nil=KI', 'lst=BS(C(BB))'],
       input: 'rev',
       cases: [
         ['rev nil', 'nil'],
@@ -206,7 +204,7 @@ describe('Quest', () => {
     const quest = new Quest({
       input:  'phi',
       allow:  'J',
-      env:   ['A=a->b->b'],
+      env:    ['A=a->b->b'],
       engine: new SKI().add('J', 'a->b->c->d->a b (a d c)'),
     });
 
@@ -216,14 +214,14 @@ describe('Quest', () => {
   it('allows named constants in input', () => {
     const quest = new Quest({
       input: 'phi',
-      env:  ['arg'],
+      env:   ['arg'],
       cases: [
         ['phi x', 'x arg'],
       ],
     });
     const passing = quest.check('SI(K arg)').details[0];
     passing.expected.expect(passing.found);
-    expect(passing.reason).to.equal(undefined);
+    expect(passing.reason).to.equal(null);
     expect(passing.pass).to.equal(true, 'should pass with named constant');
 
     const failing = quest.check('K(x arg)').details[0];
