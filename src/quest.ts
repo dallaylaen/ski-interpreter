@@ -1,5 +1,5 @@
 import { Parser } from './parser';
-import { Expr, FreeVar, Alias, Lambda, Named, control } from './expr';
+import { Expr, FreeVar, Alias, Named, control } from './expr';
 
 export type CaseResult = {
   pass: boolean,
@@ -7,9 +7,10 @@ export type CaseResult = {
   steps: number,
   start: Expr,
   found: Expr,
-  expected: Expr,
+  expected?: Expr,
   note?: string,
   args: Expr[],
+  // eslint-disable-next-line no-use-before-define
   case: Case
 };
 
@@ -71,6 +72,14 @@ export type QuestSpec = {
 
 export type SelfCheck = { accepted?: string[][], rejected?: string[][] };
 
+type AddCaseOptions = {
+  engine?: Parser,
+  env?: { [key: string]: Expr },
+  max?: number,
+  note?: string,
+  caps?: Capability,
+};
+
 export class Quest {
   /**
    * @description A combinator problem with a set of test cases for the proposed solution.
@@ -90,6 +99,7 @@ export class Quest {
    * quest.check('I');     // fail! I not in the allowed list.
    */
   input: (InputSpec & {placeholder: FreeVar})[];
+  // eslint-disable-next-line no-use-before-define
   cases: Case[];
 
   engineFull: Parser;
@@ -154,7 +164,7 @@ export class Quest {
     this.meta = meta;
 
     for (const c of cases ?? [])
-      this.add(...c);
+      (this.add as (...args: unknown[]) => void)(...c);
   }
 
   /**
@@ -170,15 +180,16 @@ export class Quest {
       : env.map( s => '+' + s).join(' ');
   }
 
-  addInput (term) {
+  addInput (term: string | InputSpec): void {
     if (typeof term !== 'object')
       term = { name: term };
     if (typeof term.name !== 'string')
       throw new Error("quest 'input' field must be a string or a {name: string, ...} object");
 
-    term.placeholder = new FreeVar(term.name);
+    const full = term as InputSpec & { placeholder: FreeVar };
+    full.placeholder = new FreeVar(term.name);
     // TODO more checks
-    this.input.push(term);
+    this.input.push(full);
   }
 
   /**
@@ -187,21 +198,22 @@ export class Quest {
    * @param {string} terms
    * @return {Quest}
    */
-  add (opt, ...terms) {
+  add (opt: AddCaseOptions | string, ...terms: string[]) {
+    let o: AddCaseOptions;
     if (typeof opt === 'string') {
       terms.unshift(opt);
-      opt = {};
+      o = {};
     } else
-      opt = { ...opt };
+      o = { ...opt };
 
-    opt.engine = opt.engine  ?? this.engineFull;
-    opt.env = opt.env ?? this.envFull;
+    o.engine = o.engine  ?? this.engineFull;
+    o.env = o.env ?? this.envFull;
 
     const input = this.input.map( t => t.placeholder );
     this.cases.push(
-      opt.caps
-        ? new PropertyCase(input, opt, terms)
-        : new ExprCase(input, opt, terms)
+      o.caps
+        ? new PropertyCase(input, o, terms)
+        : new ExprCase(input, o, terms)
     );
     return this;
   }
@@ -211,7 +223,7 @@ export class Quest {
    * @param {string[]} input
    * @return {{terms: Expr[], weight: number}}
    */
-  prepare (...input) {
+  prepare (...input: string[]) {
     if (input.length !== this.input.length)
       throw new Error('Solutions provided ' + input.length + ' terms where ' + this.input.length + ' are expected');
 
@@ -248,10 +260,10 @@ export class Quest {
    * @param {string} input
    * @return {QuestResult}
    */
-  check (...input) {
+  check (...input: string[]): QuestResult {
     try {
       const { prepared, weight } = this.prepare(...input);
-      const details = this.cases.map( c => c.check(...prepared) );
+      const details = this.cases.map( c => c.check(...prepared) ) as unknown as CaseResult[];
       const pass = details.reduce((acc, val) => acc && val.pass, true);
       const steps = details.reduce((acc, val) => acc + val.steps, 0);
       return {
@@ -263,12 +275,12 @@ export class Quest {
         weight,
       };
     } catch (e) {
-      return { pass: false, details: [], exception: e, steps: 0, input };
+      return { pass: false, details: [], exception: e as Error, steps: 0, input };
     }
   }
 
-  verify (options) {
-    const findings = this.verifyMeta(options);
+  verify (options: { solutions?: SelfCheck | { [key: string | number]: SelfCheck }, seen?: Set<string | number>, date?: boolean }) {
+    const findings: { [key: string]: unknown } = this.verifyMeta(options);
     if (options.solutions) {
       const solCheck = this.verifySolutions(options.solutions);
       if (solCheck)
@@ -277,9 +289,9 @@ export class Quest {
     if (options.seen) {
       if (!this.id)
         findings.seen = 'No id in quest ' + (this.name ?? '(unnamed)');
-      if (options.seen.has(this.id))
+      if (options.seen.has(this.id!))
         findings.seen = 'Duplicate quest id ' + this.id;
-      options.seen.add(this.id); // mutating but who cares
+      options.seen.add(this.id!); // mutating but who cares
     }
     return Object.keys(findings).length ? findings : null;
   }
@@ -289,17 +301,19 @@ export class Quest {
    * @param {SelfCheck|{[key: string]: SelfCheck}} dataset
    * @return {{shouldPass: {input: string[], result: QuestResult}[], shouldFail: {input: string[], result: QuestResult}[]} | null}
    */
-  verifySolutions (dataset) {
+  verifySolutions (dataset: SelfCheck | { [key: string | number]: SelfCheck }) {
     // dataset is either a SelfCheck object or a hash of { quest_id: SelfCheck }
-    if (typeof dataset === 'object' && !Array.isArray(dataset?.accepted) && !Array.isArray(dataset?.rejected)) {
+    if (typeof dataset === 'object' && !Array.isArray((dataset as SelfCheck).accepted) && !Array.isArray((dataset as SelfCheck).rejected)) {
       // dataset is a hash of { quest_id: SelfCheck } so extract data
-      if (!this.id || !dataset[this.id])
+      if (!this.id || !(dataset as { [key: string | number]: SelfCheck })[this.id])
         return null; // no self-check data for this quest, skip
     }
 
-    const { accepted = [], rejected = [] } = dataset[this.id] ?? dataset;
+    const byId = this.id !== undefined ? (dataset as { [key: string | number]: SelfCheck })[this.id] : undefined;
+    const { accepted = [], rejected = [] } = byId ?? (dataset as SelfCheck);
 
-    const ret = { shouldPass: [], shouldFail: [] };
+    type SolEntry = { input: string[], result: QuestResult };
+    const ret: { shouldPass: SolEntry[], shouldFail: SolEntry[] } = { shouldPass: [], shouldFail: [] };
     for (const input of accepted) {
       const result = this.check(...input);
       if (!result.pass)
@@ -313,20 +327,20 @@ export class Quest {
     return (ret.shouldFail.length + ret.shouldPass.length) ? ret : null; // return null if all good
   }
 
-  verifyMeta (options = {}) {
-    const findings = {};
+  verifyMeta (options: { date?: boolean } = {}): { [key: string]: unknown } {
+    const findings: { [key: string]: unknown } = {};
 
     for (const field of ['name', 'intro']) {
-      const found = checkHtml(this[field]);
+      const found = checkHtml((this as unknown as { [key: string]: string })[field]);
       if (found)
         findings[field] = found;
     }
     if (options.date) {
-      const date = new Date(this.meta.created_at);
-      if (isNaN(date))
-        findings.date = 'invalid date format: ' + this.meta.created_at;
-      else if (date < new Date('2024-07-15') || date > new Date())
-        findings.date = 'date out of range: ' + this.meta.created_at;
+      const date = new Date(this.meta?.created_at);
+      if (isNaN(date.getTime()))
+        findings.date = 'invalid date format: ' + this.meta?.created_at;
+      else if (date.getTime() < new Date('2024-07-15').getTime() || date.getTime() > new Date().getTime())
+        findings.date = 'date out of range: ' + this.meta?.created_at;
     }
 
     return findings;
@@ -340,8 +354,10 @@ export class Quest {
     return [...this.cases];
   }
 
-  static Group: Function;
-  static Case: Function;
+  // eslint-disable-next-line no-use-before-define
+  static Group: new (options: { name?: string, intro?: string | string[], id?: string | number, content?: (Quest | QuestSpec)[] }) => { verify: (options: { seen?: Set<string | number>, date?: boolean }) => { [key: string]: unknown } };
+  // eslint-disable-next-line no-use-before-define
+  static Case: new (input: FreeVar[], options: AddCaseOptions) => Case;
 }
 
 class Case {
@@ -359,15 +375,15 @@ class Case {
   env: { [key: string]: Expr };
   input: FreeVar[];
   engine: Parser;
-  constructor (input, options) {
+  constructor (input: FreeVar[], options: AddCaseOptions) {
     this.max = options.max ?? 1000;
-    this.note = options.note;
+    this.note = options.note!;
     this.env = { ...(options.env ?? {}) }; // note: env already contains input placeholders
     this.input = input;
-    this.engine = options.engine;
+    this.engine = options.engine!;
   }
 
-  parse (src) {
+  parse (src: string) {
     return new Subst(this.engine.parse(src, { env: this.env, scope: this  }), this.input);
   }
 
@@ -375,12 +391,17 @@ class Case {
    * @param {Expr} expr
    * @return {CaseResult}
    */
-  check ( ...expr ) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  check ( ..._expr: Expr[] ): CaseResult {
     throw new Error('not implemented');
   }
 }
 
 class ExprCase extends Case {
+  // eslint-disable-next-line no-use-before-define
+  e1: Subst;
+  // eslint-disable-next-line no-use-before-define
+  e2: Subst;
   /**
    * @param {FreeVar[]} input
    * @param {{
@@ -391,22 +412,22 @@ class ExprCase extends Case {
    * }} options
    * @param {[e1: string, e2: string]} terms
    */
-  constructor (input, options, terms) {
+  constructor (input: FreeVar[], options: AddCaseOptions, terms: string[]) {
     if (terms.length !== 2)
       throw new Error('Case accepts exactly 2 strings');
 
     super(input, options);
 
-    [this.e1, this.e2] = terms.map( s => this.parse(s) );
+    [this.e1, this.e2] = terms.map( (s: string) => this.parse(s) );
   }
 
-  check (...args) {
+  check (...args: Expr[]): CaseResult {
     const e1 = this.e1.apply(args);
     const r1 = e1.run({ max: this.max });
     const e2 = this.e2.apply(args);
     const r2 = e2.run({ max: this.max });
 
-    let reason = null;
+    let reason: string | null = null;
     if (!r1.final || !r2.final)
       reason = 'failed to reach normal form in ' + this.max + ' steps';
     else
@@ -414,7 +435,7 @@ class ExprCase extends Case {
 
     return {
       pass:     !reason,
-      reason,
+      reason:   reason ?? undefined,
       steps:    r1.steps,
       start:    e1,
       found:    r1.expr,
@@ -426,7 +447,7 @@ class ExprCase extends Case {
   }
 }
 
-const knownCaps = {
+const knownCaps: { [key: string]: boolean } = {
   normal:    true,
   proper:    true,
   discard:   true,
@@ -437,8 +458,11 @@ const knownCaps = {
 }
 
 class PropertyCase extends Case {
+  // eslint-disable-next-line no-use-before-define
+  expr: Subst;
+  caps: Capability;
   // test that an expression uses all of its inputs exactly once
-  constructor (input, options, terms) {
+  constructor (input: FreeVar[], options: AddCaseOptions, terms: string[]) {
     super(input, options);
     if (terms.length > 1)
       throw new Error('PropertyCase accepts exactly 1 string');
@@ -449,7 +473,7 @@ class PropertyCase extends Case {
       throw new Error('PropertyCase: don\'t know how to test these capabilities: ' + unknown.join(', '));
 
     this.expr = this.parse(terms[0]);
-    this.caps = options.caps;
+    this.caps = { ...options.caps };
 
     if (this.caps.linear) {
       delete this.caps.linear;
@@ -465,20 +489,20 @@ class PropertyCase extends Case {
     }
   }
 
-  check (...expr) {
+  check (...expr: Expr[]): CaseResult {
     const start = this.expr.apply(expr);
     const r = start.run({ max: this.max });
     const guess = r.expr.infer({ max: this.max });
 
-    const reason = [];
+    const reason: string[] = [];
     for (const cap in this.caps) {
-      if (guess[cap] !== this.caps[cap])
-        reason.push('expected property ' + cap + ' to be ' + this.caps[cap] + ', found ' + guess[cap]);
+      if ((guess as unknown as { [key: string]: unknown })[cap] !== (this.caps as unknown as { [key: string]: unknown })[cap])
+        reason.push('expected property ' + cap + ' to be ' + (this.caps as unknown as { [key: string]: unknown })[cap] + ', found ' + (guess as unknown as { [key: string]: unknown })[cap]);
     }
 
     return {
       pass:   !reason.length,
-      reason: reason ? reason.join('\n') : null,
+      reason: reason.length ? reason.join('\n') : undefined,
       steps:  r.steps,
       start,
       found:  r.expr,
@@ -521,7 +545,8 @@ class Group {
   intro?: string;
   id?: string|number;
   content?: Quest[];
-  constructor (options) {
+
+  constructor (options: { name?: string, intro?: string | string[], id?: string | number, content?: (Quest | QuestSpec)[] }) {
     this.name = options.name;
     this.intro = list2str(options.intro);
     this.id = options.id;
@@ -531,18 +556,18 @@ class Group {
       this.content = options.content.map( c => c instanceof Quest ? c : new Quest(c) );
   }
 
-  verify (options) {
-    const findings = {};
-    const id = checkId(this.id, options.seen);
+  verify (options: { seen?: Set<string | number>, date?: boolean }): { [key: string]: unknown } {
+    const findings: { [key: string]: unknown } = {};
+    const id = checkId(this.id!, options.seen!);
     if (id)
       findings.id = id;
     for (const field of ['name', 'intro']) {
-      const found = checkHtml(this[field]);
+      const found = checkHtml((this as unknown as { [key: string]: string })[field]);
       if (found)
         findings[field] = found;
     }
 
-    findings.content = this.content.map(q => q.verify(options));
+    findings.content = this.content!.map(q => q.verify(options));
     return findings;
   }
 }
