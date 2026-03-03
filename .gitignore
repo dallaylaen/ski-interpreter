@@ -17,3 +17,8 @@ prof.txt
 
 # lib is now built by `npm build` and only used for dist
 lib
+# temp JS->TS move generated files
+src/index.js
+src/parser.js
+src/expr.js
+
