@@ -22,3 +22,4 @@ src/index.js
 src/parser.js
 src/expr.js
 src/extras.js
+src/toposort.js

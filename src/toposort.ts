@@ -1,4 +1,4 @@
-const { Expr, Named, control } = require('./expr');
+import { Expr, Named } from './expr';
 
 /**
  * @desc  Sort a list in such a way that dependent terms come after the (named) terms they depend on.
@@ -19,7 +19,8 @@ const { Expr, Named, control } = require('./expr');
  *    const expr = ski.parse(src);
  *    toposort([expr], ski.getTerms()); // returns all terms appearing in Expr in correct order
  */
-function toposort (list, env) {
+type ToposortResult = { list: Expr[], env: { [s: string]: Named } };
+export function toposort (list:Expr[]|Expr|undefined, env: { [s: string]: Named } | undefined): ToposortResult {
   if (list instanceof Expr)
     list = [list];
   if (env) {
@@ -28,20 +29,18 @@ function toposort (list, env) {
       list = Object.keys(env).sort().map(k => env[k]); // ensure deterministic order
   } else {
     if (!list)
-      return [];
-    if (!env) {
-      env = {};
-      for (const item of list) {
-        if (!(item instanceof Named))
-          continue;
-        if (env[item.name])
-          throw new Error('duplicate name ' + item);
-        env[item.name] = item;
-      }
+      return { list: [], env: {} };
+    env = {};
+    for (const item of list) {
+      if (!(item instanceof Named))
+        continue;
+      if (env[item.name])
+        throw new Error('duplicate name ' + item);
+      env[item.name] = item;
     }
   }
 
-  const out = [];
+  const out: Expr[] = [];
   const seen = new Set();
   const rec = term => {
     if (seen.has(term))
@@ -64,5 +63,3 @@ function toposort (list, env) {
     env,
   };
 }
-
-module.exports = { toposort };

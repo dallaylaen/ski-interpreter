@@ -2,7 +2,7 @@ import { classes, native, control, FreeVar, Church, Native } from './expr';
 import { Parser } from './parser';
 
 const { Quest } = require ('./quest');
-const { toposort } = require ('./toposort');
+import { toposort } from './toposort';
 import { extras } from './extras';
 extras.toposort = toposort;
 
