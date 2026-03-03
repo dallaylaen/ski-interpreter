@@ -122,9 +122,11 @@ describe('Quest', () => {
     expect(fail.details[0].reason).to.match(/in 20 steps/);
   });
 
-  it('honors given vars', () => {
+
+
+  it('honors given vars 2', () => {
     const quest = new Quest({
-      vars:  ['nil=KI', 'lst=BS(C(BB))'],
+      env:  ['nil=KI', 'lst=BS(C(BB))'],
       input: 'rev',
       cases: [
         ['rev nil', 'nil'],
@@ -204,7 +206,7 @@ describe('Quest', () => {
     const quest = new Quest({
       input:  'phi',
       allow:  'J',
-      vars:   ['A=a->b->b'],
+      env:   ['A=a->b->b'],
       engine: new SKI().add('J', 'a->b->c->d->a b (a d c)'),
     });
 
@@ -214,7 +216,7 @@ describe('Quest', () => {
   it('allows named constants in input', () => {
     const quest = new Quest({
       input: 'phi',
-      vars:  ['arg'],
+      env:  ['arg'],
       cases: [
         ['phi x', 'x arg'],
       ],
