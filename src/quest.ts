@@ -354,6 +354,11 @@ class Case {
    *   engine: Parser
    * }} options
    */
+  max: number;
+  note: string;
+  env: { [key: string]: Expr };
+  input: FreeVar[];
+  engine: Parser;
   constructor (input, options) {
     this.max = options.max ?? 1000;
     this.note = options.note;
@@ -490,12 +495,15 @@ class Subst {
    * @param {Expr} expr
    * @param {FreeVar[]} env
    */
-  constructor (expr, env) {
+  expr: Expr;
+  // TODO rename env => args wtf?
+  env: FreeVar[];
+  constructor (expr: Expr, env: FreeVar[]) {
     this.expr = expr;
     this.env = env;
   }
 
-  apply (list) {
+  apply (list:Expr[]):Expr {
     if (list.length !== this.env.length)
       throw new Error('Subst: expected ' + this.env.length + ' terms, got ' + list.length);
 
@@ -509,6 +517,10 @@ class Subst {
 
 // corresponds to "chapter" in the quest page
 class Group {
+  name?: string;
+  intro?: string;
+  id?: string|number;
+  content?: Quest[];
   constructor (options) {
     this.name = options.name;
     this.intro = list2str(options.intro);
@@ -523,7 +535,7 @@ class Group {
     const findings = {};
     const id = checkId(this.id, options.seen);
     if (id)
-      findings[this.id] = id;
+      findings.id = id;
     for (const field of ['name', 'intro']) {
       const found = checkHtml(this[field]);
       if (found)
@@ -540,13 +552,13 @@ class Group {
  * @param {string|Array<string>|undefined} str
  * @returns {string|undefined}
  */
-function list2str (str) {
+function list2str (str: string|string[]|undefined):string|undefined {
   if (str === undefined || typeof str === 'string')
     return str;
   return Array.isArray(str) ? str.join(' ') : '' + str;
 }
 
-function checkId (id, seen) {
+function checkId (id:string|number, seen:Set<string|number>) {
   if (id === undefined)
     return 'missing';
   if (typeof id !== 'string' && typeof id !== 'number' )
@@ -559,7 +571,7 @@ function checkId (id, seen) {
   // return nothing = success
 }
 
-function checkHtml (str) {
+function checkHtml (str: string): string | null {
   if (str === undefined)
     return 'missing';
   if (typeof str !== 'string')

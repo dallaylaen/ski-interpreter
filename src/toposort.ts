@@ -1,4 +1,5 @@
-import { Expr, Named } from './expr';
+import { Expr, Named, control } from './expr';
+import { TraverseValue } from './internal';
 
 /**
  * @desc  Sort a list in such a way that dependent terms come after the (named) terms they depend on.
@@ -42,13 +43,13 @@ export function toposort (list:Expr[]|Expr|undefined, env: { [s: string]: Named 
 
   const out: Expr[] = [];
   const seen = new Set();
-  const rec = term => {
+  const rec = (term: Expr) => {
     if (seen.has(term))
       return;
-    term.fold(null, (acc, e) => {
+    term.fold(false, (acc:boolean, e:Expr):TraverseValue<boolean> => {
       if (e !== term && e instanceof Named && env[e.name] === e) {
         rec(e);
-        return Expr.control.prune(null);
+        return control.prune(false);
       }
     });
     out.push(term);
