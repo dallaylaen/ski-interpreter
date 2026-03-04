@@ -20,7 +20,7 @@
     "ski": "bin/ski.js"
   },
   "scripts": {
-    "lint": "npx eslint --ext .js,.ts src test index.js bin",
+    "lint": "npx eslint --ext .js,.ts src test bin",
     "tsc": "npx tsc",
     "test": "npm run tsc; npx nyc mocha --recursive test",
     "build-web": "npx esbuild --bundle --minify --sourcemap --format=iife ./src/index.ts --outfile=docs/build/js/ski-interpreter.min.js",
