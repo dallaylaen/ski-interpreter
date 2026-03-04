@@ -21,14 +21,15 @@
   },
   "scripts": {
     "lint": "npx eslint --ext .js,.ts src test index.js bin",
-    "test": "npx nyc mocha --recursive test",
-    "build-web": "npx esbuild --bundle --minify --sourcemap --format=iife ./index.js --outfile=docs/build/js/ski-interpreter.min.js",
-    "build-cjs": "npx esbuild --bundle --sourcemap --format=cjs ./index.js --outfile=lib/ski-interpreter.cjs.js",
-    "build-esm": "npx esbuild --bundle --sourcemap --format=esm ./index.js --outfile=lib/ski-interpreter.esm.js",
+    "tsc": "npx tsc",
+    "test": "npm run tsc; npx nyc mocha --recursive test",
+    "build-web": "npx esbuild --bundle --minify --sourcemap --format=iife ./src/index.ts --outfile=docs/build/js/ski-interpreter.min.js",
+    "build-cjs": "npx esbuild --bundle --sourcemap --format=cjs ./src/index.ts --outfile=lib/ski-interpreter.cjs.js",
+    "build-esm": "npx esbuild --bundle --sourcemap --format=esm ./src/index.ts --outfile=lib/ski-interpreter.esm.js",
     "build-site": "npx esbuild --bundle --minify --sourcemap ./site-src/index.js --outfile=docs/build/js/util.min.js",
     "build-quest": "npx esbuild --bundle --minify --sourcemap --format=iife ./site-src/index-quest.js --outfile=docs/build/js/ski-quest.min.js",
     "build-all": "npm run build-cjs && npm run build-esm && npm run build-web && npm run build-quest",
-    "build": "npm run lint && npm run test && npm run build-all",
+    "build": "npm run lint && npm run tsc && npm run test && npm run build-all",
     "prepack": "npm run build && cp docs/build/js/ski-* lib/"
   },
   "files": [
