@@ -39,3 +39,16 @@ export class SKI extends Parser {
   static extras = extras;
   static Quest = Quest;
 }
+
+// SKI_REPL=1 node -r ./index.js
+/* @ts-expect-error determine if we're in node */
+if (typeof process === 'object' && process.env.SKI_REPL && typeof global !== 'undefined') {
+  /* @ts-expect-error ofc the type of global.ski is ski */
+  global.SKI = SKI;
+  console.log('SKI_REPL activated, try `new SKI();`');
+}
+
+// we're in a browser
+if (typeof window !== 'undefined')
+  /* @ts-expect-error detect browser */
+  window.SKI = SKI;
