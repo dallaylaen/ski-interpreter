@@ -63,6 +63,8 @@ export type TermInfo = {
   steps?: number,
 }
 
+type Dict<T> = { [key: string]: T };
+
 export type Invocation = Expr | ((arg: Expr) => Invocation);
 export type Step = { expr: Expr, steps: number, changed: boolean };
 export type Run = { expr: Expr, steps: number, final: boolean };
@@ -358,9 +360,16 @@ export class Expr {
    * @return {TermInfo}
    */
   infer (options : {max?: number, maxArgs?: number } = {}): TermInfo {
+    const skipNames: Dict<boolean> = {};
+    this.traverse(e => {
+      if (e instanceof Named)
+        skipNames[e.name] = true;
+      return undefined;
+    });
     return this._infer({
       max:     options.max ?? DEFAULTS.max,
       maxArgs: options.maxArgs ?? DEFAULTS.maxArgs,
+      skipNames,
     }, 0);
   }
 
@@ -371,11 +380,11 @@ export class Expr {
    * @returns {TermInfo}
    * @private
    */
-  _infer (options:{max: number, maxArgs: number}, nargs: number): TermInfo {
-    const probe:FreeVar[] = [];
+  _infer (options:{max: number, maxArgs: number, skipNames: Dict<boolean>}, nargs: number): TermInfo {
+    const probe: FreeVar[] = [];
     let steps = 0;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
-    let expr:Expr = this;
+    let expr: Expr = this;
     // eslint-disable-next-line no-labels
     main: for (let i = 0; i < options.maxArgs; i++) {
       const next = expr.run({ max: options.max - steps });
@@ -394,7 +403,7 @@ export class Expr {
         const acc = [];
         for (let j = 1; j < list.length; j++) {
           const sub = list[j]._infer(
-            { maxArgs: options.maxArgs - nargs, max: options.max - steps }, // limit recursion
+            { maxArgs: options.maxArgs - nargs, max: options.max - steps, skipNames: options.skipNames }, // limit recursion
             nargs + i // avoid variable name clashes
           );
           steps += sub.steps ?? 0;
@@ -409,6 +418,8 @@ export class Expr {
         }
         return maybeLambda(probe, list[0].apply(...acc), { discard, duplicate, steps });
       }
+      while (options.skipNames[nthvar(nargs + i).name])
+        nargs++;
       const push = nthvar(nargs + i);
       probe.push(push);
       expr = next.expr.apply(push);

@@ -1,7 +1,26 @@
 const { expect } = require('chai');
-const { SKI } = require('../index');
+const { SKI } = require('../src/index.js');
 
 describe('Expr.infer', () => {
+  describe('properties', () => {
+    it('returns predictable properties', () => {
+      const res = SKI.S.infer();
+      expect(res.proper).to.equal(true);
+      expect(res.normal).to.equal(true);
+      expect(res.arity).to.equal(3);
+      expect((res.expr + '').replace(/ /g, '')).to.equal('a->b->c->ac(bc)');
+    });
+
+    it('avoids variable name clashes', () => {
+      const ski = new SKI();
+      const expr = ski.parse('Ka');
+      const res = expr.infer();
+
+      expect(res.expr + '').to.equal('b->a');
+    });
+  });
+
+  // now expression test cases
   // proper terms
   describeTerm(
     'I',
@@ -174,7 +193,8 @@ describe('Expr.infer', () => {
   describeTerm(
     'WI(C(K(WI)))', // quine
     { normal: false, proper: false }
-  )
+  );
+
   /*
     // TODO
 
