@@ -11,6 +11,7 @@
   ],
   "type": "commonjs",
   "main": "lib/ski-interpreter.cjs.js",
+  "types": "lib/types/index.d.ts",
   "module": "lib/ski-interpreter.esm.js",
   "exports": {
     "import": "./lib/ski-interpreter.esm.js",

@@ -28,12 +28,14 @@
 
     /* Pick up the existing hand-written declarations */
     "typeRoots": ["./node_modules/@types"],
-    "paths": {}
+    "paths": {},
+
+    "declaration": true,
+    "declarationDir": "lib/types",
   },
   "include": [
     "src/**/*.ts",
-    "test/**/*.ts",
-    "index.js",
+    "test/**/*.ts"
   ],
   "exclude": [
     "node_modules",
