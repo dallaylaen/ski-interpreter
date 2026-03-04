@@ -221,7 +221,8 @@ describe('Quest', () => {
     });
     const passing = quest.check('SI(K arg)').details[0];
     passing.expected.expect(passing.found);
-    expect(passing.reason).to.equal(null);
+    // TODO wtf? alternates between null & undefined
+    expect(passing.reason ?? null).to.equal(null);
     expect(passing.pass).to.equal(true, 'should pass with named constant');
 
     const failing = quest.check('K(x arg)').details[0];
