@@ -40,15 +40,23 @@ export class SKI extends Parser {
   static Quest = Quest;
 }
 
+declare global {
+  interface Window { SKI: typeof SKI }
+}
+
+type AnyGlobal = typeof globalThis & {
+  SKI: typeof SKI;
+  process?: { env: Record<string, string | undefined> };
+};
+
+const g = globalThis as AnyGlobal;
+
 // SKI_REPL=1 node -r ./index.js
-/* @ts-expect-error determine if we're in node */
-if (typeof process === 'object' && process.env.SKI_REPL && typeof global !== 'undefined') {
-  /* @ts-expect-error ofc the type of global.ski is ski */
-  global.SKI = SKI;
+if (g.process?.env.SKI_REPL) {
+  g.SKI = SKI;
   console.log('SKI_REPL activated, try `new SKI();`');
 }
 
 // we're in a browser
 if (typeof window !== 'undefined')
-  /* @ts-expect-error detect browser */
   window.SKI = SKI;
