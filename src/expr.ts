@@ -27,40 +27,19 @@ export const control = {
 /**
  * @desc List of predefined native combinators.
  * This is required for toSKI() to work, otherwise could as well have been in parser.js.
- * @type {{[key: string]: Native}}
  */
 export const native: Dict<Native> = {};
 
-/**
- * @typedef {Expr | function(Expr): Partial} Partial
- */
-
-/**
- * @typedef {{
- *   normal: boolean,      // whether the term becomes irreducible after receiving a number of arguments.
- *                         // if false, other properties may be missing.
- *   proper: boolean,      // whether the irreducible form is only contains its arguments. implies normal.
- *   arity?: number,       // the number of arguments that is sufficient to reach the normal form
- *                         // absent unless normal.
- *   discard?: boolean,    // whether the term (or subterms, unless proper) can discard arguments.
- *   duplicate?: boolean,  // whether the term (or subterms, unless proper) can duplicate arguments.
- *   skip?: Set<number>,   // indices of arguments that are discarded. nonempty inplies discard.
- *   dup?: Set<number>,    // indices of arguments that are duplicated. nonempty implies duplicate.
- *   expr?: Expr,          // canonical form containing lambdas, applications, and variables, if any
- *   steps?: number,       // number of steps taken to obtain the aforementioned information, if applicable
- * }} TermInfo
- */
-
 export type TermInfo = {
-  normal: boolean,
-  proper: boolean,
-  arity?: number,
-  discard?: boolean,
-  duplicate?: boolean,
-  skip?: Set<number>,
-  dup?: Set<number>,
-  expr?: Expr,
-  steps?: number,
+  normal: boolean,      // whether the term becomes irreducible after receiving a number of arguments.
+  proper: boolean,      // whether the irreducible form is only contains its arguments. implies normal.
+  arity?: number,       // the number of arguments that is enough to reach the irreducible form
+  discard?: boolean,    // whether the term (or subterms, unless proper) can discard arguments.
+  duplicate?: boolean,  // whether the term (or subterms, unless proper) can duplicate arguments.
+  skip?: Set<number>,   // indices of arguments that are discarded. nonempty implies discard.
+  dup?: Set<number>,    // indices of arguments that are duplicated. nonempty implies duplicate.
+  expr?: Expr,          // canonical form containing only lambdas, applications, and variables, if one exists
+  steps?: number,       // number of reduction  steps taken to obtain the aforementioned information, if applicable
 }
 
 export type Invocation = Expr | ((arg: Expr) => Invocation);
@@ -79,7 +58,8 @@ export type FormatOptions = {
     redex?: [string, string],
     inventory?: Dict<Expr>,
 }
-type RefinedFormatOptions = {
+
+type RefinedFormatOptions = { // ditto but with defaults plugged in
   terse?: boolean,
   html?: boolean,
   brackets: [string, string],
@@ -360,6 +340,7 @@ export class Expr {
       maxArgs: options.maxArgs ?? DEFAULTS.maxArgs,
       skipNames,
     }, 0);
+    // TODO maybe traverse() if no normal form was found
   }
 
   /**
