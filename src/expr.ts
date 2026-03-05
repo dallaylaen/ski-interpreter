@@ -79,6 +79,17 @@ export type FormatOptions = {
     redex?: [string, string],
     inventory?: Dict<Expr>,
 }
+type RefinedFormatOptions = {
+  terse?: boolean,
+  html?: boolean,
+  brackets: [string, string],
+  space: string,
+  var: [string, string],
+  lambda: [string, string, string],
+  around: [string, string],
+  redex: [string, string],
+  inventory?: Dict<Expr>,
+}
 
 type TraverseOptions = {order?: 'LO' | 'LI' | 'leftmost-outermost' | 'leftmost-innermost'};
 type TraverseCallback = (e:Expr) => TraverseValue<Expr>;
@@ -812,7 +823,7 @@ export class Expr {
    * @returns {string}
    * @private
    */
-  _format (_options: FormatOptions, _nargs: number): string {
+  _format (_options: RefinedFormatOptions, _nargs: number): string {
     throw new Error( 'No _format() method defined in class ' + this.constructor.name );
   }
 
@@ -995,7 +1006,7 @@ export class App extends Expr {
     return !first;
   }
 
-  _format (options:FormatOptions, nargs: number): string {
+  _format (options:RefinedFormatOptions, nargs: number): string {
     const fun = this.fun._format(options, nargs + 1);
     const arg = this.arg._format(options, 0);
     const wrap = nargs ? ['', ''] : options.around!;
@@ -1036,7 +1047,7 @@ export class Named extends Expr {
     );
   }
 
-  _format (options: FormatOptions, nargs: number): string {
+  _format (options: RefinedFormatOptions, nargs: number): string {
     // NOTE fancyName is not yet official and may change name or meaning
     const name = options.html ? this.fancyName ?? this.name : this.name;
     return this.arity !== undefined && this.arity > 0 && this.arity <= nargs
@@ -1096,7 +1107,7 @@ export class FreeVar extends Named {
     return null;
   }
 
-  _format (options:FormatOptions, _nargs: number): string {
+  _format (options: RefinedFormatOptions, _nargs: number): string {
     const name = options.html ? this.fancyName ?? this.name : this.name;
     return options.var![0] + name + options.var![1];
   }
@@ -1214,7 +1225,7 @@ export class Lambda extends Expr {
     return null;
   }
 
-  _format (options: FormatOptions, nargs: number): string {
+  _format (options: RefinedFormatOptions, nargs: number): string {
     return (nargs > 0 ? options.brackets![0] : '')
       + options.lambda![0]
       + this.arg._format(options, 0) // TODO highlight redex if nargs > 0
@@ -1266,7 +1277,7 @@ export class Church extends Expr {
     return false;
   }
 
-  _format (options: FormatOptions, nargs: number): string {
+  _format (options: RefinedFormatOptions, nargs: number): string {
     return nargs >= 2
       ? options.redex![0] + this.n + options.redex![1]
       : this.n + '';
@@ -1373,7 +1384,7 @@ export class Alias extends Named {
     return this.outdated ? this.impl._braced(first) : false;
   }
 
-  _format (options: FormatOptions, nargs: number): string {
+  _format (options: RefinedFormatOptions, nargs: number): string {
     const outdated = options.inventory
       ? options.inventory[this.name] !== this
       : this.outdated;
