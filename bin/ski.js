@@ -4,14 +4,15 @@ const fs = require('node:fs/promises');
 const { Command } = require('commander');
 
 const { SKI } = require('../lib/ski-interpreter.cjs');
-const { Quest } = require('../src/quest.js');
+const { Quest } = SKI;
+const { version } = require('../package.json');
 
 const program = new Command();
 
 program
   .name('ski')
   .description('Simple Kombinator Interpreter - a combinatory logic & lambda calculus parser and interpreter')
-  .version('2.2.1');
+  .version(version);
 
 // REPL subcommand
 program
