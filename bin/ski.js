@@ -59,7 +59,7 @@ program
 
 // Quest-check subcommand
 program
-  .command('quest-check <files...>')
+  .command('quest-lint <files...>')
   .description('Check quest files for validity')
   .option('--solution <file>', 'Load solutions from file')
   .action((files, options) => {
@@ -215,7 +215,7 @@ async function questCheck (files, solutionFile) {
     // Exit with appropriate code
     process.exit(hasErrors ? 1 : 0);
   } catch (err) {
-    console.error('Error in quest-check:', err.message);
+    console.error('Error in quest-lint:', err.message);
     process.exit(2);
   }
 }

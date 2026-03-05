@@ -106,9 +106,9 @@ npm install @dallaylaen/ski-interpreter
   Attempt to brute force an equivalent of the _expression_ using only the _known terms_.  
   Only normalizing terms are currently supported. 
 
-* **`quest-check <files...>`** - Validate quest definition files
+* **`quest-lint <files...>`** - Validate quest definition files
   * `--solution <file>` - Load solutions from a JSON file for verification
-  * Example: `ski quest-check quest1.json quest2.json --solution solutions.json`
+  * Example: `ski quest-lint quest1.json quest2.json --solution solutions.json`
 
 If no subcommand is provided, help is displayed.
 
