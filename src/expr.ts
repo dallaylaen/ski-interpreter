@@ -746,22 +746,22 @@ export class Expr {
    *
    */
   format (options: FormatOptions = {}): string {
-    const fallback = options.html
+    const fallback: RefinedFormatOptions = options.html
       ? {
-        brackets: ['(', ')']      as [string, string],
+        brackets: ['(', ')'],
         space:    ' ',
-        var:      ['<var>', '</var>'] as [string, string],
-        lambda:   ['', '-&gt;', ''] as [string, string, string],
-        around:   ['', '']        as [string, string],
-        redex:    ['', '']        as [string, string],
+        var:      ['<var>', '</var>'],
+        lambda:   ['', '-&gt;', ''],
+        around:   ['', ''],
+        redex:    ['', ''],
       }
       : {
-        brackets: ['(', ')']  as [string, string],
+        brackets: ['(', ')'],
         space:    ' ',
-        var:      ['', '']    as [string, string],
-        lambda:   ['', '->', ''] as [string, string, string],
-        around:   ['', '']    as [string, string],
-        redex:    ['', '']    as [string, string],
+        var:      ['', ''],
+        lambda:   ['', '->', ''],
+        around:   ['', ''],
+        redex:    ['', ''],
       }
     return this._format({
       terse:     options.terse    ?? true,
