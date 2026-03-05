@@ -242,7 +242,7 @@ export class Expr {
    * @returns {TraverseValue<Expr>}
    */
 
-  _traverse_descend (_options: TraverseOptions, _change: TraverseCallback): TraverseValue<Expr> {
+  _traverse_descend (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
     return null;
   }
 
@@ -541,7 +541,7 @@ export class Expr {
    * @param {Expr} arg
    * @returns {Partial | null}
    */
-  invoke (_arg:Expr): Invocation | null {
+  invoke (arg:Expr): Invocation | null {
     return null;
   }
 
@@ -708,7 +708,7 @@ export class Expr {
    * @returns {boolean}
    * @private
    */
-  _unspaced (_arg: Expr): boolean {
+  _unspaced (arg: Expr): boolean {
     return this._braced(true);
   }
 
@@ -783,7 +783,7 @@ export class Expr {
    * @returns {string}
    * @private
    */
-  _format (_options: RefinedFormatOptions, _nargs: number): string {
+  _format (options: RefinedFormatOptions, nargs: number): string {
     throw new Error( 'No _format() method defined in class ' + this.constructor.name );
   }
 
@@ -936,7 +936,7 @@ export class App extends Expr {
       return partial(arg);
     } else {
       // invoke = null => we're uncomputable, cache for next time
-      this.invoke = (_arg: Expr) => null;
+      this.invoke = (arg: Expr) => null;
       return null;
     }
   }
@@ -1059,7 +1059,7 @@ export class FreeVar extends Named {
     return null;
   }
 
-  _format (options: RefinedFormatOptions, _nargs: number): string {
+  _format (options: RefinedFormatOptions, nargs: number): string {
     const name = options.html ? this.fancyName ?? this.name : this.name;
     return options.var![0] + name + options.var![1];
   }
@@ -1182,7 +1182,7 @@ export class Lambda extends Expr {
       + (nargs > 0 ? options.brackets![1] : '');
   }
 
-  _braced (_first: boolean): boolean {
+  _braced (first: boolean): boolean {
     return true;
   }
 }
@@ -1221,7 +1221,7 @@ export class Church extends Expr {
       : '[' + this.n + ' != ' + other.n + ']';
   }
 
-  _unspaced (_arg: Expr): boolean {
+  _unspaced (arg: Expr): boolean {
     return false;
   }
 
