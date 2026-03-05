@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-03-06
+
+### BREAKING CHANGES
+
+- Remove Expr.freeOnly method, use `!this.any(e => !(e instanceof FreeVar || e instanceof App))` instead;
+- Remove Expr.weight() function because it's too ambiguous, use `fold (...)` instead.
+- Remove `{ Quest }` from exports, use `SKI.Quest` instead.
+- Rename `ski.js quest-check` to `ski.js quest-lint` for clarity.
+
+### Added
+- Rewrite the whole thing in TypeScript.
+
+### Fixed
+- Avoid name clashes with existing variables in infer()
+([#15](https://github.com/dallaylaen/ski-interpreter/issues/15))
+
 ## [2.3.3] - 2026-03-01
 
 ### Changed
