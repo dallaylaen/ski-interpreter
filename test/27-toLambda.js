@@ -44,7 +44,6 @@ function checkTerm (startSrc, endSrc, options = {}) {
       const start = ski.parse(startSrc);
       const end = ski.parse(endSrc);
       const seq = start.toLambda(options);
-      let weight = Infinity;
       let steps = 0;
       let expr;
       let finished = false;
@@ -57,8 +56,6 @@ function checkTerm (startSrc, endSrc, options = {}) {
         expr = value.expr;
         it('produces a smaller expression every time: ' + expr, () => {
           expect(expr).to.be.instanceOf(SKI.classes.Expr);
-          expect(expr.weight()).to.be.lessThanOrEqual(weight, 'term weight must strictly diminish');
-          weight = expr.weight();
           expect(value.steps).to.be.greaterThanOrEqual(steps, 'steps must not decrease');
           steps = value.steps;
 

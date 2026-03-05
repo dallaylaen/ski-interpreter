@@ -343,16 +343,6 @@ export class Expr {
   }
 
   /**
-   * @deprecated
-   * @desc rough estimate of the term's complexity
-   * Use fold(0, ...) with an appropriate combine function instead
-   */
-  weight (): number {
-    // TODO remove in next breaking release
-    return 1;
-  }
-
-  /**
    * @desc Try to empirically find an equivalent lambda term for the expression,
    *       returning also the term's arity and some other properties.
    *
@@ -454,8 +444,7 @@ export class Expr {
 
   /**
    * @desc Returns a series of lambda terms equivalent to the given expression,
-   *       up to the provided computation steps limit,
-   *       in decreasing weight order.
+   *       up to the provided computation steps limit.
    *
    *       Unlike infer(), this method will always return something,
    *       even if the expression has no normal form.
@@ -470,7 +459,6 @@ export class Expr {
    *   html?: boolean,
    *   latin?: number,
    * }} options
-   * @param {number} [maxWeight] - maximum allowed weight of terms in the sequence
    * @return {IterableIterator<{expr: Expr, steps?: number, comment?: string}>}
    */
   * toLambda (options: { max?: number, maxArgs?: number } = {}) {
@@ -895,10 +883,6 @@ export class App extends Expr {
   }
   /** @property {boolean} [final] */
 
-  weight () {
-    return this.fun.weight() + this.arg.weight();
-  }
-
   _traverse_descend (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
     const [fun, fAction] = unwrap(this.fun._traverse_redo(options, change));
     if (fAction === control.stop)
@@ -1085,10 +1069,6 @@ export class FreeVar extends Named {
     this.scope = scope === undefined ? this : scope;
   }
 
-  weight () {
-    return 0;
-  }
-
   diff (other:Expr, swap = false): string | null {
     if (!(other instanceof FreeVar))
       return super.diff(other, swap);
@@ -1171,10 +1151,6 @@ export class Lambda extends Expr {
     this.arg = local;
     this.impl = impl.subst(arg, local) ?? impl;
     this.arity = 1;
-  }
-
-  weight () {
-    return this.impl.weight() + 1;
   }
 
   invoke (arg: Expr): Expr {
@@ -1330,10 +1306,6 @@ export class Alias extends Named {
    * @property {number} [arity] - the number of arguments the alias waits for before expanding
    * @property {Expr} [canonical] - equivalent lambda term.
    */
-
-  weight () {
-    return this.terminal ? 1 : this.impl.weight();
-  }
 
   _traverse_descend (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
     return this.impl._traverse_redo(options, change);
