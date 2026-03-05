@@ -125,7 +125,7 @@
       ],
       "input": "x",
       "cases": [
-        [ "Y=WI(BWB(SI)); Y x", "x" ]
+        [ "Y=WS(BWB); Y x", "x" ]
       ]
     }
   ]
