@@ -99,6 +99,13 @@ npm install @dallaylaen/ski-interpreter
   * `--verbose` - Show all evaluation steps
   * Example: `ski file script.ski`
 
+* **`extract <expression> <known term> ...`** - 
+  Replace parts of the expression that are equivalent to the known terms with the respective terms. Known terms must be normalizable.
+
+* **`search <expression> <known term> ...`** - 
+  Attempt to brute force an equivalent of the _expression_ using only the _known terms_.  
+  Only normalizing terms are currently supported. 
+
 * **`quest-check <files...>`** - Validate quest definition files
   * `--solution <file>` - Load solutions from a JSON file for verification
   * Example: `ski quest-check quest1.json quest2.json --solution solutions.json`
