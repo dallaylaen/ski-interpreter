@@ -1,3 +1,7 @@
+/* utility types */
+
+export type Dict<T> = { [key: string]: T };
+
 export class Tokenizer {
   /**
    * @desc Create a tokenizer that splits strings into tokens according to the given terms.

@@ -1,6 +1,6 @@
 'use strict';
 
-import { unwrap, prepareWrapper, TraverseValue } from './internal';
+import { unwrap, prepareWrapper, TraverseValue, Dict } from './internal';
 
 const DEFAULTS = {
   max:     1000,
@@ -29,7 +29,7 @@ export const control = {
  * This is required for toSKI() to work, otherwise could as well have been in parser.js.
  * @type {{[key: string]: Native}}
  */
-export const native: {[key: string]: Native} = {};
+export const native: Dict<Native> = {};
 
 /**
  * @typedef {Expr | function(Expr): Partial} Partial
@@ -63,8 +63,6 @@ export type TermInfo = {
   steps?: number,
 }
 
-type Dict<T> = { [key: string]: T };
-
 export type Invocation = Expr | ((arg: Expr) => Invocation);
 export type Step = { expr: Expr, steps: number, changed: boolean };
 export type Run = { expr: Expr, steps: number, final: boolean };
@@ -79,7 +77,7 @@ export type FormatOptions = {
     lambda?: [string, string, string],
     around?: [string, string],
     redex?: [string, string],
-    inventory?: { [key: string]: Expr },
+    inventory?: Dict<Expr>,
 }
 
 type TraverseOptions = {order?: 'LO' | 'LI' | 'leftmost-outermost' | 'leftmost-innermost'};
@@ -108,9 +106,8 @@ export class Expr {
    * @property {TermInfo} [props] - properties inferred from the term's behavior
    */
   context?: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    scope?: any,
-    env?: { [key: string]: Expr },
+    scope?: object,
+    env?: Dict<Expr>,
     src?: string,
     parser: object,
   }
