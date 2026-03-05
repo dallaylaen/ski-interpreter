@@ -265,9 +265,11 @@ function extractExpression (targetStr, termStrs) {
 
   const replaced = expr.traverse(e => {
     const canon = e.infer().expr;
-    for (const [lambda, term] of pairs) {
-      if (canon.equals(lambda))
-        return term;
+    if (canon) {
+      for (const [lambda, term] of pairs) {
+        if (canon.equals(lambda))
+          return term;
+      }
     }
     return null;
   });
