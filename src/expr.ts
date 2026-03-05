@@ -191,15 +191,6 @@ export class Expr {
   }
 
   /**
-   * @desc Returns true if the expression contains only free variables and applications, false otherwise.
-   * @returns {boolean}
-   */
-  freeOnly ():boolean {
-    // TODO remove in a breaking release
-    return !this.any(e => !(e instanceof FreeVar || e instanceof App));
-  }
-
-  /**
    * @desc Traverse the expression tree, applying change() to each node.
    *       If change() returns an Expr, the node is replaced with that value.
    *       A null/undefined value is interpreted as
