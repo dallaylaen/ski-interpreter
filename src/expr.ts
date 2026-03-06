@@ -338,7 +338,6 @@ export class Expr {
         skipNames[e.name] = true;
       if (e instanceof Lambda)
         skipSkip.add(e.arg);
-      return undefined;
     });
     return this._infer({
       max:     options.max ?? DEFAULTS.max,
@@ -1406,7 +1405,6 @@ function maybeLambda (args: FreeVar[], expr: Expr, caps : {discard?: boolean, du
     }
     if (!(e instanceof App))
       proper = false;
-    return undefined;
   });
 
   const skip : Set<number> = new Set();

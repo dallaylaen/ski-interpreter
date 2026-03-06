@@ -77,7 +77,7 @@ export function restrict (set:Set<string>, spec?: string) {
 // eslint-disable-next-line no-use-before-define
 export type TraverseDecorator<T> = (value: T) => TraverseControl<T>;
 // eslint-disable-next-line no-use-before-define
-export type TraverseValue<T> = T | TraverseControl<T> | null | undefined;
+export type TraverseValue<T> = T | TraverseControl<T> | null | undefined | void;
 
 export class TraverseControl<T> {
   /**
