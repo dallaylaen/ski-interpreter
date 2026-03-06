@@ -408,6 +408,10 @@
         });
       }
       list.scrollTop = list.scrollHeight;
+      document.addEventListener('click', ev => {
+        if (historyVisible)
+          hideHistory();
+      }, {once: true, capture: true});
       view.historyMain.hidden = false;
       historyVisible = true;
     }
@@ -415,7 +419,7 @@
     function hideHistory() {
         view.historyMain.hidden = true;
         view.historyMain.innerHTML = '';
-        historyVisible = false;
+        setTimeout(() => historyVisible = false, 0); // to prevent immediate reopening when clicking the button
     }
 
     function setFormat(options) {
