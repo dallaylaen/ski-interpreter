@@ -171,6 +171,15 @@ describe( 'SKI', () => {
     done();
   });
 
+  it('can stop on size limit', () => {
+    const ski = new SKI();
+    const expr = ski.parseLine('WS(BWB) f');
+    const result = expr.run({ max: 10000, maxSize: 20 });
+    expect(result.final).to.equal(false, 'Expected to stop on size limit');
+    expect(result.steps).to.be.lessThan(10000, 'Expected to stop before max steps');
+    expect('' + result.expr).to.match(/^f\(f\(f\(/, 'Y combinator should have expanded a few times');
+  });
+
   it('makes at least one step on any calculation', () => {
     const ski = new SKI();
     const expr = ski.parseLine('SK x y ');

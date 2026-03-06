@@ -5,6 +5,7 @@ import { unwrap, prepareWrapper, TraverseValue, Dict } from './internal';
 const DEFAULTS = {
   max:     1000,
   maxArgs: 32,
+  maxSize: 1_000_000,
 };
 
 const ORDER = {
@@ -45,7 +46,7 @@ export type TermInfo = {
 export type Invocation = Expr | ((arg: Expr) => Invocation);
 export type Step = { expr: Expr, steps: number, changed: boolean };
 export type Run = { expr: Expr, steps: number, final: boolean };
-export type RunOptions = { max?: number, steps?: number, throw?: boolean };
+export type RunOptions = { max?: number, steps?: number, throw?: boolean, maxSize?: number };
 
 export type FormatOptions = {
     terse?: boolean,
@@ -106,6 +107,7 @@ export class Expr {
   arity?: number;
   note?: string;
   props?: TermInfo;
+  size?: number; // rough estimate of the number of nodes in the tree
 
   /**
    *
@@ -328,11 +330,14 @@ export class Expr {
    * @param {{max?: number, maxArgs?: number}} options
    * @return {TermInfo}
    */
-  infer (options : {max?: number, maxArgs?: number } = {}): TermInfo {
+  infer (options : {max?: number, maxArgs?: number, maxSize?: number } = {}): TermInfo {
     const skipNames: Dict<boolean> = {};
+    const skipSkip: Set<Expr> = new Set();
     this.traverse(e => {
-      if (e instanceof Named)
+      if (e instanceof Named && !skipSkip.has(e))
         skipNames[e.name] = true;
+      if (e instanceof Lambda)
+        skipSkip.add(e.arg);
       return undefined;
     });
     return this._infer({
@@ -575,6 +580,8 @@ export class Expr {
         final = true;
         break;
       }
+      if ((next.expr.size ?? 1) > (opt.maxSize ?? DEFAULTS.maxSize))
+        break;
       steps += next.steps;
       expr = next.expr;
     }
@@ -589,14 +596,14 @@ export class Expr {
    * @param {{max?: number}} options
    * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
    */
-  * walk (options : { max?: number } = {}): IterableIterator<Run> {
+  * walk (options : { max?: number, maxSize?: number } = {}): IterableIterator<Run> {
     const max = options.max ?? Infinity;
     let steps = 0;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     let expr:Expr = this;
     let final = false;
 
-    while (steps < max) {
+    while (steps < max && (expr.size ?? 1) < (options.maxSize ?? DEFAULTS.maxSize)) {
       // 1. calculate
       // 2. yield _unchanged_ expression
       // 3. either advance or stop
@@ -852,6 +859,7 @@ export class App extends Expr {
 
     this.arg = arg;
     this.fun = fun;
+    this.size = (fun.size ?? 1) + (arg.size ?? 1);
   }
   /** @property {boolean} [final] */
 
@@ -1123,6 +1131,7 @@ export class Lambda extends Expr {
     this.arg = local;
     this.impl = impl.subst(arg, local) ?? impl;
     this.arity = 1;
+    this.size = (impl.size ?? 1) + 1;
   }
 
   invoke (arg: Expr): Expr {
@@ -1267,6 +1276,7 @@ export class Alias extends Named {
     this._setup(options);
     this.terminal = options.terminal ?? this.props?.proper;
     this.invoke = waitn(impl, this.arity ?? 0) as (arg: Expr) => Invocation;
+    this.size = impl.size;
   }
 
   /**
