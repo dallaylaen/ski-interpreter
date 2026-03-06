@@ -63,14 +63,19 @@
             flex: 1 auto;
         }
         #history-main {
+            display: flex;
+            flex-direction: column;
             position: absolute;
             left: 0;
             bottom: 0;
             z-index: 50; /* menu is 100, be below it */
             max-height: 70vh;
             min-width: 30%;
-            overflow-y: auto;
             background-color: lightgray;
+        }
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
         }
 
         header, #teletype, #prompt {
@@ -402,6 +407,7 @@
           hideHistory();
         });
       }
+      list.scrollTop = list.scrollHeight;
       view.historyMain.hidden = false;
       historyVisible = true;
     }
