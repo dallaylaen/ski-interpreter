@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.1] - 2026-03-06
+
+### Added
+
+- expr.run({maxSize: number ?? 1_000_000}) to prevent runaway reductions (fixes #14).
+- `ski.js infer <expression>` command to infer properties of an expression.
+
+### Fixed
+
+- quests use shorter Y combinator form internally (#13)
+- history in the playground is scrolled to the bottom.
+
 ## [2.4.0] - 2026-03-06
 
 ### BREAKING CHANGES
