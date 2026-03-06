@@ -1,6 +1,6 @@
 'use strict';
 
-const { SKI } = require('../index');
+const { SKI } = require('../src/index');
 const { Store } = require('./store');
 const { EvalBox } = require('./eval-box');
 const { append } = require('./html-util')
