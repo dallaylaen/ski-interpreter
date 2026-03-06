@@ -41,12 +41,12 @@ program
     evaluateFile(filepath, options.verbose);
   });
 
-// Search subcommand
+// Infer subcommand
 program
-  .command('search <target> <terms...>')
-  .description('Search for an expression equivalent to target using known terms')
-  .action((target, terms) => {
-    searchExpression(target, terms);
+  .command('infer <expression>')
+  .description('Find a canonical form of the expression and its properties')
+  .action((expression) => {
+    inferExpression(expression);
   });
 
 // Extract subcommand
@@ -55,6 +55,14 @@ program
   .description('Rewrite target expression using known terms where possible')
   .action((target, terms) => {
     extractExpression(target, terms);
+  });
+
+// Search subcommand
+program
+  .command('search <target> <terms...>')
+  .description('Search for an expression equivalent to target using known terms')
+  .action((target, terms) => {
+    searchExpression(target, terms);
   });
 
 // Quest-check subcommand
@@ -153,6 +161,41 @@ function processLine (source, ski, verbose, onErr) {
     }
   } catch (err) {
     onErr(err);
+  }
+}
+
+function inferExpression (expression) {
+  const ski = new SKI();
+
+  const expr = ski.parse(expression);
+  const guess = expr.infer();
+
+  if (guess.normal) {
+    displayInfer(guess);
+    return;
+  }
+  // hard case...
+  let steps = guess.steps;
+  const canon = expr.traverse(e => {
+    const g = e.infer();
+    steps += g.steps;
+    return g.expr;
+  });
+
+  displayInfer({ expr: canon, steps, normal: false, proper: false });
+}
+
+/**
+ *
+ * @param {TermInfo} guess
+ */
+function displayInfer (guess) {
+  if (guess.expr)
+    console.log(guess.expr.format());
+
+  for (const key of ['normal', 'proper', 'arity', 'discard', 'duplicate', 'steps']) {
+    if (guess[key] !== undefined)
+      console.log(`// ${key}: ${guess[key]}`);
   }
 }
 
