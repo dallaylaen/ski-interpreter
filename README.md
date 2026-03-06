@@ -99,12 +99,14 @@ npm install @dallaylaen/ski-interpreter
   * `--verbose` - Show all evaluation steps
   * Example: `ski file script.ski`
 
+* **`infer <expression>`** - try to find equivalent lambda expression and display its properties if found. 
+
 * **`extract <expression> <known term> ...`** - 
   Replace parts of the expression that are equivalent to the known terms with the respective terms. Known terms must be normalizable.
 
 * **`search <expression> <known term> ...`** - 
   Attempt to brute force an equivalent of the _expression_ using only the _known terms_.  
-  Only normalizing terms are currently supported. 
+  Only normalizable terms are currently supported. 
 
 * **`quest-lint <files...>`** - Validate quest definition files
   * `--solution <file>` - Load solutions from a JSON file for verification
@@ -150,7 +152,7 @@ const final = expr.run({max: 1000}); // { steps: 42, expr: '...' }
 const iterator = expr.walk();
 
 // applying expressions
-const result = expr.run({max: 1000}, arg1, arg2 ...);
+const result = expr.run({max: 1000}, arg1, arg2, ...);
 // same sa
 expr.apply(arg1).apply(arg2).run();
 // or simply
