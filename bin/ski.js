@@ -15,8 +15,7 @@ program
   .name('ski')
   .description('Simple Kombinator Interpreter - a combinatory logic & lambda calculus parser and interpreter')
   .version(version)
-  .option('--format <json>', 'Format for output expressions',
-    json => { format = SKI.schemas.FormatOptions.parse(JSON.parse(json)) });
+  .option('--format <json>', 'Format for output expressions', setFormat);
 
 // REPL subcommand
 program
@@ -327,8 +326,7 @@ function extractExpression (targetStr, termStrs) {
 }
 
 function handleCommand (input, ski) {
-  const parts = input.trim().split(/\s+/);
-  const cmd = parts[0];
+  const [_, cmd, arg] = input.match(/^\s*(\S+)(?:\s+(.*))?$/);
 
   const dispatch = {
     '!ls': () => {
@@ -342,6 +340,12 @@ function handleCommand (input, ski) {
           console.log(`  ${name} ${term.props?.expr ?? '(native)'}`);
       }
     },
+    '!format': options => {
+      if (options)
+        setFormat(options);
+      else
+        console.log('Format: ' + JSON.stringify(format, null, 2));
+    },
     '!help': () => {
       console.log('Available commands:');
       console.log('  !ls    - List term inventory');
@@ -353,5 +357,13 @@ function handleCommand (input, ski) {
     }
   };
 
-  (dispatch[cmd] || dispatch[''])(...parts.slice(1));
+  try {
+    (dispatch[cmd] || dispatch[''])(arg)
+  } catch (err) {
+    console.error(`Error executing command ${cmd}:`, err.message);
+  }
+}
+
+function setFormat (options) {
+  format = SKI.schemas.FormatOptions.parse(JSON.parse(options));
 }
