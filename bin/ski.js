@@ -7,12 +7,16 @@ const { SKI } = require('../lib/ski-interpreter.cjs');
 const { Quest } = SKI;
 const { version } = require('../package.json');
 
+let format = {};
+
 const program = new Command();
 
 program
   .name('ski')
   .description('Simple Kombinator Interpreter - a combinatory logic & lambda calculus parser and interpreter')
-  .version(version);
+  .version(version)
+  .option('--format <json>', 'Format for output expressions',
+    json => { format = SKI.schemas.FormatOptions.parse(JSON.parse(json)) });
 
 // REPL subcommand
 program
@@ -154,7 +158,7 @@ function processLine (source, ski, verbose, onErr) {
         console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
 
       if (verbose || state.final)
-        console.log('' + state.expr.format());
+        console.log(state.expr.format(format));
 
       if (state.final && isAlias && aliasName)
         ski.add(aliasName, state.expr);
@@ -191,7 +195,7 @@ function inferExpression (expression) {
  */
 function displayInfer (guess) {
   if (guess.expr)
-    console.log(guess.expr.format());
+    console.log(guess.expr.format(format));
 
   for (const key of ['normal', 'proper', 'arity', 'discard', 'duplicate', 'steps']) {
     if (guess[key] !== undefined)
@@ -284,7 +288,7 @@ function searchExpression (targetStr, termStrs) {
   });
 
   if (res.expr) {
-    console.log(`Found ${res.expr} after ${res.total} tries.`);
+    console.log(`Found ${res.expr.format(format)} after ${res.total} tries.`);
     process.exit(0);
   } else {
     console.error(`No equivalent expression found for ${target} after ${res.total} tries.`);
@@ -317,9 +321,8 @@ function extractExpression (targetStr, termStrs) {
     return null;
   });
 
-  if (replaced)
-    console.log(replaced.toString());
-  else
+  console.log((replaced ?? expr).format(format));
+  if (!replaced)
     console.log('// unchanged');
 }
 
