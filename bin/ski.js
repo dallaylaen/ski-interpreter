@@ -8,6 +8,7 @@ const { Quest } = SKI;
 const { version } = require('../package.json');
 
 let format = {};
+let verbose = false;
 
 const program = new Command();
 
@@ -15,33 +16,31 @@ program
   .name('ski')
   .description('Simple Kombinator Interpreter - a combinatory logic & lambda calculus parser and interpreter')
   .version(version)
+  .option('-v, --verbose', 'Show all evaluation steps', () => { verbose = true; })
   .option('--format <json>', 'Format for output expressions', setFormat);
 
 // REPL subcommand
 program
   .command('repl')
   .description('Start interactive REPL')
-  .option('--verbose', 'Show all evaluation steps')
   .action((options) => {
-    startRepl(options.verbose);
+    startRepl(options);
   });
 
 // Eval subcommand
 program
   .command('eval <expression>')
   .description('Evaluate a single expression')
-  .option('--verbose', 'Show all evaluation steps')
   .action((expression, options) => {
-    evaluateExpression(expression, options.verbose);
+    evaluateExpression(expression, options);
   });
 
 // File subcommand
 program
   .command('file <filepath>')
   .description('Evaluate expressions from a file')
-  .option('--verbose', 'Show all evaluation steps')
   .action((filepath, options) => {
-    evaluateFile(filepath, options.verbose);
+    evaluateFile(filepath);
   });
 
 // Infer subcommand
@@ -83,9 +82,9 @@ program
   .parse(process.argv);
 
 if (!process.argv.slice(2).length)
-  startRepl(false);
+  startRepl();
 
-function startRepl (verbose) {
+function startRepl () {
   const readline = require('readline');
   const ski = new SKI();
 
@@ -103,7 +102,7 @@ function startRepl (verbose) {
       if (str.startsWith('!'))
         handleCommand(str, ski);
       else {
-        processLine(str, ski, verbose, err => {
+        processLine(str, ski, err => {
           console.log('' + err);
         });
       }
@@ -119,19 +118,19 @@ function startRepl (verbose) {
   rl.prompt();
 }
 
-function evaluateExpression (expression, verbose) {
+function evaluateExpression (expression) {
   const ski = new SKI();
-  processLine(expression, ski, verbose, err => {
+  processLine(expression, ski, err => {
     console.error('' + err);
     process.exit(3);
   });
 }
 
-function evaluateFile (filepath, verbose) {
+function evaluateFile (filepath) {
   const ski = new SKI();
   fs.readFile(filepath, 'utf8')
     .then(source => {
-      processLine(source, ski, verbose, err => {
+      processLine(source, ski, err => {
         console.error('' + err);
         process.exit(3);
       });
@@ -142,7 +141,7 @@ function evaluateFile (filepath, verbose) {
     });
 }
 
-function processLine (source, ski, verbose, onErr) {
+function processLine (source, ski, onErr) {
   if (!source.match(/\S/))
     return; // nothing to see here
 
@@ -326,7 +325,7 @@ function extractExpression (targetStr, termStrs) {
 }
 
 function handleCommand (input, ski) {
-  const [_, cmd, arg] = input.match(/^\s*(\S+)(?:\s+(.*))?$/);
+  const [_, cmd, arg] = input.match(/^\s*(\S+)(?:\s+(.*\S))?\s*$/);
 
   const dispatch = {
     '!ls': () => {
@@ -340,6 +339,10 @@ function handleCommand (input, ski) {
           console.log(`  ${name} ${term.props?.expr ?? '(native)'}`);
       }
     },
+    '!verbose': flag => {
+      verbose = !(['off', 'false', '0', '-'].includes(flag));
+      console.log('// verbose is ' + (verbose ? 'on' : 'off'));
+    },
     '!format': options => {
       if (options)
         setFormat(options);
@@ -349,6 +352,8 @@ function handleCommand (input, ski) {
     '!help': () => {
       console.log('Available commands:');
       console.log('  !ls    - List term inventory');
+      console.log('  !verbose [on|off] - Toggle verbose mode (show all evaluation steps)');
+      console.log('  !format [json] - Set or show output format options');
       console.log('  !help  - Show this help message');
     },
     '': () => {
