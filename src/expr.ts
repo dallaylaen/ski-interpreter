@@ -346,6 +346,7 @@ export class Expr {
     return this._infer({
       max:     options.max ?? DEFAULTS.max,
       maxArgs: options.maxArgs ?? DEFAULTS.maxArgs,
+      maxSize: options.maxSize ?? DEFAULTS.maxSize,
       skipNames,
     }, 0);
     // TODO maybe traverse() if no normal form was found
@@ -358,14 +359,14 @@ export class Expr {
    * @returns {TermInfo}
    * @private
    */
-  _infer (options:{max: number, maxArgs: number, skipNames: Dict<boolean>}, nargs: number): TermInfo {
+  _infer (options:{max: number, maxArgs: number, maxSize: number, skipNames: Dict<boolean>}, nargs: number): TermInfo {
     const probe: FreeVar[] = [];
     let steps = 0;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     let expr: Expr = this;
     // eslint-disable-next-line no-labels
     main: for (let i = 0; i < options.maxArgs; i++) {
-      const next = expr.run({ max: options.max - steps });
+      const next = expr.run({ max: options.max - steps, maxSize: options.maxSize });
       // console.log(`infer step ${i}, expr = ${expr}, probe = [${probe}]: `, next);
       steps += next.steps;
       if (!next.final)
@@ -381,7 +382,7 @@ export class Expr {
         const acc = [];
         for (let j = 1; j < list.length; j++) {
           const sub = list[j]._infer(
-            { maxArgs: options.maxArgs - nargs, max: options.max - steps, skipNames: options.skipNames }, // limit recursion
+            { maxArgs: options.maxArgs - nargs, max: options.max - steps, maxSize: options.maxSize, skipNames: options.skipNames }, // limit recursion
             nargs + i // avoid variable name clashes
           );
           steps += sub.steps ?? 0;
