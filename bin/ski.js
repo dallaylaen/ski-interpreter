@@ -7,6 +7,7 @@ const { SKI } = require('../lib/ski-interpreter.cjs');
 const { Quest } = SKI;
 const { version } = require('../package.json');
 
+const runOptions = {};
 let format = {};
 let verbose = false;
 
@@ -17,7 +18,25 @@ program
   .description('Simple Kombinator Interpreter - a combinatory logic & lambda calculus parser and interpreter')
   .version(version)
   .option('-v, --verbose', 'Show all evaluation steps', () => { verbose = true; })
-  .option('--format <json>', 'Format for output expressions', setFormat);
+  .option('--format <json>', 'Format for output expressions', setFormat)
+  .option('--max <number>', 'Limit computation steps', raw => {
+    const n = Number.parseInt(raw);
+    if (Number.isNaN(n) || n <= 0)
+      throw new Error('--max requires a positive integer');
+    runOptions.max = n;
+  })
+  .option('--max-size <number>', 'Limit expression\'s total footprint during computations', raw => {
+    const n = Number.parseInt(raw);
+    if (Number.isNaN(n) || n <= 0)
+      throw new Error('--max-size requires a positive integer');
+    runOptions.maxSize = n;
+  })
+  .option('--max-args <number>', 'Limit probed arguments when inferring terms', raw => {
+    const n = Number.parseInt(raw);
+    if (Number.isNaN(n) || n <= 0)
+      throw new Error('--max-args requires a positive integer');
+    runOptions.maxArgs = n;
+  });
 
 // REPL subcommand
 program
@@ -151,7 +170,7 @@ function processLine (source, ski, onErr) {
     const isAlias = expr instanceof SKI.classes.Alias;
     const aliasName = isAlias ? expr.name : null;
 
-    for (const state of expr.walk()) {
+    for (const state of expr.walk(runOptions)) {
       if (state.final)
         console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
 
@@ -170,7 +189,7 @@ function inferExpression (expression) {
   const ski = new SKI();
 
   const expr = ski.parse(expression);
-  const guess = expr.infer();
+  const guess = expr.infer(runOptions);
 
   if (guess.normal) {
     displayInfer(guess);
@@ -179,7 +198,9 @@ function inferExpression (expression) {
   // hard case...
   let steps = guess.steps;
   const canon = expr.traverse(e => {
-    const g = e.infer();
+    if (e === expr)
+      return; // already tried
+    const g = e.infer(runOptions);
     steps += g.steps;
     return g.expr;
   });
@@ -299,7 +320,7 @@ function extractExpression (targetStr, termStrs) {
   const expr = ski.parse(targetStr);
   const pairs = termStrs
     .map(s => ski.parse(s))
-    .map(e => [e.infer().expr, e]);
+    .map(e => [e.infer(runOptions).expr, e]);
 
   const uncanonical = pairs.filter(pair => !pair[0]);
   if (uncanonical.length) {
@@ -309,14 +330,13 @@ function extractExpression (targetStr, termStrs) {
   }
 
   const replaced = expr.traverse(e => {
-    const canon = e.infer().expr;
+    const canon = e.infer(runOptions).expr;
     if (canon) {
       for (const [lambda, term] of pairs) {
         if (canon.equals(lambda))
           return term;
       }
     }
-    return null;
   });
 
   console.log((replaced ?? expr).format(format));
