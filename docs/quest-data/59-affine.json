@@ -84,6 +84,22 @@
       ]
     },
     {
+      "id": "TOqpNIxi",
+      "created_at": "2026-03-12T22:10:21",
+      "name": "Head and shoulders",
+      "intro": [
+        "Given a function <code>f</code>, build a new function <code>g</code> such that",
+        "<code>g (V x (V y ( ... )))</code> = <code>f x y</code>, and the tail is discarded.",
+        "Easy if you can duplicate the list! But it's forbidden."
+      ],
+      "env": ["V=BC(CI)", "f"],
+      "input": "phi",
+      "cases": [
+        [{ "caps": { "affine": true }}, "phi"],
+        [ "phi (V x (V y z))", "f x y" ]
+      ]
+    },
+    {
       "id": "Ci0vMhSM",
       "created_at": "2025-08-22T01:14:01",
       "name": "Taming the infinity",
