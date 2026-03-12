@@ -82,9 +82,9 @@ program
 program
   .command('search <target> <terms...>')
   .description('Search for an expression equivalent to target using known terms')
-  .action((target, terms) => {
-    searchExpression(target, terms);
-  });
+  .option('--max-depth <number>', 'Limit search depth', toInt('--max-depth'))
+  .option('--max-tries <number>', 'Limit total terms probed', toInt('--max-tries'))
+  .action(searchExpression);
 
 // Quest-check subcommand
 program
@@ -286,11 +286,10 @@ async function questCheck (files, solutionFile) {
   }
 }
 
-function searchExpression (targetStr, termStrs) {
+function searchExpression (targetStr, termStrs, options) {
   const ski = new SKI();
-  const jar = {};
-  const target = ski.parse(targetStr, { vars: jar });
-  const seed = termStrs.map(s => ski.parse(s, { vars: jar }));
+  const target = ski.parse(targetStr);
+  const seed = termStrs.map(s => ski.parse(s));
 
   const { expr } = target.infer();
   if (!expr) {
@@ -298,7 +297,7 @@ function searchExpression (targetStr, termStrs) {
     process.exit(1);
   }
 
-  const res = SKI.extras.search(seed, { tries: 10_000_000, depth: 100 }, (e, p) => {
+  const res = SKI.extras.search(seed, { tries: options.maxTries, depth: options.maxDepth }, (e, p) => {
     if (!p.expr)
       return -1;
     if (p.expr.equals(expr))
@@ -391,4 +390,13 @@ function handleCommand (input, ski) {
 
 function setFormat (options) {
   format = SKI.schemas.FormatOptions.parse(JSON.parse(options));
+}
+
+function toInt (comment) {
+  return function (str) {
+    const n = Number.parseInt(str);
+    if (Number.isNaN(n) || n <= 0)
+      throw new Error(comment + ' requires positive integer');
+    return n;
+  }
 }
