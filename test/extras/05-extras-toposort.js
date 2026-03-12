@@ -4,7 +4,7 @@ const { expect } = require('chai');
 const { SKI } = require('../../src/index');
 
 describe('SKI.extras.toposort', () => {
-  const ski = new SKI();
+  const ski = new SKI({ addContext: true });
   it('(self-check', () => {
     checkOrder([SKI.S, SKI.K]);
     checkOrder([SKI.K, SKI.S]);

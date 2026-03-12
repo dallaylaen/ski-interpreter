@@ -107,7 +107,7 @@ describe( 'SKI.parse', () => {
   });
 
   it('can erase preexisting terms', () => {
-    const ski = new SKI();
+    const ski = new SKI({ addContext: true });
     ski.add('foo', 'SK');
     const expr = ski.parse('foo =; foo foo x');
     expect(expr.run().expr + '').to.equal('foo foo x');

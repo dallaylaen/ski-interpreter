@@ -6,7 +6,7 @@ const { SKI } = require('../../src/index');
 const { Expr, Alias } = SKI.classes;
 
 describe('Expr.context', () => {
-  const ski = new SKI();
+  const ski = new SKI({ addContext: true });
 
   it('describes where the expr comes from', () => {
     const src = 'M=WI; L=BWB; BML';

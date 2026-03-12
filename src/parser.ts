@@ -4,7 +4,7 @@
 'use strict';
 
 import { Tokenizer, restrict } from './internal';
-import { Expr, FreeVar, Lambda, Church, Alias, Native, native, Invocation } from './expr';
+import { Expr, FreeVar, Lambda, Church, Alias, Native, Named, native, Invocation } from './expr';
 import { toposort } from './toposort';
 
 class Empty extends Expr {
@@ -68,6 +68,7 @@ export type ParserOptions = {
   lambdas?: boolean,
   terms?: { [key: string]: Expr | string } | string[],
   annotate?: boolean,
+  addContext?: boolean,
 };
 
 export type ParseOptions = {
@@ -97,6 +98,7 @@ export class Parser {
    * }} [options]
    */
 
+  addContext: boolean;
   annotate: boolean;
   known: {[name: string]: Expr};
   allow: Set<string>;
@@ -106,6 +108,7 @@ export class Parser {
 
   constructor (options: ParserOptions = {}) {
     this.annotate = !!options.annotate;
+    this.addContext = !!options.addContext;
     this.known = { ...native };
     this.hasNumbers = true;
     this.hasLambdas = true;
@@ -177,16 +180,16 @@ export class Parser {
    * @private
    */
   _named (term: Alias | string, impl?: Expr | string | ((arg: Expr) => Invocation)): Native | Alias {
-    if (term instanceof Alias)
-      return new Alias(term.name, term.impl, { canonize: true });
+    if (term instanceof Named)
+      return maybeAlias(term.name, term);
     if (typeof term !== 'string')
       throw new Error('add(): term must be an Alias or a string');
     if (impl === undefined)
       throw new Error('add(): impl must be provided when term is a string');
     if (typeof impl === 'string')
-      return new Alias(term, this.parse(impl), { canonize: true });
+      return maybeAlias(term, this.parse(impl));
     if (impl instanceof Expr)
-      return new Alias(term, impl, { canonize: true });
+      return maybeAlias(term, impl);
     if (typeof impl === 'function')
       return new Native(term, impl);
     // idk what this is
@@ -405,12 +408,17 @@ export class Parser {
       // console.log('parsed line:', item, '; got:', expr,'; jar now: ', jar);
     }
 
-    expr.context = {
-      env:    { ...this.getTerms(), ...jar }, // also contains pre-parsed terms
-      scope:  options.scope,
-      src:    source,
-      parser: this,
-    };
+    if (this.addContext) {
+      // avoid modifying an ro term
+      if (expr instanceof Named)
+        expr = new Alias(expr.name, expr, { outdated: true });
+      expr.context = {
+        env:    { ...this.getTerms(), ...jar }, // also contains pre-parsed terms
+        scope:  options.scope,
+        src:    source,
+        parser: this,
+      };
+    }
     return expr;
   }
 
@@ -519,4 +527,13 @@ export class Parser {
  * @param {T} [scope] - optional context to bind the generated variables to
  * @return {{[key: string]: FreeVar}}
  */
+}
+
+function maybeAlias (name: string, impl: Expr): Named {
+  // Remove unnecessary extra aliases with the same name
+  while (impl instanceof Alias && impl.name === name)
+    impl = impl.impl;
+  if (impl instanceof Named && impl.name === name)
+    return impl;
+  return new Alias(name, impl, { canonize: true });
 }

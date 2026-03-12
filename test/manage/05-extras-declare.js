@@ -4,7 +4,7 @@ const { expect }   = require('chai');
 const { SKI }      = require('../../src/index');
 
 describe('SKI.extras.declare', () => {
-  const ski = new SKI();
+  const ski = new SKI({ addContext: true });
   ski.add('T', 'CI');
   ski.add('V', 'BCT');
   ski.add('pair', 'V x y');

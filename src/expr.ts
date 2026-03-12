@@ -1271,7 +1271,7 @@ export class Alias extends Named {
   outdated?: boolean;
 
   constructor (name: string, impl: Expr,
-    options : {canonize?: boolean, max?: number, maxArgs?: number, note?: string, terminal?: boolean} = {}) {
+    options : {canonize?: boolean, max?: number, maxArgs?: number, note?: string, terminal?: boolean, outdated?: boolean} = {}) {
     super(name);
     if (!(impl instanceof Expr))
       throw new Error('Attempt to create an alias for a non-expression: ' + impl);
@@ -1281,6 +1281,8 @@ export class Alias extends Named {
     this.terminal = options.terminal ?? this.props?.proper;
     this.invoke = waitn(impl, this.arity ?? 0) as (arg: Expr) => Invocation;
     this.size = impl.size;
+    if (options.outdated)
+      this.outdated = true;
   }
 
   /**
