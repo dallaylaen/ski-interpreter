@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-03-15
+
+### BREAKING CHANGES
+
+- `affine: true` in quests now means "has no duplicating subterms" rather than "non-duplicating as a whole." 
+Aliases are exempted from this check, so a solution `SK`
+will not pass as S is duplicating, but `false=SK; false`
+will because `false` (as a whole term) _is_ affine.
+
+### Added
+
+- `SKI.schemas.FormatOptions`: zod schema for validating format options.
+- `bin/ski.js`: global `--format` option.
+- `bin/ski.js`: `!format` command in the REPL.
+- `bin/ski.js`: `--verbose` is now a global flag with a toggle in the REPL.
+- `bin/ski.js`: `--max`, `--max-size`, and `--max-args` arguments.
+- `bin/ski.js search`: `--max-depth` and `--max-tries` options.
+- New quest: affine extract from list.
+- `zod` added as a dependency.
+
+### Fixed
+
+- `infer()` now adheres to `maxSize`.
+- Avoid adding context to parsed saved terms.
+- `TraverseValue` signature now includes `void` so that `return undefined` in `traverse`/`fold` is no longer necessary.
+
 ## [2.4.1] - 2026-03-06
 
 ### Added
