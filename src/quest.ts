@@ -1,5 +1,5 @@
 import { Parser } from './parser';
-import { Expr, FreeVar, Alias, Named, control } from './expr';
+import { Expr, FreeVar, Alias, Named, control, TermInfo, App } from './expr';
 
 export type CaseResult = {
   pass: boolean,
@@ -10,7 +10,6 @@ export type CaseResult = {
   expected?: Expr,
   note?: string,
   args: Expr[],
-  // eslint-disable-next-line no-use-before-define
   case: Case
 };
 
@@ -99,7 +98,6 @@ export class Quest {
    * quest.check('I');     // fail! I not in the allowed list.
    */
   input: (InputSpec & {placeholder: FreeVar})[];
-  // eslint-disable-next-line no-use-before-define
   cases: Case[];
 
   engineFull: Parser;
@@ -354,9 +352,7 @@ export class Quest {
     return [...this.cases];
   }
 
-  // eslint-disable-next-line no-use-before-define
   static Group: new (options: { name?: string, intro?: string | string[], id?: string | number, content?: (Quest | QuestSpec)[] }) => { verify: (options: { seen?: Set<string | number>, date?: boolean }) => { [key: string]: unknown } };
-  // eslint-disable-next-line no-use-before-define
   static Case: new (input: FreeVar[], options: AddCaseOptions) => Case;
 }
 
@@ -398,9 +394,7 @@ class Case {
 }
 
 class ExprCase extends Case {
-  // eslint-disable-next-line no-use-before-define
   e1: Subst;
-  // eslint-disable-next-line no-use-before-define
   e2: Subst;
   /**
    * @param {FreeVar[]} input
@@ -458,9 +452,9 @@ const knownCaps: { [key: string]: boolean } = {
 }
 
 class PropertyCase extends Case {
-  // eslint-disable-next-line no-use-before-define
   expr: Subst;
   caps: Capability;
+  isAffine?: boolean;
   // test that an expression uses all of its inputs exactly once
   constructor (input: FreeVar[], options: AddCaseOptions, terms: string[]) {
     super(input, options);
@@ -484,13 +478,12 @@ class PropertyCase extends Case {
 
     if (this.caps.affine) {
       delete this.caps.affine;
-      this.caps.normal = true;
-      this.caps.duplicate = false;
+      this.isAffine = true;
     }
   }
 
-  check (...expr: Expr[]): CaseResult {
-    const start = this.expr.apply(expr);
+  check (...input: Expr[]): CaseResult {
+    const start = this.expr.apply(input);
     const r = start.run({ max: this.max });
     const guess = r.expr.infer({ max: this.max });
 
@@ -498,6 +491,32 @@ class PropertyCase extends Case {
     for (const cap in this.caps) {
       if ((guess as unknown as { [key: string]: unknown })[cap] !== (this.caps as unknown as { [key: string]: unknown })[cap])
         reason.push('expected property ' + cap + ' to be ' + (this.caps as unknown as { [key: string]: unknown })[cap] + ', found ' + (guess as unknown as { [key: string]: unknown })[cap]);
+    }
+
+    if (this.isAffine) {
+      // const initial: MaybeTerm|undefined = undefined;
+      const badGuy = start.fold<{ expr: Expr, props: TermInfo }|undefined>(
+        undefined, (acc, expr) => {
+          if (expr instanceof App || expr instanceof FreeVar)
+            return;
+          const props = expr.infer({ max: this.max });
+          if (!props.expr || props.duplicate)
+            return control.stop({ expr, props });
+
+          // don't descend into aliases EXCEPT that input is aliases too and we definitely descend into them
+          // so B=S(KS)K; B is affine (which it is) but S(KS)K alone isn't
+          if (expr instanceof Alias && input.indexOf(expr) < 0)
+            return control.prune(acc);
+        }
+      );
+      if (badGuy) {
+        reason.push(
+          'found unexpected subterm ' + badGuy.expr + (badGuy.props.expr
+            ? ' that duplicates arguments'
+            : ' without a normal form'
+          )
+        );
+      }
     }
 
     return {
@@ -508,7 +527,7 @@ class PropertyCase extends Case {
       found:  r.expr,
       case:   this,
       note:   this.note,
-      args:   expr,
+      args:   input,
     };
   }
 }
@@ -516,6 +535,7 @@ class PropertyCase extends Case {
 class Subst {
   /**
    * @descr A placeholder object with exactly n free variables to be substituted later.
+   *        Basically a poor man's lambda.
    * @param {Expr} expr
    * @param {FreeVar[]} env
    */

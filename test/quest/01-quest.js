@@ -200,6 +200,30 @@ describe('Quest', () => {
     expect(nolinear.pass).to.equal(false, 'overall failed');
   });
 
+  it('supports affine cases', () => {
+    const quest = new Quest({
+      input: 'nil',
+      cases: [
+        [{ caps: { affine: true } }, 'nil'],
+        ['nil x y', 'y'],
+      ],
+    });
+
+    // KI: pass
+    // SK: fail
+    // foo=SK; foo: pass again (non-affine term S shielded by an affine alias)
+
+    const pass = quest.check('KI');
+    expect(pass.pass).to.equal(true);
+
+    const unshileded = quest.check('SK');
+    expect(unshileded.pass).to.equal(false);
+    expect(unshileded.details[0].reason).to.match(/found.*\bS\b.*duplicate/);
+
+    const shielded = quest.check('foo=SK; foo');
+    expect(shielded.pass).to.equal(true);
+  });
+
   it('displays allowed terms correctly', () => {
     const quest = new Quest({
       input:  'phi',
