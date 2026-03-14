@@ -56,15 +56,13 @@ export function restrict (set:Set<string>, spec?: string) {
   if (!spec)
     return set;
   let out = new Set([...set]);
-  /* eslint-disable @typescript-eslint/no-use-before-define */
+  let mode = '=';
   const act : {[key: string]: (s: string) => void} = {
     '=': sym => { out = new Set([sym]); mode = '+'; },
     '+': sym => { out.add(sym); },
     '-': sym => { out.delete(sym); },
   };
-  /* eslint-enable @typescript-eslint/no-use-before-define */
 
-  let mode = '=';
   for (const sym of tokRestrict.split(spec)) {
     if (act[sym])
       mode = sym;
@@ -74,9 +72,7 @@ export function restrict (set:Set<string>, spec?: string) {
   return out;
 }
 
-// eslint-disable-next-line no-use-before-define
-export type TraverseDecorator<T> = (value: T) => TraverseControl<T>;
-// eslint-disable-next-line no-use-before-define
+export type TraverseDecorator = <T>(value?: T) => TraverseControl<T>;
 export type TraverseValue<T> = T | TraverseControl<T> | null | undefined | void;
 
 export class TraverseControl<T> {
@@ -92,9 +88,9 @@ export class TraverseControl<T> {
    * @param {T} value
    * @param {function(T): TraverseControl<T>} decoration
    */
-  value: T;
-  decoration: TraverseDecorator<T>;
-  constructor (value: T, decoration: TraverseDecorator<T>) {
+  value?: T;
+  decoration: TraverseDecorator;
+  constructor (value: T | undefined, decoration: TraverseDecorator) {
     this.value = value;
     this.decoration = decoration;
   }
@@ -106,7 +102,7 @@ export class TraverseControl<T> {
  * @param {T|TraverseControl<T>|null} value
  * @returns {[T?, function|undefined]}
  */
-export function unwrap<T> (value: TraverseValue<T>): [T?, TraverseDecorator<T>?] {
+export function unwrap<T> (value: TraverseValue<T>): [T?, TraverseDecorator?] {
   // `?? undefined` so that null is not 'an object'
   if (value instanceof TraverseControl)
     return [value.value ?? undefined, value.decoration];
@@ -126,8 +122,8 @@ export function unwrap<T> (value: TraverseValue<T>): [T?, TraverseDecorator<T>?]
  * @param {string} [label]
  * @returns {function(T): TraverseControl<T>}
  */
-export function prepareWrapper (label: string): <T>(value: T) => TraverseControl<T> {
-  const fun = <T>(value: T) => new TraverseControl<T>(value, fun as TraverseDecorator<T>);
+export function prepareWrapper (label?: string): <T>(value?: T) => TraverseControl<T> {
+  const fun: TraverseDecorator = <T>(value: T|undefined) => new TraverseControl<T>(value, fun);
   (fun as { label?: string }).label = label;
   fun.toString = () => 'TraverseControl::' + label;
   return fun;
