@@ -58,7 +58,7 @@ class QuestPage {
    *   onLoad?: function, // callback for when quests are loaded, gets list of QuestChapter objects as argument
    *   onSolved?: function, // callback for when a quest is solved
    *   onFailed?: function, // callback for when a quest is attempted but not solved
-   *   onUnlock?: function, // callback for when a quest is solved and unlocks something in the engine
+   *   onTermUnlock?: function, // callback for when a quest is solved and unlocks something in the engine
    *   chapterList?: QuestChapter[], // optional write-only list for observability only
    * }} options
    */
@@ -81,7 +81,7 @@ class QuestPage {
 
     this._onSolved = options.onSolved;
     this._onFailed = options.onFailed;
-    this._onUnlock = options.onUnlock;
+    this._onTermUnlock = options.onTermUnlock;
 
     this.chapters = [];
   }
@@ -124,7 +124,7 @@ class QuestPage {
         link:     this.mkLink(item),
         engine:   this.engine,
         store:    this.store,
-        onUnlock: x => this.onUnlock(x),
+        onTermUnlock: x => this.onTermUnlock(x),
         onSolved: x => this._onSolved(x),
         onFailed: x => this._onFailed(x),
       });
@@ -143,13 +143,13 @@ class QuestPage {
     return (str.match(/^\w+:\/\//) || str.match(/^[/.]/)) ? str : this.root + '/' + str;
   }
 
-  onUnlock (term) {
+  onTermUnlock (term) {
     this.engine.maybeAdd(term.name, term.impl);
     if (this.store)
       this.store.save('engine', this.engine);
     this.showKnown();
-    if (this._onUnlock)
-      this._onUnlock(term);
+    if (this._onTermUnlock)
+      this._onTermUnlock(term);
   }
 
   showKnown () {
@@ -242,7 +242,7 @@ class QuestBox {
   onSolved (result) {
     if (this.impl.meta.unlock && result) {
       const term = new SKI.classes.Alias(this.impl.meta.unlock, result.expr.expand());
-      this.chapter?.onUnlock(term);
+      this.chapter?.onTermUnlock(term);
     }
     if (this.chapter)
       this.chapter.addSolved(this.impl.id);
@@ -386,7 +386,7 @@ class QuestChapter {
    *   number?: number,
    *   engine: SKI,
    *   store: Store,
-   *   onUnlock?: function, // callback for when a quest is solved and unlocks something in the engine
+   *   onTermUnlock?: function, // callback for when a quest is solved and unlocks something in the engine
    * }}options
    */
   constructor (options) {
@@ -397,7 +397,7 @@ class QuestChapter {
     this.number = options.number ?? 0;
     this.engine = options.engine;
     this.store = options.store;
-    this.onUnlock = options.onUnlock ?? (() => {});
+    this.onTermUnlock = options.onTermUnlock ?? (() => {});
     this.updateMeta();
   }
 
