@@ -774,7 +774,7 @@ export class Expr {
         around:   ['', ''],
         redex:    ['', ''],
       }
-    return this._format({
+    return this.formatImpl({
       terse:     options.terse    ?? true,
       brackets:  options.brackets ?? fallback.brackets,
       space:     options.space    ?? fallback.space,
@@ -794,8 +794,8 @@ export class Expr {
    * @returns {string}
    * @private
    */
-  _format (options: RefinedFormatOptions, nargs: number): string {
-    throw new Error( 'No _format() method defined in class ' + this.constructor.name );
+  formatImpl (options: RefinedFormatOptions, nargs: number): string {
+    throw new Error( 'No formatImpl() method defined in class ' + this.constructor.name );
   }
 
   /**
@@ -964,9 +964,9 @@ export class App extends Expr {
     return !first;
   }
 
-  _format (options:RefinedFormatOptions, nargs: number): string {
-    const fun = this.fun._format(options, nargs + 1);
-    const arg = this.arg._format(options, 0);
+  formatImpl (options:RefinedFormatOptions, nargs: number): string {
+    const fun = this.fun.formatImpl(options, nargs + 1);
+    const arg = this.arg.formatImpl(options, 0);
     const wrap = nargs ? ['', ''] : options.around!;
     // TODO ignore terse for now
     if (options.terse && !this.arg._braced(false))
@@ -1012,7 +1012,7 @@ export class Named extends Expr {
     );
   }
 
-  _format (options: RefinedFormatOptions, nargs: number): string {
+  formatImpl (options: RefinedFormatOptions, nargs: number): string {
     // NOTE fancyName is not yet official and may change name or meaning
     const name = options.html ? this.fancyName ?? this.name : this.name;
     return this.arity !== undefined && this.arity > 0 && this.arity <= nargs
@@ -1068,7 +1068,7 @@ export class FreeVar extends Named {
     return null;
   }
 
-  _format (options: RefinedFormatOptions, nargs: number): string {
+  formatImpl (options: RefinedFormatOptions, nargs: number): string {
     const name = options.html ? this.fancyName ?? this.name : this.name;
     return options.var![0] + name + options.var![1];
   }
@@ -1187,12 +1187,12 @@ export class Lambda extends Expr {
     return null;
   }
 
-  _format (options: RefinedFormatOptions, nargs: number): string {
+  formatImpl (options: RefinedFormatOptions, nargs: number): string {
     return (nargs > 0 ? options.brackets![0] : '')
       + options.lambda![0]
-      + this.arg._format(options, 0) // TODO highlight redex if nargs > 0
+      + this.arg.formatImpl(options, 0) // TODO highlight redex if nargs > 0
       + options.lambda![1]
-      + this.impl._format(options, 0) + options.lambda![2]
+      + this.impl.formatImpl(options, 0) + options.lambda![2]
       + (nargs > 0 ? options.brackets![1] : '');
   }
 
@@ -1246,7 +1246,7 @@ export class Church extends Expr {
     return false;
   }
 
-  _format (options: RefinedFormatOptions, nargs: number): string {
+  formatImpl (options: RefinedFormatOptions, nargs: number): string {
     return nargs >= 2
       ? options.redex![0] + this.n + options.redex![1]
       : this.n + '';
@@ -1352,11 +1352,11 @@ export class Alias extends Named {
     return this.outdated ? this.impl._braced(first) : false;
   }
 
-  _format (options: RefinedFormatOptions, nargs: number): string {
+  formatImpl (options: RefinedFormatOptions, nargs: number): string {
     const outdated = options.inventory
       ? options.inventory[this.name] !== this
       : this.outdated;
-    return outdated ? this.impl._format(options, nargs) : super._format(options, nargs);
+    return outdated ? this.impl.formatImpl(options, nargs) : super.formatImpl(options, nargs);
   }
 
   diagImpl (indent: string): string[] {
