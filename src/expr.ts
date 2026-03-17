@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 
-import { unwrap, prepareWrapper, TraverseValue, Dict } from './internal';
+import { unwrap, prepareWrapper, TraverseValue } from './internal';
 
 const DEFAULTS = {
   max:     1000,
@@ -31,7 +31,7 @@ export const control = {
  * @desc List of predefined native combinators.
  * This is required for toSKI() to work, otherwise could as well have been in parser.js.
  */
-export const native: Dict<Native> = {};
+export const native: Record<string, Native> = {};
 
 export type TermInfo = {
   normal: boolean,      // whether the term becomes irreducible after receiving a number of arguments.
@@ -73,7 +73,7 @@ type RefinedFormatOptions = { // ditto but with defaults plugged in
   lambda: [string, string, string],
   around: [string, string],
   redex: [string, string],
-  inventory?: Dict<Expr>,
+  inventory?: Record<string, Expr>,
 }
 
 type TraverseOptions = {order?: 'LO' | 'LI' | 'leftmost-outermost' | 'leftmost-innermost'};
@@ -85,33 +85,34 @@ export class Expr {
   /**
    *  @descr A combinatory logic expression.
    *
-   *  Applications, variables, and other terms like combinators per se
-   *  are subclasses of this class.
+   *  Applications, variables, lambdas, combinators per se,
+   *  and other expression subtypes all extend this class.
+   *
+   *  Expr itself cannot (or at least should not) be instantiated.
    *
    *  @abstract
-   *  @property {{
-   *    scope?: any,
-   *    env?: { [key: string]: Expr },
-   *    src?: string,
-   *    parser: object,
-   *  }} [context]
-   * @property {number} [arity] - number of arguments the term is waiting for (if known)
-   * @property {string} [note] - a brief description what the term does
-   * @property {string} [fancyName] - how to display in html mode, e.g. &phi; instead of 'f'
-   *                Typically only applicable to descendants of Named.
-   * @property {TermInfo} [props] - properties inferred from the term's behavior
    */
+
+  /** @desc optional context for the term. Is set by the parser with addContext: true */
   context?: {
     scope?: object,
-    env?: Dict<Expr>,
+    env?: Record<string, Expr>,
     src?: string,
     parser: object,
   }
 
+  /** @desc number of arguments the term is waiting for (if known) */
   arity?: number;
+  /** @desc a brief description what the term does */
   note?: string;
+  /** @desc the properties of the term, typically inferred from its behavior.
+   *      This is used internally when declaring Native / Alias terms.
+   */
   props?: TermInfo;
-  size?: number; // rough estimate of the number of nodes in the tree
+  /** @desc An estimated number of nodes in the expression tree.
+   *     Used to prevent runaway computations.
+   */
+  size?: number;
 
   /**
    *
@@ -335,7 +336,7 @@ export class Expr {
    * @return {TermInfo}
    */
   infer (options : {max?: number, maxArgs?: number, maxSize?: number } = {}): TermInfo {
-    const skipNames: Dict<boolean> = {};
+    const skipNames: Record<string, boolean> = {};
     const skipSkip: Set<Expr> = new Set();
     this.traverse(e => {
       if (e instanceof Named && !skipSkip.has(e))
@@ -359,7 +360,7 @@ export class Expr {
    * @returns {TermInfo}
    * @private
    */
-  _infer (options:{max: number, maxArgs: number, maxSize: number, skipNames: Dict<boolean>}, nargs: number): TermInfo {
+  _infer (options:{max: number, maxArgs: number, maxSize: number, skipNames: Record<string, boolean>}, nargs: number): TermInfo {
     const probe: FreeVar[] = [];
     let steps = 0;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
