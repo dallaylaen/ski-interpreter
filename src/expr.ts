@@ -820,21 +820,11 @@ export class Expr {
    *       FreeVar: x[54]
    */
   diag ():string {
-    const rec:(e: Expr, indent: string) => string[] = (e, indent) => {
-      if (e instanceof App)
-        return [indent + 'App:', ...e.unroll().flatMap(s => rec(s, indent + '  '))];
-      if (e instanceof Lambda)
-        return [`${indent}Lambda (${e.arg}[${e.arg.id}]):`, ...rec(e.impl, indent + '  ')];
-      // no indent increase so that a diff between diags is consistent with how `equals` works.
-      if (e instanceof Alias)
-        return [`${indent}Alias (${e.name}): \\`, ...rec(e.impl, indent)];
-      if (e instanceof FreeVar)
-        return [`${indent}FreeVar: ${e.name}[${e.id}]`];
-      return [`${indent}${e.constructor.name}: ${e}`];
-    }
+    return this.diagImpl('').join('\n');
+  }
 
-    const out = rec(this, '');
-    return out.join('\n');
+  diagImpl (indent: string): string[] {
+    return [indent + this.constructor.name + ': ' + this];
   }
 
   /**
@@ -985,6 +975,13 @@ export class App extends Expr {
       return wrap[0] + fun + options.brackets![0] + arg + options.brackets![1] + wrap[1];
   }
 
+  diagImpl (indent: string): string[] {
+    return [
+      indent + 'App:',
+      ...this.unroll().flatMap(e => e.diagImpl(indent + '  ')),
+    ];
+  }
+
   _unspaced (arg: Expr): boolean {
     return this.arg._braced(false) ? true : this.arg._unspaced(arg);
   }
@@ -1074,6 +1071,10 @@ export class FreeVar extends Named {
   _format (options: RefinedFormatOptions, nargs: number): string {
     const name = options.html ? this.fancyName ?? this.name : this.name;
     return options.var![0] + name + options.var![1];
+  }
+
+  diagImpl (indent: string): string[] {
+    return [`${indent}FreeVar: ${this.name}[${this.id}]`];
   }
 
   static global = ['global'];
@@ -1193,6 +1194,13 @@ export class Lambda extends Expr {
       + options.lambda![1]
       + this.impl._format(options, 0) + options.lambda![2]
       + (nargs > 0 ? options.brackets![1] : '');
+  }
+
+  diagImpl (indent: string): string[] {
+    return [
+      `${indent}Lambda (${this.arg.name}[${this.arg.id}]):`,
+      ...this.impl.diagImpl(indent + '  '),
+    ];
   }
 
   _braced (first: boolean): boolean {
@@ -1349,6 +1357,14 @@ export class Alias extends Named {
       ? options.inventory[this.name] !== this
       : this.outdated;
     return outdated ? this.impl._format(options, nargs) : super._format(options, nargs);
+  }
+
+  diagImpl (indent: string): string[] {
+    // no indent increase so that a diff between diags is consistent with how `equals` works.
+    return [
+      `${indent}Alias (${this.name}): \\`,
+      ...this.impl.diagImpl(indent),
+    ]
   }
 }
 
