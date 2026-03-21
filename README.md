@@ -7,8 +7,12 @@ This package contains a
 and [lambda calculus](https://en.wikipedia.org/wiki/Lambda_calculus)
 parser and interpreter focused on traceability and inspectability.
 
-It is written in plain JavaScript (with bolted on TypeScript support)
+It is written in TypeScript and JavaScript
 and can be used in Node.js or in the browser.
+
+A [playground](https://dallaylaen.github.io/ski-interpreter/)
+and a [quest page](https://dallaylaen.github.io/ski-interpreter/quest.html)
+containing interactive combinatory logic exercises of increasing difficulty are incuded.
 
 # Features:
 
@@ -40,7 +44,8 @@ and can be used in Node.js or in the browser.
 * <code>C x y z &mapsto; x z y</code> _// swapping_;
 * <code>W x y &mapsto; x y y</code> _//duplication_;
 
-The special combinator `+` will increment Church numerals, if they happen to come after it:
+The special combinator `+` will increment Church numerals,
+if they happen to come directly after it:
 
 * `+ 0` // 1
 * `2 + 3` // -> `+(+(3))` -> `+(4)` -> `5`
@@ -99,14 +104,14 @@ npm install @dallaylaen/ski-interpreter
   * `--verbose` - Show all evaluation steps
   * Example: `ski file script.ski`
 
-* **`infer <expression>`** - try to find equivalent lambda expression and display its properties if found. 
+* **`infer <expression>`** - try to find equivalent lambda expression and display its properties if found.
 
-* **`extract <expression> <known term> ...`** - 
+* **`extract <expression> <known term> ...`** -
   Replace parts of the expression that are equivalent to the known terms with the respective terms. Known terms must be normalizable.
 
-* **`search <expression> <known term> ...`** - 
-  Attempt to brute force an equivalent of the _expression_ using only the _known terms_.  
-  Only normalizable terms are currently supported. 
+* **`search <expression> <known term> ...`** -
+  Attempt to brute force an equivalent of the _expression_ using only the _known terms_.
+  Only normalizable terms are currently supported.
 
 * **`quest-lint <files...>`** - Validate quest definition files
   * `--solution <file>` - Load solutions from a JSON file for verification
@@ -297,6 +302,7 @@ for building interactive quest pages from JSON-encoded quest data;
 * [@ivanaxe](https://github.com/ivanaxe) for luring me into [icfpc 2011](http://icfpc2011.blogspot.com/2011/06/task-description-contest-starts-now.html) where I was introduced to combinators.
 * [@akuklev](https://github.com/akuklev) for explaining functional programming to me so many times that I actually got some idea.
 * [One happy fellow](https://github.com/happyfellow-one) whose [riddle](https://blog.happyfellow.dev/a-riddle/) trolled me into writing an early `traverse` prototype.
+* [Darkwing3125](https://github.com/Darkwing3125) for posting multiple bug reports and feature requests.
 
 # Prior art and inspiration
 
