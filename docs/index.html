@@ -400,16 +400,43 @@
         return;
       }
       view.historyMain.innerHTML = '';
-      append(view.historyMain, 'div', { class: ['history-title'], content: 'input history'});
+      append(view.historyMain, 'div', { class: ['history-title']}, el => {
+        append(el, 'span', {content: 'Input history'});
+      });
       const list = append(view.historyMain, 'ol', { class: ['history-list']});
-      for (const entry of history.list({last: view.entryField.value})) {
-        const item = append(list, 'li', { class: ['history-item'], content: entry });
-        item.addEventListener('click', ev => {
-          ev.preventDefault();
-          view.entryField.value = entry;
-          hideHistory();
+      for (const entry of history.list({})) {
+        const item = append(list, 'li', { class: ['history-item'] }, el => {
+          el.addEventListener('click', ev => {
+            ev.preventDefault();
+            view.entryField.value = entry;
+            hideHistory();
+          });
         });
+        append(item, 'input', {type: 'checkbox', value: entry, class: ['history-checkbox']}, el => {
+          el.addEventListener('click', ev => ev.stopPropagation());
+        });
+        append(item, 'span', {content: entry});
       }
+      append(view.historyMain, 'div', {class: ['history-footer']}, footer => {
+        append(footer, 'a', { href: '#', content: 'delete selected', color: 'grey'}, del => {
+          del.style.float = 'right';
+          del.style.fontSize = 'smaller';
+          del.addEventListener('click', ev => {
+            ev.preventDefault();
+            const toDelete = [];
+            for (const checkbox of view.historyMain.querySelectorAll('.history-checkbox')) {
+              if (checkbox.checked)
+                toDelete.push(checkbox.value);
+            }
+            if (toDelete.length === 0)
+              return;
+            if (!window.confirm(`Delete ${toDelete.length} entries from history?`))
+              return;
+            history.remove(toDelete);
+            hideHistory();
+          })
+        });
+      });
       list.scrollTop = list.scrollHeight;
       document.addEventListener('click', hideHistory);
       view.historyMain.classList.remove('hidden');
