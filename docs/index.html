@@ -208,7 +208,7 @@
         <dl id="inventory" class="term-list"></dl>
     </div>
     <div id="around-history">
-        <div class="history-main" id="history-main" hidden></div>
+        <div class="history-main hidden" id="history-main"></div>
     </div>
     <div id="prompt">
         <button id="history-show">H</button>
@@ -267,7 +267,10 @@
     function setupMain() {
         view.entryField.addEventListener('keydown', onKey);
         view.entryField.addEventListener('input', saveInput);
-        view.historyShow.addEventListener('click', showHistory);
+        view.historyShow.addEventListener('click', ev => {
+          ev.stopPropagation();
+          showHistory();
+        });
 
         const oldHash = util.readOldLink(window.location.search);
         if (oldHash) {
@@ -408,18 +411,19 @@
         });
       }
       list.scrollTop = list.scrollHeight;
-      document.addEventListener('click', ev => {
-        if (historyVisible)
-          hideHistory();
-      }, {once: true, capture: true});
-      view.historyMain.hidden = false;
+      document.addEventListener('click', hideHistory);
+      view.historyMain.classList.remove('hidden');
       historyVisible = true;
     }
 
-    function hideHistory() {
-        view.historyMain.hidden = true;
-        view.historyMain.innerHTML = '';
-        setTimeout(() => historyVisible = false, 0); // to prevent immediate reopening when clicking the button
+    function hideHistory(ev) {
+        if (!historyVisible)
+            return;
+        if (ev && view.historyMain.contains(ev.target))
+            return; // click inside the history shouldn't close it
+        document.removeEventListener('click', hideHistory); // don't pollute callbacks
+        view.historyMain.classList.add('hidden');
+        setTimeout(() => historyVisible = false, 0);
     }
 
     function setFormat(options) {
