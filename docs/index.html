@@ -437,7 +437,7 @@
           })
         });
       });
-      list.scrollTop = list.scrollHeight;
+      setTimeout(() => { list.scrollTop = list.scrollHeight; }, 0);
       document.addEventListener('click', hideHistory);
       view.historyMain.classList.remove('hidden');
       historyVisible = true;
