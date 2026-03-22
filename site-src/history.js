@@ -86,7 +86,7 @@ class History {
 
   remove (entries=[]) {
     // TODO add lock but later
-    const skip = new Set(entries.map(s => s.trim()));
+    const skip = new Set(entries.map(s => (s ?? '').trim()));
     const head = this.store.load('head') ?? 0;
     const tail = this.store.load('tail') ?? 0;
     let i = head;
