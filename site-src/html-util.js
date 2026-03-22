@@ -26,7 +26,11 @@ function grabView (...ids) {
 }
 
 /**
- * Create a new HTMLElement and append it to parent, if given.
+ * Create a new HTMLElement with given properties and append it to parent, if given.
+ * Properties not listed explicitly under options will be set via element.setAttribute
+ *
+ * If a callback is specified, it will be called with the element as an argument.
+ *
  * @param parent - parent element to append to, or null to create an unattached element
  * @param tagname - tag name of the element to create
  * @param {object} options
@@ -43,18 +47,19 @@ function grabView (...ids) {
  */
 function append (parent, tagname, options = {}, decorate = null) {
   const child = document.createElement(tagname);
-  if (options.class)
-    child.classList.add(...options.class);
-  if (options.content !== undefined)
-    child.innerHTML = '' + options.content;
-  if (options.hidden)
-    child.hidden = true;
-  if (options.color)
-    child.style.color = options.color;
-  if (parent)
-    parent.appendChild(child);
+  const { class: classList, content, color, ...rest } = options;
+  if (classList)
+    child.classList.add(...classList);
+  if (content !== undefined)
+    child.innerHTML = '' + content;
+  if (color)
+    child.style.color = color;
+  for (const [key, value] of Object.entries(rest))
+    child.setAttribute(key, value);
   if (decorate)
     decorate(child);
+  if (parent)
+    parent.appendChild(child);
   return child;
 }
 
