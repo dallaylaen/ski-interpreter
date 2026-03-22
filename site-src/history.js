@@ -36,15 +36,19 @@ class History {
     this.trim();
   }
 
-  list (options) {
+  list (options = {}) {
     const out = [];
     const head = this.store.load('head') ?? 0;
     const tail = this.store.load('tail') ?? 0;
-    for (let i = tail; i < head; i++) {
-      const entry = this.store.load(`entry-${i}`);
-      if (entry !== null && (!out.length || entry !== out[out.length - 1]))
-        out.push(entry);
+    const seen = new Set();
+    for (let i = head; i >= tail; i--) {
+      const entry = (this.store.load(`entry-${i}`) ?? '').trim();
+      if (!entry || seen.has(entry))
+        continue; // skip deleted or duplicate entries
+      seen.add(entry);
+      out.push(entry);
     }
+    out.reverse();
     if (options.last !== undefined && options.last !== out[out.length - 1])
       out.push(options.last);
     return out;
@@ -78,6 +82,26 @@ class History {
       this.store.delete(`entry-${tail}`);
       this.store.save('tail', ++tail);
     }
+  }
+
+  remove (entries=[]) {
+    // TODO add lock but later
+    const skip = new Set(entries.map(s => s.trim()));
+    const head = this.store.load('head') ?? 0;
+    const tail = this.store.load('tail') ?? 0;
+    let i = head;
+    let j = head;
+    for (;i > tail; i--) {
+      const entry = this.store.load(`entry-${i}`);
+      if (entry === null || skip.has(entry))
+        continue; // skip deleted or removed entries
+      if (i !== j)
+        this.store.save(`entry-${j}`, entry);
+      j--;
+    }
+    this.store.save('tail', j);
+    for (; j >= tail; j--)
+      this.store.delete(`entry-${j}`);
   }
 }
 
