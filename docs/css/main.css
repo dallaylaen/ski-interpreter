@@ -198,6 +198,10 @@ li.hamburger-separator {
 
 /* general */
 
+.hidden {
+    display: none !important;
+}
+
 .ellipsis {
     display: inline-block;
     max-width: calc(100% - 1.5em);
