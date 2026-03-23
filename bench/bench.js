@@ -1,35 +1,70 @@
 'use strict';
 
-// const { fs } = require('fs');
+const fs = require('node:fs/promises');
 const { performance } = require('perf_hooks');
 const { SKI } = require('../lib/ski-interpreter.cjs');
 
-const ski = new SKI();
+const [_node, _script, action, file] = process.argv;
 
-const grand = {};
-
-for (const [src, repeat] of [['WS(BWB)I', 100000], ['WS(BWB)W x', 4000], ['WS(BWB)f', 3000]]) {
-  console.log(`Benchmarking ${src} at ${repeat}...`);
-  const expr = ski.parse(src);
-  const result = bench(expr, { iterations: repeat });
-  // console.log(result);
-  grand[src + ':' + repeat] = result;
+if (action === 'compare') {
+  fs.readFile(file).then(content => {
+    const old = JSON.parse(content.toString());
+    compare(benchCases(), old);
+  });
+} else if (action === 'save') {
+  console.log(JSON.stringify(benchCases()));
+} else {
+  console.log(benchCases());
 }
 
-grand.search_CSK = bench(() => {
-  const eq = SKI.C.infer().expr;
-  SKI.extras.search([SKI.S, SKI.K], {}, (e, p) => {
-    if (!p.expr)
-      return -1;
-    return p.expr.equals(eq) ? 1 : 0;
-  });
-});
+function compare (current, baseline) {
+  for (const key of Object.keys(current).sort()) {
+    console.log(`${key}:`)
+    const c = current[key];
+    const b = baseline[key] ?? {};
+    for (const param of ['mean', 'stdev', 'median', 'p95']) {
+      console.log(`  ${param}: ` + compareNum(c[param], b[param]));
+    }
+  }
+}
 
-console.log(grand);
+function compareNum (current, baseline) {
+  if (!baseline)
+    return '' + current;
+  const relative = 100 * (current - baseline) / baseline;
+  return current.toFixed(2) + ' (' + (relative > 0 ? '+' : '') + relative.toFixed(1) + '%)';
+}
+
+function benchCases() {
+  const ski = new SKI();
+
+  const grand = {};
+
+  for (const [src, repeat] of [['WS(BWB)I', 1000000], ['WS(BWB)W x', 4000], ['WS(BWB)f', 3000]]) {
+    // console.log(`Benchmarking ${src} at ${repeat}...`);
+    const expr = ski.parse(src);
+    const result = bench(expr, { iterations: repeat });
+    // console.log(result);
+    grand[src + ':' + repeat] = result;
+  }
+
+  //  console.log('Benchmarking search (C <- S K)...');
+
+  grand.search_CSK = bench(() => {
+    const eq = SKI.C.infer().expr;
+    SKI.extras.search([SKI.S, SKI.K], {}, (e, p) => {
+      if (!p.expr)
+        return -1;
+      return p.expr.equals(eq) ? 1 : 0;
+    });
+  });
+
+  return grand;
+}
 
 function bench (fun, options = {}) {
   const trim = options.trim ?? 0.2;
-  const n = options.n ?? 10;
+  const n = options.n ?? 20;
 
   if (fun instanceof SKI.classes.Expr) {
     const expr = fun;
