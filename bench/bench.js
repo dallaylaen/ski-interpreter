@@ -1,5 +1,21 @@
 'use strict';
 
+/**
+ *  @desc Benchmarking script for SKI interpreter.
+ *  Run with `node bench.js` to print results to console.
+ *  Run with `node bench.js save > baseline.json` to save results for later comparison.
+ *  Run with `node bench.js compare baseline.json` to compare current results with saved baseline.
+ *
+ *  mean, stdev, median, and p95 are reported for each benchmark case.
+ *  Highest 20% are considered outliers and dismissed (aka we ran into a garbage collection / background job).
+ *
+ *  The benchmark cases include:
+ *  - Y f // a "deep" nonterminating expression
+ *  - Y W x // a "wide" nonterminating expression
+ *  - Y I // a stable nonterminating expression
+ *  - Search for C analog in S K
+ */
+
 const fs = require('node:fs/promises');
 const { performance } = require('perf_hooks');
 const { SKI } = require('../lib/ski-interpreter.cjs');
