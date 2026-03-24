@@ -132,4 +132,25 @@ describe('SKI.traverse', () => {
 
     expect(short + '').to.equal('+(+ 0)');
   });
+
+  it('can emulate reduction', () => {
+    let expr = ski.parse('S(KS)K a b c'); // B
+    const isRedex = (term) => term instanceof SKI.classes.App
+      && term.fun.invoke(term.arg) instanceof SKI.classes.Expr
+      && !isRedex(term.fun);
+
+    const normal = [...expr.walk()].map(o => o.expr + '');
+    // console.log(normal);
+
+    const trace = [];
+    while (expr) {
+      trace.push(expr + '');
+      expr = expr.traverse({}, e => {
+        if (isRedex(e))
+          return SKI.control.stop(e.fun.invoke(e.arg));
+      })
+    }
+
+    expect(trace).to.deep.equal(normal);
+  });
 });
