@@ -84,7 +84,7 @@ function bench (fun, options = {}) {
 
   if (fun instanceof SKI.classes.Expr) {
     const expr = fun;
-    fun = () => expr.run({ max: options.iterations })
+    fun = () => clone(expr).run({ max: options.iterations })
   }
 
   const values = [];
@@ -116,4 +116,12 @@ function stat (values, options = {}) {
     median: sorted[Math.floor(sorted.length * 0.5)],
     p95:    sorted[Math.floor(sorted.length * 0.95)],
   }
+}
+
+function clone(expr) {
+  return expr.traverse(e => {
+    if (e instanceof SKI.classes.Named || e instanceof SKI.classes.Church)
+      return e;
+    // also aliases?
+  }) ?? expr;
 }
