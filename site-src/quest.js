@@ -120,13 +120,13 @@ class QuestPage {
     for (const item of list) {
       // TODO if item is an object, skip fetch and use it directly, returning `resolve`
       const chapter = new QuestChapter({
-        number:   ++chapterId,
-        link:     this.mkLink(item),
-        engine:   this.engine,
-        store:    this.store,
+        number:       ++chapterId,
+        link:         this.mkLink(item),
+        engine:       this.engine,
+        store:        this.store,
         onTermUnlock: x => this.onTermUnlock(x),
-        onSolved: x => this._onSolved(x),
-        onFailed: x => this._onFailed(x),
+        onSolved:     x => this._onSolved(x),
+        onFailed:     x => this._onFailed(x),
       });
       this.chapters.push(chapter);
       chapter.attach(this.view.content, { placeholder: 'loading chapter' + chapter.number + '...' });
@@ -156,7 +156,7 @@ class QuestPage {
     if (!this.view.inventory)
       return;
     this.view.inventory.innerHTML = '';
-    const ul = append(this.view.inventory, 'ul', {class: ['ski-quest-inventory'] });
+    const ul = append(this.view.inventory, 'ul', { class: ['ski-quest-inventory'] });
     const terms = this.engine.getTerms();
     for (const entry of Object.keys(terms).sort().map(x => [x, terms[x]])) {
       const li = append(ul, 'li', {}, e => {
