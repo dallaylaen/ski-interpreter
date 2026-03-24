@@ -84,7 +84,7 @@ class History {
     }
   }
 
-  remove (entries=[]) {
+  remove (entries = []) {
     // TODO add lock but later
     const skip = new Set(entries.map(s => (s ?? '').trim()));
     const head = this.store.load('head') ?? 0;
@@ -92,14 +92,16 @@ class History {
     let i = head;
     let j = head;
     for (;i > tail; i--) {
-      const entry = this.store.load(`entry-${i}`);
-      if (entry === null || skip.has(entry))
+      const entry = (this.store.load(`entry-${i}`) ?? '').trim();
+      if (entry === '' || skip.has(entry))
         continue; // skip deleted or removed entries
       if (i !== j)
         this.store.save(`entry-${j}`, entry);
       j--;
     }
     this.store.save('tail', j);
+
+    // trim remaining entries after new tail
     for (; j >= tail; j--)
       this.store.delete(`entry-${j}`);
   }
