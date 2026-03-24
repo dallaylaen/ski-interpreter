@@ -393,6 +393,7 @@
      */
 
     let historyVisible = false;
+    let historySel = {};
 
     function showHistory() {
       if (historyVisible) {
@@ -413,7 +414,11 @@
           });
         });
         append(item, 'input', {type: 'checkbox', value: entry, class: ['history-checkbox']}, el => {
-          el.addEventListener('click', ev => ev.stopPropagation());
+          el.checked = historySel[entry];
+          el.addEventListener('click', ev => {
+            ev.stopPropagation();
+            historySel[entry] = el.checked;
+          });
         });
         append(item, 'span', {content: entry});
       }
@@ -422,7 +427,7 @@
           all.style.float = 'left';
           all.addEventListener('change', ev => {
             for (const checkbox of view.historyMain.querySelectorAll('.history-checkbox'))
-              checkbox.checked = all.checked;
+              historySel[checkbox.value] = checkbox.checked = all.checked;
           })
         });
         append(footer, 'a', { href: '#', content: 'delete selected', color: 'grey'}, del => {
@@ -441,6 +446,7 @@
               return;
             history.remove(toDelete);
             hideHistory();
+            historySel = {};
           })
         });
       });
