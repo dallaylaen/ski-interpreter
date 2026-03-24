@@ -418,6 +418,13 @@
         append(item, 'span', {content: entry});
       }
       append(view.historyMain, 'div', {class: ['history-footer']}, footer => {
+        append(footer, 'input', { type: 'checkbox' }, all => {
+          all.style.float = 'left';
+          all.addEventListener('change', ev => {
+            for (const checkbox of view.historyMain.querySelectorAll('.history-checkbox'))
+              checkbox.checked = all.checked;
+          })
+        });
         append(footer, 'a', { href: '#', content: 'delete selected', color: 'grey'}, del => {
           del.style.float = 'right';
           del.style.fontSize = 'smaller';
