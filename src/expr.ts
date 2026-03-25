@@ -83,7 +83,7 @@ export class Expr {
   static control = control;
   static native = native;
   /**
-   *  @descr A combinatory logic expression.
+   *  @desc A combinatory logic expression.
    *
    *  Applications, variables, lambdas, combinators per se,
    *  and other expression subtypes all extend this class.

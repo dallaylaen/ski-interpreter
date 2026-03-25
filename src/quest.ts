@@ -534,7 +534,7 @@ class PropertyCase extends Case {
 
 class Subst {
   /**
-   * @descr A placeholder object with exactly n free variables to be substituted later.
+   * @desc A placeholder object with exactly n free variables to be substituted later.
    *        Basically a poor man's lambda.
    * @param {Expr} expr
    * @param {FreeVar[]} env
