@@ -821,12 +821,8 @@ export class Expr {
    *       FreeVar: x[54]
    *       FreeVar: x[54]
    */
-  diag ():string {
-    return this.diagImpl('').join('\n');
-  }
-
-  diagImpl (indent: string): string[] {
-    return [indent + this.constructor.name + ': ' + this];
+  diag (indent: string = ''): string {
+    return indent + this.constructor.name + ': ' + this;
   }
 
   /**
@@ -977,11 +973,8 @@ export class App extends Expr {
       return wrap[0] + fun + options.brackets![0] + arg + options.brackets![1] + wrap[1];
   }
 
-  diagImpl (indent: string): string[] {
-    return [
-      indent + 'App:',
-      ...this.unroll().flatMap(e => e.diagImpl(indent + '  ')),
-    ];
+  diag (indent: string = ''): string {
+    return indent + 'App:\n' + this.unroll().map(e => e.diag(indent + '  ')).join('\n');
   }
 
   _unspaced (arg: Expr): boolean {
@@ -1075,8 +1068,9 @@ export class FreeVar extends Named {
     return options.var![0] + name + options.var![1];
   }
 
-  diagImpl (indent: string): string[] {
-    return [`${indent}FreeVar: ${this.name}[${this.id}]`];
+  diag (indent: string = ''): string {
+    // include variable id for disambiguation
+    return `${indent}FreeVar: ${this.name}[${this.id}]`;
   }
 
   static global = ['global'];
@@ -1198,11 +1192,9 @@ export class Lambda extends Expr {
       + (nargs > 0 ? options.brackets![1] : '');
   }
 
-  diagImpl (indent: string): string[] {
-    return [
-      `${indent}Lambda (${this.arg.name}[${this.arg.id}]):`,
-      ...this.impl.diagImpl(indent + '  '),
-    ];
+  diag (indent: string = ''): string {
+    return `${indent}Lambda (${this.arg.name}[${this.arg.id}]):\n`
+      + this.impl.diag(indent + '  ');
   }
 
   _braced (first: boolean): boolean {
@@ -1361,12 +1353,9 @@ export class Alias extends Named {
     return outdated ? this.impl.formatImpl(options, nargs) : super.formatImpl(options, nargs);
   }
 
-  diagImpl (indent: string): string[] {
+  diag (indent: string = ''): string {
     // no indent increase so that a diff between diags is consistent with how `equals` works.
-    return [
-      `${indent}Alias (${this.name}): \\`,
-      ...this.impl.diagImpl(indent),
-    ]
+    return `${indent}Alias (${this.name}): \\\n` + this.impl.diag(indent);
   }
 }
 
