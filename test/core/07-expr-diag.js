@@ -75,7 +75,7 @@ describe('Expr.diag: application expressions', () => {
     const expr = ski.parse('S(KS)K');
     const result = expr.diag();
 
-    expect(indentCount(result)).to.deep.equal([0, 2, 2, 4, 4, 2]);
+    expect(indentCount(result)).to.deep.equal([0, 2, 2, 4, 4, 2], result);
   });
 });
 
@@ -92,7 +92,7 @@ describe('Expr.diag: lambda expressions', () => {
     const expr = ski.parse('x->y->y x');
     const result = expr.diag();
 
-    expect(indentCount(result)).to.deep.equal([0, 2, 4, 6, 6]);
+    expect(indentCount(result)).to.deep.equal([0, 2, 4, 6, 6], result);
     expect(result).to.match(/Lambda \(\w+\[\d+\]\):/);
     expect(result).to.match(/(x\[\d+\]).*(y\[\d+\]).*\2.*\1/s);
   });
@@ -111,7 +111,7 @@ describe('Expr.diag: lambda expressions', () => {
     const expr = ski.parse('x->y->z->x z (y z)');
     const result = expr.diag();
 
-    expect(indentCount(result)).to.deep.equal([0, 2, 4, 6, 8, 8, 8, 10, 10]);
+    expect(indentCount(result)).to.deep.equal([0, 2, 4, 6, 8, 8, 8, 10, 10], result);
   });
 });
 
