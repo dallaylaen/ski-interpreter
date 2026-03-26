@@ -10,7 +10,8 @@ const DEFAULTS = {
   maxSize: 1_000_000,
 };
 
-const ORDER = {
+// canonize traverse order aliases
+const ORDER: Record<string, 'LI' | 'LO'> = {
   'leftmost-outermost': 'LO',
   'leftmost-innermost': 'LI',
   LO:                   'LO',
@@ -212,7 +213,7 @@ export class Expr {
       change = options;
       options = {};
     }
-    const order = ORDER[options.order ?? 'LO'] as 'LO' | 'LI' | undefined;
+    const order = ORDER[options.order ?? 'LO'];
     if (order === undefined)
       throw new Error('Unknown traversal order: ' + options.order);
     const [expr] = unwrap(this._traverse_redo({ order }, change!));
@@ -465,7 +466,7 @@ export class Expr {
             seen.add(e);
             return null;
           }
-          return control.stop(guess.expr) as TraverseValue<Expr>;
+          return control.stop(guess.expr);
         }
       });
       yield { expr, steps };
@@ -499,17 +500,17 @@ export class Expr {
         if (!(e instanceof Lambda) || (e.impl instanceof Lambda))
           return null; // continue
         if (e.impl === e.arg)
-          return control.stop(native.I as Expr);
+          return control.stop(native.I);
         if (!e.impl.any(t => t === e.arg))
-          return control.stop(native.K.apply(e.impl)) as TraverseValue<Expr>;
+          return control.stop(native.K.apply(e.impl));
         // TODO use real assert here. e.impl contains e.arg and also isn't e.arg, in MUST be App.
         if (!(e.impl instanceof App))
           throw new Error('toSKI: assert failed: lambda body is of unexpected type ' + e.impl.constructor.name );
         // eta-reduction: body === (not e.arg) (e.arg)
         if (e.impl.arg === e.arg && !e.impl.fun.any(t => t === e.arg))
-          return control.stop(e.impl.fun) as TraverseValue<Expr>;
+          return control.stop(e.impl.fun);
         // last resort, go S
-        return control.stop(native.S.apply(new Lambda(e.arg, e.impl.fun), new Lambda(e.arg, e.impl.arg))) as TraverseValue<Expr>;
+        return control.stop(native.S.apply(new Lambda(e.arg, e.impl.fun), new Lambda(e.arg, e.impl.arg)));
       })
       yield { expr, steps, final: !next };
       steps++;
@@ -861,13 +862,13 @@ export class App extends Expr {
   _traverse_descend (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
     const [fun, fAction] = unwrap(this.fun._traverse_redo(options, change));
     if (fAction === control.stop)
-      return control.stop(fun ? fun.apply(this.arg) : null) as TraverseValue<Expr>;
+      return control.stop(fun ? fun.apply(this.arg) : null);
 
     const [arg, aAction] = unwrap(this.arg._traverse_redo(options, change));
 
     const final:Expr|null = (fun || arg) ? (fun ?? this.fun).apply(arg ?? this.arg) : null;
     if (aAction === control.stop)
-      return control.stop(final) as TraverseValue<Expr>;
+      return control.stop(final);
     return final;
   }
 
@@ -1150,7 +1151,7 @@ export class Lambda extends Expr {
 
     const final = impl ? new Lambda(this.arg, impl) : null;
 
-    return iAction === control.stop ? control.stop(final) as unknown as TraverseValue<Expr> : final;
+    return iAction === control.stop ? control.stop(final) : final;
   }
 
   any (predicate: (e: Expr) => boolean): boolean {
@@ -1165,7 +1166,7 @@ export class Lambda extends Expr {
       return control.stop(value);
     const [iValue, iAction] = unwrap(this.impl._fold(value, combine));
     if (iAction === control.stop)
-      return control.stop(iValue) as unknown as TraverseValue<T>;
+      return control.stop(iValue);
     return iValue ?? value;
   }
 
@@ -1320,7 +1321,7 @@ export class Alias extends Named {
       return control.stop(value);
     const [iValue, iAction] = unwrap(this.impl._fold(value, combine));
     if (iAction === control.stop)
-      return control.stop(iValue) as unknown as TraverseValue<T>;
+      return control.stop(iValue);
     return iValue ?? value;
   }
 

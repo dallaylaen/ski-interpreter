@@ -71,7 +71,7 @@ export function restrict (set:Set<string>, spec?: string) {
 }
 
 export type TraverseDecorator = <T>(value?: T) => TraverseControl<T>;
-export type TraverseValue<T> = T | TraverseControl<T> | null | undefined | void;
+export type TraverseValue<T> = TraverseControl<T | null | undefined | void> | T | null | undefined | void;
 
 export class TraverseControl<T> {
   /**
