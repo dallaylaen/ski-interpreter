@@ -23,7 +23,17 @@ export class SKI extends Parser {
   static S = native.S;
   static W = native.W;
 
-  // variable generator shortcut
+  /**
+ * @desc Create a proxy object that generates variables on demand,
+ *       with names corresponding to the property accessed.
+ *       Different invocations will return distinct variables,
+ *       even if with the same name.
+ *
+ * @example const {x, y, z} = SKI.vars();
+ *          x.name; // 'x'
+ *          x instanceof FreeVar; // true
+ *          x.apply(y).apply(z); // x(y)(z)
+ */
   static vars (scope: object = {}): { [key: string]: FreeVar } {
     const vars: { [key: string]: FreeVar } = {};
     return new Proxy(vars, {

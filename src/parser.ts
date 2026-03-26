@@ -510,23 +510,6 @@ export class Parser {
   /**
  *  Public static shortcuts to common functions (see also ./extras.js)
  */
-
-  /**
- * @desc Create a proxy object that generates variables on demand,
- *       with names corresponding to the property accessed.
- *       Different invocations will return distinct variables,
- *       even if with the same name.
- *
- *
- * @example const {x, y, z} = SKI.vars();
- *          x.name; // 'x'
- *          x instanceof FreeVar; // true
- *          x.apply(y).apply(z); // x(y)(z)
- *
- * @template T
- * @param {T} [scope] - optional context to bind the generated variables to
- * @return {{[key: string]: FreeVar}}
- */
 }
 
 function maybeAlias (name: string, impl: Expr): Named {
