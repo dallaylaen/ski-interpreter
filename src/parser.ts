@@ -349,9 +349,9 @@ export class Parser {
         list[j] = rework(list[j]);
         detour.set(needDetour[(list[j] as Alias).name], list[j] as Alias);
         env[(list[j] as Alias).name] = list[j] as Alias;
-        console.log(`list[${j}] = ${(list[j] as Alias).name}=${(list[j] as Alias).impl};`);
+        // console.log(`list[${j}] = ${(list[j] as Alias).name}=${(list[j] as Alias).impl};`);
       }
-      console.log('detour:', detour);
+      // console.log('detour:', detour);
     }
 
     // console.log(res);
