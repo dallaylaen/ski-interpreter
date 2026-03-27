@@ -4,7 +4,7 @@
 'use strict';
 
 import { Tokenizer, restrict } from './internal';
-import { Expr, FreeVar, Lambda, Church, Alias, Native, Named, native, Invocation } from './expr';
+import { Expr, FreeVar, Lambda, Church, Alias, Native, Named, native, Invocation, RefinedFormatOptions } from './expr';
 import { toposort } from './toposort';
 
 class Empty extends Expr {
@@ -14,6 +14,10 @@ class Empty extends Expr {
 
   postParse (): Expr {
     throw new Error('Attempt to use empty expression () as a term');
+  }
+
+  formatImpl (options: RefinedFormatOptions, nargs: number): string {
+    return '()';
   }
 }
 

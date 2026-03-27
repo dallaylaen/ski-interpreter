@@ -65,7 +65,11 @@ export const FormatOptionsSchema = z.object({
 
 export type FormatOptions = z.infer<typeof FormatOptionsSchema>;
 
-type RefinedFormatOptions = { // ditto but with defaults plugged in
+/**
+ * @desc A version of FormatOptions with defaults plugged in,
+ *       use for mandatory formatImpl implementation in Expr subclasses.
+ */
+export type RefinedFormatOptions = { // ditto but with defaults plugged in
   terse?: boolean,
   html?: boolean,
   brackets: [string, string],
@@ -80,9 +84,7 @@ type RefinedFormatOptions = { // ditto but with defaults plugged in
 type TraverseOptions = {order?: 'LO' | 'LI' | 'leftmost-outermost' | 'leftmost-innermost'};
 type TraverseCallback = (e:Expr) => TraverseValue<Expr>;
 
-export class Expr {
-  static control = control;
-  static native = native;
+export abstract class Expr {
   /**
    *  @desc A combinatory logic expression.
    *
@@ -119,7 +121,7 @@ export class Expr {
    *
    * @desc Define properties of the term based on user supplied options and/or inference results.
    *       Typically useful for declaring Native and Alias terms.
-   * @private
+   * @protected
    * @param {Object} options
    * @param {string} [options.note] - a brief description what the term does
    * @param {number} [options.arity] - number of arguments the term is waiting for (if known)
@@ -203,8 +205,8 @@ export class Expr {
    * }} [options]
    * @param {(e:Expr) => TraverseValue<Expr>} change
    * @returns {Expr|null}
+   * @final
    */
-
   traverse (
     options: TraverseOptions | TraverseCallback,
     change?: TraverseCallback
@@ -221,7 +223,8 @@ export class Expr {
   }
 
   /**
-   * @private
+   * @protected
+   * @final
    * @param {Object} options
    * @param {(e:Expr) => TraverseValue<Expr>} change
    * @returns {TraverseValue<Expr>}
@@ -244,12 +247,11 @@ export class Expr {
   }
 
   /**
-   * @private
+   * @protected
    * @param {Object} options
    * @param {(e:Expr) => TraverseValue<Expr>} change
    * @returns {TraverseValue<Expr>}
    */
-
   _traverse_descend (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
     return null;
   }
@@ -277,7 +279,11 @@ export class Expr {
    *
    * This method is experimental and may change in the future.
    *
+   * @example // count the number of nodes in the expression tree
+   * expr.fold(0, (acc, e) => acc + 1);
+   *
    * @experimental
+   * @final
    * @template T
    * @param {T} initial
    * @param {(acc: T, expr: Expr) => TraverseValue<T>} combine
@@ -288,6 +294,14 @@ export class Expr {
     return value ?? initial;
   }
 
+  /**
+   * @desc Internal method for fold(), which performs the actual folding.
+   *       Should be implemented in subclasses having any internal structure.
+   *
+   * @protected
+   * @param initial
+   * @param combine
+   */
   _fold<T> (initial:T, combine: (acc: T, expr: Expr) => TraverseValue<T>): TraverseValue<T> {
     return combine(initial, this);
   }
@@ -333,6 +347,7 @@ export class Expr {
    *
    *       Use toLambda() if you want to get a lambda term in any case.
    *
+   * @final
    * @param {{max?: number, maxArgs?: number}} options
    * @return {TermInfo}
    */
@@ -434,6 +449,7 @@ export class Expr {
    *
    *       See also Expr.walk() and Expr.toSKI().
    *
+   * @final
    * @param {{
    *   max?: number,
    *   maxArgs?: number,
@@ -481,6 +497,7 @@ export class Expr {
    *
    *     See also Expr.walk() and Expr.toLambda().
    *
+   * @final
    * @param {{max?: number}} [options]
    * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
    */
@@ -519,12 +536,15 @@ export class Expr {
   }
 
   /**
-   * Replace all instances of plug in the expression with value and return the resulting expression,
+   * Replace all instances of `search` in the expression with `replace` and return the resulting expression,
    * or null if no changes could be made.
+   *
    * Lambda terms and applications will never match if used as plug
-   * as they are impossible co compare without extensive computations.
+   * as they are impossible to compare without extensive computations.
+   *
    * Typically used on variables but can also be applied to other terms, e.g. aliases.
-   * See also Expr.traverse().
+   * See also Expr.traverse() for more flexible replacement of subterms.
+   *
    * @param {Expr} search
    * @param {Expr} replace
    * @return {Expr|null}
@@ -566,6 +586,7 @@ export class Expr {
    * @desc Run uninterrupted sequence of step() applications
    *       until the expression is irreducible, or max number of steps is reached.
    *       Default number of steps = 1000.
+   * @final
    * @param {{max?: number, steps?: number, throw?: boolean}|Expr} [opt]
    * @param {Expr} args
    * @return {{expr: Expr, steps: number, final: boolean}}
@@ -598,7 +619,9 @@ export class Expr {
 
   /**
    * Execute step() while possible, yielding a brief description of events after each step.
+   *
    * Mnemonics: like run() but slower.
+   * @final
    * @param {{max?: number}} options
    * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
    */
@@ -634,6 +657,7 @@ export class Expr {
    *
    * @param {Expr} other
    * @return {boolean}
+   * @final
    */
   equals (other:Expr):boolean {
     return !this.diff(other);
@@ -653,6 +677,8 @@ export class Expr {
    *       To somewhat alleviate confusion, the output will include
    *       the internal id of the variable in square brackets.
    *
+   *       Do not rely on the exact format of the output as it may change in the future.
+   *
    * @example  "K(S != I)" is the result of comparing "KS" and "KI"
    * @example  "S(K([x[13] != x[14]]))K"
    *
@@ -660,7 +686,7 @@ export class Expr {
    * @param {boolean} [swap]  If true, the order of expressions is reversed in the output.
    * @returns {string|null}
    */
-  diff (other:Expr, swap = false): string | null {
+  diff (other:Expr, swap: boolean = false): string | null {
     if (this === other)
       return null;
     if (other instanceof Alias)
@@ -676,6 +702,11 @@ export class Expr {
    * `this` is the expected value and the argument is the actual one.
    * Mnemonic: the expected value is always a combinator, the actual one may be anything.
    *
+   * In case of failure, an error is thrown with a message describing the first point of difference
+   * and `expected` and `actual` properties like in AssertionError.
+   * AssertionError is not used directly to because browsers don't recognize it.
+   *
+   * @final
    * @param {Expr} actual
    * @param {string} comment
    */
@@ -700,7 +731,10 @@ export class Expr {
   /**
    * @desc Returns string representation of the expression.
    *       Same as format() without options.
+   *
+   *       Use formatImpl() to override in subclasses.
    * @return {string}
+   * @final
    */
   toString (): string {
     return this.format();
@@ -710,6 +744,7 @@ export class Expr {
    * @desc Whether the expression needs parentheses when printed.
    * @param {boolean} [first] - whether this is the first term in a sequence
    * @return {boolean}
+   * @protected
    */
   _braced (_first?:boolean): boolean {
     return false;
@@ -719,7 +754,7 @@ export class Expr {
    * @desc Whether the expression can be printed without a space when followed by arg.
    * @param {Expr} arg
    * @returns {boolean}
-   * @private
+   * @protected
    */
   _unspaced (arg: Expr): boolean {
     return this._braced(true);
@@ -728,8 +763,9 @@ export class Expr {
   /**
    * @desc    Stringify the expression with fancy formatting options.
    *          Said options mostly include wrappers around various constructs in form of ['(', ')'],
-   *          as well as terse and html flags that set up the defaults.
+   *          as well as `terse` and `html` flags that fill in appropriate defaults.
    *          Format without options is equivalent to toString() and can be parsed back.
+   * @final
    *
    * @param   {Object} [options]  - formatting options
    * @param   {boolean} [options.terse]   - whether to use terse formatting (omitting unnecessary spaces and parentheses)
@@ -794,11 +830,10 @@ export class Expr {
    * @param {Object} options
    * @param {number} nargs
    * @returns {string}
-   * @private
+   * @protected
+   * @abstract
    */
-  formatImpl (options: RefinedFormatOptions, nargs: number): string {
-    throw new Error( 'No formatImpl() method defined in class ' + this.constructor.name );
-  }
+  abstract formatImpl (options: RefinedFormatOptions, nargs: number): string;
 
   /**
    * @desc Returns a string representation of the expression tree, with indentation to show structure.
@@ -828,6 +863,7 @@ export class Expr {
   /**
    * @desc Convert the expression to a JSON-serializable format.
    * @returns {string}
+   * @final
    */
   toJSON (): string | object {
     return this.format();
