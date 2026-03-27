@@ -8,11 +8,11 @@ describe('SKI.traverse', () => {
   const ski = new SKI();
   ski.add('T', 'CI');
   ski.add('V', 'BCT');
-  const expr = ski.parse('S(x->5 x K)(V(Wf))');
+  const allInOne = ski.parse('S(x->5 x K)(V(Wf))');
 
   it('visits all nodes in leftmost-outermost order by default', () => {
     const nodes = [];
-    expr.traverse(e => {
+    allInOne.traverse(e => {
       if (!(e instanceof SKI.classes.App))
         nodes.push(e.format({ terse: false }));
     });
@@ -35,7 +35,7 @@ describe('SKI.traverse', () => {
 
   it('can visit nodes in leftmost-innermost order', () => {
     const nodes = [];
-    expr.traverse({ order: 'leftmost-innermost' }, e => {
+    allInOne.traverse({ order: 'leftmost-innermost' }, e => {
       if (!(e instanceof SKI.classes.App))
         nodes.push(e.format({ terse: false }));
     });
