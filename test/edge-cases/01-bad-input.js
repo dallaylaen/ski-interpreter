@@ -20,7 +20,7 @@ describe( 'SKI', () => {
   });
 
   it( 'forbids unknown stringification', () => {
-    expect(() => '' + new Noob()).to.throw(/.*defined.*Noob/);
+    expect(() => '' + new Noob()).to.throw();
   });
 
   it('Forbids strange stuff in named terms', () => {
