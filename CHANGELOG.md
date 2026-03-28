@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2026-03-28
+
+### BREAKING CHANGES
+
+- `Alias`: `outdated` and `terminal` properties replaced by
+`inline`: boolean.
+
+### Added
+
+- Experimental `Alias.makeInline()` that sets the inline property
+and adjusts the invocation accordingly
+- (don't wait for more args if inline).
+
 ## [2.5.2] - 2026-03-27
 
 ### Changed
@@ -26,7 +39,7 @@ and mark its abstract/final/protected methods appropriately.
 
 ### BREAKING CHANGES
 
-- `affine: true` in quests now means "has no duplicating subterms" rather than "non-duplicating as a whole." 
+- `affine: true` in quests now means "has no duplicating subterms" rather than "non-duplicating as a whole."
 Aliases are exempted from this check, so a solution `SK`
 will not pass as S is duplicating, but `false=SK; false`
 will because `false` (as a whole term) _is_ affine.
@@ -81,7 +94,7 @@ will because `false` (as a whole term) _is_ affine.
 ### Changed
 
 - `SKI.extras.foldr` is now removed in favor of
-`Expr.foldBottomUp<T>(fun: (expr: Expr, args: T[]) => T): T` 
+`Expr.foldBottomUp<T>(fun: (expr: Expr, args: T[]) => T): T`
 with the same semantics but more descriptive name
 and simpler signature.
 _Was experimental (and still is), so not considered a breaking change._
