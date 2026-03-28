@@ -168,8 +168,10 @@ export class Parser {
     const opts: AddOptions = typeof options === 'string' ? { note: options, canonize: false } : (options ?? {});
     named._setup({ canonize: this.annotate, ...opts });
 
-    if (this.known[named.name])
-      (this.known[named.name] as Alias).outdated = true;
+    const old = this.known[named.name];
+    if (old instanceof Alias)
+      old.makeInline();
+
     this.known[named.name] = named;
     this.allow.add(named.name);
 
@@ -279,7 +281,9 @@ export class Parser {
    * @return {SKI}
    */
   remove (name: string): this {
-    (this.known[name] as Alias).outdated = true;
+    const old = this.known[name];
+    if (old instanceof Alias)
+      old.makeInline();
     delete this.known[name];
     this.allow.delete(name);
     return this;
@@ -395,7 +399,7 @@ export class Parser {
     let expr: Expr = new Empty();
     for (const item of lines) {
       if (expr instanceof Alias)
-        expr.outdated = true;
+        expr.makeInline();
 
       const def = item.match(/^([A-Z]|[a-z][a-z_0-9]*)\s*=(.*)$/s);
       if (def && def[2] === '')
@@ -413,9 +417,9 @@ export class Parser {
     }
 
     if (this.addContext) {
-      // avoid modifying an ro term
+      // create a transparent alias to avoid mutating the original term
       if (expr instanceof Named)
-        expr = new Alias(expr.name, expr, { outdated: true });
+        expr = new Alias(expr.name, expr, { inline: true });
       expr.context = {
         env:    { ...this.getTerms(), ...jar }, // also contains pre-parsed terms
         scope:  options.scope,

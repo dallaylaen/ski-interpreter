@@ -130,7 +130,7 @@ export class Quest {
     for (const term of env ?? []) {
       const expr: Expr = this.engineFull.parse(term, { env: jar, scope: this });
       if (expr instanceof Alias)
-        this.env[expr.name] = new Alias(expr.name, expr.impl, { terminal: true, canonize: false });
+        this.env[expr.name] = new Alias(expr.name, expr.impl, { canonize: false });
         // Canonized aliases won't expand with insufficient arguments,
         // causing correct solutions to fail, so alas...
       else if (expr instanceof FreeVar)
@@ -243,7 +243,7 @@ export class Quest {
       });
       const expr = impl instanceof FreeVar
         ? impl
-        : new Alias(spec.fancy ?? spec.name, impl, { terminal: true, canonize: false });
+        : new Alias(spec.fancy ?? spec.name, impl, { canonize: false });
       jar[spec.name] = expr;
       prepared.push(expr);
     }

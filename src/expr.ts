@@ -1283,51 +1283,70 @@ export class Church extends Expr {
   }
 }
 
-function waitn (expr: Expr, n: number): Invocation {
-  return arg => n <= 1 ? expr.apply(arg) : waitn(expr.apply(arg), n - 1);
+function waitn (n: number): (e : Expr) => (arg: Expr) => Invocation {
+  return n <= 1
+    ? (e: Expr) => (arg: Expr) => e.apply(arg)
+    : (e: Expr) => (arg: Expr) => waitn(n - 1)(e.apply(arg));
 }
 
 export class Alias extends Named {
   /**
    * @desc A named alias for an existing expression.
    *
-   *     Upon evaluation, the alias expands into the original expression,
-   *     unless it has a known arity > 0 and is marked terminal,
-   *     in which case it waits for enough arguments before expanding.
+   * Aliasing allows declaring new terms without a native implementation.
+   * This is what happens when one writes `B = S(KS)K` in the interpreter.
    *
-   *     A hidden mutable property 'outdated' is used to silently
-   *     replace the alias with its definition in all contexts.
-   *     This is used when declaring named terms in an interpreter,
-   *     to avoid confusion between old and new terms with the same name.
+   * Aliases are transparent in terms of `equals` and `expect`;
+   * for that reason, Alias.diag() in not adding to the indentation.
+   *
+   * Aliases have an `inline` property. Tf true, the alias will be replaced with its implementation
+   * everywhere, unless specifically told otherwise e.g. by { inventory: { ... } } option of format().
+   *
+   * Upon creation, the aliases arity is calculated (unless `canonize` is false).
+   *
+   * Upon evaluation, the alias will be replaced with its implementation,
+   * _unless_ it's not inline and has positive arity,
+   * in which case it will wait for the required number of arguments before such replacement.
+   *
    *
    * @param {String} name
    * @param {Expr} impl
-   * @param {{canonize?: boolean, max?: number, maxArgs?: number, note?: string, terminal?: boolean}} [options]
+   * @param {{canonize?: boolean, max?: number, maxArgs?: number, note?: string, inline?: boolean}} [options]
    */
-  terminal?: boolean;
   impl: Expr;
-  outdated?: boolean;
+  inline?: boolean;
 
   constructor (name: string, impl: Expr,
-    options : {canonize?: boolean, max?: number, maxArgs?: number, note?: string, terminal?: boolean, outdated?: boolean} = {}) {
+    options : {canonize?: boolean, max?: number, maxArgs?: number, note?: string, inline?: boolean} = {}) {
     super(name);
     if (!(impl instanceof Expr))
       throw new Error('Attempt to create an alias for a non-expression: ' + impl);
     this.impl = impl;
 
     this._setup(options);
-    this.terminal = options.terminal ?? this.props?.proper;
-    this.invoke = waitn(impl, this.arity ?? 0) as (arg: Expr) => Invocation;
+    this.invoke = waitn(options.inline ? 0 : this.arity ?? 0)(impl);
     this.size = impl.size;
-    if (options.outdated)
-      this.outdated = true;
+    if (options.inline)
+      this.inline = true;
   }
 
   /**
-   * @property {boolean} [outdated] - whether the alias is outdated
-   *     and should be replaced with its definition when encountered.
-   * @property {boolean} [terminal] - whether the alias should behave like a standalone term
-   *     // TODO better name?
+   * @desc Make the alias inline, i.e. replace it with its implementation everywhere.
+   *
+   * Replaces the old `outdated` attribute.
+   *
+   * May change in future versions, use with caution.
+   *
+   * @experimental
+   * @returns {this}
+   */
+  makeInline (): this {
+    this.invoke = waitn(0)(this.impl);
+    this.inline = true;
+    return this;
+  }
+
+  /**
    * @property {boolean} [proper] - whether the alias is a proper combinator (i.e. contains no free variables or constants)
    * @property {number} [arity] - the number of arguments the alias waits for before expanding
    * @property {Expr} [canonical] - equivalent lambda term.
@@ -1379,14 +1398,14 @@ export class Alias extends Named {
   }
 
   _braced (first: boolean): boolean {
-    return this.outdated ? this.impl._braced(first) : false;
+    return this.inline ? this.impl._braced(first) : false;
   }
 
   formatImpl (options: RefinedFormatOptions, nargs: number): string {
-    const outdated = options.inventory
+    const inline = options.inventory
       ? options.inventory[this.name] !== this
-      : this.outdated;
-    return outdated ? this.impl.formatImpl(options, nargs) : super.formatImpl(options, nargs);
+      : this.inline;
+    return inline ? this.impl.formatImpl(options, nargs) : super.formatImpl(options, nargs);
   }
 
   diag (indent: string = ''): string {
