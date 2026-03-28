@@ -1,6 +1,6 @@
 {
   "name": "@dallaylaen/ski-interpreter",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "Simple Kombinator Interpreter - a combinatory logic & lambda calculus parser and interpreter. Supports SKI, BCKW, Church numerals, and setting up assertions ('quests') involving all of the above.",
   "keywords": [
     "combinatory logic",
@@ -11,10 +11,10 @@
   ],
   "type": "commonjs",
   "main": "lib/ski-interpreter.cjs.js",
-  "types": "lib/types/index.d.ts",
-  "module": "lib/ski-interpreter.esm.js",
+  "module": "lib/ski-interpreter.mjs",
   "exports": {
-    "import": "./lib/ski-interpreter.esm.js",
+    "types": "./lib/types/index.d.ts",
+    "import": "./lib/ski-interpreter.mjs",
     "require": "./lib/ski-interpreter.cjs.js"
   },
   "bin": {
@@ -26,7 +26,7 @@
     "test": "npm run tsc; npx nyc mocha --recursive test",
     "build-web": "npx esbuild --bundle --minify --sourcemap --format=iife ./src/index.ts --outfile=docs/build/js/ski-interpreter.min.js",
     "build-cjs": "npx esbuild --bundle --sourcemap --format=cjs ./src/index.ts --outfile=lib/ski-interpreter.cjs.js",
-    "build-esm": "npx esbuild --bundle --sourcemap --format=esm ./src/index.ts --outfile=lib/ski-interpreter.esm.js",
+    "build-esm": "npx esbuild --bundle --sourcemap --format=esm ./src/index.ts --outfile=lib/ski-interpreter.mjs",
     "build-site": "npx esbuild --bundle --minify --sourcemap ./site-src/index.js --outfile=docs/build/js/util.min.js",
     "build-quest": "npx esbuild --bundle --minify --sourcemap --format=iife ./site-src/index-quest.js --outfile=docs/build/js/ski-quest.min.js",
     "build-all": "npm run build-cjs && npm run build-esm && npm run build-web && npm run build-site && npm run build-quest",
