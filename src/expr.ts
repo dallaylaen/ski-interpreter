@@ -1334,6 +1334,7 @@ export class Alias extends Named {
    * @desc Make the alias inline, i.e. replace it with its implementation everywhere.
    *
    * Replaces the old `outdated` attribute.
+   * Used by the parser when a term definition is removed or updated.
    *
    * May change in future versions, use with caution.
    *
