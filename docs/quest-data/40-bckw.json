@@ -111,7 +111,7 @@
       "name": "The Turing bird",
       "intro": [
         "I've seen at least 3 things denoted by <code>U</code> in the literature concerning combinators.",
-        "This time <code>U</code> means a function of 2 arguments: <code>U a b = a (b b a)</code>.",
+        "This time <code>U</code> means a function of 2 arguments: <code>U a b = b (a a b)</code>.",
         "Build it!"
       ],
       "id": "2LpsCjKe",
