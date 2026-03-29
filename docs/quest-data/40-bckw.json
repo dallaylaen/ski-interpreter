@@ -114,12 +114,12 @@
         "This time <code>U</code> means a function of 2 arguments: <code>U a b = a (b b a)</code>.",
         "Build it!"
       ],
-      "id": "g15Ig4vM",
-      "created_at": "2025-07-06T01:56:16",
+      "id": "2LpsCjKe",
+      "created_at": "2026-03-29T17:21:21",
       "allow": "BCKIW",
       "input": "phi",
       "cases": [
-        [ "phi a b", "a (b b a)" ]
+        [ "phi a b", "b (a a b)" ]
       ]
     },
     {
