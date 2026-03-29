@@ -306,7 +306,7 @@ for building interactive quest pages from JSON-encoded quest data;
 
 # Prior art and inspiration
 
-* "To Mock The Mockingbird" by Raymond Smulian.
+* "To Mock The Mockingbird" by Raymond Smullyan.
 * [combinator birds](https://www.angelfire.com/tx4/cus/combinator/birds.html) by [Chris Rathman](https://www.angelfire.com/tx4/cus/index.html)
 * [Fun with combinators](https://doisinkidney.com/posts/2020-10-17-ski.html) by [@oisdk](https://github.com/oisdk)
 * [Conbinatris](https://dirk.rave.org/combinatris/) by Dirk van Deun
