@@ -1316,8 +1316,11 @@ export class Alias extends Named {
   impl: Expr;
   inline?: boolean;
 
-  constructor (name: string, impl: Expr,
-    options : {canonize?: boolean, max?: number, maxArgs?: number, note?: string, inline?: boolean} = {}) {
+  constructor (
+    name: string,
+    impl: Expr,
+    options : {canonize?: boolean, max?: number, maxArgs?: number, note?: string, inline?: boolean, arity?: number} = {}
+  ) {
     super(name);
     if (!(impl instanceof Expr))
       throw new Error('Attempt to create an alias for a non-expression: ' + impl);
