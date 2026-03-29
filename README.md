@@ -12,7 +12,7 @@ and can be used in Node.js or in the browser.
 
 A [playground](https://dallaylaen.github.io/ski-interpreter/)
 and a [quest page](https://dallaylaen.github.io/ski-interpreter/quest.html)
-containing interactive combinatory logic exercises of increasing difficulty are incuded.
+containing interactive combinatory logic exercises of increasing difficulty are included.
 
 # Features:
 
@@ -74,7 +74,7 @@ This is consistent with combinator behavior under LO order.
 
 * [Quests](https://dallaylaen.github.io/ski-interpreter/quest.html)
 
-This page contains small combinatory logic exercises of increasing (hopefully) diffuculty.
+This page contains small combinatory logic exercises of increasing (hopefully) difficulty.
 Each task requires the user to build a combinator with specific properties.
 New combinators are unlocked as the user progresses.
 
@@ -158,7 +158,7 @@ const iterator = expr.walk();
 
 // applying expressions
 const result = expr.run({max: 1000}, arg1, arg2, ...);
-// same sa
+// same as
 expr.apply(arg1).apply(arg2).run();
 // or simply
 expr.apply(arg1, arg2).run();
@@ -281,7 +281,7 @@ const q = new Quest({
 q.check('CI'); // pass
 q.check('a->b->b a'); // ditto
 q.check('K'); // fail
-q.check('K(K(y x))') // nope! the variable scopes won't match
+q.check('K(K(y x))') // nope! The variable scopes won't match
 ```
 
 See also [the quest guide](quest-intro.md) for more details on building your own quests or even interactive quest pages.
@@ -309,7 +309,7 @@ for building interactive quest pages from JSON-encoded quest data;
 * "To Mock The Mockingbird" by Raymond Smullyan.
 * [combinator birds](https://www.angelfire.com/tx4/cus/combinator/birds.html) by [Chris Rathman](https://www.angelfire.com/tx4/cus/index.html)
 * [Fun with combinators](https://doisinkidney.com/posts/2020-10-17-ski.html) by [@oisdk](https://github.com/oisdk)
-* [Conbinatris](https://dirk.rave.org/combinatris/) by Dirk van Deun
+* [Combinatris](https://dirk.rave.org/combinatris/) by Dirk van Deun
 
 # License and copyright
 
