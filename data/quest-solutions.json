@@ -52,13 +52,26 @@
     ]
   },
   "azxJgdmk": {
+    "comment": "Y combinator quest",
     "accepted": [
       [
         "WI(W(B(SI)))"
+      ],
+      [
+        "SSI(S(S(KS)K)(K(SII)))"
+      ],
+      [
+        "SI(S(K(SI)))(SII)"
       ]
+    ],
+    "rejected": [
+       [
+         "C 1000 (KI)"
+       ]
     ]
   },
   "0aFCHGH0": {
+    "comment": "Z combinator quest",
     "accepted": [
       [
         "WI(B(S(BSC))(BC(C(K(WI)))))"

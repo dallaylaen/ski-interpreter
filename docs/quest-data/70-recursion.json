@@ -66,9 +66,9 @@
       "cases": [
         [ "Y (Kx)", "x" ],
         [ "Y (f->a->b->b (f (a b)) a ) filler K K K (KI)", "filler KKK"],
-        [ "f = x->y->z->x(y z); Y f a b c d", "f = x->y->z->x(y z); Y f (a b c d)" ],
-        [ "f = x->y->z->x(z y); Y f a b c d", "f = x->y->z->x(z y); Y f (d (c (b a)))" ],
-        [ "f = x->y->z->x(lst z y); Y f nil a b c", "f = x->y->z->x(lst z y); Y f (lst c (lst b (lst a nil)))" ]
+        [ { "max": 200, "canonize": { "max": 100 } }, "f = x->y->z->x(y z); Y f a b c d", "f = x->y->z->x(y z); Y f (a b c d)" ],
+        [ { "max": 200, "canonize": { "max": 100 } }, "f = x->y->z->x(z y); Y f a b c d", "f = x->y->z->x(z y); Y f (d (c (b a)))" ],
+        [ { "max": 200, "canonize": { "max": 100 } }, "f = x->y->z->x(lst z y); Y f nil a b c", "f = x->y->z->x(lst z y); Y f (lst c (lst b (lst a nil)))" ]
       ]
     },
     {
@@ -84,9 +84,9 @@
       "unlock": "Z",
       "input": "Z",
       "cases": [
-        [ { "max": 200 },"Z f", "Z f" ],
-        [ "Z f x", "f (Z f) x" ],
-        [ "Z (Kx) y", "x y" ]
+        [ { "max": 200, "canonize": { "max":100} },"Z f", "Z f" ],
+        [ { "max": 200, "canonize": { "max":100} },"Z f x", "f (Z f) x" ],
+        [ { "max": 200, "canonize": { "max":100} }, "Z (Kx) y", "x y" ]
       ]
     }
   ]
