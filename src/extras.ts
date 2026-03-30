@@ -183,4 +183,38 @@ function declare (expr: Expr, env: { [s: string]: Named } = {}): string {
   }).join('; ');
 }
 
-export const extras = { search, deepFormat, declare, toposort };
+/**
+ * @desc Validate an unknown value as FormatOptions.
+ *       Returns `{ ok: true, format: <value> }` on success,
+ *       or `{ ok: false }` if any field has the wrong type.
+ */
+function checkFormatOptions (v: unknown): { ok: true, format: FormatOptions } | { ok: false } {
+  if (typeof v !== 'object' || v === null || Array.isArray(v))
+    return { ok: false };
+
+  const o = v as Record<string, unknown>;
+
+  const isStringPair    = (x: unknown): x is [string, string]         => Array.isArray(x) && x.length === 2 && typeof x[0] === 'string' && typeof x[1] === 'string';
+  const isStringTriple  = (x: unknown): x is [string, string, string] => Array.isArray(x) && x.length === 3 && typeof x[0] === 'string' && typeof x[1] === 'string' && typeof x[2] === 'string';
+
+  if ('terse'    in o && typeof o.terse    !== 'boolean')  return { ok: false };
+  if ('html'     in o && typeof o.html     !== 'boolean')  return { ok: false };
+  if ('space'    in o && typeof o.space    !== 'string')   return { ok: false };
+  if ('brackets' in o && !isStringPair(o.brackets))        return { ok: false };
+  if ('var'      in o && !isStringPair(o.var))             return { ok: false };
+  if ('around'   in o && !isStringPair(o.around))          return { ok: false };
+  if ('redex'    in o && !isStringPair(o.redex))           return { ok: false };
+  if ('lambda'   in o && !isStringTriple(o.lambda))        return { ok: false };
+
+  if ('inventory' in o) {
+    const inv = o.inventory;
+    if (typeof inv !== 'object' || inv === null || Array.isArray(inv))
+      return { ok: false };
+    for (const val of Object.values(inv as object))
+      if (!(val instanceof Expr)) return { ok: false };
+  }
+
+  return { ok: true, format: o as FormatOptions };
+}
+
+export const extras = { search, deepFormat, declare, toposort, checkFormatOptions };

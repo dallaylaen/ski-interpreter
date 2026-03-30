@@ -1,7 +1,5 @@
 'use strict';
 
-import { z } from 'zod';
-
 import { unwrap, prepareWrapper, TraverseValue } from './internal';
 
 const DEFAULTS = {
@@ -51,19 +49,17 @@ export type Step = { expr: Expr, steps: number, changed: boolean };
 export type Run = { expr: Expr, steps: number, final: boolean };
 export type RunOptions = { max?: number, steps?: number, throw?: boolean, maxSize?: number };
 
-export const FormatOptionsSchema = z.object({
-  terse:     z.boolean().optional(),
-  html:      z.boolean().optional(),
-  brackets:  z.tuple([z.string(), z.string()]).optional(),
-  space:     z.string().optional(),
-  var:       z.tuple([z.string(), z.string()]).optional(),
-  lambda:    z.tuple([z.string(), z.string(), z.string()]).optional(),
-  around:    z.tuple([z.string(), z.string()]).optional(),
-  redex:     z.tuple([z.string(), z.string()]).optional(),
-  inventory: z.record(z.string(), z.custom<Expr>(v => v instanceof Expr)).optional(),
-});
-
-export type FormatOptions = z.infer<typeof FormatOptionsSchema>;
+export type FormatOptions = {
+  terse?:     boolean,
+  html?:      boolean,
+  brackets?:  [string, string],
+  space?:     string,
+  var?:       [string, string],
+  lambda?:    [string, string, string],
+  around?:    [string, string],
+  redex?:     [string, string],
+  inventory?: Record<string, Expr>,
+};
 
 /**
  * @desc A version of FormatOptions with defaults plugged in,

@@ -1,6 +1,5 @@
 import {
   classes, native, control, FreeVar, Church,
-  FormatOptionsSchema
 } from './expr';
 import { Parser } from './parser';
 
@@ -13,8 +12,6 @@ export class SKI extends Parser {
   static native = native;
   static control = control;
   static classes = classes;
-  static schemas = { FormatOptions: FormatOptionsSchema };
-
   // TODO declare in a loop?
   static B = native.B;
   static C = native.C;
