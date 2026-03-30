@@ -77,6 +77,11 @@ type AddCaseOptions = {
   max?: number,
   note?: string,
   caps?: Capability,
+  canonize?: {
+    max?: number,
+    maxSize?: number,
+    maxArgs?: number,
+  },
 };
 
 export class Quest {
@@ -353,10 +358,10 @@ export class Quest {
   }
 
   static Group: new (options: { name?: string, intro?: string | string[], id?: string | number, content?: (Quest | QuestSpec)[] }) => { verify: (options: { seen?: Set<string | number>, date?: boolean }) => { [key: string]: unknown } };
-  static Case: new (input: FreeVar[], options: AddCaseOptions) => Case;
+  static Case: abstract new (input: FreeVar[], options: AddCaseOptions) => Case;
 }
 
-class Case {
+export abstract class Case {
   /**
    * @param {FreeVar[]} input
    * @param {{
@@ -388,20 +393,25 @@ class Case {
    * @return {CaseResult}
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  check ( ..._expr: Expr[] ): CaseResult {
-    throw new Error('not implemented');
-  }
+  abstract check ( ..._expr: Expr[] ): CaseResult;
 }
 
 class ExprCase extends Case {
   e1: Subst;
   e2: Subst;
+  canonize?: {
+    max?: number,
+    maxSize?: number,
+    maxArgs?: number,
+  };
+
   /**
    * @param {FreeVar[]} input
    * @param {{
    *    max?: number,
    *    note?: string,
    *    env?: {string: Expr},
+   *    canonize?: { max?: number, maxSize?: number, maxArgs?: number },
    *    engine?: Parser
    * }} options
    * @param {[e1: string, e2: string]} terms
@@ -412,6 +422,7 @@ class ExprCase extends Case {
 
     super(input, options);
 
+    this.canonize = options.canonize;
     [this.e1, this.e2] = terms.map( (s: string) => this.parse(s) );
   }
 
@@ -421,11 +432,15 @@ class ExprCase extends Case {
     const e2 = this.e2.apply(args);
     const r2 = e2.run({ max: this.max });
 
+    // TODO monads, monads everywhere
     let reason: string | null = null;
     if (!r1.final || !r2.final)
       reason = 'failed to reach normal form in ' + this.max + ' steps';
-    else
-      reason = r1.expr.diff(r2.expr);
+    else {
+      reason = this.canonize
+        ? canonize(r1.expr, this.canonize).diff(canonize(r2.expr, this.canonize))
+        : r1.expr.diff(r2.expr);
+    }
 
     return {
       pass:     !reason,
@@ -645,3 +660,9 @@ function checkHtml (str: string): string | null {
 
 Quest.Group = Group;
 Quest.Case = Case;
+
+function canonize (term: Expr, options = {}): Expr {
+  return term.traverse({}, e => {
+    return e.infer(options).expr;
+  }) ?? term;
+}
