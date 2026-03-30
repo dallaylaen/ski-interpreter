@@ -79,7 +79,7 @@
       "created_at": "2024-08-29T09:15:33",
       "name": "nand",
       "intro": [
-        "<p><code>nand</code> (not and) is true unless both ot its inputs are true.</p>",
+        "<p><code>nand</code> (not and) is true unless both of its inputs are true.</p>",
         "<p>Given the ability to duplicate, swap, compose, and discard arguments, <i>just one</i>",
         "<code>nand</code> term is enough to implement <i>any</i> boolean function.</p>"
       ],

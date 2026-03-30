@@ -4,7 +4,7 @@
   "name": "Least List Lost Last",
   "intro": [
     "<p>Since there's a pair(x, y) operation in combinatory logic, one can already construct linked lists:",
-    "<code>(V x V(y (V z KI)))</code>.",
+    "<code>(V x (V y (V z KI)))</code>.",
     "Such approach is very straightforward but requires explicit recursion for almost all operations. </p>",
     "<p>There is, however, another way. ",
     "Much like Church numerals, lists can be encoded as parametric higher order functions:</p>",

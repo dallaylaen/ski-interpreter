@@ -116,7 +116,7 @@
         "basically being an impersonation of recursion.</p>",
         "<p>Derive it from <code>S</code>, <code>K</code>, and <code>I</code>.</p>"
       ],
-      "hint": "Neither <code>K</code> nor <code>I</code> can duplicate arguments, so you can tell it's <code>S f g x</code>. What kind of <codE>f</code> and <code>g</code> would you expect?..",
+      "hint": "Neither <code>K</code> nor <code>I</code> can duplicate arguments, so you can tell it's <code>S f g x</code>. What kind of <code>f</code> and <code>g</code> would you expect?..",
       "allow": "SKI",
       "input": "phi",
       "unlock": "M",
@@ -160,7 +160,7 @@
       "name": "Lost identity",
       "intro": [
         "Sadly, after the previous exercise the Ibis has flown away.",
-        "Ask the Starling and the Kertrel to call it back.",
+        "Ask the Starling and the Kestrel to call it back.",
         "Emulate <code>x&rarr;x</code> with <code>S</code> and <code>K</code>.",
         "This one has multiple solutions."
       ],

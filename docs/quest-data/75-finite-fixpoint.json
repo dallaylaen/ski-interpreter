@@ -12,7 +12,7 @@
     "However, it's not guaranteed to reach the normal form.</p>",
     "<p>But in some cases it does, i.e. an equation of form <code>f x = x</code>",
     "has a specific solution <code>x</code> for a given <code>f</code>.",
-    "Let's have a look on such special cases.</p>"
+    "Let's have a look at such special cases.</p>"
   ],
   "content": [
     {
@@ -104,7 +104,7 @@
       "created_at": "2025-06-24T02:14:13",
       "name": "Iota",
       "intro": [
-        "<p>Given &iota; = z &rarr; x S K, find <code>x</code> such that <code>&iota; x = x</code>.</p>",
+        "<p>Given &iota; = z &rarr; z S K, find <code>x</code> such that <code>&iota; x = x</code>.</p>",
         "<p>As of this writing, I have no idea how to solve it, aside from adding more variables",
         "and cycling through x=K, x=S, x=Kx<sub>0</sub>, x=Sx<sub>1</sub>y<sub>1</sub>,",
         "repeating the process for new unknowns if necessary.</p>",

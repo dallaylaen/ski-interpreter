@@ -5,7 +5,7 @@
   "intro": [
     "<p>Much like the linear logic, affine logic allows for a restricted subset of operations,",
     "namely, it can swap, discard, and compose terms, but not duplicate them.",
-    "It is not therefore Turing complete, which may actually be beneficial in some applications.</p>"
+    "It is therefore not Turing complete, which may actually be beneficial in some applications.</p>"
   ],
   "content": [
     {

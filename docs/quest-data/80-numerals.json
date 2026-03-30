@@ -68,7 +68,7 @@
         "As often with numbers, you need to find <code>f</code> and <code>x</code>",
         "such that <code>f(f(...f(x)...))</code> does what you want."
       ],
-      "unlocks": "is_zero",
+      "unlock": "is_zero",
       "input": "phi",
       "cases": [
         [ "phi (KI) x y", "x" ],

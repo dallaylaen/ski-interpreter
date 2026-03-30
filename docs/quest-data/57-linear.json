@@ -108,7 +108,7 @@
       "name": "Identity but later",
       "intro": [
         "<p>Provide a combinator that takes 3 arguments and returns them applied in the same order:</p>",
-        "<p><code>I<sup>**</sup>a b c = a b c</code>.</p>",
+        "<p><code>I<sup>**</sup> a b c = a b c</code>.</p>",
         "The catch is: <code>a</code> and <code>b</code> shall not be merged until <code>c</code> arrives."
       ],
       "input": {

@@ -6,9 +6,9 @@
     "<p>The <code>J</code> combinator, aka Jay bird, works as follows: ",
     "<code>J a b c d = a b (a d c)</code>.",
     "It was discovered in 1935 by",
-    "<a href=\"https://en.wikipedia.org/wiki/J._Barkley_Rosser\" target=\"_blank\">J._Barkley_Rosser</a>.</p>",
+    "<a href=\"https://en.wikipedia.org/wiki/J._Barkley_Rosser\" target=\"_blank\">J. Barkley Rosser</a>.</p>",
     "<p><code>J</code> and <code>I</code> form a basis for all operations that do not <i>discard</i> arguments,",
-    "as it incorporates the opeartions of composition, swapping, and duplication.</p>",
+    "as it incorporates the operations of composition, swapping, and duplication.</p>",
     "<p>Let's prove it!</p>"
   ],
   "content": [

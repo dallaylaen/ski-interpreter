@@ -7,7 +7,7 @@
     "by means of combinatory logic alone.",
     "<i>(In fact, this interpreter goes to great lengths to provide the tools to do so).</i></p>",
     "<p>However, the behavior of a combinator can be studied by applying it to other terms.",
-    "Typically more than one term is needed, so <code>V</code> and it's 3-argument cousin",
+    "Typically more than one term is needed, so <code>V</code> and its 3-argument cousin",
     "may come in handy.</p>",
     "<p>Unfortunately, there's no way to ensure that the term we're looking at behaves.",
     "As soon as we get to decide what is allowed to be applied to what,",
