@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.3] - 2026-03-30
+
+### Added
+
+- Quest cases now support `{ canonize: { max: number } }` option 
+to canonize terms before comparing.
+This was added to cut off excessive `I(I(I(...)))`
+in non-normalizable solutions.
+
+### Fixed
+
+- Quests: Turing bird (wrong def) and Y combinator (was not accepting some valid solutions) fixed.
+- Exposed more types supposed to be exposed all along.
+
 ## [2.6.2] - 2026-03-29
 
 ### Added
