@@ -14,7 +14,7 @@
     <div class="chapter">
         <h2>Foreword</h2>
         <p>
-            <A href="https://en.wikipedia.org/wiki/Combinatory_logic" target="_blank">Combinatory logic</a>
+            <a href="https://en.wikipedia.org/wiki/Combinatory_logic" target="_blank">Combinatory logic</a>
             is a minimalistic functional programming language.
         </p>
 
@@ -26,7 +26,7 @@
         </p>
 
         <p>
-            Little did he know that the tool is in fact 
+            Little did he know that the tool is in fact
             <a href="https://en.wikipedia.org/wiki/Kleene%E2%80%93Rosser_paradox" target="_blank"><i>too powerful</i></a>
             for the task. Neither Gödel's incompleteness theorem, nor the halting problem were known at the time.
         </p>
@@ -61,7 +61,7 @@
             </li>
             <li>
                 Uppercase identifiers like <code>S</code>, <code>K</code>, <code>B</code> are always one-letter
-                and can be lumped together, without whitespaces in between.
+                and can be lumped together, without whitespace in between.
             </li>
             <li>
                 Lowercase identifiers like <code>x</code>, <code>y</code>, <code>pred</code>, <code>list</code>, <code>foo_42</code>
@@ -110,7 +110,7 @@
                 will be executed and/or added to the term inventory.
                 Intermediate definitions are local to one computation and may
                 <a href="https://en.wikipedia.org/wiki/Variable_shadowing" target="_blank">shadow</a>
-                (i.e., temporarily override) previoursly defined terms.
+                (i.e., temporarily override) previously defined terms.
             </li>
 
             <li>
@@ -144,7 +144,7 @@
             If the starting term in an expression is followed by enough arguments,
             it may be replaced by its returned value, with the extra arguments (if any)
             simply applied at the end as is.
-            This is called <b><i>reduction</i></b>, and the replaced term is called a <b><i>redex</i></b>
+            This is called <b><i>reduction</i></b>, and the replaced term is called a <b><i>redex</i></b>.
         </p>
 
         <p>
@@ -159,16 +159,16 @@
             Such form, if it exists, is called the <b><i>normal form</i></b> of the expression.
             If there are multiple redexes at the same time, different reduction strategies may be picked,
             and not all of them may lead to termination.
-            However, if to strategies do terminate, the normal form will always be the same.
+            However, if two strategies do terminate, the normal form will always be the same.
         </p>
 
         <p>
             The reduction strategy that always picks the leftmost outermost redex is called
             <a href="https://en.wikipedia.org/wiki/Normal_order" target="_blank">normal order</a>.
             This strategy has the property of always reaching normal form if it exists,
-            hecne the name.
+            hence the name.
             It's not the only such strategy but probably the easiest to implement.
-            This interpreter also uses normal reduction strategy.
+            This interpreter uses leftmost-outermost (LO) reduction strategy.
         </p>
 
         <p>
@@ -281,7 +281,7 @@
         <p>
             Just like <code>T</code> and <code>K</code>, any combinator of arity <i>n</i> plus an argument
             is a combinator of arity <i>n&nbsp;&minus;&nbsp;1</i>, per definition (it applies its arguments to themselves and
-            possible some previously defined terms).
+            possibly some previously defined terms).
             So a combinator may be thought of as a one-argument function returning a combinator or
             an application thereof.
             This technique is known as
