@@ -8,6 +8,7 @@ const { Quest } = SKI;
 const { version } = require('../package.json');
 
 const runOptions = {};
+/** @type FormatOptions */
 let format = {};
 let verbose = false;
 
@@ -389,7 +390,10 @@ function handleCommand (input, ski) {
 }
 
 function setFormat (options) {
-  format = SKI.schemas.FormatOptions.parse(JSON.parse(options));
+  const maybe = SKI.extras.checkFormatOptions(JSON.parse(options));
+  if (!maybe.ok)
+    throw new Error('Invalid format options: ' + options); // TODO proper error when available
+  format = maybe.format;
 }
 
 function toInt (comment) {
