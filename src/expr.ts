@@ -17,7 +17,7 @@ const ORDER: Record<string, 'LI' | 'LO'> = {
 };
 
 /**
- * @desc Control primitives for fold() and traverse() methods.
+ *  Control primitives for fold() and traverse() methods.
  */
 export const control = {
   descend: prepareWrapper('descend'),
@@ -27,7 +27,7 @@ export const control = {
 };
 
 /**
- * @desc List of predefined native combinators.
+ *  List of predefined native combinators.
  * This is required for toSKI() to work, otherwise could as well have been in parser.js.
  */
 export const native: Record<string, Native> = {};
@@ -62,7 +62,7 @@ export type FormatOptions = {
 };
 
 /**
- * @desc A version of FormatOptions with defaults plugged in,
+ *  A version of FormatOptions with defaults plugged in,
  *       use for mandatory formatImpl implementation in Expr subclasses.
  */
 export type RefinedFormatOptions = { // ditto but with defaults plugged in
@@ -77,22 +77,21 @@ export type RefinedFormatOptions = { // ditto but with defaults plugged in
   inventory?: Record<string, Expr>,
 }
 
-type TraverseOptions = {order?: 'LO' | 'LI' | 'leftmost-outermost' | 'leftmost-innermost'};
-type TraverseCallback = (e:Expr) => TraverseValue<Expr>;
+export type TraverseOptions = {order?: 'LO' | 'LI' | 'leftmost-outermost' | 'leftmost-innermost'};
+export type TraverseCallback = (e:Expr) => TraverseValue<Expr>;
 
+/**
+ *   A combinatory logic expression.
+ *
+ *  Applications, variables, lambdas, combinators per se,
+ *  and other expression subtypes all extend this class.
+ *
+ *  Expr itself cannot (or at least should not) be instantiated.
+ *
+ *  @abstract
+ */
 export abstract class Expr {
-  /**
-   *  @desc A combinatory logic expression.
-   *
-   *  Applications, variables, lambdas, combinators per se,
-   *  and other expression subtypes all extend this class.
-   *
-   *  Expr itself cannot (or at least should not) be instantiated.
-   *
-   *  @abstract
-   */
-
-  /** @desc optional context for the term. Is set by the parser with addContext: true */
+  /**  optional context for the term. Is set by the parser with addContext: true */
   context?: {
     scope?: object,
     env?: Record<string, Expr>,
@@ -100,22 +99,22 @@ export abstract class Expr {
     parser: object,
   }
 
-  /** @desc number of arguments the term is waiting for (if known) */
+  /**  number of arguments the term is waiting for (if known) */
   arity?: number;
-  /** @desc a brief description what the term does */
+  /**  a brief description what the term does */
   note?: string;
-  /** @desc the properties of the term, typically inferred from its behavior.
+  /**  the properties of the term, typically inferred from its behavior.
    *      This is used internally when declaring Native / Alias terms.
    */
   props?: TermInfo;
-  /** @desc An estimated number of nodes in the expression tree.
+  /**  An estimated number of nodes in the expression tree.
    *     Used to prevent runaway computations.
    */
   size?: number;
 
   /**
    *
-   * @desc Define properties of the term based on user supplied options and/or inference results.
+   *  Define properties of the term based on user supplied options and/or inference results.
    *       Typically useful for declaring Native and Alias terms.
    * @protected
    * @param {Object} options
@@ -152,7 +151,7 @@ export abstract class Expr {
   }
 
   /**
-   * @desc apply self to zero or more terms and return the resulting term,
+   *  apply self to zero or more terms and return the resulting term,
    * without performing any calculations whatsoever
    * @param {Expr} args
    * @return {Expr}
@@ -166,7 +165,7 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Replace all aliases in the expression with their definitions, recursively.
+   *  Replace all aliases in the expression with their definitions, recursively.
    * @return {Expr}
    */
   expand (): Expr {
@@ -177,7 +176,7 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Traverse the expression tree, applying change() to each node.
+   *  Traverse the expression tree, applying change() to each node.
    *       If change() returns an Expr, the node is replaced with that value.
    *       A null/undefined value is interpreted as
    *       "descend further if applicable, or leave the node unchanged".
@@ -201,7 +200,7 @@ export abstract class Expr {
    * }} [options]
    * @param {(e:Expr) => TraverseValue<Expr>} change
    * @returns {Expr|null}
-   * @final
+   * @sealed
    */
   traverse (
     options: TraverseOptions | TraverseCallback,
@@ -219,8 +218,10 @@ export abstract class Expr {
   }
 
   /**
+   *
+   *
    * @protected
-   * @final
+   *
    * @param {Object} options
    * @param {(e:Expr) => TraverseValue<Expr>} change
    * @returns {TraverseValue<Expr>}
@@ -243,6 +244,8 @@ export abstract class Expr {
   }
 
   /**
+   * Apply a {@link traverse} callback to the subterms of the expression, without changing the expression itself.
+   *
    * @protected
    * @param {Object} options
    * @param {(e:Expr) => TraverseValue<Expr>} change
@@ -253,7 +256,7 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Returns true if predicate() is true for any subterm of the expression, false otherwise.
+   *  Returns true if predicate() is true for any subterm of the expression, false otherwise.
    *
    * @param {(e: Expr) => boolean} predicate
    * @returns {boolean}
@@ -263,7 +266,7 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Fold the expression into a single value by recursively applying combine() to its subterms.
+   *  Fold the expression into a single value by recursively applying combine() to its subterms.
    *       Nodes are traversed in leftmost-outermost order, i.e. the same order as reduction steps are taken.
    *
    * null or undefined return value from combine() means "keep current value and descend further".
@@ -279,7 +282,7 @@ export abstract class Expr {
    * expr.fold(0, (acc, e) => acc + 1);
    *
    * @experimental
-   * @final
+   *
    * @template T
    * @param {T} initial
    * @param {(acc: T, expr: Expr) => TraverseValue<T>} combine
@@ -291,7 +294,7 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Internal method for fold(), which performs the actual folding.
+   *  Internal method for fold(), which performs the actual folding.
    *       Should be implemented in subclasses having any internal structure.
    *
    * @protected
@@ -304,7 +307,7 @@ export abstract class Expr {
 
   /**
    * @experimental
-   * @desc  Fold an application tree bottom to top.
+   *   Fold an application tree bottom to top.
    *        For each subtree, the function is given the term in the root position and
    *        a list of the results of folding its arguments.
    *
@@ -332,7 +335,7 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Try to empirically find an equivalent lambda term for the expression,
+   *  Try to empirically find an equivalent lambda term for the expression,
    *       returning also the term's arity and some other properties.
    *
    *       This is used internally when declaring a Native / Alias term,
@@ -343,7 +346,7 @@ export abstract class Expr {
    *
    *       Use toLambda() if you want to get a lambda term in any case.
    *
-   * @final
+   * @sealed
    * @param {{max?: number, maxArgs?: number}} options
    * @return {TermInfo}
    */
@@ -366,7 +369,7 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Internal method for infer(), which performs the actual inference.
+   *  Internal method for infer(), which performs the actual inference.
    * @param {{max: number, maxArgs: number}} options
    * @param {number} nargs - var index to avoid name clashes
    * @returns {TermInfo}
@@ -420,7 +423,7 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Expand an expression into a list of terms
+   *  Expand an expression into a list of terms
    * that give the initial expression when applied from left to right:
    * ((a, b), (c, d)) => [a, b, (c, d)]
    *
@@ -437,7 +440,7 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Returns a series of lambda terms equivalent to the given expression,
+   *  Returns a series of lambda terms equivalent to the given expression,
    *       up to the provided computation steps limit.
    *
    *       Unlike infer(), this method will always return something,
@@ -445,7 +448,7 @@ export abstract class Expr {
    *
    *       See also Expr.walk() and Expr.toSKI().
    *
-   * @final
+   * @sealed
    * @param {{
    *   max?: number,
    *   maxArgs?: number,
@@ -487,24 +490,24 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Rewrite the expression into S, K, and I combinators step by step.
+   *  Rewrite the expression into S, K, and I combinators step by step.
    *     Returns an iterator yielding the intermediate expressions,
    *     along with the number of steps taken to reach them.
    *
    *     See also Expr.walk() and Expr.toLambda().
    *
-   * @final
+   * @sealed
    * @param {{max?: number}} [options]
    * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
    */
-  * toSKI (_options = {}) {
+  * toSKI (options: {max?: number, maxArgs?: number} = {}) {
     // options are ignored completely, TODO remove
     // get rid of non-lambdas
     let expr:Expr|null = this.traverse(e => {
       if (e instanceof FreeVar || e instanceof App || e instanceof Lambda || e instanceof Alias)
         return null;
       // TODO infer failed for atomic term? die...
-      return e.infer().expr;
+      return e.infer(options).expr;
     }) ?? this;
 
     let steps = 0;
@@ -550,7 +553,7 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Apply term reduction rules, if any, to the given argument.
+   *  Apply term reduction rules, if any, to the given argument.
    * A returned value of null means no reduction is possible.
    * A returned value of Expr means the reduction is complete and the application
    *     of this and arg can be replaced with the result.
@@ -573,16 +576,20 @@ export abstract class Expr {
   }
 
   /**
-   * @desc iterate one step of a calculation.
+   *  iterate one step of a calculation.
    * @return {{expr: Expr, steps: number, changed: boolean}}
    */
   step (): Step { return { expr: this, steps: 0, changed: false } }
 
   /**
-   * @desc Run uninterrupted sequence of step() applications
-   *       until the expression is irreducible, or max number of steps is reached.
-   *       Default number of steps = 1000.
-   * @final
+   * Iteratively apply {@link step} to the expression until it's irreducible,
+   * or until the provided limits are reached.
+   *
+   * Returns { expr: Expr, steps: number, final: boolean }.
+   *
+   * If { throw: true } is given and no irreducible form was reached within the limits, an error is thrown.
+   *
+   * @sealed
    * @param {{max?: number, steps?: number, throw?: boolean}|Expr} [opt]
    * @param {Expr} args
    * @return {{expr: Expr, steps: number, final: boolean}}
@@ -614,10 +621,14 @@ export abstract class Expr {
   }
 
   /**
-   * Execute step() while possible, yielding a brief description of events after each step.
+   * Returns an iterator of reduction steps of the expression, up to the provided limits.
+   * Each step is an object of { expr, steps, final }, same as in {@link run}.
    *
-   * Mnemonics: like run() but slower.
-   * @final
+   * Mnemonics: like {@link run} but slower.
+   *
+   * @remarks
+   * This method is final. Do not override, override {@link step} instead.
+   *
    * @param {{max?: number}} options
    * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
    */
@@ -644,23 +655,24 @@ export abstract class Expr {
   }
 
   /**
-   * @desc True is the expressions are identical, false otherwise.
+   *  True is the expressions are identical, false otherwise.
    *       Aliases are expanded.
    *       Bound variables in lambda terms are renamed consistently.
    *       However, no reductions are attempted.
    *
    *       E.g. a->b->a == x->y->x is true, but a->b->a == K is false.
    *
+   * @remarks Final. Current implementation is a frontend to {@link diff}.
+   *
    * @param {Expr} other
    * @return {boolean}
-   * @final
    */
   equals (other:Expr):boolean {
     return !this.diff(other);
   }
 
   /**
-   * @desc Recursively compare two expressions and return a string
+   *  Recursively compare two expressions and return a string
    *       describing the first point of difference.
    *       Returns null if expressions are identical.
    *
@@ -693,16 +705,16 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Assert expression equality. Can be used in tests.
+   *  Assert expression equality. Can be used in tests.
    *
    * `this` is the expected value and the argument is the actual one.
    * Mnemonic: the expected value is always a combinator, the actual one may be anything.
    *
    * In case of failure, an error is thrown with a message describing the first point of difference
    * and `expected` and `actual` properties like in AssertionError.
-   * AssertionError is not used directly to because browsers don't recognize it.
+   * AssertionError is not used directly because browsers don't recognize it.
    *
-   * @final
+   * @sealed
    * @param {Expr} actual
    * @param {string} comment
    */
@@ -725,29 +737,30 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Returns string representation of the expression.
+   *       Returns string representation of the expression.
    *       Same as format() without options.
    *
    *       Use formatImpl() to override in subclasses.
    * @return {string}
-   * @final
+   * @sealed
    */
   toString (): string {
     return this.format();
   }
 
   /**
-   * @desc Whether the expression needs parentheses when printed.
-   * @param {boolean} [first] - whether this is the first term in a sequence
+   * Whether the expression needs to be parenthesized when printed in terse mode.
+   * (see {@link format})
+   * @param isFirst whether this is the first term in a sequence
    * @return {boolean}
    * @protected
    */
-  _braced (_first?:boolean): boolean {
+  _braced (isFirst?:boolean): boolean {
     return false;
   }
 
   /**
-   * @desc Whether the expression can be printed without a space when followed by arg.
+   *  Whether the expression can be printed without a space when followed by arg.
    * @param {Expr} arg
    * @returns {boolean}
    * @protected
@@ -757,11 +770,12 @@ export abstract class Expr {
   }
 
   /**
-   * @desc    Stringify the expression with fancy formatting options.
+   *          Stringify the expression with fancy formatting options.
    *          Said options mostly include wrappers around various constructs in form of ['(', ')'],
    *          as well as `terse` and `html` flags that fill in appropriate defaults.
    *          Format without options is equivalent to toString() and can be parsed back.
-   * @final
+   *
+   * @sealed
    *
    * @param   {Object} [options]  - formatting options
    * @param   {boolean} [options.terse]   - whether to use terse formatting (omitting unnecessary spaces and parentheses)
@@ -785,7 +799,7 @@ export abstract class Expr {
    * @example foo.format({terse: false}) // spell out all parentheses
    * @example foo.format({html: true}) // use HTML tags and entities
    * @example foo.format({ around: ['(', ')'], brackets: ['', ''], lambda: ['(', '->', ')'] }) // lisp style, still back-parsable
-   * @exapmle foo.format({ lambda: ['&lambda;', '.', ''] }) // pretty-print for the math department
+   * @example foo.format({ lambda: ['&lambda;', '.', ''] }) // pretty-print for the math department
    * @example foo.format({ lambda: ['', '=>', ''], terse: false }) // make it javascript
    * @example foo.format({ inventory: { T } }) // use T as a named term, expand all others
    *
@@ -822,7 +836,7 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Internal method for format(), which performs the actual formatting.
+   *  Internal method for format(), which performs the actual formatting.
    * @param {Object} options
    * @param {number} nargs
    * @returns {string}
@@ -832,7 +846,7 @@ export abstract class Expr {
   abstract formatImpl (options: RefinedFormatOptions, nargs: number): string;
 
   /**
-   * @desc Returns a string representation of the expression tree, with indentation to show structure.
+   *  Returns a string representation of the expression tree, with indentation to show structure.
    *
    *       Applications are flattened to avoid excessive nesting.
    *       Variables include ids to distinguish different instances of the same variable name.
@@ -857,9 +871,12 @@ export abstract class Expr {
   }
 
   /**
-   * @desc Convert the expression to a JSON-serializable format.
+   * Convert the expression to a JSON-serializable format.
+   * Sadly the format is not yet finalized and may change in the future.
+   *
+   * @experimental
    * @returns {string}
-   * @final
+   * @sealed
    */
   toJSON (): string | object {
     return this.format();
@@ -868,7 +885,7 @@ export abstract class Expr {
 
 export class App extends Expr {
   /**
-   * @desc Application of fun() to args.
+   *  Application of fun() to args.
    * Never ever use new App(fun, arg) directly, use fun.apply(...args) instead.
    * @param {Expr} fun
    * @param {Expr} arg
@@ -990,8 +1007,8 @@ export class App extends Expr {
     return null;
   }
 
-  _braced (first?: boolean): boolean {
-    return !first;
+  _braced (isFirst?: boolean): boolean {
+    return !isFirst;
   }
 
   formatImpl (options:RefinedFormatOptions, nargs: number): string {
@@ -1016,7 +1033,7 @@ export class App extends Expr {
 
 export class Named extends Expr {
   /**
-   * @desc An abstract class representing a term named 'name'.
+   *  An abstract class representing a term named 'name'.
    *
    * @param {String} name
    */
@@ -1052,7 +1069,7 @@ let freeId = 0;
 
 export class FreeVar extends Named {
   /**
-   * @desc A named variable.
+   *  A named variable.
    *
    * Given the functional nature of combinatory logic, variables are treated
    * as functions that we don't know how to evaluate just yet.
@@ -1110,7 +1127,7 @@ export class FreeVar extends Named {
 
 export class Native extends Named {
   /**
-   * @desc A named term with a known rewriting rule.
+   *  A named term with a known rewriting rule.
    *       'impl' is a function with signature Expr => Expr => ... => Expr
    *       (see typedef Partial).
    *       This is how S, K, I, and company are implemented.
@@ -1137,7 +1154,7 @@ export class Native extends Named {
 
 export class Lambda extends Expr {
   /**
-   * @desc Lambda abstraction of arg over impl.
+   *  Lambda abstraction of arg over impl.
    *     Upon evaluation, all occurrences of 'arg' within 'impl' will be replaced
    *     with the provided argument.
    *
@@ -1229,14 +1246,14 @@ export class Lambda extends Expr {
       + this.impl.diag(indent + '  ');
   }
 
-  _braced (first: boolean): boolean {
+  _braced (isFirst: boolean): boolean {
     return true;
   }
 }
 
 export class Church extends Expr {
   /**
-   * @desc Church numeral representing non-negative integer n:
+   *  Church numeral representing non-negative integer n:
    *      n f x = f(f(...(f x)...)) with f applied n times.
    * @param {number} n
    */
@@ -1287,7 +1304,7 @@ function waitn (n: number): (e : Expr) => (arg: Expr) => Invocation {
 
 export class Alias extends Named {
   /**
-   * @desc A named alias for an existing expression.
+   *  A named alias for an existing expression.
    *
    * Aliasing allows declaring new terms without a native implementation.
    * This is what happens when one writes `B = S(KS)K` in the interpreter.
@@ -1330,7 +1347,7 @@ export class Alias extends Named {
   }
 
   /**
-   * @desc Make the alias inline, i.e. replace it with its implementation everywhere.
+   *  Make the alias inline, i.e. replace it with its implementation everywhere.
    *
    * Replaces the old `outdated` attribute.
    * Used by the parser when a term definition is removed or updated.
@@ -1397,8 +1414,8 @@ export class Alias extends Named {
     return other.diff(this.impl, !swap);
   }
 
-  _braced (first: boolean): boolean {
-    return this.inline ? this.impl._braced(first) : false;
+  _braced (isFirst: boolean): boolean {
+    return this.inline ? this.impl._braced(isFirst) : false;
   }
 
   formatImpl (options: RefinedFormatOptions, nargs: number): string {
