@@ -21,7 +21,7 @@ export class SKI extends Parser {
   static W = native.W;
 
   /**
- * @desc Create a proxy object that generates variables on demand,
+ *  Create a proxy object that generates variables on demand,
  *       with names corresponding to the property accessed.
  *       Different invocations will return distinct variables,
  *       even if with the same name.

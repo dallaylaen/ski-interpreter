@@ -2,7 +2,7 @@ import { Expr, Named, control } from './expr';
 import { TraverseValue } from './internal';
 
 /**
- * @desc  Sort a list in such a way that dependent terms come after the (named) terms they depend on.
+ *        Sort a list in such a way that dependent terms come after the (named) terms they depend on.
  *        If env is given, only terms listed there are taken into account.
  *        If env is omitted, it will be implied from the list.
  *        If list is omitted, it will default to values of env.
@@ -20,7 +20,7 @@ import { TraverseValue } from './internal';
  *    const expr = ski.parse(src);
  *    toposort([expr], ski.getTerms()); // returns all terms appearing in Expr in correct order
  */
-type ToposortResult = { list: Expr[], env: { [s: string]: Named } };
+export type ToposortResult = { list: Expr[], env: { [s: string]: Named } };
 export function toposort (list:Expr[]|Expr|undefined, env: { [s: string]: Named } | undefined): ToposortResult {
   if (list instanceof Expr)
     list = [list];

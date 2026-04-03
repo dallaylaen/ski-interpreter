@@ -5,12 +5,12 @@ import { Quest } from './quest';
 import { toposort } from './toposort';
 
 /**
- * @desc  Extra utilities that do not belong in the core.
+ *   Extra utilities that do not belong in the core.
  */
 
 /**
  * @experimental
- * @desc  Look for an expression that matches the predicate,
+ *   Look for an expression that matches the predicate,
  *        starting with the seed and applying the terms to one another.
  *
  *        A predicate returning 0 (or nothing) means "keep looking",
@@ -33,7 +33,7 @@ import { toposort } from './toposort';
  * @param {(e: Expr, props: {}) => number?} predicate
  * @return {{expr?: Expr, total: number, probed: number, gen: number, cache?: Expr[][]}}
  */
-type SearchOptions = {
+export type SearchOptions = {
   depth?: number;
   tries?: number;
   infer?: boolean;
@@ -44,8 +44,8 @@ type SearchOptions = {
   progress?: (info: { gen: number, total: number, probed: number, step: boolean }) => void;
   progressInterval?: number;
 };
-type SearchCallback = (e: Expr, props: TermInfo) => (number | undefined);
-type SearchResult = { expr?: Expr, total: number, probed: number, gen: number, cache?: Expr[][] };
+export type SearchCallback = (e: Expr, props: TermInfo) => (number | undefined);
+export type SearchResult = { expr?: Expr, total: number, probed: number, gen: number, cache?: Expr[][] };
 
 function search (seed: Expr[], options: SearchOptions, predicate: SearchCallback): SearchResult {
   const {
@@ -126,7 +126,7 @@ function search (seed: Expr[], options: SearchOptions, predicate: SearchCallback
 }
 
 /**
- * @desc Recursively replace all instances of Expr in a data structure with
+ *  Recursively replace all instances of Expr in a data structure with
  *       respective string representation using the format() options.
  *       Objects of other types and primitive values are eft as is.
  *
@@ -158,7 +158,7 @@ function deepFormat (obj: any, options : FormatOptions = {}): any {
 }
 
 /**
- * @desc  Given an expression and a hash of named terms,
+ *   Given an expression and a hash of named terms,
  *        return a semicolon-separated string that declares said expression
  *        unambiguously.
  *
@@ -184,7 +184,7 @@ function declare (expr: Expr, env: { [s: string]: Named } = {}): string {
 }
 
 /**
- * @desc Validate an unknown value as FormatOptions.
+ *  Validate an unknown value as FormatOptions.
  *       Returns `{ ok: true, format: <value> }` on success,
  *       or `{ ok: false }` if any field has the wrong type.
  */

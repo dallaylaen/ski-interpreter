@@ -139,7 +139,7 @@ export class Parser {
   }
 
   /**
-   * @desc Declare a new term
+   *  Declare a new term
    * If the first argument is an Alias, it is added as is.
    * Otherwise, a new Alias or Native term (depending on impl type) is created.
    * If note is not provided and this.annotate is true, an automatic note is generated.
@@ -179,7 +179,7 @@ export class Parser {
   }
 
   /**
-   * @desc Internal helper for add() that creates an Alias or Native term from the given arguments.
+   *  Internal helper for add() that creates an Alias or Native term from the given arguments.
    * @param {Alias|string} term
    * @param {string|Expr|function(Expr):Partial} impl
    * @returns {Native|Alias}
@@ -203,7 +203,7 @@ export class Parser {
   }
 
   /**
-   * @desc Declare a new term if it is not known, otherwise just allow it.
+   *  Declare a new term if it is not known, otherwise just allow it.
    *       Currently only used by quests.
    *       Use with caution, this function may change its signature, behavior, or even be removed in the future.
    *
@@ -221,7 +221,7 @@ export class Parser {
   }
 
   /**
-   * @desc Declare and remove multiple terms at once
+   *  Declare and remove multiple terms at once
    *       term=impl adds term
    *       term= removes term
    * @param {string[]} list
@@ -303,7 +303,7 @@ export class Parser {
   }
 
   /**
-   * @desc Export term declarations for use in bulkAdd().
+   *  Export term declarations for use in bulkAdd().
    * Currently only Alias terms are serialized.
    * @returns {string[]}
    */
@@ -431,7 +431,7 @@ export class Parser {
   }
 
   /**
-   * @desc Parse a single line of source code, without splitting it into declarations.
+   *  Parse a single line of source code, without splitting it into declarations.
    *       Internal, always use parse() instead.
    * @template T
    * @param {String} source S(KI)I
