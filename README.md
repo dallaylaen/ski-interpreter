@@ -124,6 +124,8 @@ will start a node shell with the `SKI` class available as a global variable.
 
 # Usage
 
+See the [complete API reference](https://dallaylaen.github.io/ski-interpreter/man/) for gory details.
+
 ## A minimal example
 
 ```javascript
