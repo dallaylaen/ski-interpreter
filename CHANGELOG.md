@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] - 2026-04-03
+
+### BREAKING CHANGES
+
+- Remove `SKI.schemas`.
+
+### Added
+
+- `SKI.extras.checkFormatOptions` that returns { value: FormatOptions } 
+or { error: object } for validating format options.
+- Rendered documentation at https://dallaylaen.github.io/ski-interpreter/man
+
+### Changed
+- Way better core documentation
+- Removed [zod](https://www.npmjs.com/package/zod) dependency
+for good, seems like overkill here.
+
 ## [2.6.3] - 2026-03-30
 
 ### Added
