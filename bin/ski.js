@@ -391,9 +391,9 @@ function handleCommand (input, ski) {
 
 function setFormat (options) {
   const maybe = SKI.extras.checkFormatOptions(JSON.parse(options));
-  if (!maybe.ok)
-    throw new Error('Invalid format options: ' + options); // TODO proper error when available
-  format = maybe.format;
+  if (!maybe.value)
+    throw new Error('Invalid format options: ' + JSON.stringify(maybe.error));
+  format = maybe.value;
 }
 
 function toInt (comment) {
