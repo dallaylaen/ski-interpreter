@@ -183,38 +183,60 @@ function declare (expr: Expr, env: { [s: string]: Named } = {}): string {
   }).join('; ');
 }
 
+const isStringPair    = (x: unknown) =>
+  Array.isArray(x) && x.length === 2 && typeof x[0] === 'string' && typeof x[1] === 'string'
+    ? undefined
+    : 'must be a pair of strings';
+const isStringTriple  = (x: unknown) =>
+  Array.isArray(x) && x.length === 3 && typeof x[0] === 'string' && typeof x[1] === 'string' && typeof x[2] === 'string'
+    ? undefined
+    : 'must be a triplet of strings';
+
+const schema: Record<string, (arg0: unknown) => string | undefined> = {
+  html:      x => typeof x === 'boolean' ? undefined : 'must be a boolean',
+  terse:     x => typeof x === 'boolean' ? undefined : 'must be a boolean',
+  space:     x => typeof x === 'string' ? undefined : 'must be a string',
+  brackets:  isStringPair,
+  var:       isStringPair,
+  around:    isStringPair,
+  redex:     isStringPair,
+  lambda:    isStringTriple,
+  inventory: x => {
+    if (typeof x !== 'object' || x === null || x.constructor !== Object)
+      return 'must be an object, not ' + (x?.constructor?.name ?? typeof x);
+    const refined = x as Record<string, unknown>;
+    for (const key of Object.keys(refined)) {
+      if (!(refined[key] instanceof Expr))
+        return 'key ' + key + 'is not an Expr';
+    }
+    return undefined;
+  }
+}
+
 /**
- *  Validate an unknown value as FormatOptions.
- *       Returns `{ ok: true, format: <value> }` on success,
- *       or `{ ok: false }` if any field has the wrong type.
+ *   Converts an unknown object into a FormatOptions, or returns an error it it is not valid.
+ *   A null/undefined counts as an empty options object (and is thus valid).
  */
-function checkFormatOptions (v: unknown): { ok: true, format: FormatOptions } | { ok: false } {
-  if (typeof v !== 'object' || v === null || Array.isArray(v))
-    return { ok: false };
+function checkFormatOptions (raw: unknown): { value: FormatOptions } | { error: Record<string, string> } {
+  if (raw === null || raw === undefined)
+    return { value: {} };
 
-  const o = v as Record<string, unknown>;
+  if (typeof raw !== 'object' || Array.isArray(raw) || raw.constructor !== Object)
+    return { error: { object: 'Format options must be an object, not ' + (raw?.constructor?.name ?? typeof raw) } };
 
-  const isStringPair    = (x: unknown): x is [string, string]         => Array.isArray(x) && x.length === 2 && typeof x[0] === 'string' && typeof x[1] === 'string';
-  const isStringTriple  = (x: unknown): x is [string, string, string] => Array.isArray(x) && x.length === 3 && typeof x[0] === 'string' && typeof x[1] === 'string' && typeof x[2] === 'string';
+  const rec = raw as Record<string, unknown>;
+  const error: Record<string, string> = {};
 
-  if ('terse'    in o && typeof o.terse    !== 'boolean')  return { ok: false };
-  if ('html'     in o && typeof o.html     !== 'boolean')  return { ok: false };
-  if ('space'    in o && typeof o.space    !== 'string')   return { ok: false };
-  if ('brackets' in o && !isStringPair(o.brackets))        return { ok: false };
-  if ('var'      in o && !isStringPair(o.var))             return { ok: false };
-  if ('around'   in o && !isStringPair(o.around))          return { ok: false };
-  if ('redex'    in o && !isStringPair(o.redex))           return { ok: false };
-  if ('lambda'   in o && !isStringTriple(o.lambda))        return { ok: false };
-
-  if ('inventory' in o) {
-    const inv = o.inventory;
-    if (typeof inv !== 'object' || inv === null || Array.isArray(inv))
-      return { ok: false };
-    for (const val of Object.values(inv as object))
-      if (!(val instanceof Expr)) return { ok: false };
+  for (const key in rec) {
+    if (schema[key]) {
+      const err = schema[key](rec[key]);
+      if (err)
+        error[key] = err;
+    } else
+      error[key] = 'unknown option';
   }
 
-  return { ok: true, format: o as FormatOptions };
+  return Object.keys(error).length > 0 ? { error } : { value: rec as FormatOptions };
 }
 
 export const extras = { search, deepFormat, declare, toposort, checkFormatOptions };
