@@ -36,6 +36,8 @@ export type InputSpec = {
   lambdas?: boolean
 };
 
+export type SolEntry = { input: string[], result: QuestResult };
+
 export type QuestResult = {
   pass: boolean,
   details: CaseResult[],
@@ -45,10 +47,6 @@ export type QuestResult = {
   steps: number,
   weight?: number
 };
-
-// metadata not typechecked as long as it's an object
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type QuestMeta = { [key: string]: any };
 
 export type QuestSpec = {
   input: string | InputSpec | (string | InputSpec)[],
@@ -67,11 +65,11 @@ export type QuestSpec = {
   id?: string | number,
   name?: string,
   intro?: string | string[], // multiple strings will be concatenated with spaces
-} & QuestMeta;
+} & Record<string, unknown>; // allow any extra fields in the spec, they will be copied to quest.meta
 
 export type SelfCheck = { accepted?: string[][], rejected?: string[][] };
 
-type AddCaseOptions = {
+export type AddCaseOptions = {
   engine?: Parser,
   env?: { [key: string]: Expr },
   max?: number,
@@ -84,24 +82,24 @@ type AddCaseOptions = {
   },
 };
 
+/**
+ *  A combinator problem with a set of test cases for the proposed solution.
+ * @param {QuestSpec} options
+ * @example const quest = new Quest({
+ *    input: 'identity',
+ *    cases: [
+ *      ['identity x', 'x'],
+ *    ],
+ *    allow: 'SK',
+ *    intro: 'Find a combinator that behaves like the identity function.',
+ * });
+ * quest.check('S K K'); // { pass: true, details: [...], ... }
+ * quest.check('K S');   // { pass: false, details: [...], ... }
+ * quest.check('K x');   // fail! internal variable x is not equal to free variable x,
+ *                       //     despite having the same name.
+ * quest.check('I');     // fail! I not in the allowed list.
+ */
 export class Quest {
-  /**
-   * @description A combinator problem with a set of test cases for the proposed solution.
-   * @param {QuestSpec} options
-   * @example const quest = new Quest({
-   *    input: 'identity',
-   *    cases: [
-   *      ['identity x', 'x'],
-   *    ],
-   *    allow: 'SK',
-   *    intro: 'Find a combinator that behaves like the identity function.',
-   * });
-   * quest.check('S K K'); // { pass: true, details: [...], ... }
-   * quest.check('K S');   // { pass: false, details: [...], ... }
-   * quest.check('K x');   // fail! internal variable x is not equal to free variable x,
-   *                       //     despite having the same name.
-   * quest.check('I');     // fail! I not in the allowed list.
-   */
   input: (InputSpec & {placeholder: FreeVar})[];
   cases: Case[];
 
@@ -115,7 +113,7 @@ export class Quest {
   intro?: string;
   // yes allow any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  meta?: QuestMeta;
+  meta?: Record<string, unknown>;
 
   constructor (options: QuestSpec) {
     const { input, cases, allow, numbers, lambdas, engine, engineFull, ...meta } = options;
@@ -158,12 +156,11 @@ export class Quest {
     }
 
     // NOTE meta is a local variable, can mutate
-    // NOTE title/descr are old name/intro respectively, kept for backwards compatibility
+    // TODO title/descr are old name/intro respectively, do smth about it (or forget)
     this.cases = [];
-    this.name = meta.name ?? meta.title;
-    meta.intro = list2str(meta.intro ?? meta.descr);
-    this.intro = meta.intro;
-    this.id = meta.id;
+    this.name = options.name;
+    this.intro = list2str(options.intro);
+    this.id = options.id;
     this.meta = meta;
 
     for (const c of cases ?? [])
@@ -222,7 +219,7 @@ export class Quest {
   }
 
   /**
-   * @description Statefully parse a list of strings into expressions or fancy aliases thereof.
+   *  Statefully parse a list of strings into expressions or fancy aliases thereof.
    * @param {string[]} input
    * @return {{terms: Expr[], weight: number}}
    */
@@ -260,7 +257,7 @@ export class Quest {
 
   /**
    *
-   * @param {string} input
+   * @param input
    * @return {QuestResult}
    */
   check (...input: string[]): QuestResult {
@@ -300,7 +297,7 @@ export class Quest {
   }
 
   /**
-   * @desc Verify that solutions that are expected to pass/fail do so.
+   *  Verify that solutions that are expected to pass/fail do so.
    * @param {SelfCheck|{[key: string]: SelfCheck}} dataset
    * @return {{shouldPass: {input: string[], result: QuestResult}[], shouldFail: {input: string[], result: QuestResult}[]} | null}
    */
@@ -315,7 +312,6 @@ export class Quest {
     const byId = this.id !== undefined ? (dataset as { [key: string | number]: SelfCheck })[this.id] : undefined;
     const { accepted = [], rejected = [] } = byId ?? (dataset as SelfCheck);
 
-    type SolEntry = { input: string[], result: QuestResult };
     const ret: { shouldPass: SolEntry[], shouldFail: SolEntry[] } = { shouldPass: [], shouldFail: [] };
     for (const input of accepted) {
       const result = this.check(...input);
@@ -339,7 +335,7 @@ export class Quest {
         findings[field] = found;
     }
     if (options.date) {
-      const date = new Date(this.meta?.created_at);
+      const date = new Date(this.meta?.created_at as string);
       if (isNaN(date.getTime()))
         findings.date = 'invalid date format: ' + this.meta?.created_at;
       else if (date.getTime() < new Date('2024-07-15').getTime() || date.getTime() > new Date().getTime())
@@ -389,14 +385,14 @@ export abstract class Case {
   }
 
   /**
-   * @param {Expr} expr
+   * @param input
    * @return {CaseResult}
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  abstract check ( ..._expr: Expr[] ): CaseResult;
+  abstract check ( ...input: Expr[] ): CaseResult;
 }
 
-class ExprCase extends Case {
+export class ExprCase extends Case {
   e1: Subst;
   e2: Subst;
   canonize?: {
@@ -426,10 +422,10 @@ class ExprCase extends Case {
     [this.e1, this.e2] = terms.map( (s: string) => this.parse(s) );
   }
 
-  check (...args: Expr[]): CaseResult {
-    const e1 = this.e1.apply(args);
+  check (...input: Expr[]): CaseResult {
+    const e1 = this.e1.apply(input);
     const r1 = e1.run({ max: this.max });
-    const e2 = this.e2.apply(args);
+    const e2 = this.e2.apply(input);
     const r2 = e2.run({ max: this.max });
 
     // TODO monads, monads everywhere
@@ -450,7 +446,7 @@ class ExprCase extends Case {
       found:    r1.expr,
       expected: r2.expr,
       note:     this.note,
-      args,
+      args:     input,
       case:     this,
     };
   }
@@ -466,7 +462,7 @@ const knownCaps: { [key: string]: boolean } = {
   arity:     true,
 }
 
-class PropertyCase extends Case {
+export class PropertyCase extends Case {
   expr: Subst;
   caps: Capability;
   isAffine?: boolean;
@@ -547,13 +543,18 @@ class PropertyCase extends Case {
   }
 }
 
-class Subst {
-  /**
-   * @desc A placeholder object with exactly n free variables to be substituted later.
-   *        Basically a poor man's lambda.
-   * @param {Expr} expr
-   * @param {FreeVar[]} env
-   */
+/**
+ * A placeholder object with exactly n free variables to be substituted later.
+ * Basically a poor man's n-fold lambda.
+ *
+ * @remarks Internal. Do not rely on name, meaning, or structure. It's only in the docs for completeness sake.
+ *
+ * @experimental
+ *
+ * @param {Expr} expr
+ * @param {FreeVar[]} env
+ */
+export class Subst {
   expr: Expr;
   // TODO rename env => args wtf?
   env: FreeVar[];
@@ -608,11 +609,12 @@ class Group {
 }
 
 /**
- * @desc Concatenate long strings represented as arrays, or just pass along if already string or undefined.
+ *  Concatenate long strings represented as arrays, or just pass along if already string or undefined.
  * @param {string|Array<string>|undefined} str
  * @returns {string|undefined}
  */
 function list2str (str: string|string[]|undefined):string|undefined {
+  // TODO better arg validation
   if (str === undefined || typeof str === 'string')
     return str;
   return Array.isArray(str) ? str.join(' ') : '' + str;
