@@ -32,7 +32,7 @@
     "build-site": "npx esbuild --bundle --minify --sourcemap ./site-src/index.js --outfile=docs/build/js/util.min.js",
     "build-quest": "npx esbuild --bundle --minify --sourcemap --format=iife ./site-src/index-quest.js --outfile=docs/build/js/ski-quest.min.js",
     "build-all": "npm run build-cjs && npm run build-esm && npm run build-web && npm run build-site && npm run build-quest",
-    "build": "npm run lint && npm run tsc && npm run test && npm run tsdoc && npm run build-all",
+    "build": "npm run lint && npm run tsc && npm run test && npm run build-all",
     "prepack": "npm run build && cp docs/build/js/ski-* lib/"
   },
   "files": [
