@@ -883,18 +883,22 @@ export abstract class Expr {
   }
 }
 
+/**
+ *  Application of two {@link Expr} terms.
+ *
+ *  Never ever call `new App(fun, arg)` directly, use `fun.apply(...args)` instead.
+ */
 export class App extends Expr {
-  /**
-   *  Application of fun() to args.
-   * Never ever use new App(fun, arg) directly, use fun.apply(...args) instead.
-   * @param {Expr} fun
-   * @param {Expr} arg
-   */
-
   fun: Expr;
   arg: Expr;
+
+  /** If irreducible, cache it and don't try anymore */
   final?: boolean;
 
+  /**
+   * @param fun
+   * @param arg
+   */
   constructor (fun:Expr, arg:Expr) {
     super();
 
@@ -902,7 +906,6 @@ export class App extends Expr {
     this.fun = fun;
     this.size = (fun.size ?? 1) + (arg.size ?? 1);
   }
-  /** @property {boolean} [final] */
 
   _traverse_descend (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
     const [fun, fAction] = unwrap(this.fun._traverse_redo(options, change));
@@ -1031,12 +1034,12 @@ export class App extends Expr {
   }
 }
 
+/**
+ *  An abstract class representing a named term.
+ *
+ * @param {String} name
+ */
 export class Named extends Expr {
-  /**
-   *  An abstract class representing a term named 'name'.
-   *
-   * @param {String} name
-   */
   name: string;
   fancyName?: string;
 
@@ -1065,25 +1068,24 @@ export class Named extends Expr {
   }
 }
 
+/** A synthetic key for debugging/distinguishing variables. */
 let freeId = 0;
 
+/**
+ * A named variable.
+ *
+ * Given the functional nature of combinatory logic, variables are treated
+ * as functions that we don't know how to evaluate just yet.
+ *
+ * Two variables are considered the same iff they have the same `name` and `scope` properties.
+ * If `scope` is not given, the variable is only equal to itself.
+ *
+ * By convention, FreeVar.global is a constant denoting a global unbound variable.
+ */
 export class FreeVar extends Named {
   /**
-   *  A named variable.
-   *
-   * Given the functional nature of combinatory logic, variables are treated
-   * as functions that we don't know how to evaluate just yet.
-   *
-   * By default, two different variables even with the same name are considered different.
-   * They display it via a hidden id property.
-   *
-   * If a scope object is given, however, two variables with the same name and scope
-   * are considered identical.
-   *
-   * By convention, FreeVar.global is a constant denoting a global unbound variable.
-   *
-   * @param {string} name - name of the variable
-   * @param {any} scope - an object representing where the variable belongs to.
+   * @param name - name of the variable
+   * @param scope - an object representing where the variable belongs to.
    */
   scope?: object;
   id: number;
@@ -1125,22 +1127,23 @@ export class FreeVar extends Named {
   static global = ['global'];
 }
 
+/**
+ *  A named term with a known rewriting rule.
+ *       'impl' is a function with signature Expr => Expr => ... => Expr
+ *       (see typedef Partial).
+ *       This is how S, K, I, and company are implemented.
+ *
+ *       Note that as of current something like a=>b=>b(a) is not possible,
+ *       use full form instead: a=>b=>b.apply(a).
+ *
+ * @example new Native('K', x => y => x); // constant
+ * @example new Native('Y', function(f) { return f.apply(this.apply(f)); }); // self-application
+ */
 export class Native extends Named {
   /**
-   *  A named term with a known rewriting rule.
-   *       'impl' is a function with signature Expr => Expr => ... => Expr
-   *       (see typedef Partial).
-   *       This is how S, K, I, and company are implemented.
-   *
-   *       Note that as of current something like a=>b=>b(a) is not possible,
-   *       use full form instead: a=>b=>b.apply(a).
-   *
-   * @example new Native('K', x => y => x); // constant
-   * @example new Native('Y', function(f) { return f.apply(this.apply(f)); }); // self-application
-   *
-   * @param {String} name
-   * @param {Partial} impl
-   * @param {{note?: string, arity?: number, canonize?: boolean }} [opt]
+   * @param name Name of the term
+   * @param impl A javascript implementation of the term's rewriting rule.
+   * @param opt Optional settings.
    */
   constructor (name: string, impl: (e: Expr) => Invocation,
     opt: {note?: string, arity?: number, canonize?: boolean } = {}) {
@@ -1152,24 +1155,23 @@ export class Native extends Named {
   }
 }
 
+/**
+ *  A lambda abstraction.
+ *
+ *  Takes an arg: {@link FreeVar} and an impl: {@link Expr}.
+ *  Upon evaluation, all occurrences of `arg` within `impl`
+ *  will be replaced by the given term.
+ *
+ *  Note that 'arg' will be replaced by a localized placeholder,
+ *  so the original variable can be used elsewhere without interference.
+ */
 export class Lambda extends Expr {
+  arg: FreeVar;
+  impl: Expr;
   /**
-   *  Lambda abstraction of arg over impl.
-   *     Upon evaluation, all occurrences of 'arg' within 'impl' will be replaced
-   *     with the provided argument.
-   *
-   * Note that 'arg' will be replaced by a localized placeholder, so the original
-   * variable can be used elsewhere without interference.
-   * Listing symbols contained in the lambda will omit such placeholder.
-   *
-   * Legacy ([FreeVar], impl) constructor is supported but deprecated.
-   * It will create a nested lambda expression.
-   *
    * @param {FreeVar} arg
    * @param {Expr} impl
    */
-  arg: FreeVar;
-  impl: Expr;
   constructor (arg: FreeVar, impl: Expr) {
     super();
 
@@ -1251,13 +1253,15 @@ export class Lambda extends Expr {
   }
 }
 
+/**
+ *  Church numeral representing non-negative integer `n`:
+ *  `n f x = f(f(...(f x)...))` with `f` applied `n` times.
+ */
 export class Church extends Expr {
+  n: number;
   /**
-   *  Church numeral representing non-negative integer n:
-   *      n f x = f(f(...(f x)...)) with f applied n times.
    * @param {number} n
    */
-  n: number;
   constructor (n: number) {
     n = Number.parseInt(String(n));
     if (!(n >= 0))
@@ -1302,29 +1306,29 @@ function waitn (n: number): (e : Expr) => (arg: Expr) => Invocation {
     : (e: Expr) => (arg: Expr) => waitn(n - 1)(e.apply(arg));
 }
 
+/**
+ *  A named alias for an existing expression.
+ *
+ * Aliasing allows declaring new terms without a native implementation.
+ * This is what happens when one writes `B = S(KS)K` in the interpreter.
+ *
+ * Aliases are transparent in terms of `equals` and `expect`;
+ * for that reason, Alias.diag() in not adding to the indentation.
+ *
+ * Aliases have an `inline` property. Tf true, the alias will be replaced with its implementation
+ * everywhere, unless specifically told otherwise e.g. by { inventory: { ... } } option of format().
+ *
+ * Upon creation, the aliases arity is calculated (unless `canonize` is false).
+ *
+ * Upon evaluation, the alias will be replaced with its implementation,
+ * _unless_ it's not inline and has positive arity,
+ * in which case it will wait for the required number of arguments before such replacement.
+ */
 export class Alias extends Named {
   /**
-   *  A named alias for an existing expression.
-   *
-   * Aliasing allows declaring new terms without a native implementation.
-   * This is what happens when one writes `B = S(KS)K` in the interpreter.
-   *
-   * Aliases are transparent in terms of `equals` and `expect`;
-   * for that reason, Alias.diag() in not adding to the indentation.
-   *
-   * Aliases have an `inline` property. Tf true, the alias will be replaced with its implementation
-   * everywhere, unless specifically told otherwise e.g. by { inventory: { ... } } option of format().
-   *
-   * Upon creation, the aliases arity is calculated (unless `canonize` is false).
-   *
-   * Upon evaluation, the alias will be replaced with its implementation,
-   * _unless_ it's not inline and has positive arity,
-   * in which case it will wait for the required number of arguments before such replacement.
-   *
-   *
-   * @param {String} name
-   * @param {Expr} impl
-   * @param {{canonize?: boolean, max?: number, maxArgs?: number, note?: string, inline?: boolean}} [options]
+   * @param name
+   * @param impl
+   * @param options
    */
   impl: Expr;
   inline?: boolean;
@@ -1347,10 +1351,12 @@ export class Alias extends Named {
   }
 
   /**
-   *  Make the alias inline, i.e. replace it with its implementation everywhere.
+   * Make the alias inline, i.e. replace it with its implementation everywhere.
    *
    * Replaces the old `outdated` attribute.
    * Used by the parser when a term definition is removed or updated.
+   *
+   *
    *
    * May change in future versions, use with caution.
    *
@@ -1468,11 +1474,12 @@ function firstVar (expr: Expr) {
 
 /**
  * @private
- * @given a list of free variables, an expression, and some capabilities of the context,
- *        return either a lambda term, or the original expression if no lambda abstraction is needed,
- *        plus some metadata about the term and the context.
+ * Given a list of free variables, an expression, and some capabilities of the context,
+ * return either a lambda term, or the original expression if no lambda abstraction is needed,
+ * plus some metadata about the term and the context.
  *
- *        Used by infer() internally.
+ * Used by infer() internally.
+ *
  * @param {FreeVar[]} args
  * @param {Expr} expr
  * @param {object} caps
