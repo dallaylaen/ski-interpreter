@@ -25,13 +25,14 @@
     "lint": "npx eslint --ext .js,.ts src test bin",
     "tsc": "npx tsc",
     "test": "npm run tsc; npx nyc mocha --recursive test",
+    "tsdoc": "npx typedoc --treatWarningsAsErrors --out docs/man --gitRevision \"$(git log -1 --format='%H' -- src/)\" src/*.ts",
     "build-web": "npx esbuild --bundle --minify --sourcemap --format=iife ./src/index.ts --outfile=docs/build/js/ski-interpreter.min.js",
     "build-cjs": "npx esbuild --bundle --sourcemap --format=cjs ./src/index.ts --outfile=lib/ski-interpreter.cjs.js",
     "build-esm": "npx esbuild --bundle --sourcemap --format=esm ./src/index.ts --outfile=lib/ski-interpreter.mjs",
     "build-site": "npx esbuild --bundle --minify --sourcemap ./site-src/index.js --outfile=docs/build/js/util.min.js",
     "build-quest": "npx esbuild --bundle --minify --sourcemap --format=iife ./site-src/index-quest.js --outfile=docs/build/js/ski-quest.min.js",
     "build-all": "npm run build-cjs && npm run build-esm && npm run build-web && npm run build-site && npm run build-quest",
-    "build": "npm run lint && npm run tsc && npm run test && npm run build-all",
+    "build": "npm run lint && npm run tsc && npm run test && npm run tsdoc && npm run build-all",
     "prepack": "npm run build && cp docs/build/js/ski-* lib/"
   },
   "files": [
@@ -62,6 +63,7 @@
     "eslint-plugin-import": "^2.29.1",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
+    "typedoc": "^0.28.18",
     "typescript": "^5.8.2"
   },
   "dependencies": {
