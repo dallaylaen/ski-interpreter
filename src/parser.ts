@@ -4,8 +4,7 @@
 'use strict';
 
 import { Tokenizer, restrict } from './internal';
-import { Expr, FreeVar, Lambda, Church, Alias, Native, Named, native, Invocation, RefinedFormatOptions } from './expr';
-import { toposort } from './toposort';
+import { Expr, FreeVar, Lambda, Church, Alias, Native, Named, native, Invocation, RefinedFormatOptions, toposort } from './expr';
 
 class Empty extends Expr {
   apply (...args: Expr[]):Expr {

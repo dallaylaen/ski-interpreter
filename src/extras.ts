@@ -1,8 +1,7 @@
 'use strict';
 
-import { Expr, Alias, FreeVar, Named, FormatOptions, TermInfo } from './expr';
+import { Expr, Alias, FreeVar, Named, FormatOptions, TermInfo, toposort } from './expr';
 import { Quest } from './quest';
-import { toposort } from './toposort';
 
 /**
  *   Extra utilities that do not belong in the core.
