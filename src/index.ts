@@ -1,10 +1,9 @@
 import {
-  classes, native, control, FreeVar, Church,
+  classes, native, control, FreeVar, Church, toposort,
 } from './expr';
 import { Parser } from './parser';
 
 import { Quest } from './quest';
-import { toposort } from './toposort';
 import { extras } from './extras';
 extras.toposort = toposort;
 
