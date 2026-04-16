@@ -208,12 +208,14 @@ class QuestBox {
   load () {
     const data = this.store.load(this.name) ?? {};
     this.status = {
-      solved:   data.solved ?? false,
+      solved:   data.solved ?? !!data.solution,
+      solution: data.solution,
       steps:    data.steps ?? 0,
       attempts: data.attempts ?? 0,
       weight:   data.weight ?? 0,
       total:    data.total ?? 0,
     };
+    // TODO Wrong! will cause a salute on loading
     if (this.status.solved)
       this.onSolved();
     return this;
@@ -232,7 +234,7 @@ class QuestBox {
     this.status.steps = result.steps;
     this.status.weight = result.weight;
     if (result.pass) {
-      this.status.solved = true;
+      this.status.solution = result.input.map(e => e.expand());
       this.onSolved(result);
     }
     this.save();
@@ -310,8 +312,18 @@ class QuestBox {
       append(element, 'br');
     }
 
-    const btn = append(element, 'button', { content: 'solve!' });
-    btn.onclick = () => this.check();
+    append(element, 'button', { content: 'solve!' }, btn => {
+      btn.onclick = () => this.check();
+    });
+    if (this.status.solution) {
+      append(element, 'button', { content: 'reveal' }, btn => {
+        btn.onclick = () => {
+          for (let i = 0; i < this.status.solution.length; i++) {
+            this.input[i].value = this.status.solution[i];
+          }
+        }
+      });
+    }
   }
 
   showStatus () {
