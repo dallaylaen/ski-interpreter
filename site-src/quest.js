@@ -208,7 +208,7 @@ class QuestBox {
   load () {
     const data = this.store.load(this.name) ?? {};
     this.status = {
-      solved:   data.solved ?? !!data.solution,
+      solved:   data.solved || !!data.solution,
       solution: data.solution,
       steps:    data.steps ?? 0,
       attempts: data.attempts ?? 0,
@@ -226,7 +226,7 @@ class QuestBox {
     return this;
   }
 
-  update (result) {
+  update (result, input) {
     if (this.status.solved)
       return;
     this.status.attempts++;
@@ -234,7 +234,7 @@ class QuestBox {
     this.status.steps = result.steps;
     this.status.weight = result.weight;
     if (result.pass) {
-      this.status.solution = result.input.map(e => e.expand());
+      this.status.solution = input;
       this.onSolved(result);
     }
     this.save();
@@ -256,7 +256,7 @@ class QuestBox {
     const got = this.input.map(x => x.value);
     const result = this.impl.check(...got);
     this.showResult(result);
-    this.update(result);
+    this.update(result, got);
   }
 
   draw (element) {
@@ -436,8 +436,17 @@ class QuestChapter {
         this.updateMeta(data);
 
         let k = 0;
-        for (const item of data.content)
-          this.quests.push(new QuestBox(item, { chapter: this, number: ++k }));
+        for (const item of data.content) {
+          const box = new QuestBox(item, {
+            chapter: this,
+            number:  ++k,
+          }).load();
+          this.quests.push(box);
+          if (box.status.solved)
+            this.solved.add(box.impl.id);
+        }
+
+        this.showStatus();
 
         return this;
       });
