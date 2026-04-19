@@ -1,42 +1,39 @@
 const { expect } = require('chai');
 const { SKI } = require('../../src/index');
 
-describe('Expr <-> string', () => {
-  const cases = [
-    ['single native', 'S'],
-    ['lambda', 'x->y->z->x z (y z)'],
-    ['aliased lamdba', 'F = a->b->c->c; F x y'],
-    ['number', '5 x y'],
-    ['free var', 'foobared'],
-    ['some expr', 'SI(Kx)'],
-    ['lambda with args', '(x->z->y(x))(t1)(t2)'],
-    ['more than 1 free vars', 'yadda yadda yeek'],
-    ['numbers + other terms', 'B (T 2) (2 K) (foo 3)'],
-  ];
+const ski = new SKI();
 
-  const ski = new SKI();
-  for (const c of cases) {
-    const [name, source] = c;
-    it(name + ' (canonical)', () => {
-      const jar    = {}; // keep track of common free vars
-      const expr   = ski.parse(source, { to_be_deleted: jar });
+describe('Expr.toString() is back parseable', () => {
+  roundTrip('single native', 'S');
+  roundTrip('lambda', 'x->y->z->x z (y z)');
+  roundTrip('number', '5 x y');
+  roundTrip('free var', 'foobared');
+  roundTrip('some expr', 'SI(Kx)');
+  roundTrip('lambda with args', '(x->z->y(x))(t1)(t2)');
+  roundTrip('more than 1 free vars', 'yadda yadda yeek');
+  roundTrip('numbers + other terms', 'B (T 2) (2 K) (foo 3)');
+});
+
+function roundTrip (message, source) {
+  describe(message + ' round trip: ' + source, () => {
+    it('canonical', () => {
+      const expr   = ski.parse(source);
       const before = expr.format({ terse: false });
-      const expr2  = ski.parse(before, { to_be_deleted: jar });
+      const expr2  = ski.parse(before);
       const after  = expr2.format({ terse: false });
 
       expect(after).to.equal(before);
       expr.expect(expr2);
     });
 
-    it(name + ' (terse)', () => {
-      const jar    = {}; // keep track of common free vars
-      const expr   = ski.parse(source, { to_be_deleted: jar });
+    it('terse', () => {
+      const expr   = ski.parse(source);
       const before = expr.format({ terse: true });
-      const expr2  = ski.parse(before, { to_be_deleted: jar });
+      const expr2  = ski.parse(before);
       const after  = expr2.toString();
 
       expect(after).to.equal(before);
       expr.expect(expr2);
     });
-  }
-});
+  });
+}

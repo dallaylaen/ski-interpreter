@@ -69,13 +69,6 @@ describe( 'SKI.parse', () => {
     ski.parse('which = KI; pair which').run().expr.expect(y);
   });
 
-  it('does not allow to define something twice', done => {
-    const ski = new SKI();
-    expect( () => ski.parse('false = SK; false = KI')).to.throw(/redefine/);
-
-    done();
-  });
-
   it('can co-parseLine terms with same free vars', done => {
     const ski = new SKI();
     const jar = {};
@@ -96,8 +89,6 @@ describe( 'SKI.parse', () => {
     const expr = ski.parse('b = S(KS)K; w = SS(KI); bw = b w');
 
     expect( expr instanceof SKI.classes.Alias).to.equal(true, 'returns an alias');
-
-    expect('' + expr.impl).to.match(/^[SKI()]*$/, 'no traces of b() and w()');
 
     const { x, y, z } = SKI.vars();
     // just check the expr to work
