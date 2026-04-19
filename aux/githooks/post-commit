@@ -12,6 +12,14 @@ modified() {
 # We must postpone docs generation until after the commit hash is known,
 # otherwise there will be revision spam and/or wrong links in the docs.
 npm run tsdoc
+# revert hash-only changes
+set +x
+for file in $(git status --porcelain docs/man/ | grep '^.M' | awk '{print $2}'); do
+    git diff --text "$file" | node ./aux/exclude-patch.js &&\
+        git checkout -q "$file"
+   
+done
+set -x
 
 CHANGED=$(modified $AUTOFILES)
 
