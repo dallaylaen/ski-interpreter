@@ -397,20 +397,23 @@ export class Parser {
 
     let expr: Expr = new Empty();
     for (const item of lines) {
-      if (expr instanceof Alias)
-        expr.makeInline();
+      const [_, name, def] = item.match(/^([A-Z]|[a-z][a-z_0-9]*)\s*=(.*)$/s) || [];
 
-      const def = item.match(/^([A-Z]|[a-z][a-z_0-9]*)\s*=(.*)$/s);
-      if (def && def[2] === '')
-        expr = new FreeVar(def[1], options.scope ?? FreeVar.global);
+      if (name !== undefined) {
+        if (jar[name] instanceof Alias && jar[name] !== options.env?.[name]) {
+          // locally defined alias => demote
+          jar[name].makeInline();
+        }
+        delete jar[name];
+      }
+
+      if (def === '')
+        expr = new FreeVar(name, options.scope ?? FreeVar.global);
       else
         expr = this.parseLine(item, jar, options);
 
-      if (def) {
-        if (jar[def[1]] !== undefined)
-          throw new Error('Attempt to redefine a known term: ' + def[1]);
-        jar[def[1]] = expr;
-      }
+      if (name)
+        jar[name] = expr;
 
       // console.log('parsed line:', item, '; got:', expr,'; jar now: ', jar);
     }
