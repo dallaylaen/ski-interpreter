@@ -158,28 +158,17 @@ function deepFormat (obj: any, options : FormatOptions = {}): any {
 
 /**
  *   Given an expression and a hash of named terms,
- *        return a semicolon-separated string that declares said expression
- *        unambiguously.
+ *   return a semicolon-separated string that declares said expression
+ *   unambiguously.
  *
  * @example
  * var expr = ski.parse("T=CI; V=BCT; V x y");
  * SKI.extras.declare(expr, expr.context.env);
  * // 'B; C; I; T=CI; V=BC(T); x=; y=; Vx y'
  *
- * @param {Expr} expr
- * @param {{[s: string]: Named}} [env]
- * @returns {string}
  */
-function declare (expr: Expr, env: { [s: string]: Named } = {}): string {
-  const res = toposort([expr], env);
-
-  return res.list.map(s => {
-    if (s instanceof Alias)
-      return s.name + '=' + s.impl.format({ inventory: res.env });
-    if (s instanceof FreeVar)
-      return s.name + '=';
-    return s.format({ inventory: res.env });
-  }).join('; ');
+function declare (expr: Expr, env?: { [s: string]: Named }): string {
+  return expr.declare({ inventory: env });
 }
 
 const isStringPair    = (x: unknown) =>
