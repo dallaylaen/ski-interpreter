@@ -58,7 +58,7 @@ export type FormatOptions = {
   lambda?:    [string, string, string],
   around?:    [string, string],
   redex?:     [string, string],
-  inventory?: Record<string, Expr>,
+  inventory?: Record<string, Named>,
 };
 
 /**
@@ -872,16 +872,30 @@ export abstract class Expr {
     return indent + this.constructor.name + ': ' + this;
   }
 
+  declare (options: FormatOptions & { declaration?: [string, string, string] } = {}): string {
+    // TODO also make declaration syntax configurable
+    const { declaration : d = ['', '=', '; '], ...format }  = options;
+
+    const res = toposort([this], format.inventory);
+
+    return res.list.map(s => {
+      if (s instanceof Alias)
+        return d[0] + s.name + d[1] + s.impl.format({ inventory: res.env });
+      if (s instanceof FreeVar)
+        return d[0] + s.name + d[1];
+      return s.format({ inventory: res.env });
+    }).join(d[2]);
+  }
+
   /**
    * Convert the expression to a JSON-serializable format.
    * Sadly the format is not yet finalized and may change in the future.
    *
    * @experimental
-   * @returns {string}
    * @sealed
    */
   toJSON (): string | object {
-    return this.format();
+    return this.declare();
   }
 }
 
@@ -1553,6 +1567,7 @@ function nthvar (n: number): FreeVar {
 export function toposort (list:Expr[]|Expr|undefined, env: { [s: string]: Named } | undefined): ToposortResult {
   if (list instanceof Expr)
     list = [list];
+  const dynamic = !env;
   if (env) {
     // TODO check in[name].name === name
     if (!list)
@@ -1561,24 +1576,19 @@ export function toposort (list:Expr[]|Expr|undefined, env: { [s: string]: Named 
     if (!list)
       return { list: [], env: {} };
     env = {};
-    for (const item of list) {
-      if (!(item instanceof Named))
-        continue;
-      if (env[item.name])
-        throw new Error('duplicate name ' + item);
-      env[item.name] = item;
-    }
   }
 
   const out: Expr[] = [];
-  const seen = new Set();
+  const seen: Set<Expr> = new Set();
   const rec = (term: Expr) => {
     if (seen.has(term))
       return;
-    term.fold(false, (acc:boolean, e:Expr):TraverseValue<boolean> => {
+    term.fold(undefined, (_:undefined, e:Expr):TraverseValue<undefined> => {
+      if (dynamic && e instanceof Named && !env[e.name])
+        env[e.name] = e;
       if (e !== term && e instanceof Named && env![e.name] === e) {
         rec(e);
-        return control.prune(false);
+        return control.prune();
       }
     });
     out.push(term);
