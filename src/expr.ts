@@ -80,7 +80,7 @@ export type RefinedFormatOptions = { // ditto but with defaults plugged in
 export type TraverseOptions = {order?: 'LO' | 'LI' | 'leftmost-outermost' | 'leftmost-innermost'};
 export type TraverseCallback = (e:Expr) => TraverseValue<Expr>;
 
-export type ToposortResult = { list: Expr[], env: { [s: string]: Named } };
+export type ToposortResult = { list: Expr[], env: Record<string, Named> };
 
 /**
  *   A combinatory logic expression.
@@ -876,14 +876,14 @@ export abstract class Expr {
     // TODO also make declaration syntax configurable
     const { declaration : d = ['', '=', '; '], ...format }  = options;
 
-    const res = toposort([this], format.inventory);
+    const res = toposort({list: [this], env: format.inventory});
 
     return res.list.map(s => {
       if (s instanceof Alias)
-        return d[0] + s.name + d[1] + s.impl.format({ inventory: res.env });
+        return d[0] + s.name + d[1] + s.impl.format({ ...format, inventory: res.env });
       if (s instanceof FreeVar)
         return d[0] + s.name + d[1];
-      return s.format({ inventory: res.env });
+      return s.format({ ...format, inventory: res.env });
     }).join(d[2]);
   }
 
@@ -1564,35 +1564,53 @@ function nthvar (n: number): FreeVar {
  *    const expr = ski.parse(src);
  *    toposort([expr], ski.getTerms()); // returns all terms appearing in Expr in correct order
  */
-export function toposort (list:Expr[]|Expr|undefined, env: { [s: string]: Named } | undefined): ToposortResult {
-  if (list instanceof Expr)
-    list = [list];
-  const dynamic = !env;
-  if (env) {
-    // TODO check in[name].name === name
-    if (!list)
-      list = Object.keys(env).sort().map(k => env![k]); // ensure deterministic order
-  } else {
-    if (!list)
-      return { list: [], env: {} };
-    env = {};
+export function toposort (options: {list?: Expr|Expr[], env?: Record<string, Named>, allow?: Record<string, Named>}): ToposortResult {
+  if (typeof options !== 'object' || options === null || Array.isArray(options) || options instanceof Expr)
+    throw new Error('positional arguments to toposort are deprecated, use { list: ..., env: ... } instead');
+
+  // TODO enforce both `env` and `allow` to have foo[key].name === key
+
+  const allow = options.allow ? { ...options.allow } : null;
+  const env = { ...options.env ?? {} };
+  const list = options.list instanceof Expr
+    ? [options.list]
+    : options.list ?? []; // TODO imply default from allow
+
+  if (allow) {
+    // terms from `list` are automatically allowed and trump existing values
+    for (const term of list) {
+      if (term instanceof Named)
+        allow[term.name] = term;
+    }
   }
 
   const out: Expr[] = [];
-  const seen: Set<Expr> = new Set();
+  // assume all terms in env seen, too
+  const seen: Set<Expr> = new Set(Object.values(env));
   const rec = (term: Expr) => {
     if (seen.has(term))
       return;
     term.fold(undefined, (_:undefined, e:Expr):TraverseValue<undefined> => {
-      if (dynamic && e instanceof Named && !env[e.name])
-        env[e.name] = e;
-      if (e !== term && e instanceof Named && env![e.name] === e) {
+      if (!(e instanceof Named))
+        return;
+      // not allowed => fall through
+      if (allow && allow[e.name] !== e)
+        return;
+
+      // inlined alias => skip, unless explicitly allowed
+      if (!allow && e instanceof Alias && e.inline)
+        return;
+
+      // recurse. values in `env` will be auto-skipped because they're "seen"
+      if (e !== term) {
         rec(e);
         return control.prune();
       }
     });
     out.push(term);
-    seen.add(term);
+    seen.add(term); // TODO unify with env
+    if (term instanceof Named)
+      env[term.name] ||= term;
   };
 
   for (const term of list)

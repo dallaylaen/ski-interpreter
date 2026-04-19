@@ -103,7 +103,7 @@ export class Parser {
 
   addContext: boolean;
   annotate: boolean;
-  known: {[name: string]: Expr};
+  known: Record<string, Named>;
   allow: Set<string>;
 
   hasNumbers: boolean;
@@ -292,8 +292,8 @@ export class Parser {
    *
    * @return {{[key:string]: Native|Alias}}
    */
-  getTerms (): { [key: string]: Expr } {
-    const out: { [key: string]: Expr } = {};
+  getTerms (): Record<string, Named> {
+    const out: Record<string, Named> = {};
     for (const name of Object.keys(this.known)) {
       if (this.allow.has(name))
         out[name] = this.known[name];
@@ -333,7 +333,7 @@ export class Parser {
 
     // console.log(env);
 
-    const list = toposort(undefined, env).list;
+    const list = toposort({ list: Object.values(env), allow: {} }).list;
 
     const detour = new Map<Alias, Alias>();
     if (Object.keys(needDetour).length) {

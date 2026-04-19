@@ -13,10 +13,10 @@ describe('SKI.extras.declare', () => {
   ski.add('L', 'BWB');
   ski.add('Y', 'BML');
 
-  const t = ski.getTerms();
+  const terms = ski.getTerms();
 
   it('can sort dependencies', () => {
-    const decl = SKI.extras.declare(t.V, t);
+    const decl = SKI.extras.declare(terms.V, terms);
 
     expect(decl).to.equal('B; C; I; T=CI; V=BCT');
   });
