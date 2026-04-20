@@ -876,7 +876,7 @@ export abstract class Expr {
     // TODO also make declaration syntax configurable
     const { declaration : d = ['', '=', '; '], ...format }  = options;
 
-    const res = toposort({list: [this], env: format.inventory});
+    const res = toposort({ list: [this], env: format.inventory });
 
     return res.list.map(s => {
       if (s instanceof Alias)
@@ -1546,24 +1546,19 @@ function nthvar (n: number): FreeVar {
 }
 
 /**
- *        Sort a list in such a way that dependent terms come after the (named) terms they depend on.
- *        If env is given, only terms listed there are taken into account.
- *        If env is omitted, it will be implied from the list.
- *        If list is omitted, it will default to values of env.
- *        If just one term is given instead of a list, it will be coerced into a list.
+ * Topologically sort a list of terms, extending it with any missing dependency terms,
+ * if necessary. The output list is guaranteed to contain at least the input terms.
  *
- *        No terms outside env + list may ever appear in the result.
- *
- *        The terms in env must be named and their names must match their keys.
- *
- * @param {Expr|Expr[]} list
- * @param {{[s:string]: Named}} env
- * @returns {{list: Expr[], env: {[s:string]: Named}}}
+ * @param options
+ * @param [options.list] - a single expression or a list of expressions to sort.
+ * @param [options.env]  - a set of terms assumed to be known (and thus not required in the output list).
+ * @param [options.allow]  - a set of terms that are allowed in the returned list (aside from the input list).
  *
  * @example
  *    const expr = ski.parse(src);
  *    toposort([expr], ski.getTerms()); // returns all terms appearing in Expr in correct order
  */
+// TODO the docs suck. You know it and I know it. Fix when have time.
 export function toposort (options: {list?: Expr|Expr[], env?: Record<string, Named>, allow?: Record<string, Named>}): ToposortResult {
   if (typeof options !== 'object' || options === null || Array.isArray(options) || options instanceof Expr)
     throw new Error('positional arguments to toposort are deprecated, use { list: ..., env: ... } instead');
@@ -1582,6 +1577,13 @@ export function toposort (options: {list?: Expr|Expr[], env?: Record<string, Nam
       if (term instanceof Named)
         allow[term.name] = term;
     }
+  }
+
+  // env masks terms from being in output, but the terms that were in the list
+  //     to begin with should stay in the list.
+  for (const term of list) {
+    if (term instanceof Named && env[term.name] === term)
+      delete env[term.name];
   }
 
   const out: Expr[] = [];
