@@ -14,9 +14,9 @@ describe('SKI.extras.toposort', () => {
   });
 
   it('sorts dependencies', () => {
-    const expr = ski.parse('T=CI; V=BCT; pair=V x y;');
+    const expr = ski.parse('T=CI; V=BCT; V x y;');
 
-    const res = SKI.extras.toposort({list: [expr], allow: expr.context.env});
+    const res = SKI.extras.toposort({ list: [expr], allow: expr.context.env });
 
     // console.log(res);
 
@@ -27,7 +27,7 @@ describe('SKI.extras.toposort', () => {
     checkOrder(res.list);
 
     const final = res.list.pop(); // exclude from further tests
-    expect(final).to.equal(expr);
+    expect(final).to.equal(expr); // sic! no fancy equality, same object
 
     const seen = new Set([final]);
     for (const dep of res.list) {
@@ -36,9 +36,11 @@ describe('SKI.extras.toposort', () => {
       seen.add(dep);
     }
 
+    // console.log(SKI.extras.deepFormat(res));
+
     final.fold(null, (acc, e) => {
       if (e instanceof SKI.classes.Named)
-        expect(seen.has(e)).to.equal(true, `final term depends on ${e} which is missing from the sorted list`);
+        expect(seen.has(e)).to.equal(true, `final term depends on '${e}' which is missing from the sorted list`);
     });
   });
 });
