@@ -167,7 +167,7 @@ function deepFormat (obj: any, options : FormatOptions = {}): any {
  * // 'B; C; I; T=CI; V=BC(T); x=; y=; Vx y'
  *
  */
-function declare (expr: Expr, env?: { [s: string]: Named }): string {
+function declare (expr: Expr, env?: Record<string, Named>): string {
   return expr.declare({ inventory: env });
 }
 
