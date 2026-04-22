@@ -65,6 +65,7 @@ const combChars = new Tokenizer(
   '[()]', '[A-Z]', '[a-z_][a-z_0-9]*', '\\b[0-9]+\\b', '->', '\\+'
 );
 
+// TODO names too similar, rename one
 export type ParserOptions = {
   allow?: string,
   numbers?: boolean,
@@ -80,6 +81,7 @@ export type ParseOptions = {
   numbers?: boolean,
   lambdas?: boolean,
   allow?: string,
+  canonize?: boolean,
 };
 
 export type AddOptions = {
@@ -374,14 +376,15 @@ export class Parser {
   }
 
   /**
-   * @template T
    * @param {string} source
    * @param {Object} [options]
-   * @param {{[keys: string]: Expr}} [options.env]
-   * @param {T} [options.scope]
-   * @param {boolean} [options.numbers]
-   * @param {boolean} [options.lambdas]
-   * @param {string} [options.allow]
+   * @param [options.env] - additional
+   * @param [options.scope] - assign this scope to unknown free variables
+   * @param {boolean} [options.numbers] - whether numbers are allowed
+   * @param {boolean} [options.lambdas] - whether lambdas are allowed
+   * @param {string} [options.allow] - restrict known terms
+   * @param [options.canonize] - whether to calculate canonical form, arity, and properties
+   *                             of intermediate aliases
    * @return {Expr}
    */
   parse (source: string, options: ParseOptions = {}): Expr {
@@ -449,7 +452,7 @@ export class Parser {
   parseLine (source: string, env: { [key: string]: Expr } = {}, options: ParseOptions = {}): Expr {
     const aliased = source.match(/^\s*([A-Z]|[a-z][a-z_0-9]*)\s*=\s*(.*)$/s);
     if (aliased)
-      return new Alias(aliased[1], this.parseLine(aliased[2], env, options));
+      return new Alias(aliased[1], this.parseLine(aliased[2], env, options), { canonize: options.canonize });
 
     const opt = {
       numbers: options.numbers ?? this.hasNumbers,
