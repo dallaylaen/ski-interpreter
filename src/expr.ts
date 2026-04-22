@@ -115,10 +115,13 @@ export abstract class Expr {
   size?: number;
 
   /**
+   * Add metadata based on user-supplied values and/or the properties of the term itself.
    *
-   *  Define properties of the term based on user supplied options and/or inference results.
-   *       Typically useful for declaring Native and Alias terms.
-   * @protected
+   * Typically applied to named terms shortly after instantiation.
+   *
+   * Experimental. Name and meaning may change in the future.
+   *
+   * @experimental
    * @param {Object} options
    * @param {string} [options.note] - a brief description what the term does
    * @param {number} [options.arity] - number of arguments the term is waiting for (if known)
@@ -128,7 +131,7 @@ export abstract class Expr {
    * @param {number} [options.maxArgs] - maximum number of arguments for inference, if canonize is true
    * @return {this}
    */
-  _setup (options: { note?: string, arity?: number, fancy?: string, canonize?: boolean, max?: number, maxArgs?: number, } = {}) {
+  annotate (options: { note?: string, arity?: number, fancy?: string, canonize?: boolean, max?: number, maxArgs?: number, } = {}) {
     // TODO better name
 
     if (options.fancy !== undefined && this instanceof Named)
@@ -1167,7 +1170,7 @@ export class Native extends Named {
     // setup essentials
     this.invoke  = impl;
 
-    this._setup({ canonize: true, ...opt });
+    this.annotate({ canonize: true, ...opt });
   }
 }
 
@@ -1359,7 +1362,7 @@ export class Alias extends Named {
       throw new Error('Attempt to create an alias for a non-expression: ' + impl);
     this.impl = impl;
 
-    this._setup(options);
+    this.annotate(options);
     this.invoke = waitn(options.inline ? 0 : this.arity ?? 0)(impl);
     this.size = impl.size;
     if (options.inline)

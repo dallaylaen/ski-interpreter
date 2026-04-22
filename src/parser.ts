@@ -167,7 +167,7 @@ export class Parser {
 
     // backward compat
     const opts: AddOptions = typeof options === 'string' ? { note: options, canonize: false } : (options ?? {});
-    named._setup({ canonize: this.annotate, ...opts });
+    named.annotate({ canonize: this.annotate, ...opts });
 
     const old = this.known[named.name];
     if (old instanceof Alias)
