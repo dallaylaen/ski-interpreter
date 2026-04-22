@@ -166,20 +166,17 @@ function processLine (source, ski, onErr) {
     return; // nothing to see here
 
   try {
-    const expr = ski.parse(source);
+    const expr = ski.parse(source, { canonize: true });
+    if (expr instanceof SKI.classes.Alias)
+      ski.add(expr);
     const t0 = new Date();
-    const isAlias = expr instanceof SKI.classes.Alias;
-    const aliasName = isAlias ? expr.name : null;
 
     for (const state of expr.walk(runOptions)) {
-      if (state.final)
+      if (state.final) {
         console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
-
-      if (verbose || state.final)
-        console.log(state.expr.format(format));
-
-      if (state.final && isAlias && aliasName)
-        ski.add(aliasName, state.expr);
+        console.log(state.expr.declare({ ...format, inventory: ski.getTerms() }));
+      } else if (verbose)
+        console.log(state.expr.format(format) + ';');
     }
   } catch (err) {
     onErr(err);
