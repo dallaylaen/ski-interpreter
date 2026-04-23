@@ -20,6 +20,11 @@ describe('Expr.toLambda', () => {
   checkTerm('5 K I', 'a->b->c->d->e->f->f');
   checkTerm('SB(SB(SB(SB(SB(KI))))) K I', 'a->b->c->d->e->f->f');
 
+  // #24
+  checkTerm('lim=f->l->s->z->l(n->f n l s z); lim (a->b->a)', 'l->s->z->l(n->n s z)');
+
+  // --- non-terminating terms ---
+
   // quine
   checkTerm('SII(C(K(WI)))', '(x->x x) (x->y->x x)');
 
