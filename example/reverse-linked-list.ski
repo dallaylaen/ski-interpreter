@@ -1,0 +1,14 @@
+
+T=CI;
+V=BCT;
+L=BWB;
+
+nil = KI;
+
+fix = WSL;
+
+rev = V(fix (B(B(B(BC)(CBV))B)V)) nil;
+
+rev (V a (V b (V c (V d (V e nil)))))
+
+
