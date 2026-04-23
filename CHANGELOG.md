@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.0] - 2026-04-23
+
+### BREAKING CHANGES
+
+- `parse()` no longer auto-inlines aliases unless they are redefined; known aliases are preserved by name.
+- `toposort()` signature changed to use options object instead of positional parameters.
+
+### Added
+
+- `Expr.declare()` — emits a complete, round-trippable declaration of an expression including its dependencies.
+- `parse(..., { canonize: true })` — calculates properties of intermediate aliases during parsing.
+- `annotate()` — public rename of the semi-official `_setup()` method, with added documentation.
+- Quest UI: "reveal solution" button added.
+- Quest UI: raw user input is now saved when a quest is solved.
+- CLI (`bin/ski.js`): outputs full declarations instead of bare expressions.
+
+### Changed
+
+- `toJSON()` now outputs back-parsable declaration instead of just string.
+- `toposort` moved into `expr.ts`.
+- `extras.ts` delegates to `Expr.declare()` instead of re-implementing the logic.
+- Internal type `{ ... }` renamed to `Record<string, Named>` for clarity.
+
+### Fixed
+
+- `Expr.toLambda` was incorrectly preparing term (#24).
+
 ## [2.7.0] - 2026-04-03
 
 ### BREAKING CHANGES
