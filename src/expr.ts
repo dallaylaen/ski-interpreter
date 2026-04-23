@@ -466,9 +466,15 @@ export abstract class Expr {
    */
   * toLambda (options: { max?: number, maxArgs?: number } = {}) {
     let expr:Expr | null = this.traverse(e => {
-      if (e instanceof FreeVar || e instanceof App || e instanceof Lambda || e instanceof Alias)
-        return null; // no change
+      // free var => self, don't bother
+      if (e instanceof FreeVar)
+        return e;
+      // compound => fall through
+      if (e instanceof App || e instanceof Lambda || e instanceof Alias)
+        return null;
+      // all other => infer
       const guess = e.infer({ max: options.max, maxArgs: options.maxArgs });
+      // TODO just return the term itself? Not sure if assertion obligate.
       if (!guess.normal)
         throw new Error('Failed to infer an equivalent lambda term for ' + e);
       return guess.expr;
