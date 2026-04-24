@@ -48,18 +48,8 @@ export type SearchOptions = {
 export type SearchCallback = (e: Expr, props: TermInfo) => (number | undefined);
 export type SearchResult = { expr?: Expr, total: number, probed: number, gen: number, cache?: Expr[][] };
 
-// --- Utility functions ---
-
-const isStringPair    = (x: unknown) =>
-  Array.isArray(x) && x.length === 2 && typeof x[0] === 'string' && typeof x[1] === 'string'
-    ? undefined
-    : 'must be a pair of strings';
-const isStringTriple  = (x: unknown) =>
-  Array.isArray(x) && x.length === 3 && typeof x[0] === 'string' && typeof x[1] === 'string' && typeof x[2] === 'string'
-    ? undefined
-    : 'must be a triplet of strings';
-
-const schema: Record<string, (arg0: unknown) => string | undefined> = {
+// poor man's zod
+const formatSchema: Record<string, (arg0: unknown) => string | undefined> = {
   html:      x => typeof x === 'boolean' ? undefined : 'must be a boolean',
   terse:     x => typeof x === 'boolean' ? undefined : 'must be a boolean',
   space:     x => typeof x === 'string' ? undefined : 'must be a string',
@@ -97,8 +87,8 @@ function checkFormatOptions (raw: unknown): { value: FormatOptions } | { error: 
   const error: Record<string, string> = {};
 
   for (const key in rec) {
-    if (schema[key]) {
-      const err = schema[key](rec[key]);
+    if (formatSchema[key]) {
+      const err = formatSchema[key](rec[key]);
       if (err)
         error[key] = err;
     } else
@@ -236,6 +226,19 @@ function search (seed: Expr[], options: SearchOptions, predicate: SearchCallback
   }
 
   return { total, probed, gen: depth, ...(options.retain ? { cache } : {}) };
+}
+
+// --- Utility functions ---
+
+function isStringPair (x: unknown): string | undefined {
+  return Array.isArray(x) && x.length === 2 && typeof x[0] === 'string' && typeof x[1] === 'string'
+    ? undefined
+    : 'must be a pair of strings';
+}
+function isStringTriple  (x: unknown): string | undefined {
+  return Array.isArray(x) && x.length === 3 && typeof x[0] === 'string' && typeof x[1] === 'string' && typeof x[2] === 'string'
+    ? undefined
+    : 'must be a triplet of strings';
 }
 
 // --- Namespace export ---
