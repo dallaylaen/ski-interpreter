@@ -1,11 +1,13 @@
 'use strict';
 
-import { Expr, Alias, FreeVar, Named, FormatOptions, TermInfo, toposort } from './expr';
+import { Expr, Named, FormatOptions, TermInfo, toposort } from './expr';
 import { Quest } from './quest';
 
 /**
  *   Extra utilities that do not belong in the core.
  */
+
+// --- Types ---
 
 /**
  * @experimental
@@ -46,6 +48,118 @@ export type SearchOptions = {
 export type SearchCallback = (e: Expr, props: TermInfo) => (number | undefined);
 export type SearchResult = { expr?: Expr, total: number, probed: number, gen: number, cache?: Expr[][] };
 
+// --- Utility functions ---
+
+const isStringPair    = (x: unknown) =>
+  Array.isArray(x) && x.length === 2 && typeof x[0] === 'string' && typeof x[1] === 'string'
+    ? undefined
+    : 'must be a pair of strings';
+const isStringTriple  = (x: unknown) =>
+  Array.isArray(x) && x.length === 3 && typeof x[0] === 'string' && typeof x[1] === 'string' && typeof x[2] === 'string'
+    ? undefined
+    : 'must be a triplet of strings';
+
+const schema: Record<string, (arg0: unknown) => string | undefined> = {
+  html:      x => typeof x === 'boolean' ? undefined : 'must be a boolean',
+  terse:     x => typeof x === 'boolean' ? undefined : 'must be a boolean',
+  space:     x => typeof x === 'string' ? undefined : 'must be a string',
+  brackets:  isStringPair,
+  var:       isStringPair,
+  around:    isStringPair,
+  redex:     isStringPair,
+  lambda:    isStringTriple,
+  inventory: x => {
+    if (typeof x !== 'object' || x === null || x.constructor !== Object)
+      return 'must be an object, not ' + (x?.constructor?.name ?? typeof x);
+    const refined = x as Record<string, unknown>;
+    for (const key of Object.keys(refined)) {
+      if (!(refined[key] instanceof Expr))
+        return 'key ' + key + 'is not an Expr';
+    }
+    return undefined;
+  }
+}
+
+// --- Exported functions (alphabetical) ---
+
+/**
+ *   Converts an unknown object into a FormatOptions, or returns an error it it is not valid.
+ *   A null/undefined counts as an empty options object (and is thus valid).
+ */
+function checkFormatOptions (raw: unknown): { value: FormatOptions } | { error: Record<string, string> } {
+  if (raw === null || raw === undefined)
+    return { value: {} };
+
+  if (typeof raw !== 'object' || Array.isArray(raw) || raw.constructor !== Object)
+    return { error: { object: 'Format options must be an object, not ' + (raw?.constructor?.name ?? typeof raw) } };
+
+  const rec = raw as Record<string, unknown>;
+  const error: Record<string, string> = {};
+
+  for (const key in rec) {
+    if (schema[key]) {
+      const err = schema[key](rec[key]);
+      if (err)
+        error[key] = err;
+    } else
+      error[key] = 'unknown option';
+  }
+
+  return Object.keys(error).length > 0 ? { error } : { value: rec as FormatOptions };
+}
+
+/**
+ *   Given an expression and a hash of named terms,
+ *   return a semicolon-separated string that declares said expression
+ *   unambiguously.
+ *
+ * @example
+ * var expr = ski.parse("T=CI; V=BCT; V x y");
+ * SKI.extras.declare(expr, expr.context.env);
+ * // 'B; C; I; T=CI; V=BC(T); x=; y=; Vx y'
+ *
+ */
+function declare (expr: Expr, env?: Record<string, Named>): string {
+  return expr.declare({ inventory: env });
+}
+
+/**
+ *  Recursively replace all instances of Expr in a data structure with
+ *       respective string representation using the format() options.
+ *       Objects of other types and primitive values are eft as is.
+ *
+ *       May be useful for debugging or diagnostic output.
+ *
+ * @experimental
+ */
+// yes allow any in this function, it's pattern matched into correct classes during traverse
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function deepFormat (obj: any, options : FormatOptions = {}): any {
+  if (obj instanceof Expr)
+    return obj.format(options);
+  // TODO for quests, use toJSON when it's ready
+  if (obj instanceof Quest)
+    return 'Quest(' + obj.name + ')';
+  if (obj instanceof Quest.Case)
+    return 'Quest.Case';
+  if (Array.isArray(obj))
+    return obj.map(item => deepFormat(item, options));
+  if (typeof obj !== 'object' || obj === null || obj.constructor !== Object)
+    return obj;
+
+  // default = plain object
+  const out: { [key: string]: unknown } = {};
+  for (const key in obj)
+    out[key] = deepFormat(obj[key], options);
+
+  return out;
+}
+
+/**
+ * @experimental
+ *   Look for an expression that matches the predicate,
+ *        starting with the seed and applying the terms to one another.
+ */
 function search (seed: Expr[], options: SearchOptions, predicate: SearchCallback): SearchResult {
   const {
     depth = 16,
@@ -124,107 +238,6 @@ function search (seed: Expr[], options: SearchOptions, predicate: SearchCallback
   return { total, probed, gen: depth, ...(options.retain ? { cache } : {}) };
 }
 
-/**
- *  Recursively replace all instances of Expr in a data structure with
- *       respective string representation using the format() options.
- *       Objects of other types and primitive values are eft as is.
- *
- *       May be useful for debugging or diagnostic output.
- *
- * @experimental
- */
-// yes allow any in this function, it's pattern matched into correct classes during traverse
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function deepFormat (obj: any, options : FormatOptions = {}): any {
-  if (obj instanceof Expr)
-    return obj.format(options);
-  // TODO for quests, use toJSON when it's ready
-  if (obj instanceof Quest)
-    return 'Quest(' + obj.name + ')';
-  if (obj instanceof Quest.Case)
-    return 'Quest.Case';
-  if (Array.isArray(obj))
-    return obj.map(item => deepFormat(item, options));
-  if (typeof obj !== 'object' || obj === null || obj.constructor !== Object)
-    return obj;
-
-  // default = plain object
-  const out: { [key: string]: unknown } = {};
-  for (const key in obj)
-    out[key] = deepFormat(obj[key], options);
-
-  return out;
-}
-
-/**
- *   Given an expression and a hash of named terms,
- *   return a semicolon-separated string that declares said expression
- *   unambiguously.
- *
- * @example
- * var expr = ski.parse("T=CI; V=BCT; V x y");
- * SKI.extras.declare(expr, expr.context.env);
- * // 'B; C; I; T=CI; V=BC(T); x=; y=; Vx y'
- *
- */
-function declare (expr: Expr, env?: Record<string, Named>): string {
-  return expr.declare({ inventory: env });
-}
-
-const isStringPair    = (x: unknown) =>
-  Array.isArray(x) && x.length === 2 && typeof x[0] === 'string' && typeof x[1] === 'string'
-    ? undefined
-    : 'must be a pair of strings';
-const isStringTriple  = (x: unknown) =>
-  Array.isArray(x) && x.length === 3 && typeof x[0] === 'string' && typeof x[1] === 'string' && typeof x[2] === 'string'
-    ? undefined
-    : 'must be a triplet of strings';
-
-const schema: Record<string, (arg0: unknown) => string | undefined> = {
-  html:      x => typeof x === 'boolean' ? undefined : 'must be a boolean',
-  terse:     x => typeof x === 'boolean' ? undefined : 'must be a boolean',
-  space:     x => typeof x === 'string' ? undefined : 'must be a string',
-  brackets:  isStringPair,
-  var:       isStringPair,
-  around:    isStringPair,
-  redex:     isStringPair,
-  lambda:    isStringTriple,
-  inventory: x => {
-    if (typeof x !== 'object' || x === null || x.constructor !== Object)
-      return 'must be an object, not ' + (x?.constructor?.name ?? typeof x);
-    const refined = x as Record<string, unknown>;
-    for (const key of Object.keys(refined)) {
-      if (!(refined[key] instanceof Expr))
-        return 'key ' + key + 'is not an Expr';
-    }
-    return undefined;
-  }
-}
-
-/**
- *   Converts an unknown object into a FormatOptions, or returns an error it it is not valid.
- *   A null/undefined counts as an empty options object (and is thus valid).
- */
-function checkFormatOptions (raw: unknown): { value: FormatOptions } | { error: Record<string, string> } {
-  if (raw === null || raw === undefined)
-    return { value: {} };
-
-  if (typeof raw !== 'object' || Array.isArray(raw) || raw.constructor !== Object)
-    return { error: { object: 'Format options must be an object, not ' + (raw?.constructor?.name ?? typeof raw) } };
-
-  const rec = raw as Record<string, unknown>;
-  const error: Record<string, string> = {};
-
-  for (const key in rec) {
-    if (schema[key]) {
-      const err = schema[key](rec[key]);
-      if (err)
-        error[key] = err;
-    } else
-      error[key] = 'unknown option';
-  }
-
-  return Object.keys(error).length > 0 ? { error } : { value: rec as FormatOptions };
-}
+// --- Namespace export ---
 
 export const extras = { search, deepFormat, declare, toposort, checkFormatOptions };
