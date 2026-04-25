@@ -48,6 +48,11 @@ export type SearchOptions = {
 export type SearchCallback = (e: Expr, props: TermInfo) => (number | undefined);
 export type SearchResult = { expr?: Expr, total: number, probed: number, gen: number, cache?: Expr[][] };
 
+export type EquivResult = {
+  steps: number,
+  equal?: boolean,
+};
+
 // poor man's zod
 const formatSchema: Record<string, (arg0: unknown) => string | undefined> = {
   html:      x => typeof x === 'boolean' ? undefined : 'must be a boolean',
@@ -96,6 +101,30 @@ function checkFormatOptions (raw: unknown): { value: FormatOptions } | { error: 
   }
 
   return Object.keys(error).length > 0 ? { error } : { value: rec as FormatOptions };
+}
+
+/**
+ * Find out if two expressions are computationally equivalent.
+ *
+ * Unlike equals(), this function will attempt to normalize both expressions
+ * before comparing.
+ *
+ * @experimental
+ * @param e1
+ * @param e2
+ * @param options
+ */
+function equiv (e1: Expr, e2: Expr, options = {}): EquivResult {
+  let steps = 0;
+  const [n1, n2] = [e1, e2].map( x => x.traverse(e => {
+    const props = e.infer(options);
+    steps += props.steps ?? 0;
+    return props.expr;
+  }));
+  return {
+    steps,
+    equal: (n1 && n2) ? n1.equals(n2) : false,
+  }
 }
 
 /**
@@ -243,4 +272,4 @@ function isStringTriple  (x: unknown): string | undefined {
 
 // --- Namespace export ---
 
-export const extras = { search, deepFormat, declare, toposort, checkFormatOptions };
+export const extras = { search, deepFormat, declare, toposort, checkFormatOptions, equiv };
