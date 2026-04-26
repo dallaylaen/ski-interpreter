@@ -178,6 +178,13 @@ describe('Expr.infer', () => {
     'x(a->b->b)(a->b->b)(a->b->b)(a->b->b)',
   );
 
+  // exterminated omega
+  describeTerm(
+    'CK(WWW)',
+    { normal: true, arity: 1, proper: true, discard: false, duplicate: false },
+    'x->x'
+  );
+
   // non-normal terms, expect partial success
   describeTerm(
     '(a->a a)(a->b->c->b(a a b)c)',
