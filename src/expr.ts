@@ -356,6 +356,8 @@ export abstract class Expr {
    * @return {TermInfo}
    */
   infer (options : {max?: number, maxArgs?: number, maxSize?: number } = {}): TermInfo {
+    // First gather the names which can collide with generated variables and forbid them.
+    // TODO confusing naming, rewrite.
     const skipNames: Record<string, boolean> = {};
     const skipSkip: Set<Expr> = new Set();
     this.traverse(e => {
@@ -387,12 +389,14 @@ export abstract class Expr {
     let expr: Expr = this;
     // eslint-disable-next-line no-labels
     main: for (let i = 0; i < options.maxArgs; i++) {
-      const next = expr.run({ max: options.max - steps, maxSize: options.maxSize });
+      // keep reduction budget at bay.
+      // ideally should be increased with more args but that (predictably) causes very long test runs
+      const next = expr.run({ max: Math.max((options.max - steps) / 2, 10), maxSize: options.maxSize });
       // console.log(`infer step ${i}, expr = ${expr}, probe = [${probe}]: `, next);
       steps += next.steps;
-      if (!next.final)
-        break;
-      if (firstVar(next.expr)) {
+
+      // if !final, still append more args, e.g. CK(WWW) is a->a, not CK(omega)
+      if (next.final && firstVar(next.expr)) {
         // can't append more variables, return or recurse
         expr = next.expr;
         if (!expr.any(e => !(e instanceof FreeVar || e instanceof App)))
