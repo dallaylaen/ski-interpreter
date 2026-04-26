@@ -50,7 +50,9 @@ export type SearchResult = { expr?: Expr, total: number, probed: number, gen: nu
 
 export type EquivResult = {
   steps: number,
-  equal?: boolean,
+  equal: boolean,
+  normal: boolean,
+  canonical: [Expr | null, Expr | null],
 };
 
 // poor man's zod
@@ -121,9 +123,12 @@ function equiv (e1: Expr, e2: Expr, options = {}): EquivResult {
     steps += props.steps ?? 0;
     return props.expr;
   }));
+  const normal = !!(n1 && n2);
   return {
     steps,
-    equal: (n1 && n2) ? n1.equals(n2) : false,
+    normal,
+    equal:     normal ? n1.equals(n2) : false,
+    canonical: [n1, n2],
   }
 }
 
