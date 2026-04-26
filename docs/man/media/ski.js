@@ -71,6 +71,23 @@ program
     inferExpression(expression);
   });
 
+program
+  .command('compare <expr1> <expr2>')
+  .description('Check if two expressions are equivalent')
+  .action((expr1, expr2) => {
+    const ski = new SKI();
+    const e1 = ski.parse(expr1);
+    const e2 = ski.parse(expr2);
+    const res = SKI.extras.equiv(e1, e2, runOptions);
+    if (res.equal)
+      console.log('Both expressions are equivalent to ' + res.canonical[0].format(format));
+    else
+      console.log(`Expressions differ:\n${res.canonical[0].format(format)}\n vs \n${res.canonical[1].format(format)}`);
+
+    console.log(`// ${res.steps} step(s)`);
+    process.exit(res.equal ? 0 : 1);
+  });
+
 // Extract subcommand
 program
   .command('extract <target> <terms...>')
