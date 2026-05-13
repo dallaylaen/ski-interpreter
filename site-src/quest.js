@@ -208,7 +208,8 @@ class QuestBox {
   load () {
     const data = this.store.load(this.name) ?? {};
     this.status = {
-      solved:   data.solved || !!data.solution,
+      // TODO remove `solved` in favor of just checking if `solution` is there
+      solved:   !!data.solution || !!data.solved,
       solution: data.solution,
       steps:    data.steps ?? 0,
       attempts: data.attempts ?? 0,
@@ -234,6 +235,7 @@ class QuestBox {
     this.status.steps = result.steps;
     this.status.weight = result.weight;
     if (result.pass) {
+      this.status.solved = true;
       this.status.solution = input;
       this.onSolved(result);
     }
