@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!--
+  Originally by Chris Rathman, 19 April 2003
+  Salvaged from https://web.archive.org/web/20251214063902/https://angelfire.com/tx4/cus/combinator/birds.html
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Combinator Birds</title>
+  <style>
+    body { font-family: sans-serif; margin: 1em 2em; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border: 1px solid #888; padding: 0.3em 0.5em; vertical-align: top; }
+    th { background: #ddd; font-weight: bold; }
+    td:last-child { word-break: break-all; font-family: monospace; font-size: 0.85em; }
+    td:nth-child(3), td:nth-child(4) { white-space: nowrap; }
+    h1 { font-size: 1.4em; }
+    ol { line-height: 1.8; }
+    address { margin-top: 2em; font-style: normal; }
+  </style>
+</head>
+<body>
+
+<h1><a name="birds">Combinator Birds</a></h1>
+
+<table>
+  <tr>
+    <th>Function Abstraction</th>
+    <th>Symbol</th>
+    <th>Bird</th>
+    <th>Combinator</th>
+    <th>SK Combinator</th>
+  </tr>
+  <tr><td>&#955;abc.a(bc)</td><td>B</td><td>Bluebird</td><td>S(KS)K</td><td>((S(KS))K)</td></tr>
+  <tr><td>&#955;abcd.a(bcd)</td><td>B<sub>1</sub></td><td>Blackbird</td><td>BBB</td><td>((S(K((S(KS))K)))((S(KS))K))</td></tr>
+  <tr><td>&#955;abcde.a(bcde)</td><td>B<sub>2</sub></td><td>Bunting</td><td>B(BBB)B</td><td>((S(K((S(K((S(KS))K)))((S(KS))K))))((S(KS))K))</td></tr>
+  <tr><td>&#955;abcd.a(b(cd))</td><td>B<sub>3</sub></td><td>Becard</td><td>B(BB)B</td><td>((S(K((S(K((S(KS))K)))((S(KS))K))))((S(KS))K))</td></tr>
+  <tr><td>&#955;abc.acb</td><td>C</td><td>Cardinal</td><td>S(BBS)(KK)</td><td>((S((S(K((S(KS))K)))S))(KK))</td></tr>
+  <tr><td>&#955;abcd.ab(cd)</td><td>D</td><td>Dove</td><td>BB</td><td>(S(K((S(KS))K)))</td></tr>
+  <tr><td>&#955;abcde.abc(de)</td><td>D<sub>1</sub></td><td>Dickcissel</td><td>B(BB)</td><td>(S(K(S(K((S(KS))K)))))</td></tr>
+  <tr><td>&#955;abcde.a(bc)(de)</td><td>D<sub>2</sub></td><td>Dovekies</td><td>BB(BB)</td><td>((S(K((S(KS))K)))(S(K((S(KS))K))))</td></tr>
+  <tr><td>&#955;abcde.ab(cde)</td><td>E</td><td>Eagle</td><td>B(BBB)</td><td>(S(K((S(K((S(KS))K)))((S(KS))K))))</td></tr>
+  <tr><td>&#955;abcdefg.a(bcd)(efg)</td><td>&#202;</td><td>Bald Eagle</td><td>B(BBB)(B(BBB))</td><td>((S(K((S(K((S(KS))K)))((S(KS))K))))(S(K((S(K((S(KS))K)))((S(KS))K)))))</td></tr>
+  <tr><td>&#955;abc.cba</td><td>F</td><td>Finch</td><td>ETTET</td><td>((S(K((S((SK)K))(K((S(K(S((SK)K))))K)))))((S(K((S(K((S(KS))K)))((S(KS))K))))((S(K(S((SK)K))))K)))</td></tr>
+  <tr><td>&#955;abcd.ad(bc)</td><td>G</td><td>Goldfinch</td><td>BBC</td><td>((S(K((S(KS))K)))((S((S(K((S(KS))K)))S))(KK)))</td></tr>
+  <tr><td>&#955;abc.abcb</td><td>H</td><td>Hummingbird</td><td>BW(BC)</td><td>((S(K((S(K(S((S(K((S((SK)K))((SK)K))))((S(K((S(KS))K)))((S(K(S((SK)K))))K))))))K)))(S(K((S((S(K((S(KS))K)))S))(KK)))))</td></tr>
+  <tr><td>&#955;a.a</td><td>I</td><td>Identity Bird (aka Idiot)</td><td>SKK</td><td>((SK)K)</td></tr>
+  <tr><td>&#955;abcd.ab(adc)</td><td>J</td><td>Jay</td><td>B(BC)(W(BC(B(BBB))))</td><td>((S(K(S(K((S((S(K((S(KS))K)))S))(KK))))))((S((S(K((S((SK)K))((SK)K))))((S(K((S(KS))K)))((S(K(S((SK)K))))K))))(K((S(K((S((S(K((S(KS))K)))S))(KK))))(S(K((S(K((S(KS))K)))((S(KS))K))))))))</td></tr>
+  <tr><td>&#955;ab.a</td><td>K</td><td>Kestrel (True)</td><td>K</td><td>K</td></tr>
+  <tr><td>&#955;ab.a(bb)</td><td>L</td><td>Lark</td><td>CBM</td><td>((S((S(KS))K))(K((S((SK)K))((SK)K))))</td></tr>
+  <tr><td>&#955;a.aa</td><td>M</td><td>Mockingbird</td><td>SII</td><td>((S((SK)K))((SK)K))</td></tr>
+  <tr><td>&#955;ab.ab(ab)</td><td>M<sub>2</sub></td><td>Double Mockingbird</td><td>BM</td><td>(S(K((S((SK)K))((SK)K))))</td></tr>
+  <tr><td>&#955;ab.b(ab)</td><td>O</td><td>Owl</td><td>SI</td><td>(S((SK)K))</td></tr>
+  <tr><td>&#955;abc.b(ac)</td><td>Q</td><td>Queer Bird</td><td>CB</td><td>((S(K(S((S(KS))K))))K)</td></tr>
+  <tr><td>&#955;abc.a(cb)</td><td>Q<sub>1</sub></td><td>Quixotic Bird</td><td>BCB</td><td>((S(K((S((S(K((S(KS))K)))S))(KK))))((S(KS))K))</td></tr>
+  <tr><td>&#955;abc.b(ca)</td><td>Q<sub>2</sub></td><td>Quizzical Bird</td><td>C(BCB)</td><td>((S(K(S((S(K((S((S(K((S(KS))K)))S))(KK))))((S(KS))K)))))K)</td></tr>
+  <tr><td>&#955;abc.c(ab)</td><td>Q<sub>3</sub></td><td>Quirky Bird</td><td>BT</td><td>(S(K((S(K(S((SK)K))))K)))</td></tr>
+  <tr><td>&#955;abc.c(ba)</td><td>Q<sub>4</sub></td><td>Quacky Bird</td><td>F*B</td><td>((S(K((S((S(K((S(KS))K)))S))(KK))))((S(K(S((S(K((S((S(K((S(KS))K)))S))(KK))))((S(KS))K)))))K))</td></tr>
+  <tr><td>&#955;abc.bca</td><td>R</td><td>Robin</td><td>BBT</td><td>((S(K((S(KS))K)))((S(K(S((SK)K))))K))</td></tr>
+  <tr><td>&#955;abc.ac(bc)</td><td>S</td><td>Starling</td><td>S</td><td>S</td></tr>
+  <tr><td>&#955;ab.ba</td><td>T</td><td>Thrush</td><td>CI</td><td>((S(K(S((SK)K))))K)</td></tr>
+  <tr><td>&#955;ab.b(aab)</td><td>U</td><td>Turing</td><td>LO</td><td>((S(K(S((SK)K))))((S((SK)K))((SK)K)))</td></tr>
+  <tr><td>&#955;abc.cab</td><td>V</td><td>Vireo (aka Pairing)</td><td>BCT</td><td>((S(K((S((S(K((S(KS))K)))S))(KK))))((S(K(S((SK)K))))K))</td></tr>
+  <tr><td>&#955;ab.abb</td><td>W</td><td>Warbler</td><td>C(BMR)</td><td>((S(K(S((S(K((S((SK)K))((SK)K))))((S(K((S(KS))K)))((S(K(S((SK)K))))K))))))K)</td></tr>
+  <tr><td>&#955;ab.baa</td><td>W<sup>1</sup></td><td>Converse Warbler</td><td>CW</td><td>((S(K(S((S(K(S((S(K((S((SK)K))((SK)K))))((S(K((S(KS))K)))((S(K(S((SK)K))))K))))))K))))K)</td></tr>
+  <tr><td>&#955;a.a(&#955;a)</td><td>Y</td><td>Why Bird (aka Sage Bird)</td><td>SLL</td><td>(((SS)K)((S(K((SS)(S((SS)K)))))K)</td></tr>
+  <tr><td>&#955;ab.ab</td><td>I*</td><td>Identity Bird Once Removed</td><td>S(SK)</td><td>(S(SK))</td></tr>
+  <tr><td>&#955;abc.abcc</td><td>W*</td><td>Warbler Once Removed</td><td>BW</td><td>(S(K((S(K(S((S(K((S((SK)K))((SK)K))))((S(K((S(KS))K)))((S(K(S((SK)K))))K))))))K)))</td></tr>
+  <tr><td>&#955;abcd.abdc</td><td>C*</td><td>Cardinal Once Removed</td><td>BC</td><td>(S(K((S((S(K((S(KS))K)))S))(KK))))</td></tr>
+  <tr><td>&#955;abcd.acdb</td><td>R*</td><td>Robin Once Removed</td><td>C*C*</td><td>((S(K((S((S(K((S(KS))K)))S))(KK))))(S(K((S((S(K((S(KS))K)))S))(KK)))))</td></tr>
+  <tr><td>&#955;abcd.adcb</td><td>F*</td><td>Finch Once Removed</td><td>BC*R*</td><td>((S(K(S(K((S((S(K((S(KS))K)))S))(KK))))))((S(K((S((S(K((S(KS))K)))S))(KK))))(S(K((S((S(K((S(KS))K)))S))(KK))))))</td></tr>
+  <tr><td>&#955;abcd.acbd</td><td>V*</td><td>Vireo Once Removed</td><td>C*F*</td><td>((S(K((S((S(K((S(KS))K)))S))(KK))))((S(K(S(K((S((S(K((S(KS))K)))S))(KK))))))((S(K((S((S(K((S(KS))K)))S))(KK))))(S(K((S((S(K((S(KS))K)))S))(KK)))))))</td></tr>
+  <tr><td>&#955;abc.abc</td><td>I**</td><td>Identity Bird Twice Removed</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr><td>&#955;abcd.abcdd</td><td>W**</td><td>Warbler Twice Removed</td><td>B(BW)</td><td>(S(K(S(K((S(K(S((S(K((S((SK)K))((SK)K))))((S(K((S(KS))K)))((S(K(S((SK)K))))K))))))K)))))</td></tr>
+  <tr><td>&#955;abcde.abced</td><td>C**</td><td>Cardinal Twice Removed</td><td>BC*</td><td>(S(K(S(K((S((S(K((S(KS))K)))S))(KK))))))</td></tr>
+  <tr><td>&#955;abcde.abdec</td><td>R**</td><td>Robin Twice Removed</td><td>BR*</td><td>(S(K((S(K((S((S(K((S(KS))K)))S))(KK))))(S(K((S((S(K((S(KS))K)))S))(KK)))))))</td></tr>
+  <tr><td>&#955;abcde.abedc</td><td>F**</td><td>Finch Twice Removed</td><td>BF*</td><td>(S(K((S(K(S(K((S((S(K((S(KS))K)))S))(KK))))))((S(K((S((S(K((S(KS))K)))S))(KK))))(S(K((S((S(K((S(KS))K)))S))(KK))))))))</td></tr>
+  <tr><td>&#955;abcde.abecd</td><td>V**</td><td>Vireo Twice Removed</td><td>BV*</td><td>(S(K((S(K((S((S(K((S(KS))K)))S))(KK))))((S(K(S(K((S((S(K((S(KS))K)))S))(KK))))))((S(K((S((S(K((S(KS))K)))S))(KK))))(S(K((S((S(K((S(KS))K)))S))(KK)))))))))</td></tr>
+  <tr><td>&#955;ab.b</td><td>KI</td><td>Kite (False)</td><td>KI</td><td>(K((SK)K))</td></tr>
+  <tr><td>&nbsp;</td><td>&#937;</td><td>Omega</td><td>MM</td><td>(((S((SK)K))((SK)K))((S((SK)K))((SK)K)))</td></tr>
+  <tr><td>&#955;ab.bb</td><td>KM</td><td>Konstant Mocker</td><td>KM</td><td>(K((S((SK)K))((SK)K)))</td></tr>
+  <tr><td>&#955;ab.aa</td><td>C(KM)</td><td>Crossed Konstant Mocker</td><td>C(KM)</td><td>((S(K(S(K((S((SK)K))((SK)K))))))K)</td></tr>
+  <tr><td>&nbsp;</td><td>&#920;</td><td>Theta</td><td>YO</td><td>((((SS)K)((S(K((SS)(S((SS)K)))))K)(S((SK)K)))</td></tr>
+</table>
+
+<p>&nbsp;</p>
+
+<div><b>Notes on the Combinator Birds:</b></div>
+<ol>
+  <li>The combinatory birds were borrowed from <a href="https://www.amazon.com/exec/obidos/tg/detail/-/0394534913/104-1615637-3868724">To Mock A MockingBird</a>, by Raymond Smullyan.</li>
+  <li>Some additional information about combinator birds can be found in <a href="http://dkeenan.com/Lambda/">To Dissect a Mockingbird</a> by David C Keenan.</li>
+  <li>Some of the SK Combinatory terms were first reduced using the <a href="http://homepages.nyu.edu/~cb125/Lambda/ski.html">Combinatory Logic Tutorial</a> by Chris Barker.</li>
+</ol>
+
+<hr>
+<address>
+  Chris Rathman / Chris.Rathman@gmail.com<br>
+  <small>Archived from <a href="https://web.archive.org/web/20251214063902/https://angelfire.com/tx4/cus/combinator/birds.html">angelfire.com/tx4/cus/combinator/birds.html</a> (Dec 14, 2025)</small>
+</address>
+
+</body>
+</html>
