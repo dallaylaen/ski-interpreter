@@ -1,0 +1,35 @@
+{
+  "name": "Those Included In This Classification",
+  "id": "HhZsYmiI",
+  "created_at": "2026-06-23T00:49:14",
+  "intro": [
+    "<p>Let's build some more combinators, useful and not.</p>"
+  ],
+  "content": [
+    {
+      "id": "HRESMOB6",
+      "created_at": "2026-06-23T00:49:14",
+      "name": "Double Mockingbird",
+      "intro": [
+        "<p>Find a term <code>M<sub>2</sub></code> such that <code>M<sub>2</sub> x y = x y (x y)</code>.</p>"
+      ],
+      "input": { "name": "m2", "fancy": "M<sub>2</sub>" },
+      "cases": [
+        [ "m2 x y", "x y (x y)" ]
+      ]
+    },
+    {
+      "id": "HnLa4AzW",
+      "created_at": "2026-06-23T01:06:21",
+      "name": "Tartaglia",
+      "intro": [
+        "<p>Find a term such that <code>f x y = (x x)(y y)</code>.</p>",
+        "<p>Not sure if this has a common name, so we'll call it a stuttering mockingbird.</p>"
+      ],
+      "input": "f",
+      "cases": [
+        [ "f x y", "(x x)(y y)" ]
+      ]
+    }
+  ]
+}
