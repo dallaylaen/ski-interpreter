@@ -321,6 +321,7 @@ function searchExpression (targetStr, termStrs, options) {
     process.exit(1);
   }
 
+  const t0 = new Date();
   const res = SKI.extras.search(seed, { tries: options.maxTries, depth: options.maxDepth }, (e, p) => {
     if (!p.expr)
       return -1;
@@ -328,12 +329,13 @@ function searchExpression (targetStr, termStrs, options) {
       return 1;
     return 0;
   });
+  const elapsed = new Date() - t0;
 
   if (res.expr) {
-    console.log(`Found ${res.expr.format(format)} after ${res.total} tries.`);
+    console.log(`Found ${res.expr.format(format)} after ${res.total} tries in ${elapsed}ms.`);
     process.exit(0);
   } else {
-    console.error(`No equivalent expression found for ${target} after ${res.total} tries.`);
+    console.error(`No equivalent expression found for ${target} after ${res.total} tries in ${elapsed}ms.`);
     process.exit(1);
   }
 }
