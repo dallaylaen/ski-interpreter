@@ -11,6 +11,7 @@ const runOptions = {};
 /** @type FormatOptions */
 let format = {};
 let verbose = false;
+let quiet = false;
 
 const program = new Command();
 
@@ -19,6 +20,7 @@ program
   .description('Simple Kombinator Interpreter - a combinatory logic & lambda calculus parser and interpreter')
   .version(version)
   .option('-v, --verbose', 'Show all evaluation steps', () => { verbose = true; })
+  .option('-q, --quiet', 'Suppress comment lines in output', () => { quiet = true; })
   .option('--format <json>', 'Format for output expressions', setFormat)
   .option('--max <number>', 'Limit computation steps', raw => {
     const n = Number.parseInt(raw);
@@ -196,7 +198,8 @@ function processLine (source, ski, onErr) {
 
     for (const state of expr.walk(runOptions)) {
       if (state.final) {
-        console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
+        if (!quiet)
+          console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
         console.log(state.expr.declare({ ...format, inventory: ski.getTerms() }));
       } else if (verbose)
         console.log(state.expr.format(format) + ';');
@@ -238,7 +241,7 @@ function displayInfer (guess) {
     console.log(guess.expr.format(format));
 
   for (const key of ['normal', 'proper', 'arity', 'discard', 'duplicate', 'steps']) {
-    if (guess[key] !== undefined)
+    if (guess[key] !== undefined && !quiet)
       console.log(`// ${key}: ${guess[key]}`);
   }
 }
