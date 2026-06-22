@@ -12,5 +12,6 @@
   "90-lists.json",
   "85-pairs.json",
   "95-linked-lists.json",
-  "59-affine.json"
+  "59-affine.json",
+  "75-finite-fixpoint.json"
 ]
