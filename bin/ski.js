@@ -165,13 +165,19 @@ function evaluateExpression (expression) {
 
 function evaluateFile (filepath) {
   const ski = new SKI();
+  const onErr = err => {
+    console.error('' + err);
+    process.exit(3);
+  };
+  if (filepath === '-') {
+    let source = '';
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', chunk => { source += chunk; });
+    process.stdin.on('end', () => { processLine(source, ski, onErr); });
+    return;
+  }
   fs.readFile(filepath, 'utf8')
-    .then(source => {
-      processLine(source, ski, err => {
-        console.error('' + err);
-        process.exit(3);
-      });
-    })
+    .then(source => { processLine(source, ski, onErr); })
     .catch(err => {
       console.error('ski: ' + err);
       process.exit(2);
