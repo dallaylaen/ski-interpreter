@@ -29,12 +29,26 @@
       "name": "Quine",
       "intro": [
         "Technically, every irreducible combinator is a quine, for it returns itself. ",
-        "Write a combinator that returns itself when given <i>any</i> argument: <code>f x = f</code>."
+        "Write a combinator that returns itself when given <i>any</i> argument: <code>f x = f</code>.",
+        "Oh, and it should terminate."
       ],
-      "input": "phi",
+      "hint": "If <code>g g x = g g</code>, what should <code>g</code> look like?..",
+      "input": "q",
       "cases": [
-        [ "phi x", "phi" ],
-        [ "phi x y z", "phi" ]
+        [ "q x", "q" ],
+        [ "q x y z", "q" ]
+      ]
+    },
+    {
+      "id": "TdfaCuW3",
+      "created_at": "2026-06-24T00:23:44",
+      "name": "The crawl",
+      "intro": [
+        "<p>Create a term that satisfies the condition <code>f x = x f</code>. </p>"
+      ],
+      "input": "f",
+      "cases": [
+        [ "f x", "x f" ]
       ]
     },
     {
@@ -90,11 +104,44 @@
       ]
     },
     {
+      "id": "8JqqvQtV",
+      "created_at": "2026-06-24T00:29:51",
+      "name": "The harvester",
+      "intro": [
+        "<p>Create a terminating term such that <code>f x y = f(x y)</code>.",
+        "This means that <i>any</i> number of further arguments will be squashed into one.</p>"
+      ],
+      "input": "f",
+      "cases": [
+        [ { "max": 200 }, "f", "f"],
+        [ "f x y", "f (x y)" ],
+        [ "f a b c d", "f (a b c d)" ]
+      ]
+    },
+    {
+      "id": "3JcMqUYU",
+      "created_at": "2026-06-24T00:50:46",
+      "name": "Count Dracula",
+      "intro": [
+        "<p>You are given an unknown number of <code>K</code>'s, followed by a <code>KI</code>. ",
+        "Return the number of <code>K</code>'s as a Church numeral.",
+        "You can assume no other arguments are ever given. </p>"
+      ],
+      "input": "count",
+      "cases": [
+        [ "count (KI) + 0", "0" ],
+        [ "count K (KI) + 0", "1" ],
+        [ "count K K (KI) + 0", "2" ],
+        [ "count K K K K K K K (KI) + 0", "7" ]
+      ]
+    },
+    {
       "id": "l79rFZSF",
       "created_at": "2024-09-08T23:55:19",
       "name": "His Majesty Factorial",
       "intro": [
-        "Make a term that takes a number n and returns a product of all numbers from 1 to n."
+        "<p>Make a term that takes a number n and returns a product of all numbers from 1 to n.</p>",
+        "<p>Note that you can also use the built in recursion of the Church numerals for this quest.</p>"
       ],
       "input": "phi",
       "cases": [
