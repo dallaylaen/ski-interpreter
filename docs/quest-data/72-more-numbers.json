@@ -1,0 +1,63 @@
+{
+  "id": "r2VQ7P35",
+  "created_at": "2026-06-26T00:50:09",
+  "name": "Net Church of Numerals II",
+  "intro": [
+    "[TBD]"
+  ],
+  "content": [
+    {
+      "id": "l79rFZSF",
+      "created_at": "2024-09-08T23:55:19",
+      "name": "His Majesty Factorial",
+      "intro": [
+        "<p>Make a term that takes a number n and returns a product of all numbers from 1 to n.</p>",
+        "<p>Note that you can also use the built in recursion of the Church numerals for this quest.</p>"
+      ],
+      "input": "phi",
+      "cases": [
+        ["phi(KI) + 0", "1"   ],
+        ["phi I + 0",   "1"   ],
+        ["phi 5 + 0",   "120" ]
+      ]
+    },
+    {
+      "id": "ifb4SqXX",
+      "created_at": "2025-03-01T01:12:54",
+      "name": "Down the rabbit hole",
+      "intro": [
+        "<p>Create a term that takes a number n and returns the nth Fibonacci number.</p>",
+        "<p>Note that it might be easier to build n-th <i>pair</i> of Fibonacci numbers first.</p>"
+      ],
+      "input": "phi",
+      "cases": [
+        ["phi(KI) + 0", "0" ],
+        ["phi I + 0",   "1" ],
+        ["phi 5 + 0",   "5" ],
+        ["phi 6 + 0",   "8" ],
+        ["phi 7 + 0",   "13" ]
+      ]
+    },
+    {
+      "id": "u1Sr43PU",
+      "created_at": "2025-03-01T01:12:54",
+      "name": "Something in common",
+      "intro": [
+        "<p>Create a term that takes two numbers and returns their greatest common divisor (GCD).</p>",
+        "<p>You can use the Euclid's algorithm: ",
+        "<code>gcd(0, n) = n</code>, <code>gcd(m, n) = gcd(n-m, m)</code> (where m < n).</p>"
+      ],
+      "input": "gcd",
+      "cases": [
+        [ "gcd  0  0 + 0",   "0" ],
+        [ "gcd  1  0 + 0",   "1" ],
+        [ "gcd  0  1 + 0",   "1" ],
+        [ "gcd  1  1 + 0",   "1" ],
+        [ "gcd  2  3 + 0",   "1" ],
+        [ "gcd  4  6 + 0",   "2" ],
+        [ "gcd  9  6 + 0",   "3" ],
+        [ "gcd  12 15 + 0",  "3" ]
+      ]
+    }
+  ]
+}
