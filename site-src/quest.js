@@ -96,7 +96,7 @@ class QuestPage {
     // TODO update this.root based on index URL
     fetch(this.mkLink(index))
       .then(resp => resp.json())
-      .then(list => this.loadChapters(list))
+      .then(data => this.loadChapters(data.chapters))
       .then(self => {
         if (onLoad)
           onLoad(self);

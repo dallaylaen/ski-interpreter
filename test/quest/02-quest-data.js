@@ -31,11 +31,12 @@ describe('quest-data', () => {
     const index = await fs.readFile(path.join(dir, 'index.json'))
       .then(data => JSON.parse(data));
 
-    expect(Array.isArray(index)).to.equal(true, 'index is an array');
+    expect(index).to.be.an('object', 'index is an object');
+    expect(index.chapters).to.be.an('array', 'index has chapters array');
 
     describe('index', () => {
-      for (let n = 0; n < index.length; n++) {
-        const entry = typeof index[n] === 'string' ? { link: index[n] } : index[n];
+      for (let n = 0; n < index.chapters.length; n++) {
+        const entry = typeof index.chapters[n] === 'string' ? { link: index.chapters[n] } : index.chapters[n];
         it('entry ' + n + ' has quest file ' + entry.link, () => {
           expect(typeof entry.link).to.equal('string');
           return fs.readFile(path.join(dir, entry.link))

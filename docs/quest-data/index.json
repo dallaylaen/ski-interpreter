@@ -1,18 +1,20 @@
-[
-  "10-basics.json",
-  "30-arguments.json",
-  "40-bckw.json",
-  "50-iota.json",
-  "52-mtab.json",
-  "57-linear.json",
-  "55-jay.json",
-  "58-more-terms.json",
-  "65-boolean.json",
-  "80-numerals.json",
-  "70-recursion.json",
-  "90-lists.json",
-  "85-pairs.json",
-  "95-linked-lists.json",
-  "59-affine.json",
-  "75-finite-fixpoint.json"
-]
+{
+  "chapters": [
+    "10-basics.json",
+    "30-arguments.json",
+    "40-bckw.json",
+    "50-iota.json",
+    "52-mtab.json",
+    "57-linear.json",
+    "55-jay.json",
+    "58-more-terms.json",
+    "65-boolean.json",
+    "80-numerals.json",
+    "70-recursion.json",
+    "90-lists.json",
+    "85-pairs.json",
+    "95-linked-lists.json",
+    "59-affine.json",
+    "75-finite-fixpoint.json"
+  ]
+}
