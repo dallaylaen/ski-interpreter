@@ -54,6 +54,24 @@
       "cases": [
         [ "phi f g (V a b) x", "x (f a b) (g a b)" ]
       ]
+    },
+    {
+      "id": "A4fAPvZb",
+      "created_at": "2026-06-26T17:03:57",
+      "name": "Poor man's pattern matching",
+      "intro": [
+        "<p>Create a term that takes a function, a default value, and an argument.",
+        "If the argument is a pair, the function should be applied to its content",
+        "and if the argument is false/nil, the default value should be returned instead:</p>",
+        "<p><code>myfun f d (V a b) = f a b</code>;</p>",
+        "<p><code>myfun f d (KI) = d</code>.</p>",
+        "<p>What the function does for other argument types, nobody cares.</p>"
+      ],
+      "input": "myfun",
+      "cases": [
+        [ "myfun f d (KI)", "d" ],
+        [ "myfun f d (z->z a b)", "f a b" ]
+      ]
     }
   ]
 }
