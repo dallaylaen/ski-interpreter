@@ -51,16 +51,14 @@
       "name": "Join em harder",
       "intro": [
         "Now you are given 3 functions, <code>f</code>, <code>g</code>, and <code>h</code>.",
-        "Create a term that returns <code>h(f(g(x)))</code> for any given <code>x</code>.",
-        "Note that the order of arguments is the same as in the f(g(x)) problem,",
-        "so you can copy part of the solution verbatim."
+        "Create a term that returns <code>f(g(h(x)))</code> for any given <code>x</code>."
       ],
       "env": [
         "f", "g", "h"
       ],
       "input": "phi",
       "cases": [
-        [ "phi x", "h (f (g x))" ]
+        [ "phi x", "f (g (h x))" ]
       ]
     },
     {
@@ -159,7 +157,7 @@
       "created_at": "2024-12-01T16:54:23",
       "name": "Lost identity",
       "intro": [
-        "Sadly, after the previous exercise the Ibis has flown away.",
+        "Sadly, after the previous exercise the Ibis (I) has flown away.",
         "Ask the Starling and the Kestrel to call it back.",
         "Emulate <code>x&rarr;x</code> with <code>S</code> and <code>K</code>.",
         "This one has multiple solutions."

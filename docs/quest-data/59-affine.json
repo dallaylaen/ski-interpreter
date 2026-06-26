@@ -71,7 +71,7 @@
       "created_at": "2025-07-23T00:08:30",
       "name": "Triple trouble",
       "intro": [
-        "<p>Think making <code>W</code> from <code>M</code> was hard?",
+        "<p>Think <a href=\"#quest-ZCMoK02Q\">making</a> <code>W</code> from <code>M</code> was hard?",
         "This time you are given <code>triple x = x x x</code> instead of <code>M</code>. Find <code>M</code>.</p>",
         "<p><i>(Can you also build <code>W</code>?)</i></p>",
         "<p>Of course you can't use any duplicating combinators except <code>triple</code>.</p>"

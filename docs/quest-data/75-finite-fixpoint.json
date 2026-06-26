@@ -64,8 +64,7 @@
       "created_at": "2025-06-24T01:52:15",
       "name": "Use the force, Luke",
       "intro": [
-        "<p>Remember, <code>T a b = b a</code>. Find <code>x</code> such that <code>T x = x</code>. </p>",
-        "<p>Here you might need to resort to an actual fixed point calculation from the last chapter.</p>"
+        "<p>Remember, <code>T a b = b a</code>. Find <code>x</code> such that <code>T x = x</code>. </p>"
       ],
       "input": "x",
       "env": ["T=CI"],

@@ -53,8 +53,8 @@
         "<p>Implement fold: <code>fold [a, b, ... z] f x = f a (f b (... (f z x) ...))</code>.",
         "More specifically, <code>fold nil f x = x</code>",
         "and <code>fold (V a b) f x = f a (fold b f x)</code>.</p>",
-        "<p>Note that is you reuse <code>lst</code> and <code>nil</code> from the previous chapter,",
-        "you could care less about what <code>f</code> and <code>x</code> are.</p>"
+        "<p>You can use <code>lst</code> and <code>nil</code> constants",
+        "to avoid pulling f and x into the recursing part, at a little performance cost.</p>"
       ],
       "env": ["lst=BS(C(BB))", "nil=KI"],
       "input": "fold",
