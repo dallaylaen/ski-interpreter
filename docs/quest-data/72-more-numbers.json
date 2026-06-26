@@ -1,9 +1,10 @@
 {
   "id": "r2VQ7P35",
   "created_at": "2026-06-26T00:50:09",
-  "name": "Net Church of Numerals II",
+  "name": "The Church of Numerals II",
   "intro": [
-    "[TBD]"
+    "<p>Now that we can build loops, let's explore more numerical functions.",
+    "Note that some of them can also be built using the built-in recursion of the Church numerals.</p>"
   ],
   "content": [
     {
