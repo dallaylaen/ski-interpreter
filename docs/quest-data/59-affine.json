@@ -98,23 +98,6 @@
         [{ "caps": { "affine": true }}, "phi"],
         [ "phi (V x (V y z))", "f x y" ]
       ]
-    },
-    {
-      "id": "Ci0vMhSM",
-      "created_at": "2025-08-22T01:14:01",
-      "name": "Taming the infinity",
-      "intro": [
-        "<p>You are given a non-terminating fixed-point combinator, <code>Y</code>: ",
-        "<code>Y f = f(Y f) = f(f(Y f)) = ...</code>.",
-        "No other duplicating terms are allowed.</p>",
-        "<p>Build <code>M x = x x</code>.</p>"
-      ],
-      "env": ["Y=WS(BWB)"],
-      "allow": "BCVIKT",
-      "input": "phi",
-      "cases": [
-        [ "phi x", "x x" ]
-      ]
     }
   ]
 }
