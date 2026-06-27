@@ -3,7 +3,9 @@
 const { SKI } = require('../src/index');
 const { Store } = require('./store');
 const { EvalBox } = require('./eval-box');
-const { append } = require('./html-util')
+const { append } = require('./html-util');
+
+const days = 24 * 60 * 60 * 1000;
 
 /**
  * @cssClass ski-quest-box - container for an individual quest, with title, description, input, and result display
@@ -60,6 +62,7 @@ class QuestPage {
    *   onFailed?: function, // callback for when a quest is attempted but not solved
    *   onTermUnlock?: function, // callback for when a quest is solved and unlocks something in the engine
    *   chapterList?: QuestChapter[], // optional write-only list for observability only
+   *   newCutOff?: Date, // optional date to mark quests as "new" if created after this date
    * }} options
    */
   constructor (options) {
@@ -96,7 +99,13 @@ class QuestPage {
     // TODO update this.root based on index URL
     fetch(this.mkLink(index))
       .then(resp => resp.json())
-      .then(data => this.loadChapters(data.chapters))
+      .then(data => {
+        if (!Array.isArray(data.chapters))
+          throw new Error('Invalid quest index in ' + index);
+        if (data.new_age)
+          this.newCutOff = new Date(new Date - data.new_age * days);
+        return this.loadChapters(data.chapters);
+      })
       .then(self => {
         if (onLoad)
           onLoad(self);
@@ -127,6 +136,7 @@ class QuestPage {
         onTermUnlock: x => this.onTermUnlock(x),
         onSolved:     x => this._onSolved(x),
         onFailed:     x => this._onFailed(x),
+        newCutOff:    this.newCutOff,
       });
       this.chapters.push(chapter);
       chapter.attach(this.view.content, { placeholder: 'loading chapter' + chapter.number + '...' });
@@ -185,6 +195,7 @@ class QuestBox {
    *   chapter?: QuestChapter,
    *   number?: number,
    *   store?: Store,
+   *   newCutOff?: Date,
    * }}options
    */
   constructor (spec, options) {
@@ -196,6 +207,7 @@ class QuestBox {
       throw new Error('QuestBox requires a store: Store in either options or chapter');
     this.impl = new SKI.Quest({ ...spec, engine });
     this.name = this.impl.id ? 'quest-' + this.impl.id : '';
+    this.isNew = options.newCutOff && this.impl.created && this.impl.created > options.newCutOff;
     this.chapter = options.chapter;
     if (this.chapter && options.number)
       this.number = this.chapter.number + '.' + options.number;
@@ -278,6 +290,8 @@ class QuestBox {
     this.view.stat = append(title, 'span', { class: ['ski-quest-float-right'] });
 
     const descr = append(body, 'div');
+    if (this.isNew)
+      append(descr, 'div', { content: 'New!', class: ['ski-quest-new'] });
     append(descr, 'div', { content: cat(this.impl.intro), class: ['ski-quest-intro'] });
     if (this.impl.meta.hint)
       hint(descr, ' Hint:...', ' Hint: ' + this.impl.meta.hint);
@@ -401,6 +415,7 @@ class QuestChapter {
    *   engine: SKI,
    *   store: Store,
    *   onTermUnlock?: function, // callback for when a quest is solved and unlocks something in the engine
+   *   newCutOff?: Date, // optional date to mark quests as "new" if created after this date
    * }}options
    */
   constructor (options) {
@@ -411,6 +426,7 @@ class QuestChapter {
     this.number = options.number ?? 0;
     this.engine = options.engine;
     this.store = options.store;
+    this.newCutOff = options.newCutOff;
     this.onTermUnlock = options.onTermUnlock ?? (() => {});
     this.updateMeta();
   }
@@ -442,6 +458,7 @@ class QuestChapter {
           const box = new QuestBox(item, {
             chapter: this,
             number:  ++k,
+            newCutOff: this.newCutOff,
           }).load();
           this.quests.push(box);
           if (box.status.solved)
