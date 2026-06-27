@@ -322,20 +322,29 @@ function searchExpression (targetStr, termStrs, options) {
   }
 
   const t0 = new Date();
-  const res = SKI.extras.search(seed, { tries: options.maxTries, depth: options.maxDepth }, (e, p) => {
+  let lastProgress;
+  let found;
+  for (const progress of SKI.extras.search(seed, { tries: options.maxTries, depth: options.maxDepth }, (e, p) => {
     if (!p.expr)
-      return -1;
+      return { offset: -1 };
     if (p.expr.equals(expr))
-      return 1;
+      return { found: true, stop: true };
     return 0;
-  });
+  })) {
+    lastProgress = progress;
+    if (progress.found) {
+      found = progress.expr;
+      break;
+    }
+  }
   const elapsed = new Date() - t0;
+  const { total = 0 } = lastProgress ?? {};
 
-  if (res.expr) {
-    console.log(`Found ${res.expr.format(format)} after ${res.total} tries in ${elapsed}ms.`);
+  if (found) {
+    console.log(`Found ${found.format(format)} after ${total} tries in ${elapsed}ms.`);
     process.exit(0);
   } else {
-    console.error(`No equivalent expression found for ${target} after ${res.total} tries in ${elapsed}ms.`);
+    console.error(`No equivalent expression found for ${target} after ${total} tries in ${elapsed}ms.`);
     process.exit(1);
   }
 }

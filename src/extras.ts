@@ -11,12 +11,19 @@ import { Quest } from './quest';
 
 /**
  * @experimental
- *   Look for an expression that matches the predicate,
+ *   Look for expressions that match the predicate,
  *        starting with the seed and applying the terms to one another.
  *
- *        A predicate returning 0 (or nothing) means "keep looking",
- *        a positive number stands for "found",
- *        and a negative means "discard this term from further applications".
+ *        The predicate returns a {@link SearchCallbackResult} (or a plain
+ *        number for backward compatibility):
+ *        - `offset` (number): ≥0 = place the term at generation+offset in the
+ *          cache; negative = discard the term entirely; omitted = auto-compute.
+ *        - `found` (boolean): true = yield this term as a result.
+ *        - `stop` (boolean): true = stop the search after yielding (if `found`)
+ *          or immediately (if not `found`).
+ *
+ *        The generator yields a {@link SearchProgress} object on every progress
+ *        tick and whenever a term is found (`found === true`).
  *
  *        The order of search is from shortest to longest expressions.
  *
@@ -28,12 +35,18 @@ import { Quest } from './quest';
  * @param {number} [options.maxArgs] - arguments in infer()
  * @param {number} [options.max] - step limit in infer()
  * @param {boolean} [options.noskip] - prevents skipping equivalent terms. Always true if infer is false.
- * @param {boolean} [retain] - if true. also add the whole cache to returned value
- * @param {({gen: number, total: number, probed: number, step: boolean}) => void} [options.progress]
- * @param {number} [options.progressInterval] - minimum number of tries between calls to options.progress, default 1000.
- * @param {(e: Expr, props: {}) => number?} predicate
- * @return {{expr?: Expr, total: number, probed: number, gen: number, cache?: Expr[][]}}
+ * @param {number} [options.progressInterval] - minimum number of tries between progress yields, default 1000.
+ * @param {(e: Expr, props: TermInfo) => SearchCallbackResult | number | undefined} predicate
+ * @return {Generator<SearchProgress>}
  */
+export type SearchCallbackResult = {
+  /** ≥0 = cache at gen+offset; negative = discard; omitted = auto-compute */
+  offset?: number;
+  /** true = emit this term as a found result */
+  found?: boolean;
+  /** true = stop the search (after yielding if found is also true) */
+  stop?: boolean;
+};
 export type SearchOptions = {
   depth?: number;
   tries?: number;
@@ -41,12 +54,23 @@ export type SearchOptions = {
   maxArgs?: number;
   max?: number;
   noskip?: boolean;
-  retain?: boolean;
-  progress?: (info: { gen: number, total: number, probed: number, step: boolean }) => void;
   progressInterval?: number;
 };
-export type SearchCallback = (e: Expr, props: TermInfo) => (number | undefined);
-export type SearchResult = { expr?: Expr, total: number, probed: number, gen: number, cache?: Expr[][] };
+export type SearchCallback = (e: Expr, props: TermInfo) => (SearchCallbackResult | number | undefined);
+/** Yielded by the search generator on every progress tick and on each found term. */
+export type SearchProgress = {
+  /** The found expression; present only when found === true. */
+  expr?: Expr;
+  /** True when this yield carries a found term. */
+  found: boolean;
+  /** True when this is a new-generation tick (step progress), false for mid-generation ticks. */
+  step: boolean;
+  gen: number;
+  total: number;
+  probed: number;
+  /** The full generation cache at the time of this yield. */
+  cache: Expr[][];
+};
 
 export type EquivResult = {
   steps: number,
@@ -181,10 +205,11 @@ function deepFormat (obj: any, options : FormatOptions = {}): any {
 
 /**
  * @experimental
- *   Look for an expression that matches the predicate,
+ *   Look for expressions that match the predicate,
  *        starting with the seed and applying the terms to one another.
+ *        Returns a generator; iterate it to drive the search.
  */
-function search (seed: Expr[], options: SearchOptions, predicate: SearchCallback): SearchResult {
+function * search (seed: Expr[], options: SearchOptions, predicate: SearchCallback): Generator<SearchProgress> {
   const {
     depth = 16,
     infer = true,
@@ -192,11 +217,20 @@ function search (seed: Expr[], options: SearchOptions, predicate: SearchCallback
   } = options;
   const hasSeen = infer && !options.noskip;
 
-  // cache[i] = ith generation, 0 is empty
+  // cache[i] = ith generation, 0 is seed generation
   const cache: Expr[][] = [[]];
   let total = 0;
   let probed = 0;
   const seen: {[s: string]: boolean} = {};
+
+  /** Normalise the callback return to a {offset, found, stop} record. */
+  const parseResult = (raw: SearchCallbackResult | number | undefined): SearchCallbackResult => {
+    if (raw === null || raw === undefined)
+      return {};
+    if (typeof raw === 'number')
+      return raw > 0 ? { found: true, stop: true } : raw < 0 ? { offset: -1 } : {};
+    return raw;
+  };
 
   const maybeProbe = (term: Expr) => {
     total++;
@@ -204,62 +238,67 @@ function search (seed: Expr[], options: SearchOptions, predicate: SearchCallback
     if (hasSeen && props && props.expr) {
       const key = String(props.expr);
       if (seen[key])
-        return { res: -1 as number | undefined, props };
+        return { res: { offset: -1 } as SearchCallbackResult, props };
       seen[key] = true;
     }
     probed++;
-    const res = predicate(term, props!);
+    const res = parseResult(predicate(term, props!));
     return { res, props };
   };
 
   // sieve through the seed
   for (const term of seed) {
-    const { res = 0 } = maybeProbe(term);
-    if (res > 0)
-      return { expr: term, total, probed, gen: 1 };
-    else if (res < 0)
-      continue;
-
-    cache[0].push(term);
+    const { res } = maybeProbe(term);
+    if (res.found)
+      yield { expr: term, found: true, step: false, gen: 0, total, probed, cache };
+    if (res.stop)
+      return;
+    if ((res.offset ?? 0) >= 0)
+      cache[0].push(term);
   }
 
   let lastProgress = 0;
 
   for (let gen = 1; gen < depth; gen++) {
-    if (options.progress) {
-      options.progress({ gen, total, probed, step: true });
-      lastProgress = total;
-    }
+    yield { found: false, step: true, gen, total, probed, cache };
+    lastProgress = total;
+
     for (let i = 0; i < gen; i++) {
       for (const a of cache[gen - i - 1] || []) {
         for (const b of cache[i] || []) {
-          if (total >= (options.tries ?? Infinity))
-            return { total, probed, gen, ...(options.retain ? { cache } : {}) };
-          if (options.progress && total - lastProgress >= progressInterval) {
-            options.progress({ gen, total, probed, step: false });
+          if (total >= (options.tries ?? Infinity)) {
+            yield { found: false, step: false, gen, total, probed, cache };
+            return;
+          }
+          if (total - lastProgress >= progressInterval) {
+            yield { found: false, step: false, gen, total, probed, cache };
             lastProgress = total;
           }
           const term = a.apply(b);
           const { res, props } = maybeProbe(term);
 
-          if ((res ?? 0) > 0)
-            return { expr: term, total, probed, gen, ...(options.retain ? { cache } : {}) };
-          else if ((res ?? 0) < 0)
+          if (res.found)
+            yield { expr: term, found: true, step: false, gen, total, probed, cache };
+          if (res.stop) {
+            yield { found: false, step: false, gen, total, probed, cache };
+            return;
+          }
+          if ((res.offset ?? 0) < 0)
             continue;
 
           // if the term is not reducible, it is more likely to be a dead end, so we push it further away
-          const offset = infer && props
+          const autoOffset = infer && props
             ? ((props.expr ? 0 : 3) + (props.dup ? 1 : 0) + (props.proper ? 0 : 1))
             : 0;
-          if (!cache[gen + offset])
-            cache[gen + offset] = [];
-          cache[gen + offset].push(term);
+          const finalOffset = res.offset ?? autoOffset;
+          if (!cache[gen + finalOffset])
+            cache[gen + finalOffset] = [];
+          cache[gen + finalOffset].push(term);
         }
       }
     }
   }
-
-  return { total, probed, gen: depth, ...(options.retain ? { cache } : {}) };
+  yield { found: false, step: false, gen: depth, total, probed, cache };
 }
 
 // --- Utility functions ---
