@@ -109,8 +109,9 @@ export class Quest {
   env: { [key: string]: Expr };
   envFull: { [key: string]: Expr };
   id?: string | number;
-  name?: string
+  name?: string;
   intro?: string;
+  created?: Date;
   // yes allow any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   meta?: Record<string, unknown>;
@@ -162,6 +163,8 @@ export class Quest {
     this.intro = list2str(options.intro);
     this.id = options.id;
     this.meta = meta;
+    if (meta.created_at)
+      this.created = new Date(meta.created_at as string);
 
     for (const c of cases ?? [])
       (this.add as (...args: unknown[]) => void)(...c);
@@ -335,10 +338,9 @@ export class Quest {
         findings[field] = found;
     }
     if (options.date) {
-      const date = new Date(this.meta?.created_at as string);
-      if (isNaN(date.getTime()))
+      if (!this.created || isNaN(this.created.getTime()))
         findings.date = 'invalid date format: ' + this.meta?.created_at;
-      else if (date.getTime() < new Date('2024-07-15').getTime() || date.getTime() > new Date().getTime())
+      else if (this.created < new Date('2024-07-15') || this.created > new Date())
         findings.date = 'date out of range: ' + this.meta?.created_at;
     }
 
