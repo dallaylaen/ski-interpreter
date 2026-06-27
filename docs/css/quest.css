@@ -150,7 +150,16 @@
     margin-top: 0.2em;
 }
 
-
+.ski-quest-new {
+    display: inline-block;
+    float: right;
+    color: red;
+    background-color: yellow;
+    padding: 0.5em 2em;
+    margin: 0.3em;
+    border-radius: 100vh;
+    font-weight: bold;
+}
 
 /* inventory */
 .ski-quest-inventory ul {
