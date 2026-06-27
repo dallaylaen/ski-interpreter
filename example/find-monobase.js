@@ -1,5 +1,21 @@
 'use strict';
 
+/**
+ * This script showcases advanced usage of SKI.extras.search.
+ *
+ * A monobase is a single term that allows to construct a given set of terms (for example, _all of them_)
+ * by only applying itself to itself.
+ * The most well-known example is perhaps the iota combinator: x->xSK.
+ *
+ * To achieve this, we apply a brute force search twice: first to find all possible candidate terms,
+ * and second to check if the term at hand is actually a monobase.
+ *
+ * The script keeps track of the target expression max size and reduces the search depth accordingly,
+ * to reduce the computational cost.
+ *
+ * Progress indicators are emitted in the meantime.
+ */
+
 const { SKI } = require('../src');
 
 const ski = new SKI();
