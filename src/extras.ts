@@ -9,36 +9,6 @@ import { Quest } from './quest';
 
 // --- Types ---
 
-/**
- * @experimental
- *   Look for expressions that match the predicate,
- *        starting with the seed and applying the terms to one another.
- *
- *        The predicate returns a {@link SearchCallbackResult} (or a plain
- *        number for backward compatibility):
- *        - `offset` (number): ≥0 = place the term at generation+offset in the
- *          cache; negative = discard the term entirely; omitted = auto-compute.
- *        - `found` (boolean): true = yield this term as a result.
- *        - `stop` (boolean): true = stop the search after yielding (if `found`)
- *          or immediately (if not `found`).
- *
- *        The generator yields a {@link SearchProgress} object on every progress
- *        tick and whenever a term is found (`found === true`).
- *
- *        The order of search is from shortest to longest expressions.
- *
- * @param {Expr[]} seed
- * @param {object} options
- * @param {number} [options.depth] - maximum generation to search for
- * @param {number} [options.tries] - maximum number of tries before giving up
- * @param {boolean} [options.infer] - whether to call infer(), default true.
- * @param {number} [options.maxArgs] - arguments in infer()
- * @param {number} [options.max] - step limit in infer()
- * @param {boolean} [options.noskip] - prevents skipping equivalent terms. Always true if infer is false.
- * @param {number} [options.progressInterval] - minimum number of tries between progress yields, default 1000.
- * @param {(e: Expr, props: TermInfo) => SearchCallbackResult | number | undefined} predicate
- * @return {Generator<SearchProgress>}
- */
 export type SearchCallbackResult = {
   /** ≥0 = cache at gen+offset; negative = discard; omitted = auto-compute */
   offset?: number;
@@ -48,12 +18,19 @@ export type SearchCallbackResult = {
   stop?: boolean;
 };
 export type SearchOptions = {
+  /** maximum generation to search for */
   depth?: number;
+  /** maximum number of tried terms before giving up */
   tries?: number;
+  /** whether to call infer() on each term; default true */
   infer?: boolean;
+  /** maximum number of arguments in infer(), see {@link infer} */
   maxArgs?: number;
+  /** maximum number of steps in infer(), see {@link infer} */
   max?: number;
+  /** prevents skipping equivalent terms. Always true if infer is false. */
   noskip?: boolean;
+  /** minimum number of tries between progress yields, default 1000 */
   progressInterval?: number;
 };
 export type SearchCallback = (e: Expr, props: TermInfo) => (SearchCallbackResult | number | undefined);
@@ -104,7 +81,7 @@ const formatSchema: Record<string, (arg0: unknown) => string | undefined> = {
 // --- Exported functions (alphabetical) ---
 
 /**
- *   Converts an unknown object into a FormatOptions, or returns an error it it is not valid.
+ *   Converts an unknown object into a FormatOptions, or returns an error if it is not valid.
  *   A null/undefined counts as an empty options object (and is thus valid).
  */
 function checkFormatOptions (raw: unknown): { value: FormatOptions } | { error: Record<string, string> } {
@@ -205,9 +182,27 @@ function deepFormat (obj: any, options : FormatOptions = {}): any {
 
 /**
  * @experimental
- *   Look for expressions that match the predicate,
- *        starting with the seed and applying the terms to one another.
- *        Returns a generator; iterate it to drive the search.
+ * Given a seed set of expressions, search for expressions that match the predicate
+ * by applying already known expressions to one another.
+ * Seen terms are organized into generations, with gen(g f) == gen(g) + gen(f) + an optional offset
+ * (e.g. we want to study duplicating terms later than the discarding ones).
+ *
+ * The predicate receives a term and its inferred properties (if `infer` is true) and
+ * returns an object with the following optional properties:
+ * - `found`: boolean - if true, the expression is yielded as a result;
+ * - `stop`: boolean - if true, the search stops after yielding, independent of `found`;
+ * - `offset`: a number with the following meaning:
+ *   - negative: discard the expression entirely;
+ *   - 0: keep the expression to compute further terms;
+ *   - n >0: keep the expression, but delay its use by n generations.
+ * Or it can just return a number, which is shorthand for `{ offset: n }`.
+ *
+ * An intermediate result is yielded, when:
+ *   - a term is found (`found === true`) and/or the search is stopped (`stop === true`);
+ *   - a new generation is started;
+ *   - the number of tries since the last yield exceeds `progressInterval`.
+ * Such approach allows implementing progress bars and prevents the search from blocking for too long.
+ *
  */
 function * search (seed: Expr[], options: SearchOptions, predicate: SearchCallback): Generator<SearchProgress> {
   const {
@@ -223,7 +218,7 @@ function * search (seed: Expr[], options: SearchOptions, predicate: SearchCallba
   let probed = 0;
   const seen: {[s: string]: boolean} = {};
 
-  /** Normalise the callback return to a {offset, found, stop} record. */
+  /** Normalize the callback return to a {offset, found, stop} record. */
   const parseResult = (raw: SearchCallbackResult | number | undefined): SearchCallbackResult => {
     if (raw === null || raw === undefined)
       return {};
