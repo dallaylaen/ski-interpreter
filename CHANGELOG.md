@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.0] - 2026-06-27
+
+### BREAKING CHANGES
+
+* SKI.extras.search is now a generator, yielding progress ticks as well as found terms, which may now be multiple.
+* Quest page now requires { chapters: [...] } instead of [...] in index.json.
+
+### Added
+
+* Examples: `example/find-monobase.js` to showcase nested search() usage.
+* Quest page: "New!" badge for quests newer than 30 days.
+* Quest page: Reordered for clearer narrative, more quests added.
+* `bin/ski.js search` diplays elapsed time.
+* `bin/ski.js -q` flag to suppress extra output.
+* `bin/ski.js file -` will process STDIN
+* Added a self-hosted [combinator cheat-sheet page](https://dallaylaen.github.io/ski-interpreter/combinator-birds.html) (#29).
+
+### Changed
+* `bin/ski.js search` output is now parseable (metadata commented out) 
+* Better Collatz conjecture in examples (thx @Darkwing3125) fixes #28
+
+### Fixed
+* Solved quests weren't displayed as solved
+* History button svg (thx @akuklev)
+
 ## [2.8.2] - 2026-04-26
 
 ### Added
