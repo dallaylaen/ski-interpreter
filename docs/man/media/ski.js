@@ -341,10 +341,13 @@ function searchExpression (targetStr, termStrs, options) {
   const { total = 0 } = lastProgress ?? {};
 
   if (found) {
-    console.log(`Found ${found.format(format)} after ${total} tries in ${elapsed}ms.`);
+    console.log(found.format(format));
+    if (!quiet)
+      console.log(`// Found after ${total} tries in ${elapsed}ms.`);
     process.exit(0);
   } else {
-    console.error(`No equivalent expression found for ${target} after ${total} tries in ${elapsed}ms.`);
+    if (!quiet)
+      console.log(`// No expression was found after ${total} tries in ${elapsed}ms.`);
     process.exit(1);
   }
 }
