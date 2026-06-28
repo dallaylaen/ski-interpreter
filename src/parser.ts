@@ -45,7 +45,7 @@ class PartialLambda extends Empty {
   }
 
   postParse (): Expr {
-    let expr = this.impl;
+    let expr = postParse(this.impl);
     for (let i = this.terms.length; i-- > 0; )
       expr = new Lambda(this.terms[i], expr);
     return expr;
@@ -58,7 +58,7 @@ class PartialLambda extends Empty {
 }
 
 function postParse (expr: Expr): Expr {
-  return (expr as Empty).postParse ? (expr as Empty).postParse() : expr;
+  return expr instanceof Empty ? expr.postParse() : expr;
 }
 
 const combChars = new Tokenizer(
@@ -432,7 +432,8 @@ export class Parser {
         parser: this,
       };
     }
-    return expr;
+
+    return postParse(expr); // throw error if expr is still Empty
   }
 
   /**
