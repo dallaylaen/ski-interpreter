@@ -72,6 +72,24 @@
         [ "myfun f d (KI)", "d" ],
         [ "myfun f d (z->z a b)", "f a b" ]
       ]
+    },
+    {
+      "id": "Ae6ipWn7",
+      "created_at": "2026-06-29T00:12:33",
+      "name": "Three-headed dragon",
+      "intro": [
+        "<p>Build a record with three fields, together with functions to extract the parts:</p>",
+        "<p><code>first (triplet a b c) = a</code>;</p>",
+        "<p><code>second (triplet a b c) = b</code>;</p>",
+        "<p><code>third (triplet a b c) = c</code>.</p>",
+        "<p>Unlike for a pair, there are multiple sensible ways to do it.</p>"
+      ],
+      "input": ["triplet", "first", "second", "third"],
+      "cases": [
+        [ "first (triplet a b c)", "a" ],
+        [ "second (triplet a b c)", "b" ],
+        [ "third (triplet a b c)", "c" ]
+      ]
     }
   ]
 }
