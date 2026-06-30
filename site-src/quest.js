@@ -72,12 +72,11 @@ class QuestPage {
     if (!options.store && !options.storePrefix)
       throw new Error('No storePrefix provided');
     this.store = options.store ?? new Store(options.storePrefix);
-    this.engine = options.engine ?? new SKI(this.store.load('engine') ?? { annotate: true, allow: 'SKI' });
+    this.defaultEngine = options.engine;
 
-    if (options.inventoryBox) {
+    if (options.inventoryBox)
       this.view.inventory = options.inventoryBox;
-      this.showKnown();
-    }
+
     this.view.content = options.contentBox;
     if (options.indexBox)
       this.view.index = append(options.indexBox, 'div', { class: ['ski-quest-nav'] });
@@ -91,6 +90,9 @@ class QuestPage {
 
   /**
    * @desc Load quest list from given index URL, then load and draw chapters.
+   *
+   * Not part of the constructor since it involves async operations
+   *
    * @param {string} index URL to fetch the quest list from
    * @param {string} [linkedTo] id of quest to scroll into view after loading, if matches
    * @param {function} onLoad callback for when quests are loaded, gets self as argument
@@ -103,7 +105,20 @@ class QuestPage {
         if (!Array.isArray(data.chapters))
           throw new Error('Invalid quest index in ' + index);
         if (data.new_age)
-          this.newCutOff = new Date(new Date - data.new_age * days);
+          this.newCutOff = new Date(new Date() - data.new_age * days);
+
+        // TODO this is a horrible effectful elseif with faulty logic, rewrite when have time
+        const oldEngine = this.store.load('engine');
+        if (oldEngine)
+          this.engine = new SKI(oldEngine);
+        else if (this.defaultEngine)
+          this.engine = this.defaultEngine;
+        else {
+          this.engine = new SKI({ annotate: true, allow: 'I-I' });
+          this.engine.bulkAdd(data.inventory ?? ['S', 'K', 'I']);
+        }
+
+        this.showKnown();
         return this.loadChapters(data.chapters);
       })
       .then(self => {
@@ -168,13 +183,15 @@ class QuestPage {
     this.view.inventory.innerHTML = '';
     const ul = append(this.view.inventory, 'ul', { class: ['ski-quest-inventory'] });
     const terms = this.engine.getTerms();
-    for (const entry of Object.keys(terms).sort().map(x => [x, terms[x]])) {
+    for (const [name, term] of Object.keys(terms).sort().map(x => [x, terms[x]])) {
+      if (name === '+')
+        continue; // the presence of '+' depends on whether the quests allow numbers anyway
       const li = append(ul, 'li', {}, e => {
-        e.dataset.skiTerm = entry[0];
+        e.dataset.skiTerm = name;
       });
-      append(li, 'span', { content: entry[0], class: ['ski-quest-term-name'] });
+      append(li, 'span', { content: name, class: ['ski-quest-term-name'] });
       append(li, 'span', { content: ': ' });
-      append(li, 'span', { content: showTerm(entry[1]), class: ['ski-quest-term-def'] });
+      append(li, 'span', { content: showTerm(term), class: ['ski-quest-term-def'] });
     }
   }
 
@@ -334,9 +351,8 @@ class QuestBox {
     if (this.status.solution) {
       append(element, 'button', { content: 'reveal' }, btn => {
         btn.onclick = () => {
-          for (let i = 0; i < this.status.solution.length; i++) {
+          for (let i = 0; i < this.status.solution.length; i++)
             this.input[i].value = this.status.solution[i];
-          }
         }
       });
     }
@@ -456,8 +472,8 @@ class QuestChapter {
         let k = 0;
         for (const item of data.content) {
           const box = new QuestBox(item, {
-            chapter: this,
-            number:  ++k,
+            chapter:   this,
+            number:    ++k,
             newCutOff: this.newCutOff,
           }).load();
           this.quests.push(box);
