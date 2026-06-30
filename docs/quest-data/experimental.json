@@ -1,5 +1,9 @@
-[
-  "62-inspection.json",
-  "75-finite-fixpoint.json",
-  "99-postponed-quests.json"
-]
+{
+  "inventory": [
+    "S", "K", "I", "B", "C", "W", "T=CI", "V=BCT", "M=WI", "L=BWB", "R=CC", "Y=WSL"
+  ],
+  "chapters": [
+    "62-inspection.json",
+    "99-postponed-quests.json"
+  ]
+}
