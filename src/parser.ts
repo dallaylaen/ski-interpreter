@@ -230,14 +230,20 @@ export class Parser {
    */
   bulkAdd (list: string[]): this {
     for (const item of list) {
-      const m = item.match(/^([A-Z]|[a-z][a-z_0-9]*)\s*=\s*(.*)$/s);
+      const m = item.match(/^([A-Z]|[a-z][a-z_0-9]*)\s*(=\s*(.*))?$/s);
       // TODO check all declarations before applying any (but we might need earlier terms for parsing later ones)
       if (!m)
         throw new Error('bulkAdd: invalid declaration: ' + item);
-      if (m[2] === '')
+      if (!m[2]) {
+        // no '=' sign, just allow the term
+        if (!this.known[m[1]])
+          throw new Error('bulkAdd: unknown term: ' + m[1]);
+        this.restrict('+' + m[1]);
+      } else if (m[3] === '') {
+        // 'term=' removes the term
         this.remove(m[1]);
-      else
-        this.add(m[1], this.parse(m[2]));
+      } else
+        this.add(m[1], this.parse(m[3]));
     }
 
     return this;
