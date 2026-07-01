@@ -131,7 +131,7 @@ page.loadFromIndex('index.json');
 Run the checker against your chapter file:
 
 ```sh
-./bin/ski.js quest-check my-quests.json
+./bin/ski.js quest-lint my-quests.json
 ```
 
 This validates metadata, checks for duplicate IDs, and verifies that any known solutions pass all cases.
