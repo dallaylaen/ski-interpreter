@@ -111,16 +111,7 @@ const page = new QuestPage({
 page.loadChapters(['my-quests.json']);
 ```
 
-To load chapters from an index file instead, use `loadFromIndex`. The index must be a JSON object with a `chapters` array of filenames:
-
-```json
-{
-  "chapters": [
-    "chapter-one.json",
-    "chapter-two.json"
-  ]
-}
-```
+To load chapters from an index file instead, use `loadFromIndex`. 
 
 ```js
 page.loadFromIndex('index.json');
