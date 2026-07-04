@@ -24,10 +24,12 @@ export type SearchOptions = {
   tries?: number;
   /** whether to call infer() on each term; default true */
   infer?: boolean;
-  /** maximum number of arguments in infer(), see {@link infer} */
-  maxArgs?: number;
   /** maximum number of steps in infer(), see {@link infer} */
   max?: number;
+  /** maximum number of arguments in infer(), see {@link infer} */
+  maxArgs?: number;
+  /** maximum size of a term in infer() before the calculation is aborted; see {@link infer} */
+  maxSize?: number;
   /** prevents skipping equivalent terms. Always true if infer is false. */
   noskip?: boolean;
   /** minimum number of tries between progress yields, default 1000 */
@@ -229,7 +231,7 @@ function * search (seed: Expr[], options: SearchOptions, predicate: SearchCallba
 
   const maybeProbe = (term: Expr) => {
     total++;
-    const props = infer ? term.infer({ max: options.max, maxArgs: options.maxArgs }) : null;
+    const props = infer ? term.infer({ max: options.max, maxArgs: options.maxArgs, maxSize: options.maxSize }) : null;
     if (hasSeen && props && props.expr) {
       const key = String(props.expr);
       if (seen[key])
@@ -256,6 +258,9 @@ function * search (seed: Expr[], options: SearchOptions, predicate: SearchCallba
 
   for (let gen = 1; gen < depth; gen++) {
     yield { found: false, step: true, gen, total, probed, cache };
+    if (!hasUpperHalf(gen, cache))
+      return;
+
     lastProgress = total;
 
     for (let i = 0; i < gen; i++) {
@@ -307,6 +312,23 @@ function isStringTriple  (x: unknown): string | undefined {
   return Array.isArray(x) && x.length === 3 && typeof x[0] === 'string' && typeof x[1] === 'string' && typeof x[2] === 'string'
     ? undefined
     : 'must be a triplet of strings';
+}
+
+/**
+ * Check if the upper half of a 2D array has any non-empty arrays.
+ *
+ * Used in search() to determine if any more generations are possible,
+ * Since search() combines terms from the upper half with those in the lower half,
+ * hasUpperHalf : false guarantees ALL future generations will be empty.
+ *
+ * @param list
+ */
+function hasUpperHalf<T> (gen: number, list: T[][]): boolean {
+  for (let i = Math.floor(gen / 2); i < list.length; i++) {
+    if (list[i] && list[i].length > 0)
+      return true;
+  }
+  return false;
 }
 
 // --- Namespace export ---

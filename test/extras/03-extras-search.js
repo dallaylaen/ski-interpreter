@@ -61,8 +61,10 @@ describe('SKI.extras.search', () => {
 
     it('yields step:true at generation boundaries', () => {
       const steps = [];
-      for (const p of SKI.extras.search([x, y], { depth: 3, infer: false }, () => 0))
-        if (p.step) steps.push(p.gen);
+      for (const p of SKI.extras.search([x, y], { depth: 3, infer: false }, () => ({ found: true }))) {
+        if (p.step)
+          steps.push(p.gen);
+      }
 
       expect(steps).to.deep.equal([1, 2]);
     });
@@ -94,6 +96,26 @@ describe('SKI.extras.search', () => {
         (e) => (e === x || e === y) ? { found: true } : 0
       );
       expect(res.found.length).to.be.greaterThanOrEqual(2);
+    });
+
+    it('terminates if no more terms could be generated', () => {
+      const gen = SKI.extras.search([SKI.I], {}, () => ({ found: true }));
+      const trace = [];
+      for (const p of gen) {
+        if (p.expr)
+          trace.push(p.expr + '');
+        expect(p.gen).to.be.below(3);
+      }
+      expect(trace).to.deep.equal(['I']);
+    });
+
+    it('honors maxSize option', () => {
+      const gen = SKI.extras.search([SKI.K], { depth: 20, maxSize: 3 }, (_, p) => ( p.normal ? { found: true, offset: 0 } : -1));
+      for (const p of gen) {
+        if (p.expr && p.expr.size !== undefined)
+          expect(p.expr.size).to.be.lessThanOrEqual(4);
+        expect(p.gen).to.be.below(9);
+      }
     });
   });
 
