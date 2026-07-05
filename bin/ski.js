@@ -54,8 +54,8 @@ program
 program
   .command('eval <expression>')
   .description('Evaluate a single expression')
-  .action((expression, options) => {
-    evaluateExpression(expression, options);
+  .action(async (expression, options) => {
+    evaluateExpression(await readExpression(expression), options);
   });
 
 // File subcommand
@@ -70,14 +70,16 @@ program
 program
   .command('infer <expression>')
   .description('Find a canonical form of the expression and its properties')
-  .action((expression) => {
-    inferExpression(expression);
+  .action(async (expression) => {
+    inferExpression(await readExpression(expression));
   });
 
 program
   .command('compare <expr1> <expr2>')
   .description('Check if two expressions are equivalent')
-  .action((expr1, expr2) => {
+  .action(async (expr1, expr2) => {
+    expr1 = await readExpression(expr1);
+    expr2 = await readExpression(expr2);
     const ski = new SKI();
     const e1 = ski.parse(expr1);
     const e2 = ski.parse(expr2);
@@ -95,8 +97,8 @@ program
 program
   .command('extract <target> <terms...>')
   .description('Rewrite target expression using known terms where possible')
-  .action((target, terms) => {
-    extractExpression(target, terms);
+  .action(async (target, terms) => {
+    extractExpression(await readExpression(target), terms);
   });
 
 // Search subcommand
@@ -105,7 +107,9 @@ program
   .description('Search for an expression equivalent to target using known terms')
   .option('--max-depth <number>', 'Limit search depth', toInt('--max-depth'))
   .option('--max-tries <number>', 'Limit total terms probed', toInt('--max-tries'))
-  .action(searchExpression);
+  .action(async (target, terms, options) => {
+    searchExpression(await readExpression(target), terms, options);
+  });
 
 // Quest-check subcommand
 program
@@ -529,6 +533,18 @@ function setFormat (options) {
   if (!maybe.value)
     throw new Error('Invalid format options: ' + JSON.stringify(maybe.error));
   format = maybe.value;
+}
+
+function readExpression (expr) {
+  if (expr !== '-')
+    return Promise.resolve(expr);
+  return new Promise((resolve, reject) => {
+    let source = '';
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', chunk => { source += chunk; });
+    process.stdin.on('end', () => resolve(source.trim()));
+    process.stdin.on('error', reject);
+  });
 }
 
 function toInt (comment) {
