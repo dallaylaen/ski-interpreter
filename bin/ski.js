@@ -132,15 +132,68 @@ function showHelp (topic) {
     [
       'syntax',
       'Syntax of the interpreter', `
-    - Uppercase letters are always one-letter terms and should not be spaced;
-    - lowercase identifiers ([a-z_][a-zA-Z0-9_]*) must be separated with spaces;
-    [TBD]
+    Terms:
+    - Uppercase letters are single-character terms and can be concatenated:
+      SKK = S K K
+    - Lowercase identifiers ([a-z_][a-zA-Z0-9_]*) must be space-separated
+    - Non-negative integers are Church numerals (must also be space-separated)
+      i.e. "0 f x" = "x", "1 f x" = "f x", "5 f x" == "f (f (f (f (f x))))" etc
+    - "+" is the Church numeral increment combinator (+0 = 1, +1 = 2 etc)
+      so that "expr + 0" outputs a number if "expr" can be interpreted as such
+    - Unknown terms are assumed to be free variables
+
+    Application:
+    - Left-associative: a b c = (a b) c, NOT a (b c)
+
+    Lambda abstraction:
+    - Written as x->body or x->y->body (right-associative)
+    - Bound variables are local to the lambda
+
+    Definitions:
+    - name = expr  defines a new named term, e.g.
+      "T=CI", "false=KI"
+    - definitions can be prepended to expression, separated by semicolons, e.g.
+      "T=CI; false=KI; T false x y"  is equivalent to "CI (KI) x y"
+
+    Built-in combinators:
+    - I x       = x          (identity)
+    - K x y     = x          (constant)
+    - S x y z   = x z (y z)  (fusion)
+    - B x y z   = x (y z)    (composition)
+    - C x y z   = x z y      (swap)
+    - W x y     = x y y      (duplicate)
     `],
     [
       'format',
       'Output formatting options', `
     Format options are a JSON object with the following properties:
-    - html: boolean, whether to output HTML (default: false)
+
+    - terse:     boolean               omit unnecessary spaces and parentheses
+                                       (default: true)
+    - html:      boolean               HTML-safe output with fancy decorations
+                                       (default: false)
+    - brackets:  [open, close]         wrap application arguments
+                                       (default: ['(', ')'])
+    - space:     string                separator between terms
+                                       (default: ' ')
+    - var:       [open, close]         wrap variable names
+                                       (html default: ['<var>', '</var>'])
+    - lambda:    [prefix, sep, suffix] wrap lambda abstractions
+                                       (default: ['', '->', ''])
+    - around:    [open, close]         wrap each top-level (sub-)expression
+                                       (default: ['', ''])
+    - redex:     [open, close]         wrap terms eligible for reduction
+                                       (default: ['', ''])
+
+    Examples:
+      --format '{ "terse": false }'    # spell out all parentheses
+      --format '{ "html": true }'      # HTML tags and entities
+      --format '{ "around": ["(", ")"], "brackets": ["", ""], "lambda": ["(", "->", ")"] }'
+                                       # emulate lisp notation
+      --format '{ "lambda": ["\u03bb", ".", ""] }'
+                                       # pretend we're writing a science paper
+      --format '{"redex":["\u001b[38;5;41m", "\u001b[0m"]}'
+                                       # highlight reducible terms in green
     `],
   ];
 
