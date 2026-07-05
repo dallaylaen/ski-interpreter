@@ -222,7 +222,7 @@ function showHelp (topic) {
   }
 
   console.error(`Unknown help topic: ${topic}`);
-  process.exit(1);
+  process.exit(2);
 }
 
 function startRepl () {
@@ -244,7 +244,8 @@ function startRepl () {
         handleCommand(str, ski);
       else {
         processLine(str, ski, err => {
-          console.log('' + err);
+          if (err)
+            console.log('' + err);
         });
       }
     }
@@ -262,8 +263,9 @@ function startRepl () {
 function evaluateExpression (expression) {
   const ski = new SKI();
   processLine(expression, ski, err => {
-    console.error('' + err);
-    process.exit(3);
+    if (err)
+      console.error('' + err);
+    process.exit(1);
   });
 }
 
@@ -271,7 +273,7 @@ function evaluateFile (filepath) {
   const ski = new SKI();
   const onErr = err => {
     console.error('' + err);
-    process.exit(3);
+    process.exit(1);
   };
   if (filepath === '-') {
     let source = '';
@@ -281,7 +283,7 @@ function evaluateFile (filepath) {
     return;
   }
   fs.readFile(filepath, 'utf8')
-    .then(source => { processLine(source, ski, onErr); })
+    .then(evaluateExpression)
     .catch(err => {
       console.error('ski: ' + err);
       process.exit(2);
@@ -298,14 +300,22 @@ function processLine (source, ski, onErr) {
       ski.add(expr);
     const t0 = new Date();
 
-    for (const state of expr.walk(runOptions)) {
-      if (state.final) {
-        if (!quiet)
-          console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
-        console.log(state.expr.declare({ ...format, inventory: ski.getTerms() }));
-      } else if (verbose)
-        console.log(state.expr.format(format) + ';');
-    }
+    let state;
+    if (verbose) {
+      for (const next of expr.walk(runOptions)) {
+        if (state && !next.final)
+          console.log(state.expr.format(format) + ';');
+        state = next;
+      }
+    } else
+      state = expr.run(runOptions);
+    if (!quiet)
+      console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
+    if (!state.final)
+      console.log('// (partial result)');
+    console.log(state.expr.format(format));
+    if (!state.final)
+      onErr('');
   } catch (err) {
     onErr(err);
   }
