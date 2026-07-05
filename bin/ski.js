@@ -17,7 +17,7 @@ const program = new Command();
 
 program
   .name('ski')
-  .description('Simple Kombinator Interpreter - a combinatory logic & lambda calculus parser and interpreter')
+  .description('Simple Kombinator Interpreter - a combinatory logic & lambda calculus\n     parser and interpreter v.' + version)
   .version(version)
   .option('-v, --verbose', 'Show all evaluation steps', () => { verbose = true; })
   .option('-q, --quiet', 'Suppress comment lines in output', () => { quiet = true; })
@@ -117,7 +117,7 @@ program
   });
 
 program.command('help [topic]')
-  .description('Show help for a specific topic')
+  .description('Show help for a specific subcommand or topic')
   .action(showHelp);
 
 program
@@ -126,26 +126,34 @@ program
   .parse(process.argv);
 
 function showHelp (topic) {
-  if (!topic) {
-    console.log(program.helpInformation());
-    process.exit(0);
-  }
+  const header = program.description();
 
-  const helpData = {
-    syntax: `
-    Syntax of the interpreter:
+  const helpData = [
+    [
+      'syntax',
+      'Syntax of the interpreter', `
     - Uppercase letters are always one-letter terms and should not be spaced;
     - lowercase identifiers ([a-z_][a-zA-Z0-9_]*) must be separated with spaces;
     [TBD]
-    `,
-    format: `
+    `],
+    [
+      'format',
+      'Output formatting options', `
     Format options are a JSON object with the following properties:
     - html: boolean, whether to output HTML (default: false)
-    `,
-  };
+    `],
+  ];
 
-  if (helpData[topic]) {
-    console.log(helpData[topic]);
+  if (!topic) {
+    console.log(program.helpInformation() + '\nAdditional help topics:\n\n'
+      + helpData.map(([name, description]) => `  ${name} - ${description}`).join('\n'));
+    process.exit(0);
+  }
+
+  const topicData = helpData.find(([name]) => name === topic);
+  if (topicData) {
+    const [_, description, details] = topicData;
+    console.log(`${header}\n\n${description}:\n${details}`);
     process.exit(0);
   }
 
