@@ -123,6 +123,7 @@ program.command('help [topic]')
 program
   .showHelpAfterError(true)
   .helpOption(false)
+  .action(() => showHelp())
   .parse(process.argv);
 
 function showHelp (topic) {
