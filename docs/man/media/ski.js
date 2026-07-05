@@ -17,7 +17,7 @@ const program = new Command();
 
 program
   .name('ski')
-  .description('Simple Kombinator Interpreter - a combinatory logic & lambda calculus parser and interpreter')
+  .description('Simple Kombinator Interpreter - a combinatory logic & lambda calculus\n     parser and interpreter v.' + version)
   .version(version)
   .option('-v, --verbose', 'Show all evaluation steps', () => { verbose = true; })
   .option('-q, --quiet', 'Suppress comment lines in output', () => { quiet = true; })
@@ -54,8 +54,8 @@ program
 program
   .command('eval <expression>')
   .description('Evaluate a single expression')
-  .action((expression, options) => {
-    evaluateExpression(expression, options);
+  .action(async (expression, options) => {
+    evaluateExpression(await readExpression(expression), options);
   });
 
 // File subcommand
@@ -70,14 +70,16 @@ program
 program
   .command('infer <expression>')
   .description('Find a canonical form of the expression and its properties')
-  .action((expression) => {
-    inferExpression(expression);
+  .action(async (expression) => {
+    inferExpression(await readExpression(expression));
   });
 
 program
   .command('compare <expr1> <expr2>')
   .description('Check if two expressions are equivalent')
-  .action((expr1, expr2) => {
+  .action(async (expr1, expr2) => {
+    expr1 = await readExpression(expr1);
+    expr2 = await readExpression(expr2);
     const ski = new SKI();
     const e1 = ski.parse(expr1);
     const e2 = ski.parse(expr2);
@@ -95,8 +97,8 @@ program
 program
   .command('extract <target> <terms...>')
   .description('Rewrite target expression using known terms where possible')
-  .action((target, terms) => {
-    extractExpression(target, terms);
+  .action(async (target, terms) => {
+    extractExpression(await readExpression(target), terms);
   });
 
 // Search subcommand
@@ -105,7 +107,9 @@ program
   .description('Search for an expression equivalent to target using known terms')
   .option('--max-depth <number>', 'Limit search depth', toInt('--max-depth'))
   .option('--max-tries <number>', 'Limit total terms probed', toInt('--max-tries'))
-  .action(searchExpression);
+  .action(async (target, terms, options) => {
+    searchExpression(await readExpression(target), terms, options);
+  });
 
 // Quest-check subcommand
 program
@@ -117,17 +121,97 @@ program
   });
 
 program.command('help [topic]')
-  .description('Show help for a specific topic')
+  .description('Show help for a specific subcommand or topic')
   .action(showHelp);
 
 program
   .showHelpAfterError(true)
   .helpOption(false)
+  .action(() => showHelp())
   .parse(process.argv);
 
 function showHelp (topic) {
+  const header = program.description();
+
+  const helpData = [
+    [
+      'syntax',
+      'Syntax of the interpreter', `
+    Terms:
+    - Uppercase letters are single-character terms and can be concatenated:
+      SKK = S K K
+    - Lowercase identifiers ([a-z_][a-zA-Z0-9_]*) must be space-separated
+    - Non-negative integers are Church numerals (must also be space-separated)
+      i.e. "0 f x" = "x", "1 f x" = "f x", "5 f x" == "f (f (f (f (f x))))" etc
+    - "+" is the Church numeral increment combinator (+0 = 1, +1 = 2 etc)
+      so that "expr + 0" outputs a number if "expr" can be interpreted as such
+    - Unknown terms are assumed to be free variables
+
+    Application:
+    - Left-associative: a b c = (a b) c, NOT a (b c)
+
+    Lambda abstraction:
+    - Written as x->body or x->y->body (right-associative)
+    - Bound variables are local to the lambda
+
+    Definitions:
+    - name = expr  defines a new named term, e.g.
+      "T=CI", "false=KI"
+    - definitions can be prepended to expression, separated by semicolons, e.g.
+      "T=CI; false=KI; T false x y"  is equivalent to "CI (KI) x y"
+
+    Built-in combinators:
+    - I x       = x          (identity)
+    - K x y     = x          (constant)
+    - S x y z   = x z (y z)  (fusion)
+    - B x y z   = x (y z)    (composition)
+    - C x y z   = x z y      (swap)
+    - W x y     = x y y      (duplicate)
+    `],
+    [
+      'format',
+      'Output formatting options', `
+    Format options are a JSON object with the following properties:
+
+    - terse:     boolean               omit unnecessary spaces and parentheses
+                                       (default: true)
+    - html:      boolean               HTML-safe output with fancy decorations
+                                       (default: false)
+    - brackets:  [open, close]         wrap application arguments
+                                       (default: ['(', ')'])
+    - space:     string                separator between terms
+                                       (default: ' ')
+    - var:       [open, close]         wrap variable names
+                                       (html default: ['<var>', '</var>'])
+    - lambda:    [prefix, sep, suffix] wrap lambda abstractions
+                                       (default: ['', '->', ''])
+    - around:    [open, close]         wrap each top-level (sub-)expression
+                                       (default: ['', ''])
+    - redex:     [open, close]         wrap terms eligible for reduction
+                                       (default: ['', ''])
+
+    Examples:
+      --format '{ "terse": false }'    # spell out all parentheses
+      --format '{ "html": true }'      # HTML tags and entities
+      --format '{ "around": ["(", ")"], "brackets": ["", ""], "lambda": ["(", "->", ")"] }'
+                                       # emulate lisp notation
+      --format '{ "lambda": ["\u03bb", ".", ""] }'
+                                       # pretend we're writing a science paper
+      --format '{"redex":["\u001b[38;5;41m", "\u001b[0m"]}'
+                                       # highlight reducible terms in green
+    `],
+  ];
+
   if (!topic) {
-    console.log(program.helpInformation());
+    console.log(program.helpInformation() + '\nAdditional help topics:\n\n'
+      + helpData.map(([name, description]) => `  ${name} - ${description}`).join('\n'));
+    process.exit(0);
+  }
+
+  const topicData = helpData.find(([name]) => name === topic);
+  if (topicData) {
+    const [_, description, details] = topicData;
+    console.log(`${header}\n\n${description}:\n${details}`);
     process.exit(0);
   }
 
@@ -138,7 +222,7 @@ function showHelp (topic) {
   }
 
   console.error(`Unknown help topic: ${topic}`);
-  process.exit(1);
+  process.exit(2);
 }
 
 function startRepl () {
@@ -160,7 +244,8 @@ function startRepl () {
         handleCommand(str, ski);
       else {
         processLine(str, ski, err => {
-          console.log('' + err);
+          if (err)
+            console.log('' + err);
         });
       }
     }
@@ -178,8 +263,9 @@ function startRepl () {
 function evaluateExpression (expression) {
   const ski = new SKI();
   processLine(expression, ski, err => {
-    console.error('' + err);
-    process.exit(3);
+    if (err)
+      console.error('' + err);
+    process.exit(1);
   });
 }
 
@@ -187,7 +273,7 @@ function evaluateFile (filepath) {
   const ski = new SKI();
   const onErr = err => {
     console.error('' + err);
-    process.exit(3);
+    process.exit(1);
   };
   if (filepath === '-') {
     let source = '';
@@ -197,7 +283,7 @@ function evaluateFile (filepath) {
     return;
   }
   fs.readFile(filepath, 'utf8')
-    .then(source => { processLine(source, ski, onErr); })
+    .then(evaluateExpression)
     .catch(err => {
       console.error('ski: ' + err);
       process.exit(2);
@@ -214,14 +300,22 @@ function processLine (source, ski, onErr) {
       ski.add(expr);
     const t0 = new Date();
 
-    for (const state of expr.walk(runOptions)) {
-      if (state.final) {
-        if (!quiet)
-          console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
-        console.log(state.expr.declare({ ...format, inventory: ski.getTerms() }));
-      } else if (verbose)
-        console.log(state.expr.format(format) + ';');
-    }
+    let state;
+    if (verbose) {
+      for (const next of expr.walk(runOptions)) {
+        if (state && !next.final)
+          console.log(state.expr.format(format) + ';');
+        state = next;
+      }
+    } else
+      state = expr.run(runOptions);
+    if (!quiet)
+      console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
+    if (!state.final)
+      console.log('// (partial result)');
+    console.log(state.expr.format(format));
+    if (!state.final)
+      onErr('');
   } catch (err) {
     onErr(err);
   }
@@ -449,6 +543,18 @@ function setFormat (options) {
   if (!maybe.value)
     throw new Error('Invalid format options: ' + JSON.stringify(maybe.error));
   format = maybe.value;
+}
+
+function readExpression (expr) {
+  if (expr !== '-')
+    return Promise.resolve(expr);
+  return new Promise((resolve, reject) => {
+    let source = '';
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', chunk => { source += chunk; });
+    process.stdin.on('end', () => resolve(source.trim()));
+    process.stdin.on('error', reject);
+  });
 }
 
 function toInt (comment) {
