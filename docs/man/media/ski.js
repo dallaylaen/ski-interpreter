@@ -39,7 +39,8 @@ program
     if (Number.isNaN(n) || n <= 0)
       throw new Error('--max-args requires a positive integer');
     runOptions.maxArgs = n;
-  });
+  })
+  .option('--help [topic]', 'Show help', showHelp);
 
 // REPL subcommand
 program
@@ -115,13 +116,30 @@ program
     questCheck(files, options.solution);
   });
 
-// Default to REPL if no command provided
+program.command('help [topic]')
+  .description('Show help for a specific topic')
+  .action(showHelp);
+
 program
   .showHelpAfterError(true)
+  .helpOption(false)
   .parse(process.argv);
 
-if (!process.argv.slice(2).length)
-  startRepl();
+function showHelp (topic) {
+  if (!topic) {
+    console.log(program.helpInformation());
+    process.exit(0);
+  }
+
+  const subcommand = program.commands.find(cmd => cmd.name() === topic);
+  if (subcommand) {
+    console.log(subcommand.helpInformation());
+    process.exit(0);
+  }
+
+  console.error(`Unknown help topic: ${topic}`);
+  process.exit(1);
+}
 
 function startRepl () {
   const readline = require('readline');
