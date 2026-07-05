@@ -131,6 +131,24 @@ function showHelp (topic) {
     process.exit(0);
   }
 
+  const helpData = {
+    syntax: `
+    Syntax of the interpreter:
+    - Uppercase letters are always one-letter terms and should not be spaced;
+    - lowercase identifiers ([a-z_][a-zA-Z0-9_]*) must be separated with spaces;
+    [TBD]
+    `,
+    format: `
+    Format options are a JSON object with the following properties:
+    - html: boolean, whether to output HTML (default: false)
+    `,
+  };
+
+  if (helpData[topic]) {
+    console.log(helpData[topic]);
+    process.exit(0);
+  }
+
   const subcommand = program.commands.find(cmd => cmd.name() === topic);
   if (subcommand) {
     console.log(subcommand.helpInformation());
