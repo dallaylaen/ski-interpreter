@@ -54,7 +54,10 @@ export type SearchProgress<T> = {
   total: number;
   /** The number of terms excluding duplicates. Will == total if noskip is true or infer is false. */
   probed: number;
-  /** The full generation cache at the time of this yield. */
+  /** The entire generation cache reference.
+   * This is actually a mutable value and should not be modified by the consumer,
+   * and deep-copied in case one wants a true snapshot.
+   */
   cache: Expr[][];
 };
 
@@ -191,14 +194,19 @@ function deepFormat (obj: any, options : FormatOptions = {}): any {
 
 /**
  * @experimental
- * Given a seed set of expressions, search for expressions that match the predicate
+ * @template T - The 'evidence' type showing why a term is of interest.
+ * Can be `true` if we only care about the term(s) themseves, of just want one term.
+ *
+ * Given a seed set of expressions, search for expression(s) that match the predicate
  * by applying already known expressions to one another.
- * Seen terms are organized into generations, with gen(g f) == gen(g) + gen(f) + an optional offset
+ * Seen terms are organized into generations, with gen(seed) = 0
+ * and gen(g f) == gen(g) + gen(f) + 1 + an optional offset
  * (e.g. we want to study duplicating terms later than the discarding ones).
  *
- * The predicate receives a term and its inferred properties (if `infer` is true) and
- * returns an object with the following optional properties:
- * - `found`: boolean - if true, the expression is yielded as a result;
+ * The predicate receives a term and its inferred properties
+ * (if `infer` is false, a dummy constant will be given instead)
+ * and returns an object with the following optional properties:
+ * - `found`: T - if present, this term is of interest and will be yielded in the result;
  * - `stop`: boolean - if true, the search stops after yielding, independent of `found`;
  * - `offset`: a number with the following meaning:
  *   - negative: discard the expression entirely;
@@ -210,8 +218,8 @@ function deepFormat (obj: any, options : FormatOptions = {}): any {
  *   - a term is found (`found === true`) and/or the search is stopped (`stop === true`);
  *   - a new generation is started;
  *   - the number of tries since the last yield exceeds `progressInterval`.
- * Such approach allows implementing progress bars and prevents the search from blocking for too long.
- *
+ * Such approach allows implementing progress bars
+ * and prevents the search from blocking for too long.
  */
 function * search<T> (seed: Expr[], options: SearchOptions, predicate: SearchCallback<T>): Generator<SearchProgress<T>> {
   const {
@@ -220,6 +228,8 @@ function * search<T> (seed: Expr[], options: SearchOptions, predicate: SearchCal
     progressInterval = 1000,
   } = options;
   const hasSeen = infer && !options.noskip;
+
+  const dummyProps: TermInfo = { steps: 0, normal: false, proper: false };
 
   // cache[i] = ith generation, 0 is seed generation
   const cache: Expr[][] = [[]];
@@ -238,7 +248,7 @@ function * search<T> (seed: Expr[], options: SearchOptions, predicate: SearchCal
   const maybeProbe:(expr: Expr)=>{res: SearchCallbackResult<T>, props: TermInfo | undefined }
     = (term: Expr) => {
       total++;
-      const props = infer ? term.infer({ max: options.max, maxArgs: options.maxArgs, maxSize: options.maxSize }) : undefined;
+      const props = infer ? term.infer({ max: options.max, maxArgs: options.maxArgs, maxSize: options.maxSize }) : dummyProps;
       if (hasSeen && props && props.expr) {
         // skip seen terms if allowed to
         const key = String(props.expr);
@@ -256,8 +266,11 @@ function * search<T> (seed: Expr[], options: SearchOptions, predicate: SearchCal
     const { res } = maybeProbe(term);
     if (res.found !== undefined)
       yield { expr: term, found: res.found, step: false, gen: 0, total, probed, cache };
-    if (res.stop)
+    if (res.stop) {
+      // ensure at least one progress tick is always yielded
+      yield { step: false, gen: 0, total, probed, cache };
       return;
+    }
     store(term, 0, res.offset ?? 0);
   }
 
@@ -325,9 +338,11 @@ function isStringTriple  (x: unknown): string | undefined {
  *
  * Used in search() to determine if any more generations are possible,
  * Since search() combines terms from the upper half with those in the lower half,
- * hasUpperHalf : false guarantees ALL future generations will be empty.
+ * hasUpperHalf: false guarantees ALL future generations will be empty.
  *
- * @param list
+ * @param gen - the current generation number
+ * @param list - the 2D array of generations
+ * @returns true if any non-empty arrays exist in the upper half of the list
  */
 function hasUpperHalf<T> (gen: number, list: T[][]): boolean {
   for (let i = Math.floor(gen / 2); i < list.length; i++) {
