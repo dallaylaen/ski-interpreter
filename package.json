@@ -54,6 +54,9 @@
   },
   "homepage": "https://dallaylaen.github.io/ski-interpreter/index.html",
   "devDependencies": {
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^26.1.1",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
     "chai": "^4.3.7",
@@ -64,6 +67,7 @@
     "eslint-plugin-import": "^2.29.1",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
+    "ts-node": "^10.9.2",
     "typedoc": "^0.28.18",
     "typescript": "^5.8.2"
   },
