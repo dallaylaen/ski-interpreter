@@ -14,7 +14,8 @@
     "ecmaVersion": 12
   },
   "ignorePatterns": [
-    "src/**/*.js"
+    "src/**/*.js",
+    "test/ts/**/*.js"
   ],
   "rules": {
     "semi": 0,
@@ -78,7 +79,8 @@
     },
     {
       "files": [
-        "test/**/*.js"
+        "test/**/*.js",
+        "test/**/*.ts"
       ],
       "env": {
         "mocha": true

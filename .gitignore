@@ -19,3 +19,4 @@ prof.txt
 lib
 # temp JS->TS move generated files
 src/*.js
+test/ts/**/*.js

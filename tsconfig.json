@@ -42,6 +42,11 @@
     "lib",
     "docs",
     "coverage"
-  ]
+  ],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  }
 }
 
