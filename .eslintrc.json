@@ -55,7 +55,8 @@
   "overrides": [
     {
       "files": [
-        "src/**/*.ts"
+        "src/**/*.ts",
+        "test/**/*.ts"
       ],
       "parser": "@typescript-eslint/parser",
       "extends": [
