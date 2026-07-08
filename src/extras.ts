@@ -9,12 +9,14 @@ import { Quest } from './quest';
 
 // --- Types ---
 
-export type SearchCallbackResult = {
-  /** ≥0 = cache at gen+offset; negative = discard; omitted = auto-compute */
+export type SearchCallbackResult<T> = {
+  /** 0 = keep the term to compute further terms (the default);
+   *  n<0 = discard the term; n>0 = keep the term, but delay its use by n generations
+   */
   offset?: number;
-  /** true = emit this term as a found result */
-  found?: boolean;
-  /** true = stop the search (after yielding if found is also true) */
+  /** if not undefined, this means the term is of interest and will appear in the result */
+  found?: T;
+  /** true = stop the search immediately */
   stop?: boolean;
 };
 export type SearchOptions = {
@@ -35,17 +37,22 @@ export type SearchOptions = {
   /** minimum number of tries between progress yields, default 1000 */
   progressInterval?: number;
 };
-export type SearchCallback = (e: Expr, props: TermInfo) => (SearchCallbackResult | number | undefined);
+export type SearchCallback<T> = (e: Expr, props: TermInfo) => (SearchCallbackResult<T> | number | undefined);
 /** Yielded by the search generator on every progress tick and on each found term. */
-export type SearchProgress = {
-  /** The found expression; present only when found === true. */
+export type SearchProgress<T> = {
+  /** The found expression; present only when found is defined. */
   expr?: Expr;
-  /** True when this yield carries a found term. */
-  found: boolean;
-  /** True when this is a new-generation tick (step progress), false for mid-generation ticks. */
+  /** Why we should care about this term (e.g. when construction multiple terms from a basis)
+   *  or simply true if there are no important details aside from the term itself.
+   */
+  found?: T;
+  /** true = a new generation has started */
   step: boolean;
+  /** The current generation number, starting from 0 for the seed generation. */
   gen: number;
+  /** The number of terms generated so far. */
   total: number;
+  /** The number of terms excluding duplicates. Will == total if noskip is true or infer is false. */
   probed: number;
   /** The full generation cache at the time of this yield. */
   cache: Expr[][];
@@ -206,7 +213,7 @@ function deepFormat (obj: any, options : FormatOptions = {}): any {
  * Such approach allows implementing progress bars and prevents the search from blocking for too long.
  *
  */
-function * search (seed: Expr[], options: SearchOptions, predicate: SearchCallback): Generator<SearchProgress> {
+function * search<T> (seed: Expr[], options: SearchOptions, predicate: SearchCallback<T>): Generator<SearchProgress<T>> {
   const {
     depth = 16,
     infer = true,
@@ -220,44 +227,44 @@ function * search (seed: Expr[], options: SearchOptions, predicate: SearchCallba
   let probed = 0;
   const seen: {[s: string]: boolean} = {};
 
-  /** Normalize the callback return to a {offset, found, stop} record. */
-  const parseResult = (raw: SearchCallbackResult | number | undefined): SearchCallbackResult => {
-    if (raw === null || raw === undefined)
-      return {};
-    if (typeof raw === 'number')
-      return raw > 0 ? { found: true, stop: true } : raw < 0 ? { offset: -1 } : {};
-    return raw;
-  };
+  const store = (term: Expr, gen: number, offset: number = 0) => {
+    if (offset < 0)
+      return;
+    if (!cache[gen + offset])
+      cache[gen + offset] = [];
+    cache[gen + offset].push(term);
+  }
 
-  const maybeProbe = (term: Expr) => {
-    total++;
-    const props = infer ? term.infer({ max: options.max, maxArgs: options.maxArgs, maxSize: options.maxSize }) : null;
-    if (hasSeen && props && props.expr) {
-      const key = String(props.expr);
-      if (seen[key])
-        return { res: { offset: -1 } as SearchCallbackResult, props };
-      seen[key] = true;
-    }
-    probed++;
-    const res = parseResult(predicate(term, props!));
-    return { res, props };
-  };
+  const maybeProbe:(expr: Expr)=>{res: SearchCallbackResult<T>, props: TermInfo | undefined }
+    = (term: Expr) => {
+      total++;
+      const props = infer ? term.infer({ max: options.max, maxArgs: options.maxArgs, maxSize: options.maxSize }) : undefined;
+      if (hasSeen && props && props.expr) {
+        // skip seen terms if allowed to
+        const key = String(props.expr);
+        if (seen[key])
+          return { res: { offset: -1 }, props: undefined };
+        seen[key] = true;
+      }
+      probed++;
+      const res = predicate(term, props!) ?? 0;
+      return (typeof res === 'number') ? { res: { offset: res }, props } : { res, props };
+    };
 
   // sieve through the seed
   for (const term of seed) {
     const { res } = maybeProbe(term);
-    if (res.found)
-      yield { expr: term, found: true, step: false, gen: 0, total, probed, cache };
+    if (res.found !== undefined)
+      yield { expr: term, found: res.found, step: false, gen: 0, total, probed, cache };
     if (res.stop)
       return;
-    if ((res.offset ?? 0) >= 0)
-      cache[0].push(term);
+    store(term, 0, res.offset ?? 0);
   }
 
   let lastProgress = 0;
 
   for (let gen = 1; gen < depth; gen++) {
-    yield { found: false, step: true, gen, total, probed, cache };
+    yield { step: true, gen, total, probed, cache };
     if (!hasUpperHalf(gen, cache))
       return;
 
@@ -267,38 +274,37 @@ function * search (seed: Expr[], options: SearchOptions, predicate: SearchCallba
       for (const a of cache[gen - i - 1] || []) {
         for (const b of cache[i] || []) {
           if (total >= (options.tries ?? Infinity)) {
-            yield { found: false, step: false, gen, total, probed, cache };
+            yield { step: false, gen, total, probed, cache };
             return;
           }
           if (total - lastProgress >= progressInterval) {
-            yield { found: false, step: false, gen, total, probed, cache };
+            yield { step: false, gen, total, probed, cache };
             lastProgress = total;
           }
           const term = a.apply(b);
           const { res, props } = maybeProbe(term);
 
-          if (res.found)
-            yield { expr: term, found: true, step: false, gen, total, probed, cache };
+          if (res.found !== undefined)
+            yield { expr: term, found: res.found, step: false, gen, total, probed, cache };
           if (res.stop) {
-            yield { found: false, step: false, gen, total, probed, cache };
+            yield { step: false, gen, total, probed, cache };
             return;
           }
           if ((res.offset ?? 0) < 0)
             continue;
 
           // if the term is not reducible, it is more likely to be a dead end, so we push it further away
-          const autoOffset = infer && props
+          const finalOffset = res.offset ?? (infer && props
             ? ((props.expr ? 0 : 3) + (props.dup ? 1 : 0) + (props.proper ? 0 : 1))
-            : 0;
-          const finalOffset = res.offset ?? autoOffset;
-          if (!cache[gen + finalOffset])
-            cache[gen + finalOffset] = [];
-          cache[gen + finalOffset].push(term);
+            : 0);
+          store(term, gen, finalOffset);
         }
       }
     }
   }
-  yield { found: false, step: false, gen: depth, total, probed, cache };
+
+  // last hopeless progress tick
+  yield { step: false, gen: depth, total, probed, cache };
 }
 
 // --- Utility functions ---
