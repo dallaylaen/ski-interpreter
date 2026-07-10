@@ -13,6 +13,9 @@ let format = {};
 let verbose = false;
 let quiet = false;
 let declare = false;
+const defines = [];
+/** @type {InstanceType<typeof SKI>} */
+let ski;
 
 const program = new Command();
 
@@ -43,6 +46,8 @@ program
   })
   .option('--declare', 'Prepend used terms declarations to calculation result',
     () => { declare = true; })
+  .option('-d, --define <name=expr>', 'Define a global alias (may be repeated)',
+    (val) => { defines.push(val); })
   .option('--help [topic]', 'Show help', showHelp);
 
 // REPL subcommand
@@ -83,7 +88,6 @@ program
   .action(async (expr1, expr2) => {
     expr1 = await readExpression(expr1);
     expr2 = await readExpression(expr2);
-    const ski = new SKI();
     const e1 = ski.parse(expr1);
     const e2 = ski.parse(expr2);
     const res = SKI.extras.equiv(e1, e2, runOptions);
@@ -131,6 +135,13 @@ program
   .showHelpAfterError(true)
   .helpOption(false)
   .action(() => showHelp())
+  .hook('preAction', (thisCommand, actionCommand) => {
+    const name = actionCommand.name();
+    if (name === 'help' || name === 'quest-lint')
+      return;
+    ski = new SKI();
+    applyDefines(ski);
+  })
   .parse(process.argv);
 
 function showHelp (topic) {
@@ -230,7 +241,6 @@ function showHelp (topic) {
 
 function startRepl () {
   const readline = require('readline');
-  const ski = new SKI();
 
   const rl = readline.createInterface({
     input:    process.stdin,
@@ -263,8 +273,24 @@ function startRepl () {
   rl.prompt();
 }
 
+function applyDefines (ski) {
+  for (const def of defines) {
+    let alias;
+    try {
+      alias = ski.parse(def, { canonize: true });
+    } catch (err) {
+      console.error(`ski: --define ${def}: ${err.message}`);
+      process.exit(2);
+    }
+    if (!(alias instanceof SKI.classes.Alias)) {
+      console.error(`ski: --define: expected name=expr, got: ${def}`);
+      process.exit(2);
+    }
+    ski.add(alias);
+  }
+}
+
 function evaluateExpression (expression) {
-  const ski = new SKI();
   processLine(expression, ski, err => {
     if (err)
       console.error('' + err);
@@ -273,7 +299,6 @@ function evaluateExpression (expression) {
 }
 
 function evaluateFile (filepath) {
-  const ski = new SKI();
   const onErr = err => {
     console.error('' + err);
     process.exit(1);
@@ -328,8 +353,6 @@ function processLine (source, ski, onErr) {
 }
 
 function inferExpression (expression) {
-  const ski = new SKI();
-
   const expr = ski.parse(expression);
   const guess = expr.infer(runOptions);
 
@@ -429,7 +452,6 @@ async function questCheck (files, solutionFile) {
 }
 
 function searchExpression (targetStr, termStrs, options) {
-  const ski = new SKI();
   const target = ski.parse(targetStr);
   const seed = termStrs.map(s => ski.parse(s));
 
@@ -471,7 +493,6 @@ function searchExpression (targetStr, termStrs, options) {
 }
 
 function extractExpression (targetStr, termStrs) {
-  const ski = new SKI();
   const expr = ski.parse(targetStr);
   const pairs = termStrs
     .map(s => ski.parse(s))
