@@ -1,6 +1,6 @@
 {
   "name": "@dallaylaen/ski-interpreter",
-  "version": "2.10.0",
+  "version": "2.10.1",
   "description": "Simple Kombinator Interpreter - a combinatory logic & lambda calculus parser and interpreter. Supports SKI, BCKW, Church numerals, and setting up assertions ('quests') involving all of the above.",
   "keywords": [
     "combinatory logic",
@@ -33,7 +33,7 @@
     "build-quest": "npx esbuild --bundle --minify --sourcemap --format=iife ./site-src/index-quest.js --outfile=docs/build/js/ski-quest.min.js",
     "build-all": "npm run build-cjs && npm run build-esm && npm run build-web && npm run build-site && npm run build-quest",
     "build": "npm run lint && npm run tsc && npm run test && npm run build-all",
-    "prepack": "npm run build && cp docs/build/js/ski-* lib/"
+    "prepack": "rm -rf lib && npm run build && cp docs/build/js/ski-* lib/"
   },
   "files": [
     "package.json",
@@ -41,7 +41,8 @@
     "LICENSE",
     "CHANGELOG.md",
     "example",
-    "lib"
+    "lib",
+    "!lib/types/test"
   ],
   "repository": {
     "type": "git",
