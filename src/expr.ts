@@ -617,9 +617,9 @@ export abstract class Expr {
     let expr = args ? this.apply(...args) : this;
     let steps = opt.steps ?? 0;
     // make sure we make at least 1 step, to tell whether we've reached the normal form
-    const max = Math.max(opt.max ?? DEFAULTS.max, 1) + steps;
+    const max = Math.max(opt.max ?? DEFAULTS.max, 0) + steps;
     let final = false;
-    for (; steps < max; ) {
+    while (true) {
       const next = expr.step();
       if (!next.changed) {
         final = true;
@@ -629,6 +629,8 @@ export abstract class Expr {
         break;
       steps += next.steps;
       expr = next.expr;
+      if (steps >= max)
+        break;
     }
     if (opt.throw && !final)
       throw new Error('Failed to compute expression in ' + max + ' steps');
@@ -647,14 +649,17 @@ export abstract class Expr {
    * @param {{max?: number}} options
    * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
    */
-  * walk (options : { max?: number, maxSize?: number } = {}): IterableIterator<Run> {
-    const max = options.max ?? Infinity;
-    let steps = 0;
+  * walk (options : RunOptions = {}): IterableIterator<Run> {
+    let steps = options.steps ?? 0;
+    const max = Math.max(options.max ?? Infinity, 1) + steps;
+    const maxSize = options.maxSize ?? DEFAULTS.maxSize;
+
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     let expr:Expr = this;
     let final = false;
 
-    while (steps < max && (expr.size ?? 1) < (options.maxSize ?? DEFAULTS.maxSize)) {
+    // guaranteed to yield at least once
+    while (true) {
       // 1. calculate
       // 2. yield _unchanged_ expression
       // 3. either advance or stop
@@ -662,7 +667,7 @@ export abstract class Expr {
       if (!next.changed)
         final = true;
       yield { expr, steps, final };
-      if (final)
+      if (final || steps >= max || (next.expr.size ?? 1) > maxSize)
         break;
       steps += next.steps;
       expr = next.expr;
