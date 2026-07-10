@@ -341,10 +341,7 @@ function processLine (source, ski, onErr) {
       console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
     if (!state.final)
       console.log('// (partial result)');
-    if (declare)
-      console.log(state.expr.declare({ ...format, inventory: ski.getTerms() }));
-    else
-      console.log(state.expr.format(format));
+    console.log(formatExpr(state.expr));
     if (!state.final)
       onErr('');
   } catch (err) {
@@ -461,18 +458,6 @@ function searchExpression (targetStr, termStrs, options) {
     process.exit(1);
   }
 
-  const istty = process.stdout.isTTY;
-  const readline = istty ? require('node:readline') : { clearLine: () => {}, cursorTo: () => {} };
-
-  const printProgress = (text) => {
-    readline.clearLine(process.stdout, 0);
-    readline.cursorTo(process.stdout, 0);
-    process.stdout.write(text + (istty ? '' : '\n'));
-  }
-
-  const t0 = Date.now();
-  const elapsed = () => ((Date.now() - t0) / 1000).toFixed(2);
-
   const gen = SKI.extras.search(seed, { tries: options.maxTries, depth: options.maxDepth }, (e, p) => {
     if (!p.expr)
       return { offset: -1 };
@@ -480,30 +465,67 @@ function searchExpression (targetStr, termStrs, options) {
       return { found: true, stop: true };
     return 0;
   });
+  const t0 = Date.now();
 
-  let tick = true;
-  const bar = setInterval(() => { tick = true; }, 300);
+  if (verbose) {
+    const istty = process.stdout.isTTY;
+    const readline = istty
+      ? require('node:readline')
+      : {
+        clearLine: () => {
+        },
+        cursorTo: () => {
+        }
+      };
 
-  const step = () => {
-    const { value, done } = gen.next();
-    if (value.expr) {
-      printProgress(`// Found: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n${value.expr.format(format)}\n`);
-      clearInterval(bar);
-      process.exit(0);
+    const printProgress = (text) => {
+      readline.clearLine(process.stdout, 0);
+      readline.cursorTo(process.stdout, 0);
+      process.stdout.write(text + (istty ? '' : '\n'));
     }
-    if (done) {
-      clearInterval(bar);
-      printProgress(`// Nothing found: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n`);
-      process.exit(1);
+
+    const elapsed = () => ((Date.now() - t0) / 1000).toFixed(2);
+
+    let tick = true;
+    const bar = setInterval(() => {
+      tick = true;
+    }, 300);
+
+    const step = () => {
+      const {
+        value,
+        done
+      } = gen.next();
+      if (value.expr) {
+        printProgress(`// Found: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n${formatExpr(value.expr)}\n`);
+        clearInterval(bar);
+        process.exit(0);
+      }
+      if (done) {
+        clearInterval(bar);
+        printProgress(`// Nothing found: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n`);
+        process.exit(1);
+      }
+      if (tick) {
+        printProgress(`// Progress: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s`);
+        tick = false;
+      }
+      setImmediate(step);
     }
-    if (tick) {
-      printProgress(`// Progress: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s`);
-      tick = false;
+
+    step();
+  } else {
+    let value;
+    for (value of gen) {
+      if (value.expr) {
+        console.log(formatExpr(value.expr));
+        process.exit(0);
+      }
     }
-    setImmediate(step);
+
+    console.log('// Nothing found');
+    process.exit(1);
   }
-
-  step();
 }
 
 function extractExpression (targetStr, termStrs) {
@@ -529,7 +551,7 @@ function extractExpression (targetStr, termStrs) {
     }
   });
 
-  console.log((replaced ?? expr).format(format));
+  console.log(formatExpr(replaced ?? expr));
   if (!replaced)
     console.log('// unchanged');
 }
@@ -605,4 +627,10 @@ function toInt (comment) {
       throw new Error(comment + ' requires positive integer');
     return n;
   }
+}
+
+function formatExpr (expr) {
+  return declare
+    ? expr.declare({ ...format, inventory: ski.getTerms() })
+    : expr.format(format);
 }
