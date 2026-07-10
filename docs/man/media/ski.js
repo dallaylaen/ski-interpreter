@@ -12,6 +12,10 @@ const runOptions = {};
 let format = {};
 let verbose = false;
 let quiet = false;
+let declare = false;
+const defines = [];
+/** @type {InstanceType<typeof SKI>} */
+let ski;
 
 const program = new Command();
 
@@ -40,6 +44,10 @@ program
       throw new Error('--max-args requires a positive integer');
     runOptions.maxArgs = n;
   })
+  .option('--declare', 'Prepend used terms declarations to calculation result',
+    () => { declare = true; })
+  .option('-d, --define <name=expr>', 'Define a global alias (may be repeated)',
+    (val) => { defines.push(val); })
   .option('--help [topic]', 'Show help', showHelp);
 
 // REPL subcommand
@@ -80,7 +88,6 @@ program
   .action(async (expr1, expr2) => {
     expr1 = await readExpression(expr1);
     expr2 = await readExpression(expr2);
-    const ski = new SKI();
     const e1 = ski.parse(expr1);
     const e2 = ski.parse(expr2);
     const res = SKI.extras.equiv(e1, e2, runOptions);
@@ -128,6 +135,13 @@ program
   .showHelpAfterError(true)
   .helpOption(false)
   .action(() => showHelp())
+  .hook('preAction', (thisCommand, actionCommand) => {
+    const name = actionCommand.name();
+    if (name === 'help' || name === 'quest-lint')
+      return;
+    ski = new SKI();
+    applyDefines(ski);
+  })
   .parse(process.argv);
 
 function showHelp (topic) {
@@ -226,8 +240,7 @@ function showHelp (topic) {
 }
 
 function startRepl () {
-  const readline = require('readline');
-  const ski = new SKI();
+  const readline = require('node:readline');
 
   const rl = readline.createInterface({
     input:    process.stdin,
@@ -260,8 +273,24 @@ function startRepl () {
   rl.prompt();
 }
 
+function applyDefines (ski) {
+  for (const def of defines) {
+    let alias;
+    try {
+      alias = ski.parse(def, { canonize: true });
+    } catch (err) {
+      console.error(`ski: --define ${def}: ${err.message}`);
+      process.exit(2);
+    }
+    if (!(alias instanceof SKI.classes.Alias)) {
+      console.error(`ski: --define: expected name=expr, got: ${def}`);
+      process.exit(2);
+    }
+    ski.add(alias);
+  }
+}
+
 function evaluateExpression (expression) {
-  const ski = new SKI();
   processLine(expression, ski, err => {
     if (err)
       console.error('' + err);
@@ -270,7 +299,6 @@ function evaluateExpression (expression) {
 }
 
 function evaluateFile (filepath) {
-  const ski = new SKI();
   const onErr = err => {
     console.error('' + err);
     process.exit(1);
@@ -283,7 +311,7 @@ function evaluateFile (filepath) {
     return;
   }
   fs.readFile(filepath, 'utf8')
-    .then(evaluateExpression)
+    .then(source => processLine(source, ski, onErr))
     .catch(err => {
       console.error('ski: ' + err);
       process.exit(2);
@@ -308,12 +336,12 @@ function processLine (source, ski, onErr) {
         state = next;
       }
     } else
-      state = expr.run(runOptions);
+      state = expr.run({ max: Infinity, ...runOptions });
     if (!quiet)
       console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
     if (!state.final)
       console.log('// (partial result)');
-    console.log(state.expr.format(format));
+    console.log(formatExpr(state.expr));
     if (!state.final)
       onErr('');
   } catch (err) {
@@ -322,8 +350,6 @@ function processLine (source, ski, onErr) {
 }
 
 function inferExpression (expression) {
-  const ski = new SKI();
-
   const expr = ski.parse(expression);
   const guess = expr.infer(runOptions);
 
@@ -423,7 +449,6 @@ async function questCheck (files, solutionFile) {
 }
 
 function searchExpression (targetStr, termStrs, options) {
-  const ski = new SKI();
   const target = ski.parse(targetStr);
   const seed = termStrs.map(s => ski.parse(s));
 
@@ -433,39 +458,77 @@ function searchExpression (targetStr, termStrs, options) {
     process.exit(1);
   }
 
-  const t0 = new Date();
-  let lastProgress;
-  let found;
-  for (const progress of SKI.extras.search(seed, { tries: options.maxTries, depth: options.maxDepth }, (e, p) => {
+  const gen = SKI.extras.search(seed, { tries: options.maxTries, depth: options.maxDepth }, (e, p) => {
     if (!p.expr)
       return { offset: -1 };
     if (p.expr.equals(expr))
       return { found: true, stop: true };
     return 0;
-  })) {
-    lastProgress = progress;
-    if (progress.found) {
-      found = progress.expr;
-      break;
-    }
-  }
-  const elapsed = new Date() - t0;
-  const { total = 0 } = lastProgress ?? {};
+  });
+  const t0 = Date.now();
 
-  if (found) {
-    console.log(found.format(format));
-    if (!quiet)
-      console.log(`// Found after ${total} tries in ${elapsed}ms.`);
-    process.exit(0);
+  if (verbose) {
+    const istty = process.stdout.isTTY;
+    const readline = istty
+      ? require('node:readline')
+      : {
+        clearLine: () => {
+        },
+        cursorTo: () => {
+        }
+      };
+
+    const printProgress = (text) => {
+      readline.clearLine(process.stdout, 0);
+      readline.cursorTo(process.stdout, 0);
+      process.stdout.write(text + (istty ? '' : '\n'));
+    }
+
+    const elapsed = () => ((Date.now() - t0) / 1000).toFixed(2);
+
+    let tick = true;
+    const bar = setInterval(() => {
+      tick = true;
+    }, 300);
+
+    const step = () => {
+      const {
+        value,
+        done
+      } = gen.next();
+      if (value.expr) {
+        printProgress(`// Found: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n${formatExpr(value.expr)}\n`);
+        clearInterval(bar);
+        process.exit(0);
+      }
+      if (done) {
+        clearInterval(bar);
+        printProgress(`// Nothing found: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n`);
+        process.exit(1);
+      }
+      if (tick) {
+        printProgress(`// Progress: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s`);
+        tick = false;
+      }
+      setImmediate(step);
+    }
+
+    step();
   } else {
-    if (!quiet)
-      console.log(`// No expression was found after ${total} tries in ${elapsed}ms.`);
+    let value;
+    for (value of gen) {
+      if (value.expr) {
+        console.log(formatExpr(value.expr));
+        process.exit(0);
+      }
+    }
+
+    console.log('// Nothing found');
     process.exit(1);
   }
 }
 
 function extractExpression (targetStr, termStrs) {
-  const ski = new SKI();
   const expr = ski.parse(targetStr);
   const pairs = termStrs
     .map(s => ski.parse(s))
@@ -488,7 +551,7 @@ function extractExpression (targetStr, termStrs) {
     }
   });
 
-  console.log((replaced ?? expr).format(format));
+  console.log(formatExpr(replaced ?? expr));
   if (!replaced)
     console.log('// unchanged');
 }
@@ -564,4 +627,10 @@ function toInt (comment) {
       throw new Error(comment + ' requires positive integer');
     return n;
   }
+}
+
+function formatExpr (expr) {
+  return declare
+    ? expr.declare({ ...format, inventory: ski.getTerms() })
+    : expr.format(format);
 }
