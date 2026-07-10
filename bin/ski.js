@@ -240,7 +240,7 @@ function showHelp (topic) {
 }
 
 function startRepl () {
-  const readline = require('readline');
+  const readline = require('node:readline');
 
   const rl = readline.createInterface({
     input:    process.stdin,
@@ -461,35 +461,49 @@ function searchExpression (targetStr, termStrs, options) {
     process.exit(1);
   }
 
-  const t0 = new Date();
-  let lastProgress;
-  let found;
-  for (const progress of SKI.extras.search(seed, { tries: options.maxTries, depth: options.maxDepth }, (e, p) => {
+  const istty = process.stdout.isTTY;
+  const readline = istty ? require('node:readline') : { clearLine: () => {}, cursorTo: () => {} };
+
+  const printProgress = (text) => {
+    readline.clearLine(process.stdout, 0);
+    readline.cursorTo(process.stdout, 0);
+    process.stdout.write(text + (istty ? '' : '\n'));
+  }
+
+  const t0 = Date.now();
+  const elapsed = () => ((Date.now() - t0) / 1000).toFixed(2);
+
+  const gen = SKI.extras.search(seed, { tries: options.maxTries, depth: options.maxDepth }, (e, p) => {
     if (!p.expr)
       return { offset: -1 };
     if (p.expr.equals(expr))
       return { found: true, stop: true };
     return 0;
-  })) {
-    lastProgress = progress;
-    if (progress.found) {
-      found = progress.expr;
-      break;
-    }
-  }
-  const elapsed = new Date() - t0;
-  const { total = 0 } = lastProgress ?? {};
+  });
 
-  if (found) {
-    console.log(found.format(format));
-    if (!quiet)
-      console.log(`// Found after ${total} tries in ${elapsed}ms.`);
-    process.exit(0);
-  } else {
-    if (!quiet)
-      console.log(`// No expression was found after ${total} tries in ${elapsed}ms.`);
-    process.exit(1);
+  let tick = true;
+  const bar = setInterval(() => { tick = true; }, 300);
+
+  const step = () => {
+    const { value, done } = gen.next();
+    if (value.expr) {
+      printProgress(`// Found: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n${value.expr.format(format)}\n`);
+      clearInterval(bar);
+      process.exit(0);
+    }
+    if (done) {
+      clearInterval(bar);
+      printProgress(`// Nothing found: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n`);
+      process.exit(1);
+    }
+    if (tick) {
+      printProgress(`// Progress: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s`);
+      tick = false;
+    }
+    setImmediate(step);
   }
+
+  step();
 }
 
 function extractExpression (targetStr, termStrs) {
