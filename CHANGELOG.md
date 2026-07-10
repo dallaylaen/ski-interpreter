@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.0] - 2026-07-10
+
+### BREAKING CHANGES
+
+* `SKI.extras.search<T>` is now a generic/template function:
+The callback can now return `{ found: T }` to be yielded to the caller,
+signaling the exact nature of the found term.
+Old code reliant on `{ found: true }` should mostly work, though.
+
+### Added
+
+* `bin/ski.js`: Added `-d|--define term=expr ...` option to define terms inline on the CLI.
+* `bin/ski.js`: Added `--declare` option to emit final term prerequisite terms.
+* `bin/ski.js`: Added `help` subcommand with thematic help topics;
+`--help` and empty subcommand now redirect there.
+* `bin/ski.js`: Allow `-` as "read expression from stdin" in all subcommands.
+* `bin/ski.js search`: Progress indicator is printed in real time if -v is specified.
+* `bin/ski.js`: Returns exit status 1 on exceeded steps or expression size.
+* `SKI.extras.search()`: Stops if no further terms can be constructed; added `maxSize` parameter.
+* `SKI.extras.bulkAdd()`: ["C", "B"] now means "merely allow existing C and B"
+  (used in quests)
+* Quest page: `QuestPage` now adheres to initial inventory specified in the index.
+* Docs: Rewrote quest authoring guide (`quest-intro.md` → `quest-authoring.md`).
+
+### Fixed
+
+* `SKI.extras.search()`: Fixed inconsistencies; second callback argument is now always a `TermInfo`.
+* `walk()` and `run()` final state are now aligned and identical.
+* Removed 'fix B' quest whose test case contradicted the project's notion of equality (#31).
+
+### Internal
+
+* TS-native tests now supported in `test/ts`.
+
 ## [2.9.1] - 2026-06-28
 
 ### Fixed
@@ -15,7 +49,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### BREAKING CHANGES
 
-* SKI.extras.search is now a generator, yielding progress ticks as well as found terms, which may now be multiple.
+* `SKI.extras.search` is now a generator, yielding progress ticks as well as found terms,
+which may now be multiple.
 * Quest page now requires { chapters: [...] } instead of [...] in index.json.
 
 ### Added
@@ -23,7 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Examples: `example/find-monobase.js` to showcase nested search() usage.
 * Quest page: "New!" badge for quests newer than 30 days.
 * Quest page: Reordered for clearer narrative, more quests added.
-* `bin/ski.js search` diplays elapsed time.
+* `bin/ski.js search` displays elapsed time.
 * `bin/ski.js -q` flag to suppress extra output.
 * `bin/ski.js file -` will process STDIN
 * Added a self-hosted [combinator cheat-sheet page](https://dallaylaen.github.io/ski-interpreter/combinator-birds.html) (#29).
