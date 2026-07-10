@@ -12,6 +12,7 @@ const runOptions = {};
 let format = {};
 let verbose = false;
 let quiet = false;
+let declare = false;
 
 const program = new Command();
 
@@ -40,6 +41,8 @@ program
       throw new Error('--max-args requires a positive integer');
     runOptions.maxArgs = n;
   })
+  .option('--declare', 'Prepend used terms declarations to calculation result',
+    () => { declare = true; })
   .option('--help [topic]', 'Show help', showHelp);
 
 // REPL subcommand
@@ -283,7 +286,7 @@ function evaluateFile (filepath) {
     return;
   }
   fs.readFile(filepath, 'utf8')
-    .then(evaluateExpression)
+    .then(source => processLine(source, ski, onErr))
     .catch(err => {
       console.error('ski: ' + err);
       process.exit(2);
@@ -308,12 +311,15 @@ function processLine (source, ski, onErr) {
         state = next;
       }
     } else
-      state = expr.run(runOptions);
+      state = expr.run({ max: Infinity, ...runOptions });
     if (!quiet)
       console.log(`// ${state.steps} step(s) in ${new Date() - t0}ms`);
     if (!state.final)
       console.log('// (partial result)');
-    console.log(state.expr.format(format));
+    if (declare)
+      console.log(state.expr.declare({ ...format, inventory: ski.getTerms() }));
+    else
+      console.log(state.expr.format(format));
     if (!state.final)
       onErr('');
   } catch (err) {
