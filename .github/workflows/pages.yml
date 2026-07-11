@@ -2,7 +2,7 @@ name: Deploy GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, 202607-github-actions]
 
 permissions:
   contents: read
@@ -24,8 +24,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '22'
           cache: npm
+
+      - name: Install dependencies
+        run: npm install .
 
       - name: run tests & build minified artifacts
         run: npm run build
