@@ -1,0 +1,55 @@
+{
+  "id": "Rd8wxwqW",
+  "created_at": "2026-07-03T00:20:30",
+  "name": "The Final Challenge",
+  "intro": [
+    ""
+  ],
+  "content": [
+    {
+      "id": "A6JPxyDs",
+      "created_at": "2026-07-03T00:20:30",
+      "name": "Rule 110",
+      "intro": [
+        "<p><a href=\"https://en.wikipedia.org/wiki/Rule_110\">Rule 110</a>",
+        "is a one-dimensional binary cellular automaton rule introduced by Stephen Wolfram in 1983.",
+        "It is known to be Turing-complete,",
+        "meaning that it can simulate any computation that can be performed by a Turing machine.",
+        "This exercise is thus a proof of Turing-completeness of combinatory logic,",
+        "and subsequently lambda calculus.</p>",
+        "<p>Given a list of bits, encoded as <code>t=K</code> and <code>f=KI</code>,",
+        "produce a list of the same length containing the next iteration of the automaton,",
+        "according to the table:</p>",
+        "<table style=\"text-align: center;\" border=\"1\">",
+        "<tr><td>111</td><td>110</td><td>101</td><td>100</td><td>011</td><td>010</td><td>001</td><td>000</td></tr>",
+        "<tr><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td></tr>",
+        "</table>",
+        "<p>Assume the cells before and after the list are always 0.</p>"
+      ],
+      "env": ["V=BC(CI)", "nil = KI", "t = K", "f = KI" ],
+      "input": { "name": "r110", "fancy": "R<sub>110</sub>" },
+      "cases": [
+        ["r110 nil", "nil"],
+        ["r110 (V f nil)", "(V f nil)"],
+        ["r110 (V t nil)", "(V t nil)"],
+        ["r110 (V f (V f (V f nil)))", "(V f (V f (V f nil)))"],
+        ["r110 (V f (V f (V t nil)))", "(V f (V t (V t nil)))"],
+        ["r110 (V f (V t (V f nil)))", "(V f (V t (V f nil)))"],
+        ["r110 (V f (V t (V t nil)))", "(V f (V t (V t nil)))"],
+        ["r110 (V t (V f (V f nil)))", "(V t (V f (V f nil)))"],
+        ["r110 (V t (V f (V t nil)))", "(V t (V t (V t nil)))"],
+        ["r110 (V t (V t (V f nil)))", "(V t (V t (V f nil)))"],
+        ["r110 (V t (V t (V t nil)))", "(V t (V f (V t nil)))"],
+        [
+          "r110 (V f (V f (V f (V t (V f (V f (V t (V t (V f (V t (V t (V t (V t (V t nil))))))))))))))",
+          "(V f (V f (V t (V t (V f (V t (V t (V t (V t (V t (V f (V f (V f (V t nil))))))))))))))"
+        ],
+        [
+          "r110 (V f (V f (V f (V t (V t (V t (V f (V t (V t (V t nil))))))))))",
+          "(V f (V f (V t (V t (V f (V t (V t (V t (V f (V t nil))))))))))"
+        ]
+      ]
+
+    }
+  ]
+}

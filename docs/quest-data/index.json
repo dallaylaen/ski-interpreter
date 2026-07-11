@@ -17,6 +17,7 @@
     "170-recursion.json",
     "175-more-numbers.json",
     "180-linked-lists.json",
-    "190-finite-fixpoint.json"
+    "190-finite-fixpoint.json",
+    "195-final.json"
   ]
 }
