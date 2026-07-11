@@ -17,14 +17,15 @@
         "meaning that it can simulate any computation that can be performed by a Turing machine.",
         "This exercise is thus a proof of Turing-completeness of combinatory logic,",
         "and subsequently lambda calculus.</p>",
-        "<p>Given a list of bits, encoded as <code>t=K</code> and <code>f=KI</code>,",
+        "<p>Given a linked list of bits, encoded as <code>t=K</code> and <code>f=KI</code>,",
         "produce a list of the same length containing the next iteration of the automaton,",
         "according to the table:</p>",
         "<table style=\"text-align: center;\" border=\"1\">",
         "<tr><td>111</td><td>110</td><td>101</td><td>100</td><td>011</td><td>010</td><td>001</td><td>000</td></tr>",
         "<tr><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td></tr>",
         "</table>",
-        "<p>Assume the cells before and after the list are always 0.</p>"
+        "<p>Lists are encoded as <code>(V x (V y (V z nil)))</code>, where <code>V x y z = z x y</code>.",
+        "Assume the cells before and after the list are always 0.</p>"
       ],
       "env": ["V=BC(CI)", "nil = KI", "t = K", "f = KI" ],
       "input": { "name": "r110", "fancy": "R<sub>110</sub>" },
