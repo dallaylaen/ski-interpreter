@@ -17,6 +17,11 @@ prof.txt
 
 # lib is now built by `npm build` and only used for dist
 lib
-# temp JS->TS move generated files
+
+# generated artifacts are now managed by github pages
+docs/man
+docs/build
+
+# files generated from TS
 src/*.js
 test/ts/**/*.js
