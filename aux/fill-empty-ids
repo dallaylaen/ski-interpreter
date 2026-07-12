@@ -26,7 +26,7 @@ use warnings;
 use File::Find;
 use POSIX qw(strftime);
 
-my $date = strftime "%Y-%m-%dT%H:%M:%S", localtime;
+my $date = strftime "%Y-%m-%dT%H:%M:%SZ", gmtime;
 
 find sub {
     /\.json$/ or return;
