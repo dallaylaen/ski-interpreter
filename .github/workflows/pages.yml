@@ -3,6 +3,8 @@ name: Deploy GitHub Pages
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
@@ -44,3 +46,4 @@ jobs:
 
       - uses: actions/deploy-pages@v4
         id: deployment
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
