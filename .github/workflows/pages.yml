@@ -28,7 +28,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install .
+        run: npm i --also=dev
 
       - name: run tests & build minified artifacts
         run: npm run build
