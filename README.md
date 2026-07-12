@@ -305,6 +305,8 @@ for building interactive quest pages from JSON-encoded quest data;
 * [@akuklev](https://github.com/akuklev) for explaining functional programming to me so many times that I actually got some idea.
 * [One happy fellow](https://github.com/happyfellow-one) whose [riddle](https://blog.happyfellow.dev/a-riddle/) trolled me into writing an early `traverse` prototype.
 * [Darkwing3125](https://github.com/Darkwing3125) for posting multiple bug reports and feature requests.
+* [@dokutan](https://github.com/dokutan) for quest bug reports and contributions.
+* [@mikevoronov](https://github.com/mikevoronov) - chief demand officer
 
 # Prior art and inspiration
 
