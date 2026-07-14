@@ -62,7 +62,7 @@ describe('SKI.extras.search', () => {
     it('yields step:true at generation boundaries', () => {
       const steps = [];
       for (const p of SKI.extras.search([x, y], { depth: 3, infer: false }, () => ({ found: true }))) {
-        if (p.step)
+        if (p.newGen)
           steps.push(p.gen);
       }
 

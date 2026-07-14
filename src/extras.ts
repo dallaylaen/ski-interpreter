@@ -46,8 +46,10 @@ export type SearchProgress<T> = {
    *  or simply true if there are no important details aside from the term itself.
    */
   found?: T;
+  /** only true on the last yield */
+  stop?: boolean;
   /** true = a new generation has started */
-  step: boolean;
+  newGen?: boolean;
   /** The current generation number, starting from 0 for the seed generation. */
   gen: number;
   /** The number of terms generated so far. */
@@ -223,7 +225,7 @@ function deepFormat (obj: any, options : FormatOptions = {}): any {
  */
 function * search<T> (seed: Expr[], options: SearchOptions, predicate: SearchCallback<T>): Generator<SearchProgress<T>> {
   const {
-    depth = 16,
+    depth = Infinity,
     infer = true,
     progressInterval = 1000,
   } = options;
@@ -233,6 +235,7 @@ function * search<T> (seed: Expr[], options: SearchOptions, predicate: SearchCal
 
   // cache[i] = ith generation, 0 is seed generation
   const cache: Expr[][] = [[]];
+  let gen = 0;
   let total = 0;
   let probed = 0;
   const seen: {[s: string]: boolean} = {};
@@ -265,10 +268,10 @@ function * search<T> (seed: Expr[], options: SearchOptions, predicate: SearchCal
   for (const term of seed) {
     const { res } = maybeProbe(term);
     if (res.found !== undefined)
-      yield { expr: term, found: res.found, step: false, gen: 0, total, probed, cache };
+      yield { expr: term, found: res.found, gen: 0, total, probed, cache };
     if (res.stop) {
       // ensure at least one progress tick is always yielded
-      yield { step: false, gen: 0, total, probed, cache };
+      yield { stop: true, gen: 0, total, probed, cache };
       return;
     }
     store(term, 0, res.offset ?? 0);
@@ -276,10 +279,10 @@ function * search<T> (seed: Expr[], options: SearchOptions, predicate: SearchCal
 
   let lastProgress = 0;
 
-  for (let gen = 1; gen < depth; gen++) {
-    yield { step: true, gen, total, probed, cache };
+  for (gen = 1; gen < depth; gen++) {
+    yield { newGen: true, gen, total, probed, cache };
     if (!hasUpperHalf(gen, cache))
-      return;
+      break;
 
     lastProgress = total;
 
@@ -287,20 +290,20 @@ function * search<T> (seed: Expr[], options: SearchOptions, predicate: SearchCal
       for (const a of cache[gen - i - 1] || []) {
         for (const b of cache[i] || []) {
           if (total >= (options.tries ?? Infinity)) {
-            yield { step: false, gen, total, probed, cache };
+            yield { stop: true, gen, total, probed, cache };
             return;
           }
           if (total - lastProgress >= progressInterval) {
-            yield { step: false, gen, total, probed, cache };
+            yield { gen, total, probed, cache };
             lastProgress = total;
           }
           const term = a.apply(b);
           const { res, props } = maybeProbe(term);
 
           if (res.found !== undefined)
-            yield { expr: term, found: res.found, step: false, gen, total, probed, cache };
+            yield { expr: term, found: res.found, gen, total, probed, cache };
           if (res.stop) {
-            yield { step: false, gen, total, probed, cache };
+            yield { stop: true, gen, total, probed, cache };
             return;
           }
           if ((res.offset ?? 0) < 0)
@@ -308,7 +311,7 @@ function * search<T> (seed: Expr[], options: SearchOptions, predicate: SearchCal
 
           // if the term is not reducible, it is more likely to be a dead end, so we push it further away
           const finalOffset = res.offset ?? (infer && props
-            ? ((props.expr ? 0 : 3) + (props.dup ? 1 : 0) + (props.proper ? 0 : 1))
+            ? ((props.expr ? 0 : 3) + (props.duplicate ? 1 : 0) + (props.proper ? 0 : 1))
             : 0);
           store(term, gen, finalOffset);
         }
@@ -317,7 +320,7 @@ function * search<T> (seed: Expr[], options: SearchOptions, predicate: SearchCal
   }
 
   // last hopeless progress tick
-  yield { step: false, gen: depth, total, probed, cache };
+  yield { stop: true, gen, total, probed, cache };
 }
 
 // --- Utility functions ---

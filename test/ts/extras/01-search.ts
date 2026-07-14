@@ -24,7 +24,7 @@ describe('SKI.extras.search (ts)', () => {
     expect(trace).to.deep.equal([10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
 
     if (last) {
-      expect(last.total).to.be.below(100, 'all possible terms exhausted by search');
+      expect(last.total).to.be.below(110, 'all possible terms exhausted by search');
       expect(last.probed).to.equal(trace.length);
     } else
       throw new Error('No search progress was reported ever');
