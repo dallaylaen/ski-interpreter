@@ -492,16 +492,13 @@ function searchExpression (targetStr, termStrs, options) {
     }, 300);
 
     const step = () => {
-      const {
-        value,
-        done
-      } = gen.next();
+      const { value } = gen.next();
       if (value.expr) {
         printProgress(`// Found: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n${formatExpr(value.expr)}\n`);
         clearInterval(bar);
         process.exit(0);
       }
-      if (done) {
+      if (value.stop) {
         clearInterval(bar);
         printProgress(`// Nothing found: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n`);
         process.exit(1);
