@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.0] - 2026-07-15
+
+### BREAKING CHANGES
+
+* `SKI.extras.search()` change: { step: boolean } renamed to { newGen?: boolean };
+{ stop?: boolean } added; default depth limit 16 -> Infinity.
+
+### Added
+
+* SKI.extras.search() is guaranteed to yield before exhaustion.
+
+### Fixed
+
+* ski.js search -v doesn't crash on exhaustion.
+
 ## [2.10.2] - 2026-07-12
 
 ### Changed
