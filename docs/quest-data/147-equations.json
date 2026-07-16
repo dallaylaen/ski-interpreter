@@ -1,0 +1,72 @@
+{
+  "id": "n27Dv4dN",
+  "name": "Equations",
+  "intro": [
+    "<p>So far we've mostly built terms affecting their arguments",
+    "in a uniform way. But what about distinguishing arguments?</p>",
+    "<p>The trick is almost always to put the argument in front of",
+    "some other terms and equate the computation result to the",
+    "desired expression(s).</p>",
+    "<p>Throughout this chapter, producing an equivalent term",
+    "(given enough extra arguments) is enough.</p>"
+  ],
+  "content": [
+    {
+      "id": "3YiOt9K9",
+      "created_at": "2026-07-16T20:23:34Z",
+      "name": "Warm up",
+      "intro": [
+        "<p>Create a term that returns K for I and I for K</p>"
+      ],
+      "input": { "name": "phi", "fancy": "&phi;" },
+      "cases": [
+        ["phi K x", "x"],
+        ["phi I x y", "x"]
+      ]
+    },
+    {
+      "id": "5SupNbQO",
+      "created_at": "2026-07-16T20:46:42Z",
+      "name": "Identity upgrade",
+      "intro": [
+        "<p>Create a term that converts I to K, and leaves KI in place.</p>",
+        "<p>What it does to other terms is irrelevant. Multiple solutions are possible.</p>"
+      ],
+      "input": { "name": "phi", "fancy": "&phi;" },
+      "cases": [
+        ["phi I x y", "x"],
+        ["phi (KI) x y", "y"]
+      ]
+    },
+    {
+      "id": "tY6UuNQ6",
+      "created_at": "2026-07-16T21:26:17Z",
+      "name": "vice-",
+      "intro": [
+        "<p>Create term <code>f</code> such that",
+        "<code>f I = S</code>, <code>f S = K</code>, and <code>f K = I</code>.</p>"
+      ],
+      "input": "f",
+      "cases": [
+        ["f I x y z", "x z (y z)"],
+        ["f S x y", "x"],
+        ["f K x", "x"]
+      ]
+    },
+    {
+      "id": "NUDTbx2N",
+      "created_at": "2026-07-16T21:26:17Z",
+      "name": "-versa",
+      "intro": [
+        "<p>Create term <code>f</code> such that",
+        "<code>f S = I</code>, <code>f I = K</code>, and <code>f K = S</code>.</p>"
+      ],
+      "input": "f",
+      "cases": [
+        ["f K x y z", "x z (y z)"],
+        ["f I x y", "x"],
+        ["f S x", "x"]
+      ]
+    }
+  ]
+}
