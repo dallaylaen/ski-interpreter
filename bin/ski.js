@@ -401,6 +401,7 @@ async function questCheck (files, solutionFile, fix) {
     for (const file of files) {
       try {
         let data = await fs.readFile(file, 'utf8');
+        let write = false; // write back if --fix
 
         // Fix empty id/created_at fields if requested
         if (fix) {
@@ -410,8 +411,7 @@ async function questCheck (files, solutionFile, fix) {
             .replace(/"created_at": *""/g, `"created_at": "${date}"`);
           if (fixed !== data) {
             data = fixed;
-            await fs.writeFile(file, fixed, 'utf8');
-            console.log(`  fixed ${file}`);
+            write = true;
           }
         }
 
@@ -449,8 +449,13 @@ async function questCheck (files, solutionFile, fix) {
             hasErrors = true;
             console.error(`Error in ${file}:`);
             console.error(JSON.stringify(findings, null, 2));
-          } else
+          } else {
+            if (write) {
+              await fs.writeFile(file, data, 'utf8');
+              console.log(`  fixed ${file}`);
+            }
             console.log(`✓ ${file}`);
+          }
         } catch (err) {
           hasErrors = true;
           console.error(`Error parsing quest group in ${file}:`, err.stack);
