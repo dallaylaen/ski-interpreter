@@ -17,7 +17,7 @@ and how to create and verify them.
 
 | Field | Required | Description | Example |
 |---|---|---|---|
-| `id` | yes | Unique string identifier                                                                                | `"br0ingh"`                                                               |
+| `id` | yes[^1] | Unique string identifier                                                                                | `"br0ingh"`                                                               |
 | `name` | yes | Display name                                                                                            | "Find all the birds that sing at dawn"                                    |
 | `intro` | yes | HTML description (string or array of strings). The latter will be concatenated with spaces.             | `[ "<p>Create <code>I</code>", "from <code>S</code> and <code>K</code>" ]` |
 | `input` | yes | Placeholder name (string) or array of input specs                                                       | `{"name": "phi", "fancy": "&phi;" }` or just `"x"`                        
@@ -26,7 +26,12 @@ and how to create and verify them.
 | `env` | no | A list of predefined terms or variables available in the quest.                                         | `["f", "cons = BC(CI)", "nil=KI" ]`                                         |
 | `hint` | no | Spoiler hint shown on demand                                                                            |
 | `unlock` | no | Term name to add to the inventory when the quest is solved                                              |
-| `created_at` | no | ISO 8601 timestamp of creation.                                                                         | `"2024-06-01T12:00:00Z"`                                                  |
+| `created_at` | no[^1] | ISO 8601 timestamp of creation.                                                                         | `"2024-06-01T12:00:00Z"`                                                  |
+
+[^1]: `id` and `created_at` can be left blank and filled in at last moment
+using this command:
+
+    ./bin/ski.js quest-lint --fix <quest-file.json>
 
 #### Test Cases
 

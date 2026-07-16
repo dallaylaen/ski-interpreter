@@ -80,9 +80,9 @@ Commands such as `npm run build` and `npx eslint` will help with the gory detail
 
 If you are adding new quests,
 don't fill in quest `id` and `created_at` by hand.
-Instead, add `"id":"",` on a separate line and then run
+Instead, leave `"id":"",` and `"created_at":""` blank and, when quest is ready, run
 
-    ./aux/fill-empty-ids
+    ./bin/ski.js quest-lint --fix
 
 If you know of a better way to automate quest authoring and
 ensuring unique ids, please write me.
