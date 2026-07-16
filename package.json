@@ -41,6 +41,7 @@
     "LICENSE",
     "CHANGELOG.md",
     "example",
+    "quest-authoring.md",
     "lib",
     "!lib/types/test"
   ],
