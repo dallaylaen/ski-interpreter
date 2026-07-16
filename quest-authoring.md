@@ -22,7 +22,7 @@ and how to create and verify them.
 | `intro` | yes | HTML description (string or array of strings). The latter will be concatenated with spaces.             | `[ "<p>Create <code>I</code>", "from <code>S</code> and <code>K</code>" ]` |
 | `input` | yes | Placeholder name (string) or array of input specs                                                       | `{"name": "phi", "fancy": "&phi;" }` or just `"x"`                        
 | `cases` | yes | Array of test cases, each case being itself an array: `[[...],...]`                                     | `[ [ "x K true false", "false" ], [ "x (KI) true false", "true" ] ]`      |
-| `allow` | no | Restrict allowed combinators, e.g. `"SK"` or `"I-I"` (for "none at all, e.g. the quest only has lambdas)" |
+| `allow` | no | Restrict allowed combinators. The format is either a string of terms (uppercase lumped, lowercase space-separated) or `"-<term> ..."` to forbid term(s). | `"SK"` to only allow S and K. The `"I-I"` idiom means "no combinators at all" (e.g. the input is lambda term instead)|
 | `env` | no | A list of predefined terms or variables available in the quest.                                         | `["f", "cons = BC(CI)", "nil=KI" ]`                                         |
 | `hint` | no | Spoiler hint shown on demand                                                                            |
 | `unlock` | no | Term name to add to the inventory when the quest is solved                                              |
@@ -75,7 +75,7 @@ A chapter file contains a single object with a `content` array of quest objects:
   "id": "unique-chapter-id",
   "name": "Chapter Name",
   "intro": [ "<p>HTML", "introduction.</p>" ],
-  "content": [ ... ]
+  "content": [ /* array of quest objects described above */ ]
 }
 ```
 
@@ -135,7 +135,5 @@ This validates metadata, checks for duplicate IDs, and verifies that any known s
 ## Further Reading
 
 - Examples: [html file](example/mini-quest.html) and [json file](example/example-quests.json)
-- Core logic: [src/quest.js](src/quest.js)
+- Core logic: [src/quest.ts](src/quest.ts)
 - Rendering logic: [site-src/quest.js](site-src/quest.js)
-
-
