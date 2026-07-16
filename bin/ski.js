@@ -123,8 +123,9 @@ program
   .command('quest-lint <files...>')
   .description('Check quest files for validity')
   .option('--solution <file>', 'Load solutions from file')
+  .option('--fix', 'Fill empty id/created_at fields in place')
   .action((files, options) => {
-    questCheck(files, options.solution);
+    questCheck(files, options.solution, options.fix);
   });
 
 program.command('help [topic]')
@@ -384,7 +385,7 @@ function displayInfer (guess) {
   }
 }
 
-async function questCheck (files, solutionFile) {
+async function questCheck (files, solutionFile, fix) {
   try {
     // Load solutions if provided
     let solutions = null;
@@ -399,11 +400,31 @@ async function questCheck (files, solutionFile) {
 
     for (const file of files) {
       try {
-        const data = await fs.readFile(file, 'utf8');
+        let data = await fs.readFile(file, 'utf8');
+
+        // Fix empty id/created_at fields if requested
+        if (fix) {
+          const date = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+          const fixed = data
+            .replace(/"id": *""/g, () => `"id": "${questId()}"`)
+            .replace(/"created_at": *""/g, `"created_at": "${date}"`);
+          if (fixed !== data) {
+            data = fixed;
+            await fs.writeFile(file, fixed, 'utf8');
+            console.log(`  fixed ${file}`);
+          }
+        }
+
         const questData = JSON.parse(data);
 
         // Handle both single quest objects and quest groups
         const entry = Array.isArray(questData) ? { content: questData } : questData;
+
+        // Skip files that aren't quest data (e.g. index.json)
+        if (!Array.isArray(entry.content) && !entry.cases) {
+          console.log(`  skipped ${file} (not a quest file)`);
+          continue;
+        }
 
         try {
           const group = new Quest.Group(entry);
@@ -432,11 +453,11 @@ async function questCheck (files, solutionFile) {
             console.log(`✓ ${file}`);
         } catch (err) {
           hasErrors = true;
-          console.error(`Error parsing quest group in ${file}:`, err.message);
+          console.error(`Error parsing quest group in ${file}:`, err.stack);
         }
       } catch (err) {
         hasErrors = true;
-        console.error(`Error reading file ${file}:`, err.message);
+        console.error(`Error reading file ${file}:`, err.stack);
       }
     }
 
@@ -630,4 +651,12 @@ function formatExpr (expr) {
   return declare
     ? expr.declare({ ...format, inventory: ski.getTerms() })
     : expr.format(format);
+}
+
+function questId (len = 8) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let id = '';
+  for (let i = 0; i < len; i++)
+    id += chars[Math.floor(Math.random() * 62)];
+  return id;
 }
