@@ -77,6 +77,30 @@
       "cases": [
         [ "phi x y z", "x z (y z)"]
       ]
+    },
+    {
+      "id": "dhnhKHNl",
+      "created_at": "2026-07-16T21:44:50Z",
+      "name": "Iottier than iota",
+      "intro": [
+        "<p>Perhaps you can create your own monobase that converges to <code>S</code> and <code>K</code>",
+        "even faster?</p>"
+      ],
+      "input": [
+        {
+          "name": "X", "lambdas": true, "note": "Create your own combinator. Lambdas (in form of <code>a-&gt;foo a bar</code>) are allowed."
+        },
+        {
+          "name": "s", "allow": "I-I", "note": "Create a combinator that behaves like S, using only your own combinator X."
+        },
+        {
+            "name": "k", "allow": "I-I", "note": "Create a combinator that behaves like K, using only your own combinator X."
+        }
+      ],
+        "cases": [
+          ["s x y z", "x z (y z)"],
+          ["k x y", "x"]
+        ]
     }
   ]
 }
