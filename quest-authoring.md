@@ -17,21 +17,38 @@ and how to create and verify them.
 
 | Field | Required | Description | Example |
 |---|---|---|---|
-| `id` | yes[^1] | Unique string identifier                                                                                | `"br0ingh"`                                                               |
-| `name` | yes | Display name                                                                                            | "Find all the birds that sing at dawn"                                    |
-| `intro` | yes | HTML description (string or array of strings). The latter will be concatenated with spaces.             | `[ "<p>Create <code>I</code>", "from <code>S</code> and <code>K</code>" ]` |
-| `input` | yes | Placeholder name (string) or array of input specs                                                       | `{"name": "phi", "fancy": "&phi;" }` or just `"x"`                        
-| `cases` | yes | Array of test cases, each case being itself an array: `[[...],...]`                                     | `[ [ "x K true false", "false" ], [ "x (KI) true false", "true" ] ]`      |
-| `allow` | no | Restrict allowed combinators. The format is either a string of terms (uppercase lumped, lowercase space-separated) or `"-<term> ..."` to forbid term(s). | `"SK"` to only allow S and K. The `"I-I"` idiom means "no combinators at all" (e.g. the input is lambda term instead)|
-| `env` | no | A list of predefined terms or variables available in the quest.                                         | `["f", "cons = BC(CI)", "nil=KI" ]`                                         |
-| `hint` | no | Spoiler hint shown on demand                                                                            |
-| `unlock` | no | Term name to add to the inventory when the quest is solved                                              |
-| `created_at` | no[^1] | ISO 8601 timestamp of creation.                                                                         | `"2024-06-01T12:00:00Z"`                                                  |
+| `id` | yes | Unique string identifier | `"br0ingh"` |
+| `name` | yes | Display name | "Find all the birds that sing at dawn" |
+| `intro` | yes | HTML description (string or array of strings). The latter will be concatenated with spaces. | `[ "<p>Create <code>I</code>", "from <code>S</code> and <code>K</code>" ]` |
+| `input` | yes | Placeholder name (string) or array of input specs | `{"name": "phi", "fancy": "&phi;" }` or just `"x"` |
+| `cases` | yes | Array of test cases, each case being itself an array: `[[...],...]` | `[ [ "x K true false", "false" ], [ "x (KI) true false", "true" ] ]` |
+| `allow` | no | Restrict allowed combinators. The format is either a string of terms (uppercase lumped, lowercase space-separated) or `"-<term> ..."` to forbid term(s). | `"SK"` to only allow S and K. The `"I-I"` idiom means "allow I, then forbit I" (e.g. the input is a pure lambda term instead) |
+| `env` | no | A list of predefined named terms or variables available throughtout the specific quest. | `["f", "cons = BC(CI)", "nil = KI" ]` |
+| `hint` | no | Spoiler hint shown on demand | |
+| `unlock` | no | Term name to add to the inventory when the quest is solved | |
+| `created_at` | no | ISO 8601 timestamp of creation. | `"2024-06-01T12:00:00Z"` |
 
-[^1]: `id` and `created_at` can be left blank and filled in at last moment
-using this command:
+### The input field
 
-    ./bin/ski.js quest-lint --fix <quest-file.json>
+Input(s) specify placeholder(s) for the proposed quest solution
+that will be substituted into the test cases.
+In the vast majority of quests, there is only one input, and it only has a variable name.
+However, multiple inputs are possible.
+
+Therefore, a input spec consisting of a string is inflated into `{ "name": "<string>" }`,
+and a single input object is inflated into an 1-element array.
+
+Here's the complete input spec format:
+
+| Field | Required | Description | Example |
+|---|---|---|---|
+| `name` | yes | Placeholder name for the input | `"x"` |
+| `fancy` | no | HTML string to display instead of the name | `"&phi;"` |
+| `lambdas` | no | Boolean, whether the input may contain lambda abstractions | `true` |
+| `numbers` | no | Boolean, whether the input may contain numbers | `true` |
+| `allow` | no | Restrict allowed combinators for this input. Overrides the quests's `allow`. | `"SK"` |
+| `note` | no | HTML string to display as a note about the input | `"This is the function to be applied."` |
+
 
 #### Test Cases
 
@@ -58,10 +75,12 @@ Supported `caps` properties: `linear`, `affine`, `normal`, `proper`, `discard`, 
 When a quest takes more than one input, set `input` to an array of input specs:
 
 ```json
+{
 "input": [
-  {"name": "f", "note": "the function"},
-  {"name": "x", "lambdas": true, "note": "the argument"}
-]
+    {"name": "f", "note": "the function"},
+    {"name": "x", "lambdas": true, "note": "the argument"}
+  ]
+}
 ```
 
 Each spec can override global `allow`, `numbers`, and `lambdas` settings.
