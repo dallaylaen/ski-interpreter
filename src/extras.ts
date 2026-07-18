@@ -260,8 +260,8 @@ function * search<T> (seed: Expr[], options: SearchOptions, predicate: SearchCal
         seen[key] = true;
       }
       probed++;
-      const res = predicate(term, props!) ?? 0;
-      return (typeof res === 'number') ? { res: { offset: res }, props } : { res, props };
+      const res = predicate(term, props!);
+      return (typeof res === 'object') ?  { res, props } : { res: { offset: res }, props };
     };
 
   // sieve through the seed
@@ -348,6 +348,8 @@ function isStringTriple  (x: unknown): string | undefined {
  * @returns true if any non-empty arrays exist in the upper half of the list
  */
 function hasUpperHalf<T> (gen: number, list: T[][]): boolean {
+  if (gen < list.length)
+    return true;
   for (let i = Math.floor(gen / 2); i < list.length; i++) {
     if (list[i] && list[i].length > 0)
       return true;
