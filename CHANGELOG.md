@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.2] - 2026-07-18
+
+### Added
+
+* `quest-authoring.md` now comes with the package.
+
+### Fixed
+
+* `SKI.extras.search()` treated undefined return from callback as offset=0,
+instead of calculating offset based on term properties.
+* `./bin/ski.js search` returned offset=0 on non-matching terms, resulting
+in wrong candidate term prioritization and longer searches.
+* `./bin/ski.js search`: more frequent progress ticks in verbose mode,
+and a compulsory tick on every generation change.
+
 ## [2.11.1] - 2026-07-17
 
 ### Added
