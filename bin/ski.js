@@ -489,7 +489,6 @@ function searchExpression (targetStr, termStrs, options) {
       return { offset: -1 };
     if (p.expr.equals(expr))
       return { found: true, stop: true };
-    return 0;
   });
   const t0 = Date.now();
 
