@@ -3,15 +3,21 @@
   "created_at": "2025-03-25T14:17:10",
   "name": "The island of Iota",
   "intro": [
-    "Now you know two bases: the SK(I) and the BCKW.",
-    "Apparently, there is a one element base: <code>X = x &rarr; xSK</code>. Try it!"
+    "<p>Now you know two bases: the SK and the BCKW.",
+    "Can the number of combinators be reduced even further?</p>",
+    "<p>Turns out, it can. However, at a price: it can be proven that",
+    "such combinator cannot be <i>proper</i>,",
+    "i.e. reducible to just an application of its arguments.</p>"
   ],
   "content": [
     {
       "id": "YAN4Mxrt",
       "created_at": "2024-08-29T09:15:33",
       "name": "All you need is",
-      "intro": "Build <code>x &rarr; x(S)(K)</code>",
+      "intro": [
+        "<p>Build a combinator <code>&iota;</code> such that <code>&iota; x = x S K</code>.</p>",
+        "<p>For ease of typing, we will call it <code>X</code> in the subsequent exercises.</p>"
+      ],
       "input": "phi",
       "cases": [
         [ "phi K x y z", "x z (y z)" ],
