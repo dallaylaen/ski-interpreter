@@ -484,12 +484,21 @@ function searchExpression (targetStr, termStrs, options) {
     process.exit(1);
   }
 
-  const gen = SKI.extras.search(seed, { tries: options.maxTries, depth: options.maxDepth }, (e, p) => {
-    if (!p.expr)
-      return { offset: -1 };
-    if (p.expr.equals(expr))
-      return { found: true, stop: true };
-  });
+  const gen = SKI.extras.search(
+    seed,
+    {
+      tries:            options.maxTries,
+      depth:            options.maxDepth,
+      maxArgs:          runOptions.maxArgs,
+      progressInterval: 10,
+    },
+    (e, p) => {
+      if (!p.expr)
+        return { offset: -1 };
+      if (p.expr.equals(expr))
+        return { found: true, stop: true };
+    }
+  );
   const t0 = Date.now();
 
   if (verbose) {
@@ -528,7 +537,7 @@ function searchExpression (targetStr, termStrs, options) {
         printProgress(`// Nothing found: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n`);
         process.exit(1);
       }
-      if (tick) {
+      if (tick || value?.newGen) {
         printProgress(`// Progress: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s`);
         tick = false;
       }
