@@ -4,9 +4,8 @@
   "intro": [
     "<p>So far we've mostly built terms affecting their arguments",
     "in a uniform way. But what about distinguishing arguments?</p>",
-    "<p>The trick is almost always to put the argument in front of",
-    "some other terms and equate the computation result to the",
-    "desired expression(s).</p>",
+    "<p>The trick is almost always to put some unknowns to the argument,",
+    "add some extra probe arguments to both sides, and try to achieve a simpler equation.</p>",
     "<p>Throughout this chapter, producing an equivalent term",
     "(given enough extra arguments) is enough.</p>"
   ],
@@ -16,7 +15,8 @@
       "created_at": "2026-07-16T20:23:34Z",
       "name": "Warm up",
       "intro": [
-        "<p>Create a term that returns K for I and I for K</p>"
+        "<p>Create a term that returns <code>K</code> for <code>I</code>",
+        "and <code>I</code> for <code>K</code>.</p>"
       ],
       "input": { "name": "phi", "fancy": "&phi;" },
       "cases": [
@@ -29,8 +29,9 @@
       "created_at": "2026-07-16T20:46:42Z",
       "name": "Identity upgrade",
       "intro": [
-        "<p>Create a term that converts I to K, and leaves KI in place.</p>",
-        "<p>What it does to other terms is irrelevant. Multiple solutions are possible.</p>"
+        "<p>Create a term that converts <code>I</code> to <code>K</code>,",
+        "and leaves <code>KI</code> in place.</p>",
+        "<p>What it does to other terms is irrelevant. Multiple solutions exist.</p>"
       ],
       "input": { "name": "phi", "fancy": "&phi;" },
       "cases": [
@@ -59,7 +60,9 @@
       "name": "-versa",
       "intro": [
         "<p>Create term <code>f</code> such that",
-        "<code>f S = I</code>, <code>f I = K</code>, and <code>f K = S</code>.</p>"
+        "<code>f S = I</code>, <code>f I = K</code>, and <code>f K = S</code>.</p>",
+        "<p>This and previous puzzle names were shamelessly stolen from",
+        "the <a href=\"https://en.wikipedia.org/wiki/Supaplex\" target=\"_blank\">Supaplex</a> game.</p>"
       ],
       "input": "f",
       "cases": [
