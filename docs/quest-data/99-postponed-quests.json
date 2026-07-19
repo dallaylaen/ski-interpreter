@@ -12,6 +12,25 @@
       "cases": [
         [ "V=BC(CI); phi f (V a (V b (V c (V d (KI)))))", "f b c" ]
       ]
+    },
+    {
+      "id": "",
+      "created_at": "",
+      "name": "Sort a linked list",
+      "intro": [
+        "<p>Given a predicate <code>in_order</code> and a linked list,",
+        "return a list such that for every two consecutive elements <code>in_order</code> returns true.</p>",
+        "<p><code>in_order</code> is guaranteed to be transitive. </p>",
+        "<p>You can use <code>cons/V</code> and <code>nil</code> to construct a linked list.</p>"
+      ],
+      "env": ["V=BC(CI)", "nil=KI", "cons=V"],
+      "input": "sort",
+      "cases": [
+        [ "sort (KK) nil", "nil" ],
+        [ "sort (KK) (cons x nil)", "cons x nil" ],
+        [ "sort (a->b->(a (CI)(KK)(b (CI) (K(KI))))) (V 5(V 2(V 4(V 1(V 3 nil)))))", "V 1(V 2(V 3(V 4(V 5 nil))))" ]
+
+      ]
     }
   ]
 }
