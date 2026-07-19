@@ -308,12 +308,13 @@ for building interactive quest pages from JSON-encoded quest data;
 * [@dokutan](https://github.com/dokutan) for quest bug reports and contributions.
 * [@mikevoronov](https://github.com/mikevoronov) - chief demand officer
 
-# Prior art and inspiration
+# Prior art, inspiration, and similar projects
 
 * "To Mock The Mockingbird" by Raymond Smullyan.
-* [combinator birds](https://www.angelfire.com/tx4/cus/combinator/birds.html) by [Chris Rathman](https://www.angelfire.com/tx4/cus/index.html)
-* [Fun with combinators](https://doisinkidney.com/posts/2020-10-17-ski.html) by [@oisdk](https://github.com/oisdk)
-* [Combinatris](https://dirk.rave.org/combinatris/) by Dirk van Deun
+* [combinator birds](https://www.angelfire.com/tx4/cus/combinator/birds.html) by [Chris Rathman](https://www.angelfire.com/tx4/cus/index.html);
+* [Fun with combinators](https://doisinkidney.com/posts/2020-10-17-ski.html) by [@oisdk](https://github.com/oisdk);
+* [Combinatris](https://dirk.rave.org/combinatris/) by Dirk van Deun;
+* [Combinate](https://combinate.app/) by [Matthías Páll Gissurarson](https://github.com/Tritlo).
 
 # License and copyright
 
