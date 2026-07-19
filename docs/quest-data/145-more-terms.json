@@ -36,7 +36,10 @@
       "created_at": "2026-06-23T01:16:19",
       "name": "Sudo Make Me A Sandwich",
       "intro": [
-        "<p>Also without a common name, find a term such that <code>f bread cheese = bread cheese bread</code>.</p>"
+        "<p>Also without a common name, find a term such that",
+        "<code>f bread cheese = bread cheese bread</code>.</p>",
+        "<p>Inspired by <a href=\"https://combinate.app/\" target=\"_blank\">Combinate</a>,",
+        "a combinatory logic game starting with &iota;.</p>"
       ],
       "input": "f",
       "cases": [
