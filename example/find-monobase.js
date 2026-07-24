@@ -16,7 +16,7 @@
  * Progress indicators are emitted in the meantime.
  */
 
-const { SKI } = require('../src');
+const { SKI } = require('../lib/ski-interpreter.cjs');
 
 const ski = new SKI();
 
@@ -50,7 +50,7 @@ for (const progress of search(seed, { depth: 100, max: 150, tries: 100_000_000, 
   const term = new SKI.classes.Alias('X', expr);
   const ret = checkBase([term], target, { depth: best, tries: 100_000, maxArgs: 8, max: 150 });
   if (!ret)
-    return 0;
+    return;
 
   const maxlen = Math.max(
     ...Object.values(ret)
@@ -85,13 +85,13 @@ function checkBase (base, target, options) {
   for (const progress of search(base, options, (e, p) => {
     if (!p.expr) return { offset: -1 };
     const maybe = need[p.expr];
-    if (!maybe) return 0;
+    if (!maybe) return;
 
     //  console.log(`found ${maybe} as ${e}`);
 
     found[maybe] = e;
     delete need[p.expr];
-    return Object.keys(need).length === 0 ? { found: true, stop: true } : 0;
+    return Object.keys(need).length === 0 ? { found: true, stop: true } : {};
   })) {
     if (progress.found)
       return found;
