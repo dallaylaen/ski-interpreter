@@ -112,7 +112,7 @@ export abstract class Expr {
   /**  An estimated number of nodes in the expression tree.
    *     Used to prevent runaway computations.
    */
-  size?: number;
+  size: number = 1;
 
   /**
    * Add metadata based on user-supplied values and/or the properties of the term itself.
@@ -938,7 +938,7 @@ export class App extends Expr {
 
     this.arg = arg;
     this.fun = fun;
-    this.size = (fun.size ?? 1) + (arg.size ?? 1);
+    this.size = fun.size + arg.size;
   }
 
   _traverse_descend (options: TraverseOptions, change: TraverseCallback): TraverseValue<Expr> {
@@ -1217,7 +1217,7 @@ export class Lambda extends Expr {
     this.arg = local;
     this.impl = impl.subst(arg, local) ?? impl;
     this.arity = 1;
-    this.size = (impl.size ?? 1) + 1;
+    this.size = impl.size + 1;
   }
 
   invoke (arg: Expr): Expr {
@@ -1379,9 +1379,10 @@ export class Alias extends Named {
 
     this.annotate(options);
     this.invoke = waitn(options.inline ? 0 : this.arity ?? 0)(impl);
-    this.size = impl.size;
-    if (options.inline)
+    if (options.inline) {
       this.inline = true;
+      this.size = impl.size;
+    }
   }
 
   /**
