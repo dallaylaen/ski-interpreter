@@ -1388,10 +1388,11 @@ export class Alias extends Named {
   /**
    * Make the alias inline, i.e. replace it with its implementation everywhere.
    *
+   * NOTE: this is a mutating method, and mutation has a terrible track record
+   * throughout this codebase.
+   *
    * Replaces the old `outdated` attribute.
    * Used by the parser when a term definition is removed or updated.
-   *
-   *
    *
    * May change in future versions, use with caution.
    *
@@ -1401,6 +1402,7 @@ export class Alias extends Named {
   makeInline (): this {
     this.invoke = waitn(0)(this.impl);
     this.inline = true;
+    this.size = this.impl.size;
     return this;
   }
 
