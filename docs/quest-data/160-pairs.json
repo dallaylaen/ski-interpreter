@@ -90,6 +90,26 @@
         [ "second (triplet a b c)", "b" ],
         [ "third (triplet a b c)", "c" ]
       ]
+    },
+    {
+      "id": "3DVrMPrF",
+      "created_at": "2026-07-28T06:14:48Z",
+      "name": "n-tuple",
+      "intro": [
+        "<p>Given a number <code>n</code>, return a function <code>tuple</code>",
+        "that takes <code>n</code> arguments",
+        "and feeds them to the <code>n+1th</code> argument.</p>",
+        "<p>E.g. <code>tuple 5 a b c d e f = f a b c d e</code>.</p>",
+        "<p>Inspired by <a href=\"https://github.com/VictorTaelin\" target=\"_blank\">Victor Taelin</a>.</p>"
+      ],
+      "input": "tuple",
+      "cases": [
+        [ "tuple 1 a b", "b a" ],
+        [ "tuple 2 a b f", "f a b" ],
+        [ "tuple 3 a b c f", "f a b c" ],
+        [ "tuple 4 a b c d f", "f a b c d" ],
+        [ "tuple 5 a b c d e f", "f a b c d e" ]
+      ]
     }
   ]
 }
