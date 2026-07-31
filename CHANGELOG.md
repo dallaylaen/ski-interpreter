@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.3] - 2026-08-01
+
+### Changed
+
+* `expr.size` is now always defined and defaults to 1.
+
+### Fixed
+
+* `example/find-monobase.js` now relies on build artifacts rather than source files.
+
 ## [2.11.2] - 2026-07-18
 
 ### Added
