@@ -10,5 +10,6 @@ or create a new one and document it here:
 * `manage` - operations on the parser object: adding/removing terms, restricting, save/load etc.
 * `quest` - quests
 * `transform` - SKI<->Lambda, fancy formatting, and tree traversals
+* `ts/*` - has the same structure as above, but written in native TypeScript
 * `REAMDE.md` - this file
 
