@@ -1,5 +1,15 @@
 #!/usr/bin/env perl
 
+=head1 DESCRIPTION
+
+This script was used to retroactively add "created_at" fields
+to the JSON files in docs/quest-data, based on git history.
+It serves no purpose anymore
+(quest commits without dates will be rejected)
+and is only kept as an exercise in archaeology.
+
+=cut
+
 use strict;
 use warnings;
 use POSIX qw(strftime);
@@ -15,9 +25,6 @@ for my $file(@ARGV) {
         return $json;
     });
 };
-
-
-
 
 sub in_place {
     my ($name, $change) = @_;
