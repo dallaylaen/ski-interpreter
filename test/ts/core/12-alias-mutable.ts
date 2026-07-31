@@ -18,6 +18,8 @@ describe('Alias.makeInline() vs Alias constructor with inline option', () => {
     it('walk()', () => expect(walk(inline)).to.deep.equal(walk(mutated)));
     it('walk(a, b, c)', () => expect(walk(inline, a, b, c)).to.deep.equal(walk(mutated, a, b, c)));
     it('produces predictable eval', () => c.apply(a, b).expect(mutated.apply(a, b, c).run().expr));
+    it('size', () => expect(inline.size).to.equal(mutated.size));
+    it('has same size as impl', () => expect(mutated.size).to.equal(mutated.impl.size));
   })
 });
 
