@@ -118,6 +118,15 @@ program
     searchExpression(await readExpression(target), terms, options);
   });
 
+// Quest-attempt subcommand
+program
+  .command('quest-attempt <quest-id> <terms...>')
+  .description('Attempt a quest solution with the given term(s)')
+  .option('-f, --file <file>', 'Quest file (chapter) to load the quest from')
+  .action(async (questId, terms, options) => {
+    await questAttempt(questId, terms, options.file);
+  });
+
 // Quest-check subcommand
 program
   .command('quest-lint <files...>')
@@ -383,6 +392,98 @@ function displayInfer (guess) {
     if (guess[key] !== undefined && !quiet)
       console.log(`// ${key}: ${guess[key]}`);
   }
+}
+
+async function questAttempt (id, terms, file) {
+  // Resolve the quest file: if not provided, search docs/quest-data/index.json
+  let questData = null;
+
+  const loadQuestFromFile = async (filePath) => {
+    const raw = await fs.readFile(filePath, 'utf8');
+    const data = JSON.parse(raw);
+    const entry = Array.isArray(data) ? { content: data } : data;
+
+    // Single quest (has cases directly)
+    if (entry.cases) {
+      if (String(entry.id) === String(id))
+        return entry;
+      return null;
+    }
+
+    // Quest group (has content array)
+    if (Array.isArray(entry.content)) {
+      for (const item of entry.content) {
+        if (String(item.id) === String(id))
+          return item;
+      }
+    }
+    return null;
+  };
+
+  if (file) {
+    questData = await loadQuestFromFile(file);
+    if (!questData) {
+      console.error(`Quest '${id}' not found in ${file}`);
+      process.exit(1);
+    }
+  } else {
+    // Search all chapter files listed in docs/quest-data/index.json
+    const indexPath = require('node:path').join(__dirname, '..', 'docs', 'quest-data', 'index.json');
+    let chapters;
+    try {
+      const indexRaw = await fs.readFile(indexPath, 'utf8');
+      chapters = JSON.parse(indexRaw).chapters;
+    } catch {
+      console.error('Could not load quest index. Use -f <file> to specify a quest file.');
+      process.exit(1);
+    }
+    const dir = require('node:path').dirname(indexPath);
+    for (const chapter of chapters) {
+      const filePath = require('node:path').join(dir, chapter);
+      try {
+        questData = await loadQuestFromFile(filePath);
+        if (questData)
+          break;
+      } catch { /* skip unreadable files */ }
+    }
+    if (!questData) {
+      console.error(`Quest '${id}' not found in any chapter. Use -f <file> to specify a quest file.`);
+      process.exit(1);
+    }
+  }
+
+  // Build and run the quest
+  let quest;
+  try {
+    quest = new Quest(questData);
+  } catch (err) {
+    console.error(`Failed to construct quest '${id}': ${err.message}`);
+    process.exit(1);
+  }
+
+  const result = quest.check(...terms);
+
+  if (result.exception) {
+    console.error(`Error: ${result.exception.message}`);
+    process.exit(1);
+  }
+
+  const passCount = result.details.filter(d => d.pass).length;
+  const total = result.details.length;
+
+  for (let i = 0; i < result.details.length; i++) {
+    const d = result.details[i];
+    const mark = d.pass ? '✓' : '✗';
+    let line = `  ${mark} case ${i + 1}`;
+    if (!d.pass && d.reason)
+      line += `: ${d.reason}`;
+    if (!d.pass && d.found && d.expected)
+      line += `\n      found:    ${d.found.format(format)}\n      expected: ${d.expected.format(format)}`;
+    console.log(line);
+  }
+
+  console.log(`\n${result.pass ? '✓ PASS' : '✗ FAIL'} (${passCount}/${total} cases, ${result.steps} step(s))`);
+  process.exit(result.pass ? 0 : 1);
 }
 
 async function questCheck (files, solutionFile, fix) {
