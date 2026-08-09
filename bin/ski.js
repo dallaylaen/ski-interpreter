@@ -127,6 +127,15 @@ program
     await questAttempt(questId, terms, options.file);
   });
 
+// Quest-list subcommand
+program
+  .command('quest-list')
+  .description('List all quests with their chapter/index, ID, and title')
+  .option('-f, --file <file>', 'Quest file (chapter) to list quests from')
+  .action(async (options) => {
+    await questList(options.file);
+  });
+
 // Quest-check subcommand
 program
   .command('quest-lint <files...>')
@@ -391,6 +400,54 @@ function displayInfer (guess) {
   for (const key of ['normal', 'proper', 'arity', 'discard', 'duplicate', 'steps']) {
     if (guess[key] !== undefined && !quiet)
       console.log(`// ${key}: ${guess[key]}`);
+  }
+}
+
+async function questList (file) {
+  const path = require('node:path');
+
+  const listChapter = (chapterIndex, entry) => {
+    const quests = Array.isArray(entry.content) ? entry.content : entry.cases ? [entry] : [];
+    for (let qi = 0; qi < quests.length; qi++) {
+      const q = quests[qi];
+      const loc = `${chapterIndex}.${qi + 1}`;
+      const id = q.id ?? '(no id)';
+      const name = q.name ?? '(unnamed)';
+      console.log(`${loc.padEnd(8)} ${id.padEnd(12)} ${name}`);
+    }
+  };
+
+  if (file) {
+    const raw = await fs.readFile(file, 'utf8');
+    const data = JSON.parse(raw);
+    const entry = Array.isArray(data) ? { content: data } : data;
+    listChapter(1, entry);
+    return;
+  }
+
+  // Load all chapters from index
+  const indexPath = path.join(__dirname, '..', 'docs', 'quest-data', 'index.json');
+  let chapters;
+  try {
+    const indexRaw = await fs.readFile(indexPath, 'utf8');
+    chapters = JSON.parse(indexRaw).chapters;
+  } catch {
+    console.error('Could not load quest index. Use -f <file> to specify a quest file.');
+    process.exit(1);
+  }
+  const dir = path.dirname(indexPath);
+  for (let ci = 0; ci < chapters.length; ci++) {
+    const filePath = path.join(dir, chapters[ci]);
+    try {
+      const raw = await fs.readFile(filePath, 'utf8');
+      const data = JSON.parse(raw);
+      const entry = Array.isArray(data) ? { content: data } : data;
+      const chapterName = entry.name ?? chapters[ci];
+      console.log(`\n## ${ci + 1}. ${chapterName}`);
+      listChapter(ci + 1, entry);
+    } catch (err) {
+      console.error(`Could not read ${chapters[ci]}: ${err.message}`);
+    }
   }
 }
 
