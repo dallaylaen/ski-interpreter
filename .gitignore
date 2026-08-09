@@ -25,3 +25,4 @@ docs/build
 # files generated from TS
 src/*.js
 test/ts/**/*.js
+test/integration/**/*.js
