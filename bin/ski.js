@@ -127,6 +127,15 @@ program
     await questAttempt(questId, terms, options.file);
   });
 
+// Quest-show subcommand
+program
+  .command('quest-show <quest-id>')
+  .description('Display a quest description and input requirement(s)')
+  .option('-f, --file <file>', 'Quest file (chapter) to load the quest from')
+  .action(async (questId, options) => {
+    await questShow(questId, options.file, verbose);
+  });
+
 // Quest-list subcommand
 program
   .command('quest-list')
@@ -403,6 +412,80 @@ function displayInfer (guess) {
   }
 }
 
+async function questShow (id, file, showCases) {
+  const questData = await findQuest(id, file);
+  if (!questData) {
+    console.error(`Quest '${id}' not found${file ? ` in ${file}` : ''}.`);
+    process.exit(1);
+  }
+
+  // Strip HTML tags for terminal display
+  const stripHtml = s => s
+    .replace(/<[^>]+>/g, '')
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
+    .replace(/&rarr;/g, '->').replace(/&compfn;/g, 'o').replace(/&#?\w+;/g, '');
+
+  // Title
+  console.log(`${questData.name ?? '(unnamed)'}  [${id}]`);
+
+  // Intro
+  const intro = questData.intro;
+  if (intro) {
+    const lines = (Array.isArray(intro) ? intro : [intro]).map(stripHtml);
+    console.log('\n' + lines.join(' ').replace(/\s+/g, ' ').trim());
+  }
+
+  // Hint
+  if (questData.hint)
+    console.log('\nHint: ' + stripHtml(questData.hint));
+
+  // Input(s)
+  const inputs = Array.isArray(questData.input) ? questData.input : [questData.input];
+  const allow = questData.allow;
+  const env = questData.env;
+  console.log('');
+  if (inputs.length === 1) {
+    const inp = inputs[0];
+    const name = (typeof inp === 'object' ? inp.name : inp) ?? '?';
+    process.stdout.write(`Input: ${name}`);
+    if (allow) process.stdout.write(`  (allowed: ${allow})`);
+    console.log('');
+  } else {
+    console.log('Inputs:');
+    for (const inp of inputs) {
+      if (typeof inp === 'object') {
+        const name = inp.name ?? '?';
+        const note = inp.note ? `  -- ${stripHtml(inp.note)}` : '';
+        const inpAllow = inp.allow ?? allow;
+        const allowStr = inpAllow ? `  (allowed: ${inpAllow})` : '';
+        console.log(`  ${name}${allowStr}${note}`);
+      } else {
+        const allowStr = allow ? `  (allowed: ${allow})` : '';
+        console.log(`  ${inp}${allowStr}`);
+      }
+    }
+  }
+  if (env && env.length)
+    console.log(`Env: ${env.join(', ')}`);
+
+  // Cases (only with -v)
+  if (showCases && questData.cases && questData.cases.length) {
+    console.log('\nCases:');
+    for (const c of questData.cases) {
+      if (Array.isArray(c) && typeof c[0] === 'object') {
+        const [opts, ...exprs] = c;
+        const optStr = Object.entries(opts)
+          .map(([k, v]) => typeof v === 'object' ? `${k}: ${JSON.stringify(v)}` : `${k}: ${v}`)
+          .join(', ');
+        console.log(`  [${optStr}]  ${exprs.join('  =>  ')}`);
+      } else {
+        const exprs = Array.isArray(c) ? c : [c];
+        console.log(`  ${exprs.join('  =>  ')}`);
+      }
+    }
+  }
+}
+
 async function questList (file) {
   const path = require('node:path');
 
@@ -451,23 +534,12 @@ async function questList (file) {
   }
 }
 
-async function questAttempt (id, terms, file) {
-  // Resolve the quest file: if not provided, search docs/quest-data/index.json
-  let questData = null;
+async function findQuest (id, file) {
+  const path = require('node:path');
 
-  const loadQuestFromFile = async (filePath) => {
-    const raw = await fs.readFile(filePath, 'utf8');
-    const data = JSON.parse(raw);
-    const entry = Array.isArray(data) ? { content: data } : data;
-
-    // Single quest (has cases directly)
-    if (entry.cases) {
-      if (String(entry.id) === String(id))
-        return entry;
-      return null;
-    }
-
-    // Quest group (has content array)
+  const searchInEntry = (entry) => {
+    if (entry.cases && String(entry.id) === String(id))
+      return entry;
     if (Array.isArray(entry.content)) {
       for (const item of entry.content) {
         if (String(item.id) === String(id))
@@ -477,36 +549,40 @@ async function questAttempt (id, terms, file) {
     return null;
   };
 
-  if (file) {
-    questData = await loadQuestFromFile(file);
-    if (!questData) {
-      console.error(`Quest '${id}' not found in ${file}`);
-      process.exit(1);
-    }
-  } else {
-    // Search all chapter files listed in docs/quest-data/index.json
-    const indexPath = require('node:path').join(__dirname, '..', 'docs', 'quest-data', 'index.json');
-    let chapters;
+  const loadFile = async (filePath) => {
+    const raw = await fs.readFile(filePath, 'utf8');
+    const data = JSON.parse(raw);
+    return searchInEntry(Array.isArray(data) ? { content: data } : data);
+  };
+
+  if (file)
+    return loadFile(file);
+
+  // Search all chapters from index
+  const indexPath = path.join(__dirname, '..', 'docs', 'quest-data', 'index.json');
+  let chapters;
+  try {
+    const indexRaw = await fs.readFile(indexPath, 'utf8');
+    chapters = JSON.parse(indexRaw).chapters;
+  } catch {
+    return null;
+  }
+  const dir = path.dirname(indexPath);
+  for (const chapter of chapters) {
     try {
-      const indexRaw = await fs.readFile(indexPath, 'utf8');
-      chapters = JSON.parse(indexRaw).chapters;
-    } catch {
-      console.error('Could not load quest index. Use -f <file> to specify a quest file.');
-      process.exit(1);
-    }
-    const dir = require('node:path').dirname(indexPath);
-    for (const chapter of chapters) {
-      const filePath = require('node:path').join(dir, chapter);
-      try {
-        questData = await loadQuestFromFile(filePath);
-        if (questData)
-          break;
-      } catch { /* skip unreadable files */ }
-    }
-    if (!questData) {
-      console.error(`Quest '${id}' not found in any chapter. Use -f <file> to specify a quest file.`);
-      process.exit(1);
-    }
+      const found = await loadFile(path.join(dir, chapter));
+      if (found)
+        return found;
+    } catch { /* skip */ }
+  }
+  return null;
+}
+
+async function questAttempt (id, terms, file) {
+  const questData = await findQuest(id, file);
+  if (!questData) {
+    console.error(`Quest '${id}' not found${file ? ` in ${file}` : ' in any chapter. Use -f <file> to specify a quest file.'}`);
+    process.exit(1);
   }
 
   // Build and run the quest
