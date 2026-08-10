@@ -355,7 +355,7 @@ export class Quest {
     return [...this.cases];
   }
 
-  static Group: new (options: { name?: string, intro?: string | string[], id?: string | number, content?: (Quest | QuestSpec)[] }) => { verify: (options: { seen?: Set<string | number>, date?: boolean }) => { [key: string]: unknown } };
+  static Group: new (options: { name?: string, intro?: string | string[], id?: string | number, content?: (Quest | QuestSpec)[] }) => { name?: string, intro?: string, id?: string | number, content?: Quest[], verify: (options: { seen?: Set<string | number>, date?: boolean, solutions?: SelfCheck | { [key: string | number]: SelfCheck } }) => { [key: string]: unknown } };
   static Case: abstract new (input: FreeVar[], options: AddCaseOptions) => Case;
 }
 
