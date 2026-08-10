@@ -1,10 +1,12 @@
 /**
  *  Smoke test the interpreter and also the facilities used by other tests.
- *  Ideally we should bail out if these tests fail.
+ *  Ideally, we should bail out if these tests fail.
  */
 
 import { expect } from 'chai';
-import { SKI } from '../../../src/index';
+import { isInstanceOf } from '../../lib/assert';
+
+import { SKI } from '../../../src';
 import { App, FreeVar } from '../../../src/expr';
 
 describe('SKI.classes', () => {
@@ -20,14 +22,58 @@ describe('SKI.classes', () => {
 });
 
 describe('SKI.classes.FreeVar', () => {
-  it('creates global free vars identical to one another', () => {
-    const x0 = new SKI.classes.FreeVar('x', null as unknown as object);
-    const x1 = new SKI.classes.FreeVar('x', null as unknown as object);
-    const y = new SKI.classes.FreeVar('y', null as unknown as object);
+  it('has consistent equality based on name + scope', () => {
+    const scope = {};
+
+    const x0 = new SKI.classes.FreeVar('x', scope);
+    const x1 = new SKI.classes.FreeVar('x', scope);
+    const x2 = new SKI.classes.FreeVar('x', {});
+    const x3 = new SKI.classes.FreeVar('x');
+    const x4 = new SKI.classes.FreeVar('x');
+    const y  = new SKI.classes.FreeVar('y', scope);
+
+    // now matrix!
+    expect(x0.equals(x0)).to.equal(true);
+    expect(x0.equals(x1)).to.equal(true);
+    expect(x0.equals(x2)).to.equal(false);
+    expect(x0.equals(x3)).to.equal(false);
+    expect(x0.equals(x4)).to.equal(false);
+    expect(x0.equals(y)).to.equal(false);
 
     expect(x1.equals(x0)).to.equal(true);
+    expect(x1.equals(x1)).to.equal(true);
+    expect(x1.equals(x2)).to.equal(false);
+    expect(x1.equals(x3)).to.equal(false);
+    expect(x1.equals(x4)).to.equal(false);
     expect(x1.equals(y)).to.equal(false);
-    expect(x1.subst(x0, y)!.equals(y)).to.equal(true);
+
+    expect(x2.equals(x0)).to.equal(false);
+    expect(x2.equals(x1)).to.equal(false);
+    expect(x2.equals(x2)).to.equal(true);
+    expect(x2.equals(x3)).to.equal(false);
+    expect(x2.equals(x4)).to.equal(false);
+    expect(x2.equals(y)).to.equal(false);
+
+    expect(x3.equals(x0)).to.equal(false);
+    expect(x3.equals(x1)).to.equal(false);
+    expect(x3.equals(x2)).to.equal(false);
+    expect(x3.equals(x3)).to.equal(true);
+    expect(x3.equals(x4)).to.equal(false);
+    expect(x3.equals(y)).to.equal(false);
+
+    expect(x4.equals(x0)).to.equal(false);
+    expect(x4.equals(x1)).to.equal(false);
+    expect(x4.equals(x2)).to.equal(false);
+    expect(x4.equals(x3)).to.equal(false);
+    expect(x4.equals(x4)).to.equal(true);
+    expect(x4.equals(y)).to.equal(false);
+
+    expect(y.equals(x0)).to.equal(false);
+    expect(y.equals(x1)).to.equal(false);
+    expect(y.equals(x2)).to.equal(false);
+    expect(y.equals(x3)).to.equal(false);
+    expect(y.equals(x4)).to.equal(false);
+    expect(y.equals(y)).to.equal(true);
   });
 });
 
@@ -75,20 +121,27 @@ describe('SKI', () => {
 
   it('Can parse basic applications', () => {
     const ski = new SKI();
-    const expr = ski.parseLine('x z (y z)') as App;
-    expect(expr).to.be.an.instanceOf(SKI.classes.App);
-    expect(expr.fun).to.be.an.instanceOf(SKI.classes.App);
-    const fun = expr.fun as App;
-    expect(fun.fun).to.be.an.instanceOf(SKI.classes.FreeVar);
-    expect((fun.fun as FreeVar).name).to.equal('x');
-    expect(fun.arg).to.be.an.instanceOf(SKI.classes.FreeVar);
-    expect((fun.arg as FreeVar).name).to.equal('z');
-    expect(expr.arg).to.be.an.instanceOf(SKI.classes.App);
-    const arg = expr.arg as App;
-    expect(arg.fun).to.be.an.instanceOf(SKI.classes.FreeVar);
-    expect((arg.fun as FreeVar).name).to.equal('y');
-    expect(arg.arg).to.be.an.instanceOf(SKI.classes.FreeVar);
-    expect((arg.arg as FreeVar).name).to.equal('z');
+    const expr = ski.parseLine('x z (y z)');
+
+    isInstanceOf(expr, App);
+
+    const { fun, arg } = expr;
+
+    isInstanceOf( fun, App );
+    isInstanceOf( arg, App );
+
+    isInstanceOf( fun.fun, FreeVar );
+    isInstanceOf( fun.arg, FreeVar );
+    isInstanceOf( arg.fun, FreeVar );
+    isInstanceOf( arg.arg, FreeVar );
+
+    expect(fun.fun.name).to.equal('x');
+    expect(fun.arg.name).to.equal('z');
+    expect(arg.fun.name).to.equal('y');
+    expect(arg.arg.name).to.equal('z');
+
+    fun.arg.expect(arg.arg);
+
     // can't rely on format() so just str + replace
     expect((expr + '').split(' ').join('')).to.equal('xz(yz)');
   });
@@ -113,7 +166,8 @@ describe('SKI', () => {
   it('can parse with respect to scope', () => {
     const ski = new SKI();
     const ctx = {};
-    const expr1 = ski.parse('foo', { scope: ctx }) as FreeVar;
+    const expr1 = ski.parse('foo', { scope: ctx });
+    isInstanceOf(expr1, FreeVar);
     expect(expr1.scope).to.equal(ctx);
     expect(expr1.name).to.equal('foo');
 
