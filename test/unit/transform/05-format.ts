@@ -55,7 +55,7 @@ describe('Expr.format: aliases behavior', () => {
 
     expect(foo.format({
       terse:     false,
-      inventory: { T, M: ski.parse('a->a a') as unknown as Named },
+      inventory: { T, M: ski.parse('M=a->a a') as Named },
     })).to.equal('T(S(I)(I)(42))');
 
     ski.add('M', 'a->a a');

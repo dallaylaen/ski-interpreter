@@ -94,7 +94,7 @@ describe('SKI.traverse', () => {
         if (e instanceof SKI.classes.Lambda)
           return SKI.control.prune(null);
         if (e instanceof App && e.fun instanceof SKI.classes.Lambda)
-          return SKI.control.stop(e.fun.invoke(e.arg) as Expr);
+          return SKI.control.stop(e.fun.invoke(e.arg));
       });
     }
 
@@ -133,7 +133,7 @@ describe('SKI.traverse', () => {
 
   it('can emulate reduction', () => {
     let expr: Expr | null = ski.parse('S(KS)K a b c'); // B
-    const isRedex = (term: Expr): boolean => term instanceof App
+    const isRedex = (term: Expr): term is App => term instanceof App
       && term.fun.invoke(term.arg) instanceof Expr
       && !isRedex(term.fun);
 
@@ -145,7 +145,7 @@ describe('SKI.traverse', () => {
       trace.push(expr + '');
       expr = expr.traverse({}, e => {
         if (isRedex(e))
-          return SKI.control.stop((e as App).fun.invoke((e as App).arg) as Expr);
+          return SKI.control.stop(e.fun.invoke(e.arg) as Expr);
       });
     }
 

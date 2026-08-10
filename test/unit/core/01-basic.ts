@@ -185,9 +185,7 @@ describe('SKI', () => {
   it('can execute simple expr: S K I x', done => {
     const ski = new SKI();
     const expr = ski.parseLine('SKIx');
-    // note: the numeric argument is meaningless as RunOptions and is ignored,
-    // same as calling run() with no arguments (kept for fidelity with the original test)
-    const result = expr.run();
+    const result = expr.run({ max: 15 });
     expect('' + result.expr).to.equal('x');
     expect(result.final).to.equal(true);
     done();

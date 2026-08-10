@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { isInstanceOf } from '../../lib/assert';
 import { SKI } from '../../../src/index';
 import { Alias, Expr, Native, Invocation } from '../../../src/expr';
 
@@ -62,8 +63,8 @@ describe('SKI', () => {
 
   it('can add aliases', () => {
     const ski = new SKI();
-    const alias = ski.parse('T = S(K(SI))K') as Alias;
-    expect(alias).to.be.instanceof(SKI.classes.Alias);
+    const alias = ski.parse('T = S(K(SI))K');
+    isInstanceOf(alias, Alias);
     ski.add(alias);
     const expr = ski.parse('T x y').run().expr;
     ski.parse('y x').expect(expr);
@@ -100,7 +101,8 @@ describe('SKI', () => {
 
   it('honors alias arity if added via one-arg form', () => {
     const ski = new SKI();
-    const alias = ski.parse('T=CI') as Alias;
+    const alias = ski.parse('T=CI');
+    isInstanceOf(alias, Alias);
     ski.add(alias);
 
     const y = ski.parse('y');

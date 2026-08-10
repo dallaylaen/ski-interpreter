@@ -1,5 +1,6 @@
 import { expect } from 'chai';
-import { SKI } from '../../../src/index';
+import { isInstanceOf } from '../../lib/assert';
+import { SKI } from '../../../src';
 import { Alias } from '../../../src/expr';
 
 describe('SKI.parse', () => {
@@ -30,8 +31,10 @@ describe('SKI.parse', () => {
 
   it('makes last expr an alias if = given', done => {
     const ski = new SKI();
-    const expr = ski.parse('foo = SKK') as Alias;
+    const expr = ski.parse('foo = SKK');
     const { x } = SKI.vars();
+
+    isInstanceOf(expr, Alias);
 
     expect(expr.name).to.equal('foo');
     expect(expr.run(x).expr).to.equal(x);

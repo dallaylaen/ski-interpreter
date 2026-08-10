@@ -5,6 +5,8 @@ describe('SKI.parse', () => {
   it('does not affect existing terms', () => {
     const ski = new SKI({ addContext: true });
     const S = ski.getTerms().S;
+
+    // Imagine we're in plain javascript and fetch S's own properties before and after parsing
     const dynamic = S as unknown as Record<string, unknown>;
     const saved: Record<string, unknown> = {};
     Object.getOwnPropertyNames(S).forEach(name => { saved[name] = dynamic[name]; });

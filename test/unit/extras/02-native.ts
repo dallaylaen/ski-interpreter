@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { isInstanceOf } from '../../lib/assert';
 import { SKI } from '../../../src/index';
 import { Native } from '../../../src/expr';
 
@@ -18,7 +19,7 @@ describe('native combinators', () => {
 
   for (const comb in list) {
     it('contains combinator ' + comb, () => {
-      expect(skiStatics[comb]).to.be.instanceOf(SKI.classes.Native);
+      isInstanceOf(skiStatics[comb], Native);
       expect(skiStatics[comb].run(x, y, z).expr.format({ terse: false })).to.equal(list[comb]);
     });
   }

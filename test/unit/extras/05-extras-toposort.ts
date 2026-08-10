@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { SKI } from '../../../src/index';
 import { Expr, Named } from '../../../src/expr';
+import { isInstanceOf } from '../../lib/assert';
 
 describe('SKI.extras.toposort', () => {
   const ski = new SKI({ addContext: true });
@@ -30,9 +31,8 @@ describe('SKI.extras.toposort', () => {
 
     const seen = new Set([final]);
     for (const dep of res.list) {
-      expect(dep).to.be.instanceof(SKI.classes.Named);
-      const named = dep as Named;
-      expect(res.env[named.name]).to.equal(dep);
+      isInstanceOf(dep, Named);
+      expect(res.env[dep.name]).to.equal(dep);
       seen.add(dep);
     }
 

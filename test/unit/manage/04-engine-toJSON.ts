@@ -1,5 +1,6 @@
 import { expect } from 'chai';
-import { SKI } from '../../../src/index';
+import { isInstanceOf } from '../../lib/assert';
+import { SKI } from '../../../src';
 import { Alias } from '../../../src/expr';
 
 describe('SKI.toJSON', () => {
@@ -38,8 +39,14 @@ describe('SKI.toJSON', () => {
 
     expect(copy.parse('v3 a b c f').run().expr + '').to.equal('f a b c');
     const terms = copy.getTerms();
-    expect((terms.V as Alias).impl + '').to.equal('BCT');
-    expect((terms.v3 as Alias).impl + '').to.equal('BBBCV');
+
+    const { V, v3 } = terms;
+
+    isInstanceOf(V, Alias);
+    isInstanceOf(v3, Alias);
+
+    expect(V.impl + '').to.equal('BCT');
+    expect(v3.impl + '').to.equal('BBBCV');
 
     expect(JSON.stringify(copy)).to.equal(str); // some stupid round trip
   });

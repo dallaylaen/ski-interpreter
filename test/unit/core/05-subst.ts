@@ -32,14 +32,14 @@ describe('Expr.subst', () => {
         const expr = ski.parse(input);
         const plugExpr = ski.parse(plug);
         const replExpr = ski.parse(replacement);
-        const expected = result ? ski.parse(result) : null;
-
         const got = expr.subst(plugExpr, replExpr);
 
-        if (expected === null)
+        if (result === null)
           expect(got).to.equal(null);
-        else
-          expected.expect(got as Expr);
+        else {
+          const expected: Expr = ski.parse(result);
+          expected.expect(got);
+        }
       });
     };
 
@@ -54,7 +54,7 @@ function check (got: Expr | null, expected: Expr | string | null, jar?: Record<s
   if (expected === null)
     expect(got).to.equal(null);
   else if (typeof expected === 'string')
-    ski.parse(expected, { env: jar }).expect(got as Expr);
+    ski.parse(expected, { env: jar }).expect(got);
   else
-    expected.expect(got as Expr);
+    expected.expect(got);
 }
