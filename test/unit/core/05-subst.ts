@@ -1,0 +1,60 @@
+import { expect } from 'chai';
+
+import { SKI } from '../../../src/index';
+import { Alias, Expr } from '../../../src/expr';
+
+const ski = new SKI();
+
+describe('Expr.subst', () => {
+  const { x, y, z } = SKI.vars();
+
+  it('handles simple variable cases', () => {
+    check(x.subst(y, z), null);
+    check(x.subst(x, z), z);
+    check(x.apply(x).subst(x, y), y.apply(y));
+    check(x.apply(x).subst(y, z), null);
+    check(x.apply(y.apply(x)).subst(x, z), z.apply(y.apply(z)));
+  });
+
+  it('works on aliases', () => {
+    const tx = new Alias('tx', ski.parse('CI').apply(x));
+
+    check(tx.subst(y, z), null);
+    check(tx.subst(x, z), 'CIz', { z });
+    check(tx.subst(tx, z), z);
+    check(tx.subst(SKI.C, SKI.K), 'K I x', { x });
+    check(tx.subst(SKI.K, SKI.S), null);
+  });
+
+  describe('handles arbitrary expressions', () => {
+    const runcase = (comment: string, input: string, plug: string, replacement: string, result: string | null) => {
+      it(`${comment}: ${input} [${plug} := ${replacement}] == ${result}`, () => {
+        const expr = ski.parse(input);
+        const plugExpr = ski.parse(plug);
+        const replExpr = ski.parse(replacement);
+        const expected = result ? ski.parse(result) : null;
+
+        const got = expr.subst(plugExpr, replExpr);
+
+        if (expected === null)
+          expect(got).to.equal(null);
+        else
+          expected.expect(got as Expr);
+      });
+    };
+
+    runcase('lambda shielding', 'x->y->x y', 'y', 'z', null);
+    runcase('lambda no shielding', 'x->z->x y', 'y', 'x', 'a->b->a x');
+
+    runcase('some expr', 'f=5 x; a->f a', 'x', 'y', 'a->5 y a');
+  });
+});
+
+function check (got: Expr | null, expected: Expr | string | null, jar?: Record<string, Expr>) {
+  if (expected === null)
+    expect(got).to.equal(null);
+  else if (typeof expected === 'string')
+    ski.parse(expected, { env: jar }).expect(got as Expr);
+  else
+    expected.expect(got as Expr);
+}
