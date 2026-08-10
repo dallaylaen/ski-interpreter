@@ -1,6 +1,6 @@
 {
   "require": "ts-node/register",
   "loader": "ts-node/esm",
-  "extension": ["js", "ts"],
+  "extension": ["ts"],
   "recursive": true
 }

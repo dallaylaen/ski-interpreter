@@ -16,13 +16,12 @@ prof.txt
 *.log
 
 # lib is now built by `npm build` and only used for dist
-lib
+/lib/
 
 # generated artifacts are now managed by github pages
 docs/man
 docs/build
 
 # files generated from TS
-src/*.js
-test/unit/**/*.js
-test/integration/**/*.js
+src/**/*.js
+test/**/*.js

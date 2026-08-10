@@ -15,8 +15,7 @@
   },
   "ignorePatterns": [
     "src/**/*.js",
-    "test/unit/**/*.js",
-    "test/integration/**/*.js"
+    "test/**/*.js"
   ],
   "rules": {
     "semi": 0,
