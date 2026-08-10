@@ -738,7 +738,8 @@ export abstract class Expr {
    * @param {Expr} actual
    * @param {string} comment
    */
-  expect (actual:Expr|object, comment = ''):void {
+  expect (actual:Expr|unknown, comment = ''):void {
+    // not adding `asserts actual is Expr` because it doesn't work with `parse(foo).expect(bar)` in tests
     comment = comment ? comment + ': ' : '';
     if (!(actual instanceof Expr)) {
       throw new Error(comment + 'Expected a combinator but found '
@@ -1580,7 +1581,7 @@ function nthvar (n: number): FreeVar {
  *    toposort([expr], ski.getTerms()); // returns all terms appearing in Expr in correct order
  */
 // TODO the docs suck. You know it and I know it. Fix when have time.
-export function toposort (options: {list?: Expr|Expr[], env?: Record<string, Named>, allow?: Record<string, Named>}): ToposortResult {
+export function toposort (options: {list?: Expr|Expr[], env?: Record<string, Named> | undefined, allow?: Record<string, Named> | undefined}): ToposortResult {
   if (typeof options !== 'object' || options === null || Array.isArray(options) || options instanceof Expr)
     throw new Error('positional arguments to toposort are deprecated, use { list: ..., env: ... } instead');
 
