@@ -51,7 +51,7 @@ describe('Expr.fold', () => {
   });
 
   it('can break out', () => {
-    const trace = expr.fold([] as string[], (acc, e) => {
+    const trace = expr.fold([], (acc: string[], e) => {
       const next = [...acc, e.constructor.name + ':' + e];
       if (e instanceof Church)
         return SKI.control.stop(next);
@@ -69,7 +69,7 @@ describe('Expr.fold', () => {
   });
 
   it('can prune branches', () => {
-    const trace = expr.fold([] as string[], (acc, e) => {
+    const trace = expr.fold([], (acc: string[], e) => {
       const next = [...acc, e.constructor.name + ':' + e.toString()];
       if (e instanceof SKI.classes.Alias)
         return SKI.control.prune(next);
@@ -92,7 +92,7 @@ describe('Expr.fold', () => {
   });
 
   it('can use descend explicitly on App nodes', () => {
-    const trace = expr.fold([] as string[], (acc, e) => {
+    const trace = expr.fold([], (acc: string[], e) => {
       const next = [...acc, e.constructor.name + ':' + e.toString()];
       if (e instanceof App && e.toString().includes('5 K'))
         return SKI.control.descend(next);
@@ -121,7 +121,7 @@ describe('Expr.fold', () => {
   });
 
   it('stops at Lambda nodes with control.stop', () => {
-    const trace = expr.fold([] as string[], (acc, e) => {
+    const trace = expr.fold([], (acc: string[], e) => {
       const next = [...acc, e.constructor.name + ':' + e.toString()];
       if (e instanceof Lambda)
         return SKI.control.stop(next);
@@ -133,7 +133,7 @@ describe('Expr.fold', () => {
   });
 
   it('prunes Native nodes while collecting others', () => {
-    const trace = expr.fold([] as string[], (acc, e) => {
+    const trace = expr.fold([], (acc:string[], e) => {
       const next = [...acc, e.constructor.name + ':' + e.toString()];
       if (e instanceof Native)
         return SKI.control.prune(next);
@@ -161,7 +161,7 @@ describe('Expr.fold', () => {
   });
 
   it('stops early when encountering Church numerals', () => {
-    const trace = expr.fold([] as string[], (acc, e) => {
+    const trace = expr.fold([], (acc: string[], e) => {
       const next = [...acc, e.constructor.name + ':' + e.toString()];
       if (e instanceof Church)
         return SKI.control.stop(next);
@@ -179,7 +179,7 @@ describe('Expr.fold', () => {
   });
 
   it('prunes FreeVar to skip variable details', () => {
-    const trace = expr.fold([] as string[], (acc, e) => {
+    const trace = expr.fold([], (acc: string[], e) => {
       const next = [...acc, e.constructor.name + ':' + e.toString()];
       if (e instanceof SKI.classes.FreeVar)
         return SKI.control.prune(next);
@@ -207,7 +207,7 @@ describe('Expr.fold', () => {
   });
 
   it('combines multiple control strategies on different Expr types', () => {
-    const trace = expr.fold([] as string[], (acc, e) => {
+    const trace = expr.fold([], (acc: string[], e) => {
       const next = [...acc, e.constructor.name + ':' + e.toString()];
       // Stop at Lambda, prune Alias branches, descend normally otherwise
       if (e instanceof Lambda)
@@ -224,7 +224,7 @@ describe('Expr.fold', () => {
   it('uses redo control to retrace from current node', () => {
     // redo makes fold restart traversal from current node with new accumulator
     let redoCount = 0;
-    const trace = expr.fold([] as string[], (acc, e) => {
+    const trace = expr.fold([], (acc: string[], e) => {
       const next = [...acc, e.constructor.name + ':' + e.toString()];
       // Use redo once on the first Church node to duplicate it in trace
       if (e instanceof Church && redoCount === 0) {
@@ -241,7 +241,7 @@ describe('Expr.fold', () => {
 
   it('stops at first App then prunes in complex expression', () => {
     // Test mixed control on nested Apps
-    const trace = expr.fold([] as string[], (acc, e) => {
+    const trace = expr.fold([], (acc: string[], e) => {
       const next = [...acc, e.constructor.name];
       // Stop at the first outermost App
       if (e instanceof App && e.toString() === 'x(5 Ky)(Mz)')
@@ -254,7 +254,7 @@ describe('Expr.fold', () => {
   const nestedLambda = ski.parse('(x->x x)(y->y(z->z))');
 
   it('prunes entire nested Lambda bodies', () => {
-    const trace = nestedLambda.fold([] as string[], (acc, e) => {
+    const trace = nestedLambda.fold([], (acc: string[], e) => {
       const next = [...acc, e.constructor.name + ':' + e.toString()];
       // Prune entire bodies of nested Lambdas
       if (e instanceof Lambda)
