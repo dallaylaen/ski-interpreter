@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.0] - 2026-08-11
+
+### BREAKING CHANGES
+
+* `SKI.Quest` is removed. Instead, a `SKI.quest` object similar to `SKI.classes` is added,
+containing quest-related classes: `{ Quest, Chapter, Case }` and others.
+
+### Added
+
+* `bin/ski.js`: `quest-attempt <quest-id> <term> <term...>` subcommand
+to attempt a solution to a given quest.
+* `bin/ski.js`: `quest-list` subcommand to show all quests.
+* `bin/ski.js`: `quest-show` subcommand to show a single quest's details.
+* New quest: n-tuple.
+
+### Changed
+
+* All tests converted to TypeScript.
+* Added integration tests for `bin/ski.js`; `quest-data` content test is now also considered integration.
+* `Chapter` is now an officially exported class (formerly Quest.Group).
+
+### Fixed
+
+* types in `toposort()`, `Expr.expect()`, and `Quest.verify()`
+
+### Internal
+
+* Added `npm run check` script (build sans bundling, plus integration test).
+* Added test utility functions (`isInstanceOf`).
+* `npm run build-all` renamed to `npm run bundle`; integration tests
+  now run after build artifacts are produced.
+
 ## [2.11.3] - 2026-08-01
 
 ### Changed
