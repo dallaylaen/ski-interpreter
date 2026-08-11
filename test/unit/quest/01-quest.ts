@@ -1,9 +1,7 @@
 import { expect } from 'chai';
-import { SKI } from '../../../src/index';
-import { CaseResult, TestCase } from '../../../src/quest';
+import { SKI } from '../../../src/';
+import { Quest, CaseResult, TestCase } from '../../../src/quest';
 import { Expr } from '../../../src/expr';
-
-const { Quest } = SKI;
 
 describe('Quest', () => {
   const reduct = (item: CaseResult) => item.start + ' -> ' + item.found + ' vs ' + item.expected;

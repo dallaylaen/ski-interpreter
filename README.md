@@ -269,7 +269,8 @@ expr.fold(0, (acc, e) => acc + (e.equals(SKI.K) ? acc+1 : acc));
 The `Quest` class may be used to build and execute test cases for combinators.
 
 ```javascript
-const { Quest } = require('@dallaylaen/ski-interpreter');
+const { SKI } = require('@dallaylaen/ski-interpreter');
+const { Quest } = SKI.quest;
 
 const q = new Quest({
     name: 'Test combinator T',

@@ -10,10 +10,8 @@ import { expect } from 'chai';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 
-import { SKI } from '../../src/index';
-
-const { Quest } = SKI;
-type QuestGroup = InstanceType<typeof Quest.Group>;
+import { SKI } from '../../src/';
+import { Quest, Group } from '../../src/quest';
 
 const dir          = path.join(__dirname, '../../docs/quest-data/');
 const solutionsPath = path.join(__dirname, '../../data/quest-solutions.json');
@@ -59,7 +57,7 @@ describe('quest-data', () => {
 
 function verifyChapter (entry: Record<string, unknown> & { link?: string; id?: string }, n: number): void {
   describe('chapter ' + n + ' ' + (entry.link ?? 'empty'), () => {
-    let group: QuestGroup | undefined;
+    let group: Group | undefined;
     let err: unknown;
     try {
       group = new Quest.Group(entry as ConstructorParameters<typeof Quest.Group>[0]);
@@ -97,7 +95,7 @@ function verifyChapter (entry: Record<string, unknown> & { link?: string; id?: s
       const seenIds = new Set<string | number>();
       const findings = safeGroup.verify({
         date:      true,
-        solutions: questSolutions as Parameters<QuestGroup['verify']>[0]['solutions'],
+        solutions: questSolutions,
         seen:      seenIds,
       });
 

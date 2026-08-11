@@ -3,7 +3,7 @@ import {
 } from './expr';
 import { Parser } from './parser';
 
-import { Quest } from './quest';
+import * as quest from './quest';
 import { extras } from './extras';
 extras.toposort = toposort;
 
@@ -47,7 +47,7 @@ export class SKI extends Parser {
   }
 
   static extras = extras;
-  static Quest = Quest;
+  static quest = quest;
 }
 
 declare global {

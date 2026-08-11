@@ -4,7 +4,7 @@ const fs = require('node:fs/promises');
 const { Command } = require('commander');
 
 const { SKI } = require('../lib/ski-interpreter.cjs');
-const { Quest } = SKI;
+const { Quest } = SKI.quest;
 const { version } = require('../package.json');
 
 const runOptions = {};

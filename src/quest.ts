@@ -578,7 +578,7 @@ export class Subst {
 }
 
 // corresponds to "chapter" in the quest page
-class Group {
+export class Group {
   name?: string;
   intro?: string;
   id?: string|number;
