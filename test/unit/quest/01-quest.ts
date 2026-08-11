@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { SKI } from '../../../src/';
-import { Quest, CaseResult, TestCase } from '../../../src/quest';
+import { Quest, Chapter, CaseResult, TestCase } from '../../../src/quest';
 import { Expr } from '../../../src/expr';
 
 describe('Quest', () => {
@@ -332,7 +332,7 @@ describe('Quest', () => {
   });
 
   it('can self-check but in groups', () => {
-    const group = new Quest.Group({
+    const chapter = new Chapter({
       id:      'group1',
       intro:   'This is a <b>group',
       content: [
@@ -351,7 +351,7 @@ describe('Quest', () => {
     });
 
     const seen = new Set<string>();
-    const result = group.verify({ seen, date: true });
+    const result = chapter.verify({ seen, date: true });
     expect(result).to.be.an('object');
 
     const { name, intro, content, ...rest } = result;

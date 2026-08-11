@@ -11,7 +11,8 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 
 import { SKI } from '../../src/';
-import { Quest, Group } from '../../src/quest';
+import { Quest, Chapter } from '../../src/quest';
+import { isInstanceOf } from '../lib/assert';
 
 const dir          = path.join(__dirname, '../../docs/quest-data/');
 const solutionsPath = path.join(__dirname, '../../data/quest-solutions.json');
@@ -57,10 +58,10 @@ describe('quest-data', () => {
 
 function verifyChapter (entry: Record<string, unknown> & { link?: string; id?: string }, n: number): void {
   describe('chapter ' + n + ' ' + (entry.link ?? 'empty'), () => {
-    let group: Group | undefined;
+    let chapter: Chapter | undefined;
     let err: unknown;
     try {
-      group = new Quest.Group(entry as ConstructorParameters<typeof Quest.Group>[0]);
+      chapter = new Chapter(entry);
     } catch (e) {
       err = e;
     }
@@ -68,14 +69,12 @@ function verifyChapter (entry: Record<string, unknown> & { link?: string; id?: s
     it('is a quest group', () => {
       if (err)
         throw err;
-      expect(group).to.be.instanceof(Quest.Group, 'A Quest.Group was generated');
-      expect(Array.isArray(group!.content)).to.equal(true, 'Content is an array');
+      isInstanceOf(chapter, Chapter);
+      expect(Array.isArray(chapter!.content)).to.equal(true, 'Content is an array');
     });
 
-    if (!(group instanceof Quest.Group))
+    if (!(chapter instanceof Chapter))
       return;
-
-    const safeGroup = group;
 
     it('has unique chapter id', () => {
       expect(entry.id).to.be.a('string');
@@ -84,16 +83,16 @@ function verifyChapter (entry: Record<string, unknown> & { link?: string; id?: s
     });
 
     it('has title', () => {
-      expect(typeof safeGroup.name).to.equal('string');
+      expect(typeof chapter.name).to.equal('string');
     });
 
     it('has description', () => {
-      expect(typeof safeGroup.intro).to.equal('string');
+      expect(typeof chapter.intro).to.equal('string');
     });
 
     it('passes group verify() checks', () => {
       const seenIds = new Set<string | number>();
-      const findings = safeGroup.verify({
+      const findings = chapter.verify({
         date:      true,
         solutions: questSolutions,
         seen:      seenIds,
@@ -112,8 +111,8 @@ function verifyChapter (entry: Record<string, unknown> & { link?: string; id?: s
     });
 
     // Detailed tests for each quest in the group
-    for (let i = 0; i < safeGroup.content!.length; i++) {
-      const q = safeGroup.content![i];
+    for (let i = 0; i < chapter.content!.length; i++) {
+      const q = chapter.content![i];
       describe('quest ' + entry.link + ' [' + i + '] ' + q.id, () => {
         it('is a quest', () => {
           expect(q).to.be.instanceof(Quest, 'A quest was generated');

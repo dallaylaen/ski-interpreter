@@ -4,6 +4,7 @@ const { SKI } = require('../src/index');
 const { Store } = require('./store');
 const { EvalBox } = require('./eval-box');
 const { append } = require('./html-util');
+const { Quest } = SKI.quest;
 
 const days = 24 * 60 * 60 * 1000;
 
@@ -222,7 +223,7 @@ class QuestBox {
     const store = options.store ?? options.chapter?.store;
     if (!store)
       throw new Error('QuestBox requires a store: Store in either options or chapter');
-    this.impl = new SKI.Quest({ ...spec, engine });
+    this.impl = new Quest({ ...spec, engine });
     this.name = this.impl.id ? 'quest-' + this.impl.id : '';
     this.isNew = options.newCutOff && this.impl.created && this.impl.created > options.newCutOff;
     this.chapter = options.chapter;

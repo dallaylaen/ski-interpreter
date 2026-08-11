@@ -82,6 +82,12 @@ export type AddCaseOptions = {
   },
 };
 
+export type QuestVerifyOptions = {
+  solutions?: SelfCheck | Record<string, SelfCheck>,
+  seen?: Set<string | number>,
+  date?: boolean,
+}
+
 /**
  *  A combinator problem with a set of test cases for the proposed solution.
  * @param {QuestSpec} options
@@ -282,8 +288,8 @@ export class Quest {
     }
   }
 
-  verify (options: { solutions?: SelfCheck | { [key: string | number]: SelfCheck }, seen?: Set<string | number>, date?: boolean }) {
-    const findings: { [key: string]: unknown } = this.verifyMeta(options);
+  verify (options: QuestVerifyOptions): Record<string, unknown> | null {
+    const findings: Record<string, unknown> = this.verifyMeta(options);
     if (options.solutions) {
       const solCheck = this.verifySolutions(options.solutions);
       if (solCheck)
@@ -354,9 +360,6 @@ export class Quest {
   show ():Case[] {
     return [...this.cases];
   }
-
-  static Group: new (options: { name?: string, intro?: string | string[], id?: string | number, content?: (Quest | QuestSpec)[] }) => { name?: string, intro?: string, id?: string | number, content?: Quest[], verify: (options: { seen?: Set<string | number>, date?: boolean, solutions?: SelfCheck | { [key: string | number]: SelfCheck } }) => { [key: string]: unknown } };
-  static Case: abstract new (input: FreeVar[], options: AddCaseOptions) => Case;
 }
 
 export abstract class Case {
@@ -578,7 +581,7 @@ export class Subst {
 }
 
 // corresponds to "chapter" in the quest page
-export class Group {
+export class Chapter {
   name?: string;
   intro?: string;
   id?: string|number;
@@ -594,7 +597,7 @@ export class Group {
       this.content = options.content.map( c => c instanceof Quest ? c : new Quest(c) );
   }
 
-  verify (options: { seen?: Set<string | number>, date?: boolean }): { [key: string]: unknown } {
+  verify (options: QuestVerifyOptions): { [key: string]: unknown } {
     const findings: { [key: string]: unknown } = {};
     const id = checkId(this.id!, options.seen!);
     if (id)
@@ -661,9 +664,6 @@ function checkHtml (str: string): string | null {
 
   return null; // No issues found
 }
-
-Quest.Group = Group;
-Quest.Case = Case;
 
 function canonize (term: Expr, options = {}): Expr {
   return term.traverse({}, e => {

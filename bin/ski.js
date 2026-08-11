@@ -4,7 +4,7 @@ const fs = require('node:fs/promises');
 const { Command } = require('commander');
 
 const { SKI } = require('../lib/ski-interpreter.cjs');
-const { Quest } = SKI.quest;
+const { Quest, Chapter } = SKI.quest;
 const { version } = require('../package.json');
 
 const runOptions = {};
@@ -661,7 +661,7 @@ async function questCheck (files, solutionFile, fix) {
         }
 
         try {
-          const group = new Quest.Group(entry);
+          const group = new Chapter(entry);
 
           // Verify the group
           const findings = group.verify({
@@ -671,7 +671,7 @@ async function questCheck (files, solutionFile, fix) {
           });
 
           // Check for errors
-          const hasGroupErrors = Object.keys(findings).some(key => {
+          const hasChapterErrors = Object.keys(findings).some(key => {
             if (key === 'content') {
               const contentErrors = findings.content?.filter(item => item !== null);
               return contentErrors && contentErrors.length > 0;
@@ -679,7 +679,7 @@ async function questCheck (files, solutionFile, fix) {
             return findings[key];
           });
 
-          if (hasGroupErrors) {
+          if (hasChapterErrors) {
             hasErrors = true;
             console.error(`Error in ${file}:`);
             console.error(JSON.stringify(findings, null, 2));

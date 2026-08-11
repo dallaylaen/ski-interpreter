@@ -1,7 +1,7 @@
 'use strict';
 
 import { Expr, Named, FormatOptions, TermInfo, toposort } from './expr';
-import { Quest } from './quest';
+import { Case, Quest } from './quest';
 
 /**
  *   Extra utilities that do not belong in the core.
@@ -179,7 +179,7 @@ function deepFormat (obj: any, options : FormatOptions = {}): any {
   // TODO for quests, use toJSON when it's ready
   if (obj instanceof Quest)
     return 'Quest(' + obj.name + ')';
-  if (obj instanceof Quest.Case)
+  if (obj instanceof Case)
     return 'Quest.Case';
   if (Array.isArray(obj))
     return obj.map(item => deepFormat(item, options));
