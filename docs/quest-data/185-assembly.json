@@ -1,0 +1,55 @@
+{
+  "id": "SPXLpnjE",
+  "created_at": "2026-08-12T11:13:57Z",
+  "name": "An Assembly Of Birds",
+  "intro": [
+    "<p>In this chapter, we'll build some more real-life like functions from combinators.",
+    "This <i>is</i> going to be tedious. Brace yourself!</p>",
+    "<p>Throughout this chapter, unless specified otherwise, the following conventions apply:",
+    "<code>true = K</code> and <code>false = KI</code> (boolean),",
+    "<code>cons = V = x->y->f x y</code>, <code>nil = KI</code> (linked lists / pairs),",
+    "and <code>lst = head->tail->f->x->f head (tail f x)</code> (self-folding list, also nil-terminated).</p>"
+  ],
+  "content": [
+    {
+      "id": "of3RL30D",
+      "created_at": "2026-08-12T11:13:57Z",
+      "name": "Hello World",
+      "intro": [
+        "<p>Given <code>lst</code> and <code>nil</code>, return a list of ASCII character codes",
+        "representing the string <code>HELLO WORLD</code> (all caps).</p>",
+        "<p>Key codes for letters start with <code>A = 65</code>, code for space is <code>32</code>.</p>",
+        "<p>Numeric literals are NOT allowed, you'll have to construct them all!</p>",
+        "<p>Unfortunately, no I/O is implemented yet.</p>"
+      ],
+      "env": ["lst=BS(C(BB))", "nil=KI"],
+      "input": "hello",
+      "cases": [
+        [
+          { "max": 128000 },
+          "hello (x->putc (x + 0)) eol", "putc 72 (putc 69 (putc 76 (putc 76 (putc 79 (putc 32 (putc 87 (putc 79 (putc 82 (putc 76 (putc 68 eol))))))))))"
+        ]
+      ]
+    },
+    {
+      "id": "c8ht2oKB",
+      "created_at": "2026-08-12T11:13:57Z",
+      "name": "Read binary",
+      "intro": [
+        "<p>Given a linked list of true/false values,",
+        "return a Church numeral representing the binary number stored in the list, little endian.",
+        " E.g. <code>(cons false (cons true (cons true nil)))</code> should return 6.</p>",
+        "<p>Empty list should return 0.</p>",
+        "<p>Usual conventions apply: <code>cons = V = x->y->f x y</code>, <code>nil = KI</code>,",
+        "<code>true = K</code>, <code>false = KI</code>.</p>"
+      ],
+      "input": "num",
+      "cases": [
+        ["num nil + 0", "0"],
+        ["num (cons false (cons true (cons true nil))) + 0", "6"],
+        ["num (cons true (cons false (cons true nil))) + 0", "5"],
+        ["num (cons false (cons false (cons false nil))) + 0", "0"]
+      ]
+    }
+  ]
+}
