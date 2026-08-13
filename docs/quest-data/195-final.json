@@ -33,14 +33,16 @@
         ["r110 nil", "nil"],
         ["r110 (V f nil)", "(V f nil)"],
         ["r110 (V t nil)", "(V t nil)"],
+
         ["r110 (V f (V f (V f nil)))", "(V f (V f (V f nil)))"],
         ["r110 (V f (V f (V t nil)))", "(V f (V t (V t nil)))"],
-        ["r110 (V f (V t (V f nil)))", "(V f (V t (V f nil)))"],
-        ["r110 (V f (V t (V t nil)))", "(V f (V t (V t nil)))"],
+        ["r110 (V f (V t (V f nil)))", "(V t (V t (V f nil)))"],
+        ["r110 (V f (V t (V t nil)))", "(V t (V t (V t nil)))"],
         ["r110 (V t (V f (V f nil)))", "(V t (V f (V f nil)))"],
         ["r110 (V t (V f (V t nil)))", "(V t (V t (V t nil)))"],
         ["r110 (V t (V t (V f nil)))", "(V t (V t (V f nil)))"],
         ["r110 (V t (V t (V t nil)))", "(V t (V f (V t nil)))"],
+
         [
           "r110 (V f (V f (V f (V t (V f (V f (V t (V t (V f (V t (V t (V t (V t (V t nil))))))))))))))",
           "(V f (V f (V t (V t (V f (V t (V t (V t (V t (V t (V f (V f (V f (V t nil))))))))))))))"
