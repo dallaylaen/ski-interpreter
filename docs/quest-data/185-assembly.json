@@ -40,7 +40,7 @@
         "return a Church numeral representing the binary number stored in the list, little endian.",
         " E.g. <code>(cons false (cons true (cons true nil)))</code> should return 6.</p>",
         "<p>Empty list should return 0.</p>",
-        "<p>Usual conventions apply: <code>cons = V = x->y->f x y</code>, <code>nil = KI</code>,",
+        "<p>Usual conventions apply: <code>cons = V = x->y->f->f x y</code>, <code>nil = KI</code>,",
         "<code>true = K</code>, <code>false = KI</code>.</p>"
       ],
       "input": "num",
