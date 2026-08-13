@@ -45,5 +45,5 @@ if (!input || !/^[01]+$/.test(input)) {
 const original = input.split('').map(Number);
 const next     = applyRule110(original);
 
-console.log(toListExpr(original));
-console.log(toListExpr(next));
+// output json consumable by quest engine, with trailing comma
+console.log(`[ "r110 ${toListExpr(original)}", "${toListExpr(next)}" ],`);
