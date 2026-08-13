@@ -32,9 +32,9 @@
       ]
     },
     {
-      "id": "c8ht2oKB",
-      "created_at": "2026-08-12T11:13:57Z",
-      "name": "Read binary",
+      "id": "Rpc0i8ff",
+      "created_at": "2025-05-31T14:11:17",
+      "name": "It's all just ones and zeros",
       "intro": [
         "<p>Given a linked list of true/false values,",
         "return a Church numeral representing the binary number stored in the list, little endian.",
@@ -45,10 +45,13 @@
       ],
       "input": "num",
       "cases": [
-        ["num nil + 0", "0"],
-        ["num (cons false (cons true (cons true nil))) + 0", "6"],
-        ["num (cons true (cons false (cons true nil))) + 0", "5"],
-        ["num (cons false (cons false (cons false nil))) + 0", "0"]
+        ["num (KI) + 0", "0"],
+        ["V=BC(CI); t=K; f=KI; num (V f f) + 0", "0"],
+        ["V=BC(CI); t=K; f=KI; num (V t f) + 0", "1"],
+        ["V=BC(CI); t=K; f=KI; num (V t (V f (V t f))) + 0", "5"],
+        ["V=BC(CI); t=K; f=KI; num (V f (V f (V f (V t f)))) + 0", "8"],
+        ["V=BC(CI); t=K; f=KI; num (V f (V f (V f (V f f)))) + 0", "0"],
+        ["V=BC(CI); t=K; f=KI; num (V t (V t (V f (V t f)))) + 0", "11"]
       ]
     }
   ]
