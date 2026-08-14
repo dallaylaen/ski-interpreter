@@ -54,8 +54,12 @@ function append (parent, tagname, options = {}, decorate = null) {
     child.innerHTML = '' + content;
   if (color)
     child.style.color = color;
-  for (const [key, value] of Object.entries(rest))
-    child.setAttribute(key, value);
+  for (const [key, value] of Object.entries(rest)) {
+    if (typeof value === 'boolean')
+      child[key] = value; // e.g. hidden, disabled, checked - setAttribute would always add them regardless of value
+    else
+      child.setAttribute(key, value);
+  }
   if (decorate)
     decorate(child);
   if (parent)
