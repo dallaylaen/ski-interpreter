@@ -271,6 +271,7 @@ class QuestBox {
     }
     this.save();
     this.showStatus();
+    this.showReveal();
   }
 
   onSolved (result) {
@@ -349,14 +350,17 @@ class QuestBox {
     append(element, 'button', { content: 'solve!' }, btn => {
       btn.onclick = () => this.check();
     });
-    if (this.status.solution) {
-      append(element, 'button', { content: 'reveal' }, btn => {
-        btn.onclick = () => {
-          for (let i = 0; i < this.status.solution.length; i++)
-            this.input[i].value = this.status.solution[i];
-        }
-      });
-    }
+    this.view.reveal = append(element, 'button', { content: 'reveal', hidden: !this.status.solution }, btn => {
+      btn.onclick = () => {
+        for (let i = 0; i < this.status.solution.length; i++)
+          this.input[i].value = this.status.solution[i];
+      }
+    });
+  }
+
+  showReveal () {
+    if (this.view.reveal)
+      this.view.reveal.hidden = !this.status.solution;
   }
 
   showStatus () {
