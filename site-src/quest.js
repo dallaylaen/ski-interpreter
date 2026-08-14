@@ -85,6 +85,7 @@ class QuestPage {
     this._onSolved = options.onSolved;
     this._onFailed = options.onFailed;
     this._onTermUnlock = options.onTermUnlock;
+    this._onTermReplace = options.onTermReplace;
 
     this.chapters = [];
   }
@@ -145,14 +146,15 @@ class QuestPage {
     for (const item of list) {
       // TODO if item is an object, skip fetch and use it directly, returning `resolve`
       const chapter = new QuestChapter({
-        number:       ++chapterId,
-        link:         this.mkLink(item),
-        engine:       this.engine,
-        store:        this.store,
-        onTermUnlock: x => this.onTermUnlock(x),
-        onSolved:     x => this._onSolved(x),
-        onFailed:     x => this._onFailed(x),
-        newCutOff:    this.newCutOff,
+        number:        ++chapterId,
+        link:          this.mkLink(item),
+        engine:        this.engine,
+        store:         this.store,
+        onTermUnlock:  x => this.onTermUnlock(x),
+        onTermReplace: x => this.onTermReplace(x),
+        onSolved:      x => this._onSolved(x),
+        onFailed:      x => this._onFailed(x),
+        newCutOff:     this.newCutOff,
       });
       this.chapters.push(chapter);
       chapter.attach(this.view.content, { placeholder: 'loading chapter' + chapter.number + '...' });
@@ -171,6 +173,24 @@ class QuestPage {
 
   onTermUnlock (term) {
     this.engine.maybeAdd(term.name, term.impl);
+    if (this.store)
+      this.store.save('engine', this.engine);
+    this.showKnown();
+    if (this._onTermUnlock)
+      this._onTermUnlock(term);
+  }
+
+  /**
+   * @desc Force-replace an already unlocked term in the engine with a new implementation,
+   *       unless the currently known term with the same name is a Native (built-in) combinator,
+   *       which must never be overridden.
+   * @param term
+   */
+  onTermReplace (term) {
+    const known = this.engine.getTerms()[term.name];
+    if (known instanceof SKI.classes.Native)
+      return;
+    this.engine.add(term.name, term.impl);
     if (this.store)
       this.store.save('engine', this.engine);
     this.showKnown();
@@ -258,8 +278,12 @@ class QuestBox {
   }
 
   update (result, input) {
-    if (this.status.solved)
+    if (this.status.solved) {
+      // already solved: offer to replace the saved solution instead of touching stats right away
+      this.pendingReplacement = result.pass ? { result, input } : null;
+      this.showReplace();
       return;
+    }
     this.status.attempts++;
     this.status.total += result.steps;
     this.status.steps = result.steps;
@@ -281,6 +305,33 @@ class QuestBox {
     }
     if (this.chapter)
       this.chapter.addSolved(this.impl.id);
+  }
+
+  /**
+   * @desc Replace an already saved solution with the latest successful attempt.
+   *       Only available right after a successful re-attempt of an already solved quest.
+   *       Also replaces the corresponding term in the engine, unless it is a Native term
+   *       (i.e. one of the built-in combinators, which must never be overridden).
+   */
+  replaceSolution () {
+    if (!this.pendingReplacement)
+      return;
+    const { result, input } = this.pendingReplacement;
+
+    this.status.attempts++;
+    this.status.solution = input;
+    this.status.steps = result.steps;
+    this.status.weight = result.weight;
+    this.save();
+
+    this.pendingReplacement = null;
+    this.showReplace();
+    this.showStatus();
+
+    if (this.impl.meta.unlock) {
+      const term = new SKI.classes.Alias(this.impl.meta.unlock, result.expr.expand());
+      this.chapter?.onTermReplace(term);
+    }
   }
 
   check () {
@@ -356,11 +407,19 @@ class QuestBox {
           this.input[i].value = this.status.solution[i];
       }
     });
+    this.view.replace = append(element, 'button', { content: 'replace', hidden: !this.pendingReplacement }, btn => {
+      btn.onclick = () => this.replaceSolution();
+    });
   }
 
   showReveal () {
     if (this.view.reveal)
       this.view.reveal.hidden = !this.status.solution;
+  }
+
+  showReplace () {
+    if (this.view.replace)
+      this.view.replace.hidden = !this.pendingReplacement;
   }
 
   showStatus () {
@@ -449,6 +508,7 @@ class QuestChapter {
     this.store = options.store;
     this.newCutOff = options.newCutOff;
     this.onTermUnlock = options.onTermUnlock ?? (() => {});
+    this.onTermReplace = options.onTermReplace ?? (() => {});
     this.updateMeta();
   }
 
