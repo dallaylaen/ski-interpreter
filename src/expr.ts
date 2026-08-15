@@ -32,6 +32,12 @@ export const control = {
  */
 export const native: Record<string, Native> = {};
 
+export type InferOptions = {
+  max?: number,
+  maxArgs?: number,
+  maxSize?: number,
+};
+
 export type TermInfo = {
   normal: boolean,      // whether the term becomes irreducible after receiving a number of arguments.
   proper: boolean,      // whether the irreducible form is only contains its arguments. implies normal.
@@ -355,7 +361,7 @@ export abstract class Expr {
    * @param {{max?: number, maxArgs?: number}} options
    * @return {TermInfo}
    */
-  infer (options : {max?: number, maxArgs?: number, maxSize?: number } = {}): TermInfo {
+  infer (options : InferOptions = {}): TermInfo {
     // First gather the names which can collide with generated variables and forbid them.
     // TODO confusing naming, rewrite.
     const skipNames: Record<string, boolean> = {};
@@ -1187,6 +1193,67 @@ export class Native extends Named {
     this.invoke  = impl;
 
     this.annotate({ canonize: true, ...opt });
+  }
+}
+
+export class PureNative extends Native {
+  constructor (self: FreeVar, impl: Lambda) {
+    // build invoke() from lambda
+    let count = 0;
+    const env: Record<string, Expr> = { self };
+    const map: Map<Expr, string> = new Map([[self, self.name]]);
+
+    let arity = 0;
+    let body: Expr = impl;
+    while (body instanceof Lambda) {
+      if (env[body.arg.name])
+        throw new Error('PureNative: conflicting argument name ' + body.arg.name);
+      env[body.arg.name] = body.arg;
+      map.set(body.arg, body.arg.name);
+      body = body.impl;
+      arity++;
+    }
+
+    const replaced = impl.traverse({}, term => {
+      if (term instanceof App || term instanceof Lambda)
+        return; // descend
+      if (map.has(term))
+        return env[map.get(term)!];
+      let name = term instanceof Named ? term.name : '';
+      while (name.length === 0 || env[name])
+        name = 'term' + (++count);
+      const placeholder = new FreeVar(name);
+      env[name] = term;
+      map.set(term, name);
+      return placeholder;
+    });
+
+    // should never happen actually
+    if (replaced === null)
+      throw new Error('PureNative: failed to replace terms in ' + impl);
+
+    const preamble = Object.keys(env)
+      .map(k => 'var ' + k + ' = env.' + k + ';')
+      .join('\n');
+
+    const text = replaced.format({
+      terse:    false,
+      lambda:   ['function(', ') { return ', '; }'],
+      brackets: ['.apply(', ')'],
+    })
+      .replace(/{/, '{ var ' + self + ' = ' + 'this; ');
+
+    const code = '(function() {\n' + preamble + '\nreturn ' + text + '; })();';
+
+    // console.log('PureNative: generated code for ' + self.name + ':\n' + code);
+
+    const invoke = eval(code) as (e: Expr) => Invocation; // eslint-disable-line no-eval
+
+    super(self.name, invoke, {
+      arity,
+      canonize: false,
+      note:     impl.format({ html: true, lambda: ['', ' &mapsto; ', ''] }),
+    });
   }
 }
 
