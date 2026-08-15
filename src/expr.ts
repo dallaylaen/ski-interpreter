@@ -1243,11 +1243,11 @@ export class PureNative extends Native {
     })
       .replace(/{/, '{ var ' + self + ' = ' + 'this; ');
 
-    const code = '(function() {\n' + preamble + '\nreturn ' + text + '; })();';
+    const code = preamble + '\nreturn ' + text + ';';
 
     // console.log('PureNative: generated code for ' + self.name + ':\n' + code);
 
-    const invoke = eval(code) as (e: Expr) => Invocation; // eslint-disable-line no-eval
+    const invoke = new Function('env', code)(env) as (e: Expr) => Invocation; // eslint-disable-line no-new-func
 
     super(self.name, invoke, {
       arity,
