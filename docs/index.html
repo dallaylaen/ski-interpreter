@@ -280,14 +280,16 @@
 
         const hotlink = util.readlink(window.location.hash);
         if (hotlink && hotlink.expr) {
-            ski = new SKI();
+            ski = new SKI({"native": true});
             autosave = false;
             ski.bulkAdd(hotlink.decls);
             view.entryField.value = hotlink.expr;
         } else {
-            ski = new SKI(store.load('engine') ?? {} );
-            autosave = true;
-            view.entryField.value = loadInput() ?? 'S(K(SI))K x y';
+          const param = store.load('engine') ?? {};
+          param.native = true;
+          ski = new SKI(param);
+          autosave = true;
+          view.entryField.value = loadInput() ?? 'S(K(SI))K x y';
         }
         showInventory();
 
