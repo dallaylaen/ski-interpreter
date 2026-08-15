@@ -1202,11 +1202,17 @@ export class Native extends Named {
 }
 
 export class PureNative extends Native {
-  constructor (self: FreeVar, impl: Lambda) {
+  constructor (self: FreeVar|string, impl: Lambda) {
     // build invoke() from lambda
     let count = 0;
-    const env: Record<string, Expr> = { self };
-    const map: Map<Expr, string> = new Map([[self, self.name]]);
+    const env: Record<string, Expr> = { };
+    const map: Map<Expr, string> = new Map();
+
+    if (self instanceof FreeVar) {
+      // might have self-reference
+      env[self.name] = self;
+      map.set(self, self.name);
+    }
 
     let arity = 0;
     let body: Expr = impl;
@@ -1238,15 +1244,18 @@ export class PureNative extends Native {
       throw new Error('PureNative: failed to replace terms in ' + impl);
 
     const preamble = Object.keys(env)
+      .filter(k => k !== self + '')
       .map(k => 'var ' + k + ' = env.' + k + ';')
       .join('\n');
 
-    const text = replaced.format({
+    let text = replaced.format({
       terse:    false,
       lambda:   ['function(', ') { return ', '; }'],
       brackets: ['.apply(', ')'],
-    })
-      .replace(/{/, '{ var ' + self + ' = ' + 'this; ');
+    });
+
+    if (self instanceof FreeVar)
+      text = text.replace(/{/, '{ var ' + self + ' = ' + 'this; ');
 
     const code = preamble + '\nreturn ' + text + ';';
 
@@ -1254,7 +1263,7 @@ export class PureNative extends Native {
 
     const invoke = new Function('env', code)(env) as (e: Expr) => Invocation; // eslint-disable-line no-new-func
 
-    super(self.name, invoke, {
+    super(self + '', invoke, {
       arity,
       canonize: false,
       note:     impl.format({ html: true, lambda: ['', ' &mapsto; ', ''] }),

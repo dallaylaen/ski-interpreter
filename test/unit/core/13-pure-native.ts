@@ -7,9 +7,26 @@ import { Lambda, PureNative } from '../../../src/expr';
 describe('PureNative', () => {
   const ski = new SKI();
 
+  describe('T', () => {
+    const T = new PureNative('T', ski.parse('x->y->y x') as Lambda);
+    it('has predictable arity', () => {
+      expect(T.arity).to.equal(2);
+    });
+
+    it('reduces predictably', () => {
+      const { x, y } = SKI.vars();
+      y.apply(x).expect(T.apply(x, y).run().expr);
+    })
+  });
+
   describe('iota', () => {
     const { X } = SKI.vars();
     const iota = new PureNative(X, ski.parse('x->xSK') as Lambda);
+
+    it('has name', () => {
+      expect(iota.name).to.equal('X');
+      expect(iota + '').to.equal('X');
+    });
 
     it('has predictable arity', () => {
       expect(iota.arity).to.equal(1);
