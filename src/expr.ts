@@ -87,7 +87,7 @@ export type RefinedFormatOptions = { // ditto but with defaults plugged in
 export type TraverseOptions = {order?: 'LO' | 'LI' | 'leftmost-outermost' | 'leftmost-innermost'};
 export type TraverseCallback = (e:Expr) => TraverseValue<Expr>;
 
-export type ToposortResult = { list: Expr[], env: Record<string, Named> };
+export type ToposortResult<T extends Expr = Expr> = { list: (T|Named)[], env: Record<string, Named> };
 
 /**
  *   A combinatory logic expression.
@@ -1471,7 +1471,7 @@ export class Alias extends Named {
       throw new Error('Attempt to create an alias for a non-expression: ' + impl);
     this.impl = impl;
 
-    this.annotate(options);
+    this.annotate({ arity: impl.arity, ...options });
     this.invoke = waitn(options.inline ? 0 : this.arity ?? 0)(impl);
     if (options.inline) {
       this.inline = true;
@@ -1679,7 +1679,7 @@ function nthvar (n: number): FreeVar {
  *    toposort([expr], ski.getTerms()); // returns all terms appearing in Expr in correct order
  */
 // TODO the docs suck. You know it and I know it. Fix when have time.
-export function toposort (options: {list?: Expr|Expr[], env?: Record<string, Named> | undefined, allow?: Record<string, Named> | undefined}): ToposortResult {
+export function toposort<T extends Expr = Expr> (options: {list?: T|T[], env?: Record<string, Named> | undefined, allow?: Record<string, Named> | undefined}): ToposortResult<T> {
   if (typeof options !== 'object' || options === null || Array.isArray(options) || options instanceof Expr)
     throw new Error('positional arguments to toposort are deprecated, use { list: ..., env: ... } instead');
 
@@ -1706,10 +1706,10 @@ export function toposort (options: {list?: Expr|Expr[], env?: Record<string, Nam
       delete env[term.name];
   }
 
-  const out: Expr[] = [];
+  const out: (T|Named)[] = [];
   // assume all terms in env seen, too
   const seen: Set<Expr> = new Set(Object.values(env));
-  const rec = (term: Expr) => {
+  const rec = (term: T|Named) => {
     if (seen.has(term))
       return;
     term.fold(undefined, (_:undefined, e:Expr):TraverseValue<undefined> => {

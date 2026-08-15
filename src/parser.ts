@@ -365,7 +365,7 @@ export class Parser {
 
       for (let j = 0; j < list.length; j++) {
         // upon processing list[j], only terms declared before it may be detoured
-        list[j] = rework(list[j]);
+        list[j] = rework(list[j]) as Named;
         detour.set(needDetour[(list[j] as Alias).name], list[j] as Alias);
         env[(list[j] as Alias).name] = list[j] as Alias;
         // console.log(`list[${j}] = ${(list[j] as Alias).name}=${(list[j] as Alias).impl};`);
