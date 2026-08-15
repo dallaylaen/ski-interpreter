@@ -1202,6 +1202,8 @@ export class Native extends Named {
 }
 
 export class PureNative extends Native {
+  source: Expr;
+
   constructor (self: FreeVar|string, impl: Lambda) {
     // build invoke() from lambda
     let count = 0;
@@ -1230,6 +1232,9 @@ export class PureNative extends Native {
         return; // descend
       if (map.has(term))
         return env[map.get(term)!];
+      if (term instanceof Named && term.name === self + '')
+        throw new Error('PureNative: definition subterm conflicts with self-reference: ' + term.name);
+        // TODO error message is misleading, think better
       let name = term instanceof Named ? term.name : '';
       while (name.length === 0 || env[name])
         name = 'term' + (++count);
@@ -1268,6 +1273,13 @@ export class PureNative extends Native {
       canonize: false,
       note:     impl.format({ html: true, lambda: ['', ' &mapsto; ', ''] }),
     });
+    this.source = impl;
+  }
+
+  declareImpl (options: FormatOptions): string {
+    return options.declaration![0]
+      + '@native ' + this.format(options)
+      + options.declaration![1] + this.source.format(options);
   }
 }
 

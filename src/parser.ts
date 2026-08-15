@@ -4,7 +4,10 @@
 'use strict';
 
 import { Tokenizer, restrict } from './internal';
-import { Expr, FreeVar, Lambda, Church, Alias, Native, Named, native, Invocation, RefinedFormatOptions, toposort } from './expr';
+import {
+  Expr, FreeVar, Lambda, Church, Alias, Native, Named, native, Invocation, RefinedFormatOptions, toposort,
+  PureNative,
+} from './expr';
 
 class Empty extends Expr {
   apply (...args: Expr[]):Expr {
@@ -70,6 +73,7 @@ export type ParserOptions = {
   allow?: string,
   numbers?: boolean,
   lambdas?: boolean,
+  native?: boolean,
   terms?: { [key: string]: Expr | string } | string[],
   annotate?: boolean,
   addContext?: boolean,
@@ -110,6 +114,7 @@ export class Parser {
 
   hasNumbers: boolean;
   hasLambdas: boolean;
+  hasNative: boolean;
 
   constructor (options: ParserOptions = {}) {
     this.annotate = !!options.annotate;
@@ -117,6 +122,7 @@ export class Parser {
     this.known = { ...native };
     this.hasNumbers = true;
     this.hasLambdas = true;
+    this.hasNative = !!options.native;
     /** @type {Set<string>} */
     this.allow = new Set(Object.keys(this.known));
 
@@ -230,20 +236,18 @@ export class Parser {
    */
   bulkAdd (list: string[]): this {
     for (const item of list) {
-      const m = item.match(/^([A-Z]|[a-z][a-z_0-9]*)\s*(=\s*(.*))?$/s);
-      // TODO check all declarations before applying any (but we might need earlier terms for parsing later ones)
-      if (!m)
-        throw new Error('bulkAdd: invalid declaration: ' + item);
-      if (!m[2]) {
-        // no '=' sign, just allow the term
-        if (!this.known[m[1]])
-          throw new Error('bulkAdd: unknown term: ' + m[1]);
-        this.restrict('+' + m[1]);
-      } else if (m[3] === '') {
-        // 'term=' removes the term
-        this.remove(m[1]);
-      } else
-        this.add(m[1], this.parse(m[3]));
+      if (item.match(/^\s*([A-Z]|[a-z][a-z_0-9]*)\s*=\s*$/s)) {
+        this.remove(item);
+        continue;
+      }
+      if (item.match(/^\s*([A-Z]|[a-z][a-z_0-9]*)\s*$/s)) {
+        this.allow.add(item.trim());
+        continue;
+      }
+      const term = this.parse(item);
+      if (!(term instanceof Named))
+        throw new Error('bulkAdd: expected named term, got ' + term);
+      this.add(term.name, term);
     }
 
     return this;
@@ -461,6 +465,17 @@ export class Parser {
     if (aliased)
       return new Alias(aliased[1], this.parseLine(aliased[2], env, options), { canonize: options.canonize });
 
+    const isNative = source.match(/^\s*@native\s+([A-Z]|[a-z][a-z_0-9]*)\s*=\s*(.*)$/s);
+    if (isNative) {
+      if (!this.hasNative)
+        throw new Error('Please allow native terms explicitly in the interpreter ("native": true)');
+      const self = new FreeVar(isNative[1]); // no scope, self-bound placeholder
+      const impl = this.parseLine(isNative[2], { ...env, [isNative[1]]: self }, options);
+      if (!(impl instanceof Lambda))
+        throw new Error('Native term must be defined via a lambda expression');
+      return new Alias(self + '', new PureNative(self, impl));
+    }
+
     const opt = {
       numbers: options.numbers ?? this.hasNumbers,
       lambdas: options.lambdas ?? this.hasLambdas,
@@ -518,11 +533,12 @@ export class Parser {
 
   toJSON () {
     return {
-      version:  '1.1.1', // set to incremented package.json version whenever SKI serialization changes
+      version:  '2.12.1', // set to incremented package.json version whenever SKI serialization changes
       allow:    this.showRestrict('+'),
       numbers:  this.hasNumbers,
       lambdas:  this.hasLambdas,
       annotate: this.annotate,
+      native:   this.hasNative,
       terms:    this.declare(),
     }
   }
