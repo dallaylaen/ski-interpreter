@@ -56,15 +56,16 @@ export type Run = { expr: Expr, steps: number, final: boolean };
 export type RunOptions = { max?: number, steps?: number, throw?: boolean, maxSize?: number };
 
 export type FormatOptions = {
-  terse?:     boolean,
-  html?:      boolean,
-  brackets?:  [string, string],
-  space?:     string,
-  var?:       [string, string],
-  lambda?:    [string, string, string],
-  around?:    [string, string],
-  redex?:     [string, string],
-  inventory?: Record<string, Named>,
+  terse?:       boolean,
+  html?:        boolean,
+  brackets?:    [string, string],
+  space?:       string,
+  var?:         [string, string],
+  lambda?:      [string, string, string],
+  around?:      [string, string],
+  redex?:       [string, string],
+  declaration?: [string, string, string],
+  inventory?:   Record<string, Named>,
 };
 
 /**
@@ -897,19 +898,19 @@ export abstract class Expr {
     return indent + this.constructor.name + ': ' + this;
   }
 
-  declare (options: FormatOptions & { declaration?: [string, string, string] } = {}): string {
+  declare (options: FormatOptions = {}): string {
     // TODO also make declaration syntax configurable
-    const { declaration : d = ['', '=', '; '], ...format }  = options;
+    const { declaration = ['', '=', '; '], ...format }  = options;
 
     const res = toposort({ list: [this], env: format.inventory });
 
-    return res.list.map(s => {
-      if (s instanceof Alias)
-        return d[0] + s.name + d[1] + s.impl.format({ ...format, inventory: res.env });
-      if (s instanceof FreeVar)
-        return d[0] + s.name + d[1];
-      return s.format({ ...format, inventory: res.env });
-    }).join(d[2]);
+    return res.list
+      .map(s => s.declareImpl({ ...format, inventory: res.env, declaration }))
+      .join(declaration[2]);
+  }
+
+  declareImpl (options: FormatOptions): string {
+    return this.format(options);
   }
 
   /**
@@ -1158,6 +1159,10 @@ export class FreeVar extends Named {
   formatImpl (options: RefinedFormatOptions, nargs: number): string {
     const name = options.html ? this.fancyName ?? this.name : this.name;
     return options.var![0] + name + options.var![1];
+  }
+
+  declareImpl (options: FormatOptions): string {
+    return options.declaration![0] + this.format(options) + options.declaration![1];
   }
 
   diag (indent: string = ''): string {
@@ -1534,6 +1539,11 @@ export class Alias extends Named {
       ? options.inventory[this.name] !== this
       : this.inline;
     return inline ? this.impl.formatImpl(options, nargs) : super.formatImpl(options, nargs);
+  }
+
+  declareImpl (options: FormatOptions): string {
+    const d = options.declaration!;
+    return d[0] + this.name + d[1] + this.impl.format(options);
   }
 
   diag (indent: string = ''): string {
