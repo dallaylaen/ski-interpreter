@@ -14,6 +14,11 @@ describe('Expr.declare', () => {
       expect(decl).to.not.match(/\b[A-Z];/);
     });
   });
+  roundTrip('lambda', 'a->aSK', {}, (expr, decl) => {
+    it('does not leak the bound variable as a separate declaration', () => {
+      expect(decl).to.not.match(/\ba\s*=/);
+    });
+  });
 });
 
 function roundTrip (
