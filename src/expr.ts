@@ -1203,6 +1203,8 @@ export class Native extends Named {
 
 export class PureNative extends Native {
   source: Expr;
+  /** the placeholder variable used for self-reference within `source`, if any */
+  selfRef?: FreeVar;
 
   constructor (self: FreeVar|string, impl: Lambda) {
     // build invoke() from lambda
@@ -1274,6 +1276,27 @@ export class PureNative extends Native {
       note:     impl.format({ html: true, lambda: ['', ' &mapsto; ', ''] }),
     });
     this.source = impl;
+    if (self instanceof FreeVar)
+      this.selfRef = self;
+  }
+
+  /**
+   *  Fold over the term's `source` definition, so that dependencies on other named terms
+   *       (including self-references) can be discovered, e.g. by {@link toposort}.
+   *
+   *       Self-references are folded as the PureNative term itself (`this`), rather than
+   *       the internal placeholder variable, so that generic dependency-tracking code
+   *       (which relies on reference identity) treats them correctly, i.e. doesn't try
+   *       to recurse into a "different" term with the same name.
+   */
+  _fold<T> (initial: T, combine: (acc: T, expr: Expr) => TraverseValue<T>): TraverseValue<T> {
+    const [value = initial, action] = unwrap(combine(initial, this));
+    if (action === control.prune)
+      return value;
+    if (action === control.stop)
+      return control.stop(value);
+    const selfRef = this.selfRef;
+    return this.source._fold(value, (acc, e) => e === selfRef ? combine(acc, this) : combine(acc, e));
   }
 
   declareImpl (options: FormatOptions): string {
@@ -1715,6 +1738,11 @@ export function toposort<T extends Expr = Expr> (options: {list?: T|T[], env?: R
     term.fold(undefined, (_:undefined, e:Expr):TraverseValue<undefined> => {
       if (!(e instanceof Named))
         return;
+
+      // a variable bound by an enclosing lambda is not a real dependency, skip it
+      if (e instanceof FreeVar && e.scope instanceof Lambda)
+        return;
+
       // not allowed => fall through
       if (allow && allow[e.name] !== e)
         return;

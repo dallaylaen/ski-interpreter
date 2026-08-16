@@ -315,14 +315,14 @@ export class Parser {
 
   /**
    *  Export term declarations for use in bulkAdd().
-   * Currently only Alias terms are serialized.
+   * Alias and @atomic (PureNative) terms are serialized.
    * @returns {string[]}
    */
   declare (): string[] {
     // TODO accept argument to declare specific terms only
-    const env: { [key: string]: Alias } = {};
+    const env: { [key: string]: Named } = {};
     for (const [name, term] of Object.entries(this.getTerms())) {
-      if (term instanceof Alias)
+      if (term instanceof Alias || term instanceof PureNative)
         env[name] = term;
     }
 
@@ -376,7 +376,7 @@ export class Parser {
     // console.log(res);
     const out = list.map(e => needDetour[(e as Alias).name]
       ? (e as Alias).name + '=' + needDetour[(e as Alias).name].name + '=' + (e as Alias).impl.format({ inventory: env })
-      : (e as Alias).name + '=' + (e as Alias).impl.format({ inventory: env })
+      : e.declareImpl({ inventory: env, declaration: ['', '=', ''] })
     );
 
     for (const [name, temp] of detour)
