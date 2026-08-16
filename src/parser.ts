@@ -73,7 +73,7 @@ export type ParserOptions = {
   allow?: string,
   numbers?: boolean,
   lambdas?: boolean,
-  native?: boolean,
+  atomic?: boolean,
   terms?: { [key: string]: Expr | string } | string[],
   annotate?: boolean,
   addContext?: boolean,
@@ -114,7 +114,7 @@ export class Parser {
 
   hasNumbers: boolean;
   hasLambdas: boolean;
-  hasNative: boolean;
+  hasAtomic: boolean;
 
   constructor (options: ParserOptions = {}) {
     this.annotate = !!options.annotate;
@@ -122,7 +122,7 @@ export class Parser {
     this.known = { ...native };
     this.hasNumbers = true;
     this.hasLambdas = true;
-    this.hasNative = !!options.native;
+    this.hasAtomic = !!options.atomic;
     /** @type {Set<string>} */
     this.allow = new Set(Object.keys(this.known));
 
@@ -467,8 +467,8 @@ export class Parser {
 
     const isNative = source.match(/^\s*@atomic\s+([A-Z]|[a-z][a-z_0-9]*)\s*=\s*(.*)$/s);
     if (isNative) {
-      if (!this.hasNative)
-        throw new Error('Please allow native terms explicitly in the interpreter ("native": true)');
+      if (!this.hasAtomic)
+        throw new Error('Please allow atomic terms explicitly in the interpreter ("atomic": true)');
       const self = new FreeVar(isNative[1]); // no scope, self-bound placeholder
       const impl = this.parseLine(isNative[2], { ...env, [isNative[1]]: self }, options);
       if (!(impl instanceof Lambda))
@@ -538,7 +538,7 @@ export class Parser {
       numbers:  this.hasNumbers,
       lambdas:  this.hasLambdas,
       annotate: this.annotate,
-      native:   this.hasNative,
+      atomic:   this.hasAtomic,
       terms:    this.declare(),
     }
   }

@@ -6,7 +6,7 @@ import { Alias, Expr, Lambda, Named, PureNative } from '../../../src/expr';
 import { isInstanceOf } from '../../lib/assert';
 
 describe('PureNative', () => {
-  const ski = new SKI({ native: true });
+  const ski = new SKI({ atomic: true });
 
   describe('new PureNative()', () => {
     const { x, y } = SKI.vars();
