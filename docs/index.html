@@ -280,13 +280,13 @@
 
         const hotlink = util.readlink(window.location.hash);
         if (hotlink && hotlink.expr) {
-            ski = new SKI({"native": true});
+            ski = new SKI({atomic: true});
             autosave = false;
             ski.bulkAdd(hotlink.decls);
             view.entryField.value = hotlink.expr;
         } else {
           const param = store.load('engine') ?? {};
-          param.native = true;
+          param.atomic = true;
           ski = new SKI(param);
           autosave = true;
           view.entryField.value = loadInput() ?? 'S(K(SI))K x y';
