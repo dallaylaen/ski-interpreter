@@ -314,8 +314,8 @@ export class Parser {
   }
 
   /**
-   *  Export term declarations for use in bulkAdd().
-   * Alias and @atomic (PureNative) terms are serialized.
+   * Export term declarations for use in bulkAdd().
+   * Alias'es and atomic (PureNative) terms are serialized.
    * @returns {string[]}
    */
   declare (): string[] {
