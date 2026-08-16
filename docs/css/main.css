@@ -307,6 +307,17 @@ ul.term-list li {
     color: orangered;
 }
 
+.brand-new {
+    display: inline-block;
+    float: left;
+    color: red;
+    background-color: yellow;
+    border: 5px black wave;
+    border-radius: 100vh;
+    padding: 0.7em;
+    margin: 0.2em;
+}
+
 h1 {
     margin: 0;
     padding: 05.em;

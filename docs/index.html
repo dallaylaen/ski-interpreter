@@ -150,6 +150,14 @@
                 the <b>&rarr;&lambda;</b> button attempts to find the shortest equivalent lambda term.
             </p>
             <p>
+                <span class="brand-new">New!</span>
+                Use <code>@atomic T=a->b->b a</code> to declare new atomic combinators that reduce in one step.
+                Other terms may be used in the definition, but the right-hand side must always start with abstraction (<code>-&gt;</code>).
+                Self-referencing definitions supported, too.
+                This is a highly experimental feature, please share your feedback in this
+                <a href="https://github.com/dallaylaen/ski-interpreter/issues/18" target="_blank">issue</a>.
+            </p>
+            <p>
                 Enter <code>?</code> to get detailed info on syntax.
             </p>
         </div>
@@ -189,6 +197,12 @@
                     A non-negative integer is assumed to be a Church numeral, i.e. a term with
                     two arguments <code>x</code> and <code>y</code>
                     returning <code>x(...{n times}...(x(y)...)</code>.
+                </li>
+                <li>
+                    New atomic combinators can be declared with <code>@atomic name = x-&gt;y-&gt;...&lt;expression&gt;</code>.
+                    The right-hand side must always start with an abstraction (<code>-&gt;</code>).
+                    Self-referencing definitions are supported.
+                    This feature is highly experimental.
                 </li>
             </ul>
             <p>Examples: </p>
