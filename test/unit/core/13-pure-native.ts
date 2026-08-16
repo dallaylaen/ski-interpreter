@@ -26,7 +26,7 @@ describe('PureNative', () => {
   });
 
   describe('T', () => {
-    const T = stripAlias(ski.parse('@native T = x->y->y x'));
+    const T = stripAlias(ski.parse('@atomic T = x->y->y x'));
 
     it('has correct type and name', () => {
       isInstanceOf(T, PureNative);
@@ -45,7 +45,7 @@ describe('PureNative', () => {
   });
 
   describe('iota', () => {
-    const iota = stripAlias(ski.parse('@native X = x->xSK'));
+    const iota = stripAlias(ski.parse('@atomic X = x->xSK'));
 
     it('has type and name', () => {
       isInstanceOf(iota, PureNative);
@@ -66,7 +66,7 @@ describe('PureNative', () => {
   });
 
   describe('Y combinator', () => {
-    const Y = stripAlias(ski.parse('@native Y = f->f(Y f)'));
+    const Y = stripAlias(ski.parse('@atomic Y = f->f(Y f)'));
 
     it('has predictable arity', () => {
       expect(Y.arity).to.equal(1);

@@ -1278,7 +1278,7 @@ export class PureNative extends Native {
 
   declareImpl (options: FormatOptions): string {
     return options.declaration![0]
-      + '@native ' + this.format(options)
+      + '@atomic ' + this.format(options)
       + options.declaration![1] + this.source.format(options);
   }
 }

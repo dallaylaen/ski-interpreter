@@ -465,7 +465,7 @@ export class Parser {
     if (aliased)
       return new Alias(aliased[1], this.parseLine(aliased[2], env, options), { canonize: options.canonize });
 
-    const isNative = source.match(/^\s*@native\s+([A-Z]|[a-z][a-z_0-9]*)\s*=\s*(.*)$/s);
+    const isNative = source.match(/^\s*@atomic\s+([A-Z]|[a-z][a-z_0-9]*)\s*=\s*(.*)$/s);
     if (isNative) {
       if (!this.hasNative)
         throw new Error('Please allow native terms explicitly in the interpreter ("native": true)');
