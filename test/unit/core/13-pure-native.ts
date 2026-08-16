@@ -2,13 +2,38 @@ import { expect } from 'chai';
 // import { isInstanceOf } from '../../lib/assert';
 
 import { SKI } from '../../../src';
-import { Lambda, PureNative } from '../../../src/expr';
+import { Alias, Expr, Lambda, Named, PureNative } from '../../../src/expr';
+import { isInstanceOf } from '../../lib/assert';
 
 describe('PureNative', () => {
-  const ski = new SKI();
+  const ski = new SKI({ native: true });
+
+  describe('new PureNative()', () => {
+    const { x, y } = SKI.vars();
+    const M = new PureNative('M', new Lambda(x, x.apply(x)));
+
+    it('has name', () => {
+      expect(M.name).to.equal('M');
+    });
+
+    it('has predictable arity', () => {
+      expect(M.arity).to.equal(1);
+    });
+
+    it('reduces predictably', () => {
+      y.apply(y).expect(M.apply(y).run().expr);
+    });
+  });
 
   describe('T', () => {
-    const T = new PureNative('T', ski.parse('x->y->y x') as Lambda);
+    const T = stripAlias(ski.parse('@native T = x->y->y x'));
+
+    it('has correct type and name', () => {
+      isInstanceOf(T, PureNative);
+      expect(T.name).to.equal('T');
+      expect(T + '').to.equal('T');
+    });
+
     it('has predictable arity', () => {
       expect(T.arity).to.equal(2);
     });
@@ -20,10 +45,10 @@ describe('PureNative', () => {
   });
 
   describe('iota', () => {
-    const { X } = SKI.vars();
-    const iota = new PureNative(X, ski.parse('x->xSK') as Lambda);
+    const iota = stripAlias(ski.parse('@native X = x->xSK'));
 
-    it('has name', () => {
+    it('has type and name', () => {
+      isInstanceOf(iota, PureNative);
       expect(iota.name).to.equal('X');
       expect(iota + '').to.equal('X');
     });
@@ -41,19 +66,32 @@ describe('PureNative', () => {
   });
 
   describe('Y combinator', () => {
-    const { Y } = SKI.vars();
-    const natY = new PureNative(Y, ski.parse('f->f(Y f)', { env: { Y } }) as Lambda);
+    const Y = stripAlias(ski.parse('@native Y = f->f(Y f)'));
 
     it('has predictable arity', () => {
-      expect(natY.arity).to.equal(1);
+      expect(Y.arity).to.equal(1);
     });
 
     it('reduces predictably', () => {
       const { x } = SKI.vars();
-      const trace = [...natY.apply(SKI.W, x).walk({ max: 20 })].map(r => r.expr + '');
+      const trace = [...Y.apply(SKI.W, x).walk({ max: 20 })].map(r => r.expr + '');
       expect(trace[2]).to.equal('YWx x');
       expect(trace[3]).to.equal('W(YW)x x');
       expect(trace[4]).to.equal('YWx x x');
     });
   });
 });
+
+// move to test/lib?
+/**
+ * The parser may add an invisible eponymous Alias wrapper around a Named term
+ * to protect the original term from modifications.
+ * This function reveals the underlying term instead.
+ * @param expr
+ */
+function stripAlias (expr: Expr): Expr {
+  let next = expr;
+  while (next instanceof Alias && next.impl instanceof Named && next.impl.name === next.name)
+    next = next.impl;
+  return next;
+}
