@@ -80,6 +80,30 @@ describe('PureNative', () => {
       expect(trace[4]).to.equal('YWx x x');
     });
   });
+
+  describe('Is back-parsable', () => {
+    // pedestrian fix-point combinator
+    const src = '@atomic P = f->f P f';
+    const P = stripAlias(ski.parse(src));
+
+    it('has predictable arity', () => {
+      expect(P.arity).to.equal(1);
+    });
+
+    const src2 = P.declare();
+    it('boils down to the same source', () => {
+      expect(src2.replace(/ /g, '')).to.equal(src.replace(/ /g, ''));
+    });
+
+    it('is back-parsable', () => {
+      expect(src2.replace(/ /g, '')).to.equal(src.replace(/ /g, ''));
+      const p2 = stripAlias(ski.parse(src2));
+      isInstanceOf(p2, PureNative);
+      expect(p2.name).to.equal('P');
+      expect(p2.arity).to.equal(P.arity);
+      p2.expect(p2.run(SKI.K).expr);
+    });
+  });
 });
 
 // move to test/lib?
