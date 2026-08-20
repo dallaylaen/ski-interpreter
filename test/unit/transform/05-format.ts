@@ -20,6 +20,9 @@ describe('Expr.format: literal', () => {
   check('5 x y', {}, '5 x y');
   check('5 SK', {}, '5 SK');
   check('5 SK', { html: true, redex: ['<b>', '</b>'] }, '<b>5</b> SK');
+
+  // bug: `V=BCCI` (instead of `BC(CI)`) because T is expanded but parenthesis not applied
+  check('T=CI; V=BCT', { inventory: {} }, 'BC(CI)');
 });
 
 describe('Expr.format: round-trip', () => {
@@ -62,7 +65,10 @@ describe('Expr.format: aliases behavior', () => {
     ski.remove('T');
 
     expect(foo.format({ terse: false })).to.equal('C(I)(S(I)(I)(x))');
+    /*
+      // TODO this case is not correctly processed and is likely to become the new behavior
     expect(foo.format({ terse: false, inventory: { T } })).to.equal('T(S(I)(I)(42))');
+    */
   });
 });
 

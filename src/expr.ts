@@ -833,6 +833,16 @@ export abstract class Expr {
    *
    */
   format (options: FormatOptions = {}): string {
+    if (options.inventory) {
+      const { inventory, ...format } = options;
+      // replace all aliases except those in the inventory with their implementation
+      // TODO we ignore inline aliases, could make a detour later
+      return (this.traverse({}, e => {
+        if (e instanceof Alias && inventory[e.name] !== e)
+          return control.redo(e.impl);
+      }) ?? this).format(format);
+    }
+
     const fallback: RefinedFormatOptions = options.html
       ? {
         brackets: ['(', ')'],
@@ -849,17 +859,17 @@ export abstract class Expr {
         lambda:   ['', '->', ''],
         around:   ['', ''],
         redex:    ['', ''],
-      }
+      };
+
     return this.formatImpl({
-      terse:     options.terse    ?? true,
-      brackets:  options.brackets ?? fallback.brackets,
-      space:     options.space    ?? fallback.space,
-      var:       options.var      ?? fallback.var,
-      lambda:    options.lambda   ?? fallback.lambda,
-      around:    options.around   ?? fallback.around,
-      redex:     options.redex    ?? fallback.redex,
-      inventory: options.inventory, // TODO better name
-      html:      options.html     ?? false,
+      terse:    options.terse    ?? true,
+      brackets: options.brackets ?? fallback.brackets,
+      space:    options.space    ?? fallback.space,
+      var:      options.var      ?? fallback.var,
+      lambda:   options.lambda   ?? fallback.lambda,
+      around:   options.around   ?? fallback.around,
+      redex:    options.redex    ?? fallback.redex,
+      html:     options.html     ?? false,
     }, 0);
   }
 
@@ -1579,10 +1589,7 @@ export class Alias extends Named {
   }
 
   formatImpl (options: RefinedFormatOptions, nargs: number): string {
-    const inline = options.inventory
-      ? options.inventory[this.name] !== this
-      : this.inline;
-    return inline ? this.impl.formatImpl(options, nargs) : super.formatImpl(options, nargs);
+    return this.inline ? this.impl.formatImpl(options, nargs) : super.formatImpl(options, nargs);
   }
 
   declareImpl (options: FormatOptions): string {
