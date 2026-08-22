@@ -1631,6 +1631,58 @@ addNative(
 
 // utility functions dependent on Expr* classes, in alphabetical order
 
+/**
+ * Simplified toposort from scratch.
+ *
+ * @param list
+ */
+export function depSort (list: Expr[]): Expr[] {
+  const out : Expr[] = [];
+  const seen : Set<Expr> = new Set();
+
+  const uniq : Record<string, Named> = {};
+
+  for (const item of list) {
+    if (!(item instanceof Named))
+      continue;
+    if (uniq[item.name] === item)
+      continue;
+    if (uniq[item.name] !== undefined)
+      throw new Error('depSort: different terms with the same name: ' + item.name);
+    uniq[item.name] = item;
+  }
+
+  const rec = (term: Expr) => {
+    if (seen.has(term))
+      return;
+    seen.add(term);
+
+    if (term instanceof Alias && term.impl instanceof Named && term.name === term.impl.name)
+      return rec(term.impl);
+
+    if (term instanceof PureNative && term.selfRef)
+      seen.add(term.selfRef);
+
+    const tmp = term instanceof PureNative ? term.source : term;
+
+    tmp.traverse(e => {
+      if (e instanceof Lambda)
+        seen.add(e.arg);
+      if (e === term || !(e instanceof Named))
+        return;
+      rec(e);
+      return control.prune();
+    });
+
+    out.push(term);
+  };
+
+  for (const term of list)
+    rec(term);
+
+  return out;
+}
+
 function firstVar (expr: Expr) {
   // yay premature optimization
   while (expr instanceof App)
