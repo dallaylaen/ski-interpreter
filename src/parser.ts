@@ -461,20 +461,10 @@ export class Parser {
    * @return {Expr} parsed expression
    */
   parseLine (source: string, env: { [key: string]: Expr } = {}, options: ParseOptions = {}): Expr {
-    const aliased = source.match(/^\s*([A-Z]|[a-z][a-z_0-9]*)\s*=\s*(.*)$/s);
-    if (aliased)
-      return new Alias(aliased[1], this.parseLine(aliased[2], env, options), { canonize: options.canonize });
+    const isDef = source.match(/^\s*(?:(@[a-z][-a-z_0-9]*)\s+)?([A-Z]|[a-z][a-z_0-9]*)\s*=\s*(.*)$/s);
 
-    const isNative = source.match(/^\s*@atomic\s+([A-Z]|[a-z][a-z_0-9]*)\s*=\s*(.*)$/s);
-    if (isNative) {
-      if (!this.hasAtomic)
-        throw new Error('Please allow atomic terms explicitly in the interpreter ("atomic": true)');
-      const self = new FreeVar(isNative[1]); // no scope, self-bound placeholder
-      const impl = this.parseLine(isNative[2], { ...env, [isNative[1]]: self }, options);
-      if (!(impl instanceof Lambda))
-        throw new Error('Native term must be defined via a lambda expression');
-      return new PureNative(self, impl);
-    }
+    if (isDef)
+      return this._parseDef(isDef, env, options);
 
     const opt = {
       numbers: options.numbers ?? this.hasNumbers,
@@ -529,6 +519,30 @@ export class Parser {
     }
 
     return postParse(stack.pop()!);
+  }
+
+  _parseDef (parts: string[], env: Record<string, Expr>, options: ParseOptions): Expr {
+    const [_, tag, name, source] = parts;
+    if (tag === undefined) {
+      return source.match(/\S/)
+        ? new Alias(name, this.parseLine(source, env, options))
+        : new FreeVar(name, options.scope ?? FreeVar.global);
+    }
+
+    if (tag === '@inline')
+      return new Alias(name, this.parseLine(source, env, options), { canonize: false, inline: true });
+
+    if (tag === '@atomic') {
+      if (!this.hasAtomic)
+        throw new Error('Please allow atomic terms explicitly in the interpreter ("atomic": true)');
+      const self = new FreeVar(name); // no scope, self-bound placeholder
+      const impl = this.parseLine(source, { ...env, [name]: self }, options);
+      if (!(impl instanceof Lambda))
+        throw new Error('Native term must be defined via a lambda expression');
+      return new PureNative(self, impl);
+    }
+
+    throw new Error(`Unsupported tag '${tag}'`);
   }
 
   toJSON () {
