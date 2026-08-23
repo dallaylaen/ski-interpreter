@@ -473,7 +473,7 @@ export class Parser {
       const impl = this.parseLine(isNative[2], { ...env, [isNative[1]]: self }, options);
       if (!(impl instanceof Lambda))
         throw new Error('Native term must be defined via a lambda expression');
-      return new Alias(self + '', new PureNative(self, impl));
+      return new PureNative(self, impl);
     }
 
     const opt = {
