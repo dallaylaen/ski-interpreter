@@ -14,6 +14,7 @@ let verbose = false;
 let quiet = false;
 let declare = false;
 const defines = [];
+const engineOptions = {};
 /** @type {InstanceType<typeof SKI>} */
 let ski;
 
@@ -48,6 +49,9 @@ program
     () => { declare = true; })
   .option('-d, --define <name=expr>', 'Define a global alias (may be repeated)',
     (val) => { defines.push(val); })
+  .option('-x|--experimental', 'Enable experimental features (may be unstable)', () => {
+    engineOptions.experimental = true;
+  })
   .option('--help [topic]', 'Show help', showHelp);
 
 // REPL subcommand
@@ -167,7 +171,7 @@ program
     const name = actionCommand.name();
     if (name === 'help' || name === 'quest-lint')
       return;
-    ski = new SKI();
+    ski = new SKI(engineOptions);
     applyDefines(ski);
   })
   .parse(process.argv);
@@ -310,7 +314,7 @@ function applyDefines (ski) {
       console.error(`ski: --define ${def}: ${err.message}`);
       process.exit(2);
     }
-    if (!(alias instanceof SKI.classes.Alias)) {
+    if (!(alias instanceof SKI.classes.Named)) {
       console.error(`ski: --define: expected name=expr, got: ${def}`);
       process.exit(2);
     }
