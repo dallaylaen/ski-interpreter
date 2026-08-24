@@ -68,12 +68,12 @@ const combChars = new Tokenizer(
   '[()]', '[A-Z]', '[a-z_][a-z_0-9]*', '\\b[0-9]+\\b', '->', '\\+'
 );
 
-// TODO names too similar, rename one
-export type ParserOptions = {
+export type EngineOptions = {
   allow?: string,
   numbers?: boolean,
   lambdas?: boolean,
   atomic?: boolean,
+  experimental?: boolean,
   terms?: { [key: string]: Expr | string } | string[],
   annotate?: boolean,
   addContext?: boolean,
@@ -115,14 +115,17 @@ export class Parser {
   hasNumbers: boolean;
   hasLambdas: boolean;
   hasAtomic: boolean;
+  hasExperimental: boolean;
 
-  constructor (options: ParserOptions = {}) {
+  constructor (options: EngineOptions = {}) {
     this.annotate = !!options.annotate;
     this.addContext = !!options.addContext;
     this.known = { ...native };
+
+    // Relax permissions before importing terms, restrict later
     this.hasNumbers = true;
     this.hasLambdas = true;
-    this.hasAtomic = !!options.atomic;
+    this.hasAtomic  = true;
     /** @type {Set<string>} */
     this.allow = new Set(Object.keys(this.known));
 
@@ -141,6 +144,9 @@ export class Parser {
     // We must do it after recreating terms, or else terms reliant on forbidden terms will fail
     this.hasNumbers = options.numbers ?? true;
     this.hasLambdas = options.lambdas ?? true;
+    this.hasAtomic  = options.atomic ?? false;
+    this.hasExperimental = !!options.experimental;
+
     if (options.allow)
       this.restrict(options.allow);
   }
@@ -533,7 +539,7 @@ export class Parser {
       return new Alias(name, this.parseLine(source, env, options), { canonize: false, inline: true });
 
     if (tag === '@atomic') {
-      if (!this.hasAtomic)
+      if (!this.hasAtomic && !this.hasExperimental)
         throw new Error('Please allow atomic terms explicitly in the interpreter ("atomic": true)');
       const self = new FreeVar(name); // no scope, self-bound placeholder
       const impl = this.parseLine(source, { ...env, [name]: self }, options);
