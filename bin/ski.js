@@ -836,7 +836,7 @@ function handleCommand (input, ski) {
         const term = terms[name];
         if (term instanceof SKI.classes.Alias)
           console.log(`  ${name} = ${term.impl}`);
-        else if (term instanceof SKI.classes.Native)
+        else if (term instanceof SKI.classes.Primitive)
           console.log(`  ${name} ${term.props?.expr ?? '(native)'}`);
       }
     },

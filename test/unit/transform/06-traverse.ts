@@ -81,7 +81,7 @@ describe('SKI.traverse', () => {
 
     // convert to lambdas
     let expr: Expr | null = initial.traverse(e => {
-      if (e instanceof SKI.classes.Native)
+      if (e instanceof SKI.classes.Primitive)
         return e.infer().expr;
     });
 

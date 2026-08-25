@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { SKI } from '../../../src';
 import { isInstanceOf } from '../../lib/assert';
-import { PureNative } from '../../../src/expr';
+import { Atomic } from '../../../src/expr';
 
 describe('Parser.bulkAdd', () => {
   it('can set up terms', () => {
@@ -30,7 +30,7 @@ describe('Parser.bulkAdd', () => {
     const ski = new SKI({ atomic: true });
     ski.bulkAdd(['@atomic V=a->b->f->f a b']);
 
-    isInstanceOf(ski.getTerms().V, PureNative);
+    isInstanceOf(ski.getTerms().V, Atomic);
 
     const trace = [...ski.parse('V a b f').walk()].map(x => x.expr + '');
 

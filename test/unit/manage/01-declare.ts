@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { isInstanceOf } from '../../lib/assert';
 import { SKI } from '../../../src/index';
-import { Alias, Expr, Native, Invocation } from '../../../src/expr';
+import { Alias, Expr, Primitive, Invocation } from '../../../src/expr';
 
 describe('SKI', () => {
   it('can declare terms', done => {
@@ -37,7 +37,7 @@ describe('SKI', () => {
     let expr: Expr = known.sub;
     expect(expr).to.be.instanceof(SKI.classes.Alias);
     expr = expr.expand();
-    expect(expr).to.be.instanceof(SKI.classes.Native);
+    expect(expr).to.be.instanceof(SKI.classes.Primitive);
 
     done();
   });
@@ -125,7 +125,7 @@ describe('SKI', () => {
 
   it('can handle self-referential terms', () => {
     const ski = new SKI();
-    ski.add('Y', function (this: Native, f: Expr): Invocation { return f.apply(this.apply(f)); });
+    ski.add('Y', function (this: Primitive, f: Expr): Invocation { return f.apply(this.apply(f)); });
 
     const expr = ski.parse('Y f');
     const walk = expr.walk();

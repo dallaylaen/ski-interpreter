@@ -30,7 +30,7 @@ export const control = {
  *  List of predefined native combinators.
  * This is required for toSKI() to work, otherwise could as well have been in parser.js.
  */
-export const native: Record<string, Native> = {};
+export const builtin: Record<string, Primitive> = {};
 
 export type InferOptions = {
   max?: number,
@@ -113,7 +113,7 @@ export abstract class Expr {
   /**  a brief description what the term does */
   note?: string;
   /**  the properties of the term, typically inferred from its behavior.
-   *      This is used internally when declaring Native / Alias terms.
+   *      This is used internally when declaring Primitive / Alias terms.
    */
   props?: TermInfo;
   /**  An estimated number of nodes in the expression tree.
@@ -350,7 +350,7 @@ export abstract class Expr {
    *  Try to empirically find an equivalent lambda term for the expression,
    *       returning also the term's arity and some other properties.
    *
-   *       This is used internally when declaring a Native / Alias term,
+   *       This is used internally when declaring a Primitive / Alias term,
    *       unless {canonize: false} is used.
    *
    *       As of current it only recognizes terms that have a normal form,
@@ -538,9 +538,9 @@ export abstract class Expr {
         if (!(e instanceof Lambda) || (e.impl instanceof Lambda))
           return null; // continue
         if (e.impl === e.arg)
-          return control.stop(native.I);
+          return control.stop(builtin.I);
         if (!e.impl.any(t => t === e.arg))
-          return control.stop(native.K.apply(e.impl));
+          return control.stop(builtin.K.apply(e.impl));
         // TODO use real assert here. e.impl contains e.arg and also isn't e.arg, in MUST be App.
         if (!(e.impl instanceof App))
           throw new Error('toSKI: assert failed: lambda body is of unexpected type ' + e.impl.constructor.name );
@@ -548,7 +548,7 @@ export abstract class Expr {
         if (e.impl.arg === e.arg && !e.impl.fun.any(t => t === e.arg))
           return control.stop(e.impl.fun);
         // last resort, go S
-        return control.stop(native.S.apply(new Lambda(e.arg, e.impl.fun), new Lambda(e.arg, e.impl.arg)));
+        return control.stop(builtin.S.apply(new Lambda(e.arg, e.impl.fun), new Lambda(e.arg, e.impl.arg)));
       })
       yield { expr, steps, final: !next };
       steps++;
@@ -896,7 +896,7 @@ export abstract class Expr {
    * @example
    * > console.log(ski.parse('C 5 x (x->x x)').diag())
    * App:
-   *   Native: C
+   *   Primitive: C
    *   Church: 5
    *   FreeVar: x[53]
    *   Lambda (x[54]):
@@ -1184,18 +1184,18 @@ export class FreeVar extends Named {
 }
 
 /**
- *  A named term with a known rewriting rule.
- *       'impl' is a function with signature Expr => Expr => ... => Expr
- *       (see typedef Partial).
- *       This is how S, K, I, and company are implemented.
+ *  A named term with a rewriting rule implemented in JavaScript/TypeScript.
  *
- *       Note that as of current something like a=>b=>b(a) is not possible,
- *       use full form instead: a=>b=>b.apply(a).
+ *  'impl' is a function with the signature Expr => Expr => ... => Expr
+ *  (see typedef Invocation).
  *
- * @example new Native('K', x => y => x); // constant
- * @example new Native('Y', function(f) { return f.apply(this.apply(f)); }); // self-application
+ *  Note that as of current something like a=>b=>b(a) is not possible,
+ *  use full form instead: a=>b=>b.apply(a).
+ *
+ * @example new Primitive('K', x => y => x); // constant
+ * @example new Primitive('Y', function(f) { return f.apply(this.apply(f)); }); // self-application
  */
-export class Native extends Named {
+export class Primitive extends Named {
   /**
    * @param name Name of the term
    * @param impl A javascript implementation of the term's rewriting rule.
@@ -1211,7 +1211,7 @@ export class Native extends Named {
   }
 }
 
-export class PureNative extends Native {
+export class Atomic extends Primitive {
   source: Expr;
   /** the placeholder variable used for self-reference within `source`, if any */
   selfRef?: FreeVar;
@@ -1607,10 +1607,10 @@ export class Alias extends Named {
 
 // declare native combinators
 
-// redeclare `native` type with `Native` class
+// redeclare `native` type with `Primitive` class
 
 function addNative (name: string, impl: (arg: Expr) => Invocation, opt : {note?: string} = {}): void {
-  native[name] = new Native(name, impl, opt);
+  builtin[name] = new Primitive(name, impl, opt);
 }
 addNative('I', x => x);
 addNative('K', x => _y => x);
@@ -1660,10 +1660,10 @@ export function depSort (list: Expr[]): Expr[] {
     if (term instanceof Alias && term.impl instanceof Named && term.name === term.impl.name)
       return rec(term.impl);
 
-    if (term instanceof PureNative && term.selfRef)
+    if (term instanceof Atomic && term.selfRef)
       seen.add(term.selfRef);
 
-    const tmp = term instanceof PureNative ? term.source : term;
+    const tmp = term instanceof Atomic ? term.source : term;
 
     tmp.traverse(e => {
       if (e instanceof Lambda)
@@ -1831,4 +1831,4 @@ export function toposort<T extends Expr = Expr> (options: {list?: T|T[], env?: R
   };
 }
 
-export const classes = { Expr, App, Named, FreeVar, Native, Lambda, Church, Alias };
+export const classes = { Expr, App, Named, FreeVar, Primitive, Lambda, Church, Alias };

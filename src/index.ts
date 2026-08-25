@@ -1,5 +1,5 @@
 import {
-  classes, native, control, FreeVar, Church, toposort,
+  classes, builtin, control, FreeVar, Church, toposort,
 } from './expr';
 import { Parser } from './parser';
 
@@ -8,16 +8,16 @@ import { extras } from './extras';
 extras.toposort = toposort;
 
 export class SKI extends Parser {
-  static native = native;
+  static native = builtin;
   static control = control;
   static classes = classes;
   // TODO declare in a loop?
-  static B = native.B;
-  static C = native.C;
-  static I = native.I;
-  static K = native.K;
-  static S = native.S;
-  static W = native.W;
+  static B = builtin.B;
+  static C = builtin.C;
+  static I = builtin.I;
+  static K = builtin.K;
+  static S = builtin.S;
+  static W = builtin.W;
 
   /**
  *  Create a proxy object that generates variables on demand,

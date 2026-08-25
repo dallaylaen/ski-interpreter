@@ -16,7 +16,7 @@ describe('SKI.parse', () => {
 
     // verify that no aliased terms were created within ski itself
     for (const x of Object.values(ski.getTerms()))
-      expect(x).to.be.instanceof(SKI.classes.Native);
+      expect(x).to.be.instanceof(SKI.classes.Primitive);
 
     expect(vars).to.deep.equal({});
 

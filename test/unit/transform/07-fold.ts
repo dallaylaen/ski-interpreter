@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { SKI } from '../../../src/index';
 
-const { Lambda, App, Church, Native } = SKI.classes;
+const { Lambda, App, Church, Primitive } = SKI.classes;
 
 describe('Expr.fold', () => {
   const ski = new SKI();
@@ -26,15 +26,15 @@ describe('Expr.fold', () => {
       'App:5 Ky',
       'App:5 K',
       'Church:5',
-      'Native:K',
+      'Primitive:K',
       'FreeVar:y',
       'App:Mz',
       'Alias:M',
       'App:SII',
       'App:SI',
-      'Native:S',
-      'Native:I',
-      'Native:I',
+      'Primitive:S',
+      'Primitive:I',
+      'Primitive:I',
       'FreeVar:z',
     ]);
     expect(ret).to.equal(42); // all null => return initial value
@@ -83,7 +83,7 @@ describe('Expr.fold', () => {
       'App:5 Ky',
       'App:5 K',
       'Church:5',
-      'Native:K',
+      'Primitive:K',
       'FreeVar:y',
       'App:Mz',
       'Alias:M',
@@ -107,15 +107,15 @@ describe('Expr.fold', () => {
       'App:5 Ky',
       'App:5 K',
       'Church:5',
-      'Native:K',
+      'Primitive:K',
       'FreeVar:y',
       'App:Mz',
       'Alias:M',
       'App:SII',
       'App:SI',
-      'Native:S',
-      'Native:I',
-      'Native:I',
+      'Primitive:S',
+      'Primitive:I',
+      'Primitive:I',
       'FreeVar:z',
     ]);
   });
@@ -132,10 +132,10 @@ describe('Expr.fold', () => {
     ]);
   });
 
-  it('prunes Native nodes while collecting others', () => {
+  it('prunes Primitive nodes while collecting others', () => {
     const trace = expr.fold([], (acc:string[], e) => {
       const next = [...acc, e.constructor.name + ':' + e.toString()];
-      if (e instanceof Native)
+      if (e instanceof Primitive)
         return SKI.control.prune(next);
       return next;
     });
@@ -147,15 +147,15 @@ describe('Expr.fold', () => {
       'App:5 Ky',
       'App:5 K',
       'Church:5',
-      'Native:K',
+      'Primitive:K',
       'FreeVar:y',
       'App:Mz',
       'Alias:M',
       'App:SII',
       'App:SI',
-      'Native:S',
-      'Native:I',
-      'Native:I',
+      'Primitive:S',
+      'Primitive:I',
+      'Primitive:I',
       'FreeVar:z'
     ]);
   });
@@ -193,15 +193,15 @@ describe('Expr.fold', () => {
       'App:5 Ky',
       'App:5 K',
       'Church:5',
-      'Native:K',
+      'Primitive:K',
       'FreeVar:y',
       'App:Mz',
       'Alias:M',
       'App:SII',
       'App:SI',
-      'Native:S',
-      'Native:I',
-      'Native:I',
+      'Primitive:S',
+      'Primitive:I',
+      'Primitive:I',
       'FreeVar:z'
     ]);
   });

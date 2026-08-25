@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { SKI } from '../../../src/index';
 
 describe('Expr.step', () => {
-  it('does not destroy Native on execution', () => {
+  it('does not destroy Primitive on execution', () => {
     const ski = new SKI();
     const expr = ski.parse('S(K(SI))K foo bar');
 

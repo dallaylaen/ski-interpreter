@@ -2,7 +2,7 @@ import { expect } from 'chai';
 // import { isInstanceOf } from '../../lib/assert';
 
 import { SKI } from '../../../src';
-import { Alias, Expr, Lambda, Named, PureNative } from '../../../src/expr';
+import { Alias, Expr, Lambda, Named, Atomic } from '../../../src/expr';
 import { isInstanceOf } from '../../lib/assert';
 
 describe('PureNative', () => {
@@ -10,7 +10,7 @@ describe('PureNative', () => {
 
   describe('new PureNative()', () => {
     const { x, y } = SKI.vars();
-    const M = new PureNative('M', new Lambda(x, x.apply(x)));
+    const M = new Atomic('M', new Lambda(x, x.apply(x)));
 
     it('has name', () => {
       expect(M.name).to.equal('M');
@@ -29,7 +29,7 @@ describe('PureNative', () => {
     const T = stripAlias(ski.parse('@atomic T = x->y->y x'));
 
     it('has correct type and name', () => {
-      isInstanceOf(T, PureNative);
+      isInstanceOf(T, Atomic);
       expect(T.name).to.equal('T');
       expect(T + '').to.equal('T');
     });
@@ -48,7 +48,7 @@ describe('PureNative', () => {
     const iota = stripAlias(ski.parse('@atomic X = x->xSK'));
 
     it('has type and name', () => {
-      isInstanceOf(iota, PureNative);
+      isInstanceOf(iota, Atomic);
       expect(iota.name).to.equal('X');
       expect(iota + '').to.equal('X');
     });
@@ -98,7 +98,7 @@ describe('PureNative', () => {
     it('is back-parsable', () => {
       expect(src2.replace(/ /g, '')).to.equal(src.replace(/ /g, ''));
       const p2 = stripAlias(ski.parse(src2));
-      isInstanceOf(p2, PureNative);
+      isInstanceOf(p2, Atomic);
       expect(p2.name).to.equal('P');
       expect(p2.arity).to.equal(P.arity);
       p2.expect(p2.run(SKI.K).expr);

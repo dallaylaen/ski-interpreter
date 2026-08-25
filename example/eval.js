@@ -20,7 +20,7 @@ const ski = new SKI();
 
 // add some extra terms
 ski.add('M', 'SII'); // an alias
-ski.add('L', x => y => x.apply(y.apply(y))) // ditto but with a 'Native' js impl
+ski.add('L', x => y => x.apply(y.apply(y))) // ditto but with a 'Primitive' js impl
 
 const expr = ski.parse(src);
 

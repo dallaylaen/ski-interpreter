@@ -38,7 +38,7 @@ describe('SKI declare -> bulkAdd -> declare round-trip', () => {
     expect(decl2).to.deep.equal(decl1);
 
     // term behaviour should be preserved too.
-    // Native terms (including @atomic ones) are only ever equal to themselves,
+    // Primitive terms (including @atomic ones) are only ever equal to themselves,
     // so compare the results of applying/running them rather than the bare terms.
     ski.parse('T a b').run().expr.expect(ski2.parse('T a b').run().expr);
     ski.parse('iota x').run().expr.expect(ski2.parse('iota x').run().expr);

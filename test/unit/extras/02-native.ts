@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { isInstanceOf } from '../../lib/assert';
 import { SKI } from '../../../src/index';
-import { Native } from '../../../src/expr';
+import { Primitive } from '../../../src/expr';
 
 describe('native combinators', () => {
   const list: Record<string, string> = {
@@ -15,11 +15,11 @@ describe('native combinators', () => {
 
   const { x, y, z } = SKI.vars();
 
-  const skiStatics = SKI as unknown as Record<string, Native>;
+  const skiStatics = SKI as unknown as Record<string, Primitive>;
 
   for (const comb in list) {
     it('contains combinator ' + comb, () => {
-      isInstanceOf(skiStatics[comb], Native);
+      isInstanceOf(skiStatics[comb], Primitive);
       expect(skiStatics[comb].run(x, y, z).expr.format({ terse: false })).to.equal(list[comb]);
     });
   }

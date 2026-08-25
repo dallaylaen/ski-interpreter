@@ -5,8 +5,8 @@
 
 import { Tokenizer, restrict } from './internal';
 import {
-  Expr, FreeVar, Lambda, Church, Alias, Native, Named, native, Invocation, RefinedFormatOptions, toposort,
-  PureNative,
+  Expr, FreeVar, Lambda, Church, Alias, Primitive, Named, builtin, Invocation, RefinedFormatOptions, toposort,
+  Atomic,
 } from './expr';
 
 class Empty extends Expr {
@@ -120,7 +120,7 @@ export class Parser {
   constructor (options: EngineOptions = {}) {
     this.annotate = !!options.annotate;
     this.addContext = !!options.addContext;
-    this.known = { ...native };
+    this.known = { ...builtin };
 
     // Relax permissions before importing terms, restrict later
     this.hasNumbers = true;
@@ -134,8 +134,8 @@ export class Parser {
       this.bulkAdd(options.terms);
     else if (options.terms) {
       for (const name in options.terms) {
-        // Native terms already handled by allow
-        if (typeof options.terms[name] !== 'string' || !options.terms[name].match(/^Native:/))
+        // Primitive terms already handled by allow
+        if (typeof options.terms[name] !== 'string' || !options.terms[name].match(/^Primitive:/))
           this.add(name, options.terms[name]);
       }
     }
@@ -154,7 +154,7 @@ export class Parser {
   /**
    *  Declare a new term
    * If the first argument is an Alias, it is added as is.
-   * Otherwise, a new Alias or Native term (depending on impl type) is created.
+   * Otherwise, a new Alias or Primitive term (depending on impl type) is created.
    * If note is not provided and this.annotate is true, an automatic note is generated.
    *
    * If impl is a function, it should have signature (Expr) => ... => Expr
@@ -192,13 +192,13 @@ export class Parser {
   }
 
   /**
-   *  Internal helper for add() that creates an Alias or Native term from the given arguments.
+   *  Internal helper for add() that creates an Alias or Primitive term from the given arguments.
    * @param {Alias|string} term
    * @param {string|Expr|function(Expr):Partial} impl
-   * @returns {Native|Alias}
+   * @returns {Primitive|Alias}
    * @private
    */
-  _named (term: Alias | string, impl?: Expr | string | ((arg: Expr) => Invocation)): Native | Alias {
+  _named (term: Alias | string, impl?: Expr | string | ((arg: Expr) => Invocation)): Primitive | Alias {
     if (term instanceof Named)
       return maybeAlias(term.name, term);
     if (typeof term !== 'string')
@@ -210,7 +210,7 @@ export class Parser {
     if (impl instanceof Expr)
       return maybeAlias(term, impl);
     if (typeof impl === 'function')
-      return new Native(term, impl);
+      return new Primitive(term, impl);
     // idk what this is
     throw new Error('add(): impl must be an Expr, a string, or a function with a signature Expr => ... => Expr');
   }
@@ -308,7 +308,7 @@ export class Parser {
 
   /**
    *
-   * @return {{[key:string]: Native|Alias}}
+   * @return {{[key:string]: Primitive|Alias}}
    */
   getTerms (): Record<string, Named> {
     const out: Record<string, Named> = {};
@@ -328,7 +328,7 @@ export class Parser {
     // TODO accept argument to declare specific terms only
     const env: { [key: string]: Named } = {};
     for (const [name, term] of Object.entries(this.getTerms())) {
-      if (term instanceof Alias || term instanceof PureNative)
+      if (term instanceof Alias || term instanceof Atomic)
         env[name] = term;
     }
 
@@ -338,7 +338,7 @@ export class Parser {
     // finally, remove the temporary aliases from the output
     const needDetour: { [key: string]: Alias } = {};
     let i = 1;
-    for (const name in native) {
+    for (const name in builtin) {
       if (!(env[name] instanceof Alias))
         continue;
       while ('tmp' + i in env)
@@ -530,8 +530,8 @@ export class Parser {
       const self = new FreeVar(name); // no scope, self-bound placeholder
       const impl = this.parseLine(source, { ...env, [name]: self }, options);
       if (!(impl instanceof Lambda))
-        throw new Error('Native term must be defined via a lambda expression');
-      return new PureNative(self, impl);
+        throw new Error('Primitive term must be defined via a lambda expression');
+      return new Atomic(self, impl);
     }
 
     throw new Error(`Unsupported tag '${tag}'`);

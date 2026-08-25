@@ -22,7 +22,7 @@ describe('Church numbers', () => {
   it('keeps track of whether numbers are allowed', () => {
     const allow = new SKI({ numbers: true });
     expect(allow.parse('2')).to.be.instanceof(SKI.classes.Church);
-    expect(allow.parse('+')).to.be.instanceof(SKI.classes.Native);
+    expect(allow.parse('+')).to.be.instanceof(SKI.classes.Primitive);
   });
   it('keeps track of whether numbers are NOT allowed', () => {
     const deny = new SKI({ numbers: false });

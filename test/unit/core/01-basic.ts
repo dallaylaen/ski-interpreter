@@ -16,7 +16,7 @@ describe('SKI.classes', () => {
 
     // expect some core classes to be present & be constructors
     const classes: Record<string, unknown> = SKI.classes;
-    for (const cls of ['Expr', 'FreeVar', 'Lambda', 'Native', 'Alias'])
+    for (const cls of ['Expr', 'FreeVar', 'Lambda', 'Primitive', 'Alias'])
       expect(classes[cls]).to.be.a('function', 'Expected SKI.classes.' + cls + ' to be a constructor');
   });
 });
@@ -269,8 +269,8 @@ describe('Expr.expect', () => {
       expr2.expect(expr1);
     } catch (e) {
       const err = e as Error & { expected?: string, actual?: string };
-      expect(err.expected).to.equal('Native: K');
-      expect(err.actual).to.equal('Native: S');
+      expect(err.expected).to.equal('Primitive: K');
+      expect(err.actual).to.equal('Primitive: S');
       return;
     }
     throw new Error('Expected an exception to be thrown');

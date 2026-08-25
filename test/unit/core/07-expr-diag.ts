@@ -10,7 +10,7 @@ describe('Expr.diag: basic expressions', () => {
 
     expect(result).to.be.a('string');
     expect(result).to.include('S');
-    expect(result).to.include('Native');
+    expect(result).to.include('Primitive');
     expect(result).to.match(/^[^\n]+\n?$/s, 'result should be single line');
   });
 

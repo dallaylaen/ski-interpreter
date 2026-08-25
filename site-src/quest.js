@@ -182,13 +182,13 @@ class QuestPage {
 
   /**
    * @desc Force-replace an already unlocked term in the engine with a new implementation,
-   *       unless the currently known term with the same name is a Native (built-in) combinator,
+   *       unless the currently known term with the same name is a Primitive (built-in) combinator,
    *       which must never be overridden.
    * @param term
    */
   onTermReplace (term) {
     const known = this.engine.getTerms()[term.name];
-    if (known instanceof SKI.classes.Native)
+    if (known instanceof SKI.classes.Primitive)
       return;
     this.engine.add(term.name, term.impl);
     if (this.store)
@@ -310,7 +310,7 @@ class QuestBox {
   /**
    * @desc Replace an already saved solution with the latest successful attempt.
    *       Only available right after a successful re-attempt of an already solved quest.
-   *       Also replaces the corresponding term in the engine, unless it is a Native term
+   *       Also replaces the corresponding term in the engine, unless it is a Primitive term
    *       (i.e. one of the built-in combinators, which must never be overridden).
    */
   replaceSolution () {
