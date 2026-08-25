@@ -8,7 +8,7 @@ import { extras } from './extras';
 extras.toposort = toposort;
 
 export class SKI extends Parser {
-  static native = builtin;
+  static builtin = builtin;
   static control = control;
   static classes = classes;
   // TODO declare in a loop?

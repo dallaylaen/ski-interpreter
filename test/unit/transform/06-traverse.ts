@@ -119,7 +119,7 @@ describe('SKI.traverse', () => {
 
   it('can extract equivalent terms', () => {
     const expr = ski.parse('(S(S(KS)K) (S(S(KS)K) (SK)))');
-    const terms = [SKI.native['+'], SKI.church(0)];
+    const terms = [SKI.builtin['+'], SKI.church(0)];
     const short = expr.traverse(e => {
       const canon = e.infer().expr;
       for (const t of terms) {
