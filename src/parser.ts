@@ -416,23 +416,9 @@ export class Parser {
 
     let expr: Expr = new Empty();
     for (const item of lines) {
-      const [_, name, def] = item.match(/^([A-Z]|[a-z][a-z_0-9]*)\s*=(.*)$/s) || [];
-
-      if (name !== undefined) {
-        if (jar[name] instanceof Alias && jar[name] !== options.env?.[name]) {
-          // locally defined alias => demote
-          jar[name].makeInline();
-        }
-        delete jar[name];
-      }
-
-      if (def === '')
-        expr = new FreeVar(name, options.scope ?? FreeVar.global);
-      else
-        expr = this.parseLine(item, jar, options);
-
-      if (name)
-        jar[name] = expr;
+      expr = this.parseLine(item, jar, options);
+      if (expr instanceof Named)
+        jar[expr.name] = expr;
 
       // console.log('parsed line:', item, '; got:', expr,'; jar now: ', jar);
     }
