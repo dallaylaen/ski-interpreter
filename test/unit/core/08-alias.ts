@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { SKI } from '../../../src/index';
-import { Alias, Expr } from '../../../src/expr';
+import { Alias, App, Expr } from '../../../src/expr';
 import { isInstanceOf } from '../../lib/assert';
 
 describe('Alias', () => {
@@ -40,6 +40,15 @@ describe('Alias', () => {
     isInstanceOf(expr, Alias);
     expect(expr.inline).to.equal(true, 'alias with @inline tag is indeed inline');
     expect(expr + '').to.equal('CI');
+    expect(expr.apply(x) + '').to.equal('CIx');
+  });
+
+  it('can be used as inline in subsequent expressions', () => {
+    const expr = ski.parse('@inline T=CI; Tx');
+    isInstanceOf(expr, App);
+    isInstanceOf(expr.fun, Alias);
+    expect(expr.fun.inline).to.equal(true, 'alias with @inline tag is indeed inline');
+    expect(expr + '').to.equal('CIx');
   });
 
   it('can be declared inline + non-inline', () => {
