@@ -689,13 +689,15 @@ export abstract class Expr {
    *
    *       E.g. a->b->a == x->y->x is true, but a->b->a == K is false.
    *
-   * @remarks Final. Current implementation is a frontend to {@link diff}.
-   *
    * @param {Expr} other
    * @return {boolean}
    */
   equals (other:Expr):boolean {
-    return !this.diff(other);
+    if (this === other)
+      return true;
+    if (other instanceof Alias)
+      return other.impl.equals(this);
+    return false;
   }
 
   /**
@@ -1062,6 +1064,12 @@ export class App extends Expr {
     return null;
   }
 
+  equals (other: Expr): boolean {
+    if (!(other instanceof App))
+      return super.equals(other);
+    return this.fun.equals(other.fun) && this.arg.equals(other.arg);
+  }
+
   _braced (isFirst?: boolean): boolean {
     return !isFirst;
   }
@@ -1158,6 +1166,12 @@ export class FreeVar extends Named {
     return swap
       ? '[' + rhs + ' != ' + lhs + ']'
       : '[' + lhs + ' != ' + rhs + ']';
+  }
+
+  equals (other: Expr): boolean {
+    if (!(other instanceof FreeVar))
+      return super.equals(other);
+    return this.name === other.name && this.scope === other.scope;
   }
 
   subst (search: Expr, replace: Expr): Expr | null {
@@ -1314,6 +1328,18 @@ export class Atomic extends Primitive {
       + '@atomic ' + this.format(options)
       + options.declaration![1] + this.source.format(options);
   }
+
+  equals (other: Expr): boolean {
+    if (!(other instanceof Atomic))
+      return super.equals(other);
+    if (this.name !== other.name)
+      return false;
+    if (this.selfRef && other.selfRef)
+      return this.source.equals(other.source.subst(other.selfRef, this.selfRef) ?? other.source);
+    if (!this.selfRef && !other.selfRef)
+      return this.source.equals(other.source);
+    return false;
+  }
 }
 
 /**
@@ -1395,6 +1421,15 @@ export class Lambda extends Expr {
     return null;
   }
 
+  equals (other: Expr): boolean {
+    if (!(other instanceof Lambda))
+      return super.equals(other);
+
+    const t = new FreeVar('t'); // TODO better placeholder name
+
+    return this.invoke(t).equals(other.invoke(t));
+  }
+
   formatImpl (options: RefinedFormatOptions, nargs: number): string {
     return (nargs > 0 ? options.brackets![0] : '')
       + options.lambda![0]
@@ -1448,6 +1483,12 @@ export class Church extends Expr {
     return swap
       ? '[' + other.n + ' != ' + this.n + ']'
       : '[' + this.n + ' != ' + other.n + ']';
+  }
+
+  equals (other: Expr): boolean {
+    if (!(other instanceof Church))
+      return super.equals(other);
+    return this.n === other.n;
   }
 
   _unspaced (arg: Expr): boolean {
@@ -1582,6 +1623,12 @@ export class Alias extends Named {
     if (this === other)
       return null;
     return other.diff(this.impl, !swap);
+  }
+
+  equals (other: Expr): boolean {
+    if (this === other)
+      return true;
+    return other.equals(this.impl);
   }
 
   _braced (isFirst: boolean): boolean {
