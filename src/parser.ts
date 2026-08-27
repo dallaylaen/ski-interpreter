@@ -174,7 +174,7 @@ export class Parser {
    * @param {number} [options.arity] - custom arity for the term, default is inferred from the implementation
    * @return {SKI} chainable
    */
-  add (term: Alias | string, impl?: Expr | string | ((arg: Expr) => Invocation), options?: AddOptions | string): this {
+  add (term: Named | string, impl?: Expr | string | ((arg: Expr) => Invocation), options?: AddOptions | string): this {
     const named = this._named(term, impl);
 
     // backward compat
@@ -198,7 +198,7 @@ export class Parser {
    * @returns {Primitive|Alias}
    * @private
    */
-  _named (term: Alias | string, impl?: Expr | string | ((arg: Expr) => Invocation)): Primitive | Alias {
+  _named (term: Named | string, impl?: Expr | string | ((arg: Expr) => Invocation)): Primitive | Alias {
     if (term instanceof Named)
       return maybeAlias(term.name, term);
     if (typeof term !== 'string')
@@ -548,10 +548,6 @@ export class Parser {
       terms:    this.declare(),
     }
   }
-
-  /**
- *  Public static shortcuts to common functions (see also ./extras.js)
- */
 }
 
 function maybeAlias (name: string, impl: Expr): Named {
