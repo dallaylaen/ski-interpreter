@@ -754,13 +754,12 @@ export abstract class Expr {
       throw new Error(comment + 'Expected a combinator but found '
         + (actual?.constructor?.name ?? typeof actual));
     }
-    const diff = this.diff(actual);
-    if (!diff)
+    if (this.equals(actual))
       return; // all good
 
     // TODO wanna use AssertionError but browser doesn't recognize it
     // still the below hack works for mocha-based tests.
-    const poorMans = new Error(comment + diff) as Error & { expected?: string, actual?: string };
+    const poorMans = new Error(comment + `${this} does not equal ${actual}`) as Error & { expected?: string, actual?: string };
     poorMans.expected = this.diag();
     poorMans.actual = actual.diag();
     throw poorMans;
@@ -1340,6 +1339,10 @@ export class Atomic extends Primitive {
       return this.source.equals(other.source);
     return false;
   }
+
+  diag ( indent: string = ''): string {
+    return `${indent}Atomic ${this.name} = ${this.source}\n`;
+  }
 }
 
 /**
@@ -1646,7 +1649,7 @@ export class Alias extends Named {
 
   diag (indent: string = ''): string {
     // no indent increase so that a diff between diags is consistent with how `equals` works.
-    return `${indent}Alias (${this.name}): \\\n` + this.impl.diag(indent);
+    return `${indent}Alias (${this.name})${this.inline ? '[inline]' : ''}: \\\n` + this.impl.diag(indent);
   }
 }
 
