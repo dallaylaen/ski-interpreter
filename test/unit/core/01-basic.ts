@@ -259,7 +259,7 @@ describe('Expr.expect', () => {
     const ski = new SKI();
     const expr1 = ski.parse('S');
     const expr2 = ski.parse('K');
-    expect(() => expr1.expect(expr2)).to.throw(/S *!= *K/);
+    expect(() => expr1.expect(expr2)).to.throw(/S *\bdoes not equal\b *K/);
   });
   it('provides a diff', () => {
     const ski = new SKI();
@@ -279,7 +279,7 @@ describe('Expr.expect', () => {
     const ski = new SKI();
     const expr1 = ski.parse('S');
     const expr2 = ski.parse('K');
-    expect(() => expr1.expect(expr2, 'foobared')).to.throw(/foobared: .*\bS *!= *K\b/);
+    expect(() => expr1.expect(expr2, 'foobared')).to.throw(/foobared: .*\bS *\bdoes not equal\b *K\b/);
   });
   it('lives for equal expressions', () => {
     const ski = new SKI();
