@@ -242,8 +242,9 @@ export class Parser {
    */
   bulkAdd (list: string[]): this {
     for (const item of list) {
-      if (item.match(/^\s*([A-Z]|[a-z][a-z_0-9]*)\s*=\s*$/s)) {
-        this.remove(item);
+      const removeMatch = item.match(/^\s*([A-Z]|[a-z][a-z_0-9]*)\s*=\s*$/s);
+      if (removeMatch) {
+        this.remove(removeMatch[1]);
         continue;
       }
       if (item.match(/^\s*([A-Z]|[a-z][a-z_0-9]*)\s*$/s)) {
@@ -343,8 +344,9 @@ export class Parser {
         continue;
       while ('tmp' + i in env)
         i++;
-      const temp = new Alias('tmp' + i, env[name]);
-      needDetour[temp.name] = env[name];
+      const original = env[name] as Alias;
+      const temp = new Alias('tmp' + i, original.impl);
+      needDetour[temp.name] = original;
       env[temp.name] = temp;
       delete env[name];
     }
@@ -372,7 +374,9 @@ export class Parser {
       for (let j = 0; j < list.length; j++) {
         // upon processing list[j], only terms declared before it may be detoured
         list[j] = rework(list[j]) as Named;
-        detour.set(needDetour[(list[j] as Alias).name], list[j] as Alias);
+        const original = needDetour[(list[j] as Alias).name];
+        if (original)
+          detour.set(original, list[j] as Alias);
         env[(list[j] as Alias).name] = list[j] as Alias;
         // console.log(`list[${j}] = ${(list[j] as Alias).name}=${(list[j] as Alias).impl};`);
       }
@@ -380,10 +384,7 @@ export class Parser {
     }
 
     // console.log(res);
-    const out = list.map(e => needDetour[(e as Alias).name]
-      ? (e as Alias).name + '=' + needDetour[(e as Alias).name].name + '=' + (e as Alias).impl.format({ inventory: env })
-      : e.declareImpl({ inventory: env, declaration: ['', '=', ''] })
-    );
+    const out = list.map(e => e.declareImpl({ inventory: env, declaration: ['', '=', ''] }));
 
     for (const [name, temp] of detour)
       out.push((name as Alias).name + '=' + temp, temp + '=');
