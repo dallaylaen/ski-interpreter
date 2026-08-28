@@ -87,7 +87,7 @@ export type RefinedFormatOptions = { // ditto but with defaults plugged in
 export type TraverseOptions = {order?: 'LO' | 'LI' | 'leftmost-outermost' | 'leftmost-innermost'};
 export type TraverseCallback = (e:Expr) => TraverseValue<Expr>;
 
-export type ToposortResult<T extends Expr = Expr> = { list: (T|Named)[], env: Record<string, Named> };
+export type ToposortResult = { list: Expr[], env: Record<string, Named> };
 
 /**
  *   A combinatory logic expression.
@@ -1303,25 +1303,6 @@ export class Atomic extends Primitive {
       this.selfRef = self;
   }
 
-  /**
-   *  Fold over the term's `source` definition, so that dependencies on other named terms
-   *       (including self-references) can be discovered, e.g. by {@link toposort}.
-   *
-   *       Self-references are folded as the PureNative term itself (`this`), rather than
-   *       the internal placeholder variable, so that generic dependency-tracking code
-   *       (which relies on reference identity) treats them correctly, i.e. doesn't try
-   *       to recurse into a "different" term with the same name.
-   */
-  _fold<T> (initial: T, combine: (acc: T, expr: Expr) => TraverseValue<T>): TraverseValue<T> {
-    const [value = initial, action] = unwrap(combine(initial, this));
-    if (action === control.prune)
-      return value;
-    if (action === control.stop)
-      return control.stop(value);
-    const selfRef = this.selfRef;
-    return this.source._fold(value, (acc, e) => e === selfRef ? combine(acc, this) : combine(acc, e));
-  }
-
   declareImpl (options: FormatOptions): string {
     return options.declaration![0]
       + '@atomic ' + this.format(options)
@@ -1811,7 +1792,7 @@ function nthvar (n: number): FreeVar {
  *    toposort([expr], ski.getTerms()); // returns all terms appearing in Expr in correct order
  */
 // TODO the docs suck. You know it and I know it. Fix when have time.
-export function toposort<T extends Expr = Expr> (options: {list?: T|T[], env?: Record<string, Named> | undefined, allow?: Record<string, Named> | undefined}): ToposortResult<T> {
+export function toposort (options: {list?: Expr|Expr[], env?: Record<string, Named> | undefined, allow?: Record<string, Named> | undefined}): ToposortResult {
   if (typeof options !== 'object' || options === null || Array.isArray(options) || options instanceof Expr)
     throw new Error('positional arguments to toposort are deprecated, use { list: ..., env: ... } instead');
 
@@ -1838,12 +1819,13 @@ export function toposort<T extends Expr = Expr> (options: {list?: T|T[], env?: R
       delete env[term.name];
   }
 
-  const out: (T|Named)[] = [];
+  const out: Expr[] = [];
   // assume all terms in env seen, too
   const seen: Set<Expr> = new Set(Object.values(env));
-  const rec = (term: T|Named) => {
+  const rec = (term: Expr, push: boolean = false) => {
     if (seen.has(term))
       return;
+    seen.add(term);
     term.fold(undefined, (_:undefined, e:Expr):TraverseValue<undefined> => {
       if (!(e instanceof Named))
         return;
@@ -1860,20 +1842,26 @@ export function toposort<T extends Expr = Expr> (options: {list?: T|T[], env?: R
       if (!allow && e instanceof Alias && e.inline)
         return;
 
+      if (e instanceof Atomic) {
+        if (e.selfRef)
+          seen.add(e.selfRef);
+        rec(e.source);
+      }
+
       // recurse. values in `env` will be auto-skipped because they're "seen"
       if (e !== term) {
         rec(e);
         return control.prune();
       }
     });
-    out.push(term);
-    seen.add(term); // TODO unify with env
+    if (push || term instanceof Named)
+      out.push(term);
     if (term instanceof Named)
       env[term.name] ||= term;
   };
 
   for (const term of list)
-    rec(term);
+    rec(term, true);
 
   return {
     list: out,
