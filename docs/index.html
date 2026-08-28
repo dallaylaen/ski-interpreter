@@ -392,7 +392,7 @@
         menu.addAction('reset terms', () => {
             if (!window.confirm('Really erase all terms?'))
                 return;
-            ski = new SKI();
+            ski = new SKI({atomic: true});
             store.save('engine', ski);
             showInventory();
         });
@@ -565,7 +565,7 @@
                     currentBox.stop('Interrupted by a different command'); // only one box runnning at a time
                 currentBox = this;
                 view.runstopBtn.classList.add('running');
-                if (this.expr instanceof SKI.classes.Alias) {
+                if (this.expr instanceof SKI.classes.Named && !(this.expr instanceof SKI.classes.FreeVar)) {
                     // user defined a new term
                     this.engine.add(this.expr);
                     showInventory();
