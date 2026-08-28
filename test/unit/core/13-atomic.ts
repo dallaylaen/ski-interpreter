@@ -104,6 +104,30 @@ describe('PureNative', () => {
       p2.expect(p2.run(SKI.K).expr);
     });
   });
+
+  describe('eqaulity', () => {
+    const ski2 = new SKI({ atomic: true });
+    const T = stripAlias(ski.parse('@atomic T = x->y->y x'));
+    const T2 = stripAlias(ski.parse('@atomic T = x->y->y x'));
+    const T3 = stripAlias(ski2.parse('@atomic T = x->y->y x'));
+
+    it('is equal to itself', () => {
+      expect(T.equals(T)).to.equal(true);
+    });
+
+    it('is equal to another instance of the same term', () => {
+      expect(T.equals(T2)).to.equal(true);
+    });
+
+    it('is equal to the same term parsed by a different interpreter', () => {
+      expect(T.equals(T3)).to.equal(true);
+    });
+
+    it('is not equal to a different term', () => {
+      const iota = stripAlias(ski.parse('@atomic X = x->xSK'));
+      expect(T.equals(iota)).to.equal(false);
+    });
+  });
 });
 
 // move to test/lib?
