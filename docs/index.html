@@ -511,8 +511,8 @@
     // ---- page functions ----
 
     const generator = {
-        toSKI: e => e.toSKI(),
-        toLambda: e => e.toLambda(),
+        toSKI: e => SKI.extras.toSKI(e),
+        toLambda: e => SKI.extras.toLambda(e),
     }
 
     function run(options = {}) {
