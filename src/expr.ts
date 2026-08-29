@@ -26,12 +26,6 @@ export const control = {
   stop:    prepareWrapper('stop'),
 };
 
-/**
- *  List of predefined native combinators.
- * This is required for extras.toSKI() to work, otherwise could as well have been in parser.js.
- */
-export const builtin: Record<string, Primitive> = {};
-
 export type InferOptions = {
   max?: number,
   maxArgs?: number,
@@ -1449,30 +1443,6 @@ export class Alias extends Named {
 
 // ----- Expr* classes end here -----
 
-// declare native combinators
-
-// redeclare `native` type with `Primitive` class
-
-function addNative (name: string, impl: (arg: Expr) => Invocation, opt : {note?: string} = {}): void {
-  builtin[name] = new Primitive(name, impl, opt);
-}
-addNative('I', x => x);
-addNative('K', x => _y => x);
-addNative('S', x => y => z => x.apply(z, y.apply(z)));
-addNative('B', x => y => z => x.apply(y.apply(z)));
-addNative('C', x => y => z => x.apply(z).apply(y));
-addNative('W', x => y => x.apply(y).apply(y));
-
-addNative(
-  '+',
-  n => n instanceof Church
-    ? new Church(n.n + 1)
-    : f => x => f.apply(n.apply(f, x)),
-  {
-    note: 'Increase a Church numeral argument by 1, otherwise n => f => x => f(n f x)',
-  }
-);
-
 // utility functions dependent on Expr* classes, in alphabetical order
 
 function firstVar (expr: Expr) {
@@ -1630,4 +1600,4 @@ export function toposort (options: {list?: Expr|Expr[], env?: Record<string, Nam
   };
 }
 
-export const classes = { Expr, App, Named, FreeVar, Primitive, Lambda, Church, Alias };
+export const classes = { Expr, App, Named, FreeVar, Primitive, Atomic, Lambda, Church, Alias };

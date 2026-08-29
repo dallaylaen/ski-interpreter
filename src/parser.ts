@@ -5,7 +5,7 @@
 
 import { Tokenizer, restrict } from './internal';
 import {
-  Expr, FreeVar, Lambda, Church, Alias, Primitive, Named, builtin, Invocation, RefinedFormatOptions, toposort,
+  Expr, FreeVar, Lambda, Church, Alias, Primitive, Named, Invocation, RefinedFormatOptions, toposort,
   Atomic,
 } from './expr';
 
@@ -66,6 +66,29 @@ function postParse (expr: Expr): Expr {
 
 const combChars = new Tokenizer(
   '[()]', '[A-Z]', '[a-z_][a-z_0-9]*', '\\b[0-9]+\\b', '->', '\\+'
+);
+
+// declare builtin combinators, available in all interpreters by default
+// at least 'K', 'S', 'I', and '+' should be available for number parsing and SKI.extras.toSKI to work
+export const builtin: Record<string, Primitive> = {};
+function addNative (name: string, impl: (arg: Expr) => Invocation, opt : {note?: string} = {}): void {
+  builtin[name] = new Primitive(name, impl, opt);
+}
+addNative('I', x => x);
+addNative('K', x => _y => x);
+addNative('S', x => y => z => x.apply(z, y.apply(z)));
+addNative('B', x => y => z => x.apply(y.apply(z)));
+addNative('C', x => y => z => x.apply(z).apply(y));
+addNative('W', x => y => x.apply(y).apply(y));
+
+addNative(
+  '+',
+  n => n instanceof Church
+    ? new Church(n.n + 1)
+    : f => x => f.apply(n.apply(f, x)),
+  {
+    note: 'Increase a Church numeral argument by 1, otherwise n => f => x => f(n f x)',
+  }
 );
 
 export type EngineOptions = {

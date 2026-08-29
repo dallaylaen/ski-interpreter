@@ -2,8 +2,9 @@
 
 import {
   Expr, Named, FormatOptions, TermInfo, toposort,
-  App, Alias, FreeVar, Lambda, builtin, control,
+  App, Alias, FreeVar, Lambda, control,
 } from './expr';
+import { builtin } from './parser';
 import { Case, Quest } from './quest';
 
 /**

@@ -1,7 +1,7 @@
 import {
-  classes, builtin, control, FreeVar, Church, toposort,
+  classes, control, FreeVar, Church, toposort,
 } from './expr';
-import { Parser } from './parser';
+import { Parser, builtin } from './parser';
 
 import * as quest from './quest';
 import { extras } from './extras';
