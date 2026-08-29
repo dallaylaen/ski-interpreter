@@ -701,39 +701,6 @@ export abstract class Expr {
   }
 
   /**
-   *  Recursively compare two expressions and return a string
-   *       describing the first point of difference.
-   *       Returns null if expressions are identical.
-   *
-   *       Aliases are expanded.
-   *       Bound variables in lambda terms are renamed consistently.
-   *       However, no reductions are attempted.
-   *
-   *       Members of the FreeVar class are considered different
-   *       even if they have the same name, unless they are the same object.
-   *       To somewhat alleviate confusion, the output will include
-   *       the internal id of the variable in square brackets.
-   *
-   *       Do not rely on the exact format of the output as it may change in the future.
-   *
-   * @example  "K(S != I)" is the result of comparing "KS" and "KI"
-   * @example  "S(K([x[13] != x[14]]))K"
-   *
-   * @param {Expr} other
-   * @param {boolean} [swap]  If true, the order of expressions is reversed in the output.
-   * @returns {string|null}
-   */
-  diff (other:Expr, swap: boolean = false): string | null {
-    if (this === other)
-      return null;
-    if (other instanceof Alias)
-      return other.impl.diff(this, !swap);
-    return swap
-      ? '[' + other + ' != ' + this  + ']'
-      : '[' + this  + ' != ' + other + ']';
-  }
-
-  /**
    *  Assert expression equality. Can be used in tests.
    *
    * `this` is the expected value and the argument is the actual one.
@@ -1050,19 +1017,6 @@ export class App extends Expr {
     return [...this.fun.unroll(), this.arg];
   }
 
-  diff (other: Expr, swap = false) {
-    if (!(other instanceof App))
-      return super.diff(other, swap);
-
-    const fun = this.fun.diff(other.fun, swap);
-    if (fun)
-      return fun + '(...)';
-    const arg = this.arg.diff(other.arg, swap);
-    if (arg)
-      return this.fun + '(' + arg + ')';
-    return null;
-  }
-
   equals (other: Expr): boolean {
     if (!(other instanceof App))
       return super.equals(other);
@@ -1153,18 +1107,6 @@ export class FreeVar extends Named {
     this.id = ++freeId;
     // TODO replace with null and scope??[notmatching] everywhere, but later
     this.scope = scope === undefined ? this : scope;
-  }
-
-  diff (other:Expr, swap = false): string | null {
-    if (!(other instanceof FreeVar))
-      return super.diff(other, swap);
-    if (this.name === other.name && this.scope === other.scope)
-      return null;
-    const lhs = this.name + '[' + this.id + ']';
-    const rhs = other.name + '[' + other.id + ']';
-    return swap
-      ? '[' + rhs + ' != ' + lhs + ']'
-      : '[' + lhs + ' != ' + rhs + ']';
   }
 
   equals (other: Expr): boolean {
@@ -1393,18 +1335,6 @@ export class Lambda extends Expr {
     return change ? new Lambda(this.arg, change) : null;
   }
 
-  diff (other: Expr, swap = false): string | null {
-    if (!(other instanceof Lambda))
-      return super.diff(other, swap);
-
-    const t = new FreeVar('t'); // TODO better placeholder name
-
-    const diff = this.invoke(t).diff(other.invoke(t), swap);
-    if (diff)
-      return '(t->' + diff + ')'; // parentheses required to avoid ambiguity
-    return null;
-  }
-
   equals (other: Expr): boolean {
     if (!(other instanceof Lambda))
       return super.equals(other);
@@ -1457,16 +1387,6 @@ export class Church extends Expr {
     /** @type {number} */
     this.n = n;
     this.arity = 2;
-  }
-
-  diff (other:Expr, swap = false): string | null {
-    if (!(other instanceof Church))
-      return super.diff(other, swap);
-    if (this.n === other.n)
-      return null;
-    return swap
-      ? '[' + other.n + ' != ' + this.n + ']'
-      : '[' + this.n + ' != ' + other.n + ']';
   }
 
   equals (other: Expr): boolean {
@@ -1601,12 +1521,6 @@ export class Alias extends Named {
       return { expr: this, steps: 0, changed: false };
     // expanding is a change but it takes 0 steps
     return { expr: this.impl, steps: 0, changed: true };
-  }
-
-  diff (other: Expr, swap = false): string | null {
-    if (this === other)
-      return null;
-    return other.diff(this.impl, !swap);
   }
 
   equals (other: Expr): boolean {
