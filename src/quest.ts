@@ -1,5 +1,5 @@
 import { Parser } from './parser';
-import { Expr, FreeVar, Alias, Named, control, TermInfo, App } from './expr';
+import { Expr, FreeVar, Alias, Named, control, TermInfo, App, InferOptions } from './expr';
 
 export type CaseResult = {
   pass: boolean,
@@ -437,11 +437,8 @@ export class ExprCase extends Case {
     let reason: string | null = null;
     if (!r1.final || !r2.final)
       reason = 'failed to reach normal form in ' + this.max + ' steps';
-    else {
-      reason = this.canonize
-        ? canonize(r1.expr, this.canonize).diff(canonize(r2.expr, this.canonize))
-        : r1.expr.diff(r2.expr);
-    }
+    else
+      reason = diff(r1.expr, r2.expr, this.canonize);
 
     return {
       pass:     !reason,
@@ -665,8 +662,18 @@ function checkHtml (str: string): string | null {
   return null; // No issues found
 }
 
-function canonize (term: Expr, options = {}): Expr {
+function canonize (term: Expr, options: InferOptions = {}): Expr {
   return term.traverse({}, e => {
     return e.infer(options).expr;
   }) ?? term;
+}
+
+function diff (a: Expr, b: Expr, opt?: InferOptions): string | null {
+  if (opt) {
+    a = canonize(a, opt) ?? a;
+    b = canonize(b, opt) ?? b;
+  }
+  // TODO this comparison leads to comical 'X != x' errors when two variables have equal names
+  //      but different scopes. Fix later.
+  return a.equals(b) ? null : (a + ' != ' + b);
 }
