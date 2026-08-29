@@ -1,7 +1,8 @@
 import { expect } from 'chai';
 import { SKI } from '../../../src/index';
+import { extras } from '../../../src/extras';
 
-describe('Expr.toSKI()', () => {
+describe('extras.toSKI()', () => {
   const predictable: [string, string][] = [
     ['x->y->x', 'K'],
     ['x->y->z->x z (y z)', 'S'],
@@ -26,7 +27,7 @@ describe('Expr.toSKI()', () => {
     it(`${got} -> ${expected}`, () => {
       const expr = ski.parse(got);
       const exp = ski.parse(expected);
-      const seq = expr.toSKI();
+      const seq = extras.toSKI(expr);
       let done = false;
       for (const step of seq) {
         expect(step.expr).to.be.instanceOf(SKI.classes.Expr);
@@ -46,7 +47,7 @@ describe('Expr.toSKI()', () => {
     const canon = ski.parse(src).infer().expr!;
     it(`round trips on every step for ${src} aka ${canon}`, () => {
       const expr = ski.parse(src);
-      const seq = expr.toSKI();
+      const seq = extras.toSKI(expr);
       for (const step of seq)
         canon.expect(step.expr.infer().expr!);
     });

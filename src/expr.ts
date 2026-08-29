@@ -28,7 +28,7 @@ export const control = {
 
 /**
  *  List of predefined native combinators.
- * This is required for toSKI() to work, otherwise could as well have been in parser.js.
+ * This is required for extras.toSKI() to work, otherwise could as well have been in parser.js.
  */
 export const builtin: Record<string, Primitive> = {};
 
@@ -356,7 +356,7 @@ export abstract class Expr {
    *       As of current it only recognizes terms that have a normal form,
    *       perhaps after adding some variables. This may change in the future.
    *
-   *       Use toLambda() if you want to get a lambda term in any case.
+   *       Use extras.toLambda() if you want to get a lambda term in any case.
    *
    * @sealed
    * @param {{max?: number, maxArgs?: number}} options
@@ -453,107 +453,6 @@ export abstract class Expr {
     // currently only used by infer() but may be useful
     // to convert binary App trees to n-ary or smth
     return [this];
-  }
-
-  /**
-   *  Returns a series of lambda terms equivalent to the given expression,
-   *       up to the provided computation steps limit.
-   *
-   *       Unlike infer(), this method will always return something,
-   *       even if the expression has no normal form.
-   *
-   *       See also Expr.walk() and Expr.toSKI().
-   *
-   * @sealed
-   * @param {{
-   *   max?: number,
-   *   maxArgs?: number,
-   *   varGen?: function(void): FreeVar,
-   *   steps?: number,
-   *   html?: boolean,
-   *   latin?: number,
-   * }} options
-   * @return {IterableIterator<{expr: Expr, steps?: number, comment?: string}>}
-   */
-  * toLambda (options: { max?: number, maxArgs?: number } = {}) {
-    let expr:Expr | null = this.traverse(e => {
-      // free var => self, don't bother
-      if (e instanceof FreeVar)
-        return e;
-      // compound => fall through
-      if (e instanceof App || e instanceof Lambda || e instanceof Alias)
-        return null;
-      // all other => infer
-      const guess = e.infer({ max: options.max, maxArgs: options.maxArgs });
-      // TODO just return the term itself? Not sure if assertion obligate.
-      if (!guess.normal)
-        throw new Error('Failed to infer an equivalent lambda term for ' + e);
-      return guess.expr;
-    }) ?? this;
-    const seen = new Set(); // prune irreducible
-    let steps = 0;
-    while (expr) {
-      const next = expr.traverse({ order: 'LI' }, e => {
-        if (seen.has(e))
-          return null;
-        if (e instanceof App && e.fun instanceof Lambda) {
-          const guess = e.infer({ max: options.max, maxArgs: options.maxArgs });
-          steps += guess.steps ?? 0;
-          if (!guess.normal) {
-            seen.add(e);
-            return null;
-          }
-          return control.stop(guess.expr);
-        }
-      });
-      yield { expr, steps };
-      expr = next;
-    }
-  }
-
-  /**
-   *  Rewrite the expression into S, K, and I combinators step by step.
-   *     Returns an iterator yielding the intermediate expressions,
-   *     along with the number of steps taken to reach them.
-   *
-   *     See also Expr.walk() and Expr.toLambda().
-   *
-   * @sealed
-   * @param {{max?: number}} [options]
-   * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
-   */
-  * toSKI (options: {max?: number, maxArgs?: number} = {}) {
-    // options are ignored completely, TODO remove
-    // get rid of non-lambdas
-    let expr:Expr|null = this.traverse(e => {
-      if (e instanceof FreeVar || e instanceof App || e instanceof Lambda || e instanceof Alias)
-        return null;
-      // TODO infer failed for atomic term? die...
-      return e.infer(options).expr;
-    }) ?? this;
-
-    let steps = 0;
-    while (expr) {
-      const next = expr.traverse({ order: 'LI' }, e => {
-        if (!(e instanceof Lambda) || (e.impl instanceof Lambda))
-          return null; // continue
-        if (e.impl === e.arg)
-          return control.stop(builtin.I);
-        if (!e.impl.any(t => t === e.arg))
-          return control.stop(builtin.K.apply(e.impl));
-        // TODO use real assert here. e.impl contains e.arg and also isn't e.arg, in MUST be App.
-        if (!(e.impl instanceof App))
-          throw new Error('toSKI: assert failed: lambda body is of unexpected type ' + e.impl.constructor.name );
-        // eta-reduction: body === (not e.arg) (e.arg)
-        if (e.impl.arg === e.arg && !e.impl.fun.any(t => t === e.arg))
-          return control.stop(e.impl.fun);
-        // last resort, go S
-        return control.stop(builtin.S.apply(new Lambda(e.arg, e.impl.fun), new Lambda(e.arg, e.impl.arg)));
-      })
-      yield { expr, steps, final: !next };
-      steps++;
-      expr = next;
-    }
   }
 
   /**

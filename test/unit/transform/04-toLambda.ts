@@ -1,10 +1,11 @@
 import { expect } from 'chai';
 import { SKI } from '../../../src/index';
 import { Expr } from '../../../src/expr';
+import { extras } from '../../../src/extras';
 
 const ski = new SKI();
 
-describe('Expr.toLambda', () => {
+describe('extras.toLambda', () => {
   // basic types
   checkTerm('x', 'x');
   checkTerm('K x y', 'x');
@@ -45,11 +46,11 @@ describe('Expr.toLambda', () => {
 });
 
 function checkTerm (startSrc: string, endSrc: string, options: { max?: number, maxArgs?: number } = {}) {
-  describe(`Expr.toLambda ${startSrc} -> ${endSrc}`, () => {
+  describe(`extras.toLambda ${startSrc} -> ${endSrc}`, () => {
     try {
       const start = ski.parse(startSrc);
       const end = ski.parse(endSrc);
-      const seq = start.toLambda(options);
+      const seq = extras.toLambda(start, options);
       let steps = 0;
       let expr: Expr | undefined;
       let finished = false;
@@ -80,7 +81,7 @@ function checkTerm (startSrc: string, endSrc: string, options: { max?: number, m
         end.expect(expr!);
       });
       it('is idempotent', () => {
-        const again = [...expr!.toLambda()];
+        const again = [...extras.toLambda(expr!)];
         expect(again.length).to.equal(1, 'got further steps: ' + again.join('\n'));
         end.expect(again[0].expr, 'last step is indeed final');
       });
