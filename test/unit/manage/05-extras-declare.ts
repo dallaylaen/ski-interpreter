@@ -16,7 +16,7 @@ describe('SKI.extras.declare', () => {
   it('can sort dependencies', () => {
     // console.log(terms.V.declare({inventory: {...terms, V: undefined}}));
 
-    const decl = SKI.extras.declare(terms.V, {});
+    const decl = terms.V.declare({});
 
     expect(decl).to.equal('B; C; I; T=CI; V=BCT');
   });
@@ -24,7 +24,7 @@ describe('SKI.extras.declare', () => {
   it('can fetch prerequisites', () => {
     const expr = ski.parse('CL(CL)x(My)');
 
-    const str = SKI.extras.declare(expr);
+    const str = expr.declare();
     const expr2 = new SKI().parse(str);
     expr.expect(expr2);
   });
@@ -32,7 +32,7 @@ describe('SKI.extras.declare', () => {
   it('can recover enough info to rebuild the term', () => {
     const expr = ski.parse('swap = CI; pair = BCswap; pair a b f');
 
-    const str = SKI.extras.declare(expr);
+    const str = expr.declare();
     // console.log(str);
     const expr2 = new SKI().parse(str);
 

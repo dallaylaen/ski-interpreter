@@ -151,21 +151,6 @@ function equiv (e1: Expr, e2: Expr, options = {}): EquivResult {
 }
 
 /**
- *   Given an expression and a hash of named terms,
- *   return a semicolon-separated string that declares said expression
- *   unambiguously.
- *
- * @example
- * var expr = ski.parse("T=CI; V=BCT; V x y");
- * SKI.extras.declare(expr, expr.context.env);
- * // 'B; C; I; T=CI; V=BC(T); x=; y=; Vx y'
- *
- */
-function declare (expr: Expr, env?: Record<string, Named>): string {
-  return expr.declare({ inventory: env });
-}
-
-/**
  *  Recursively replace all instances of Expr in a data structure with
  *       respective string representation using the format() options.
  *       Objects of other types and primitive values are eft as is.
@@ -463,4 +448,4 @@ function hasUpperHalf<T> (gen: number, list: T[][]): boolean {
 
 // --- Namespace export ---
 
-export const extras = { search, deepFormat, declare, toposort, checkFormatOptions, equiv, toLambda, toSKI };
+export const extras = { search, deepFormat, toposort, checkFormatOptions, equiv, toLambda, toSKI };
