@@ -641,9 +641,9 @@
             const placeholder = append(entryDiv, 'span', {class: [ 'float-right' ], content: '&Xi;'});
             const menu = new Hamburger(placeholder, {right: true});
             menu.addLabel('manage ' + name);
-            if (entry instanceof SKI.classes.Alias) {
+            if (entry instanceof SKI.classes.Alias || entry instanceof SKI.classes.Atomic) {
                 menu.addAction('copy definition', () => navigator.clipboard.writeText(
-                    `${name} = ${entry.impl}`));
+                    entry.declare({inventory: ski.getTerms()})));
                 menu.addAction('play in terminal', () => {
                     run({src: entry.name + ' = ' + entry.impl});
                 });
