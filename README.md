@@ -181,12 +181,12 @@ ski.getTerms(); // all of the above as an object
 
 // converting lambda expressions to SKI
 const lambdaExpr = ski.parse('x->y->x y');
-const steps = [...lambdaExpr.toSKI()];
+const steps = [...SKI.extras.toSKI(lambdaExpr)];
 // steps[steps.length - 1].expr only contains S, K, I, and free variables, if any
 
 // converting SKI expressions to lambda
 const skiExpr = ski.parse('S K K');
-const lambdaSteps = [...skiExpr.toLambda()];
+const lambdaSteps = [...SKI.extras.toLambda(skiExpr)];
 // lambdaSteps[lambdaSteps.length - 1].expr only contains lambda abstractions and applications
 ```
 
