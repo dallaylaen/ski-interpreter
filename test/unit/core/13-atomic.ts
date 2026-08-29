@@ -5,7 +5,7 @@ import { SKI } from '../../../src';
 import { Alias, Expr, Lambda, Named, Atomic } from '../../../src/expr';
 import { isInstanceOf } from '../../lib/assert';
 
-describe('PureNative', () => {
+describe('Atomic', () => {
   const ski = new SKI({ atomic: true });
 
   describe('new PureNative()', () => {
@@ -102,6 +102,17 @@ describe('PureNative', () => {
       expect(p2.name).to.equal('P');
       expect(p2.arity).to.equal(P.arity);
       p2.expect(p2.run(SKI.K).expr);
+    });
+  });
+
+  describe('can contain nested lambdas', () => {
+    const src = '@atomic ti = x->x(y->y)';
+    const ti = stripAlias(ski.parse(src));
+
+    it('can infer', () => {
+      const props = ti.infer();
+      expect(props.arity).to.equal(1);
+      expect(props.expr + '').to.equal('a->a(b->b)');
     });
   });
 

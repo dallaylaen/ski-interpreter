@@ -814,7 +814,6 @@ export class App extends Expr {
    */
   constructor (fun:Expr, arg:Expr) {
     super();
-
     this.arg = arg;
     this.fun = fun;
     this.size = fun.size + arg.size;
@@ -1076,19 +1075,19 @@ export class Atomic extends Primitive {
       map.set(self, self.name);
     }
 
-    let arity = 0;
+    const args: FreeVar[] = [];
     let body: Expr = impl;
     while (body instanceof Lambda) {
       if (env[body.arg.name])
         throw new Error('PureNative: conflicting argument name ' + body.arg.name);
       env[body.arg.name] = body.arg;
       map.set(body.arg, body.arg.name);
+      args.push(body.arg);
       body = body.impl;
-      arity++;
     }
 
-    const replaced = impl.traverse({}, term => {
-      if (term instanceof App || term instanceof Lambda)
+    body = body.traverse({}, term => {
+      if (term instanceof App)
         return; // descend
       if (map.has(term))
         return env[map.get(term)!];
@@ -1102,18 +1101,17 @@ export class Atomic extends Primitive {
       env[name] = term;
       map.set(term, name);
       return placeholder;
-    });
+    }) ?? body;
 
-    // should never happen actually
-    if (replaced === null)
-      throw new Error('PureNative: failed to replace terms in ' + impl);
+    for (const arg of args.reverse())
+      body = new Lambda(arg, body);
 
     const preamble = Object.keys(env)
       .filter(k => k !== self + '')
       .map(k => 'var ' + k + ' = env.' + k + ';')
       .join('\n');
 
-    let text = replaced.format({
+    let text = body.format({
       terse:    false,
       lambda:   ['function(', ') { return ', '; }'],
       brackets: ['.apply(', ')'],
@@ -1129,7 +1127,7 @@ export class Atomic extends Primitive {
     const invoke = new Function('env', code)(env) as (e: Expr) => Invocation; // eslint-disable-line no-new-func
 
     super(self + '', invoke, {
-      arity,
+      arity:    args.length,
       canonize: false,
       note:     impl.format({ html: true, lambda: ['', ' &mapsto; ', ''] }),
     });
