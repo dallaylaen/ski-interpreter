@@ -1064,70 +1064,14 @@ export class Atomic extends Primitive {
   selfRef?: FreeVar;
 
   constructor (self: FreeVar|string, impl: Lambda) {
-    // build invoke() from lambda
-    let count = 0;
-    const env: Record<string, Expr> = { };
-    const map: Map<Expr, string> = new Map();
+    const { code, env, arity } = lambda2code(self, impl);
 
-    if (self instanceof FreeVar) {
-      // might have self-reference
-      env[self.name] = self;
-      map.set(self, self.name);
-    }
-
-    const args: FreeVar[] = [];
-    let body: Expr = impl;
-    while (body instanceof Lambda) {
-      if (env[body.arg.name])
-        throw new Error('PureNative: conflicting argument name ' + body.arg.name);
-      env[body.arg.name] = body.arg;
-      map.set(body.arg, body.arg.name);
-      args.push(body.arg);
-      body = body.impl;
-    }
-
-    body = body.traverse({}, term => {
-      if (term instanceof App)
-        return; // descend
-      if (map.has(term))
-        return env[map.get(term)!];
-      if (term instanceof Named && term.name === self + '')
-        throw new Error('PureNative: definition subterm conflicts with self-reference: ' + term.name);
-        // TODO error message is misleading, think better
-      let name = term instanceof Named ? term.name : '';
-      while (name.length === 0 || env[name])
-        name = 'term' + (++count);
-      const placeholder = new FreeVar(name);
-      env[name] = term;
-      map.set(term, name);
-      return placeholder;
-    }) ?? body;
-
-    for (const arg of args.reverse())
-      body = new Lambda(arg, body);
-
-    const preamble = Object.keys(env)
-      .filter(k => k !== self + '')
-      .map(k => 'var ' + k + ' = env.' + k + ';')
-      .join('\n');
-
-    let text = body.format({
-      terse:    false,
-      lambda:   ['function(', ') { return ', '; }'],
-      brackets: ['.apply(', ')'],
-    });
-
-    if (self instanceof FreeVar)
-      text = text.replace(/{/, '{ var ' + self + ' = ' + 'this; ');
-
-    const code = preamble + '\nreturn ' + text + ';';
-
-    // console.log('PureNative: generated code for ' + self.name + ':\n' + code);
+    // console.log('Atomic: generated code for ' + self.name + ':\n' + code);
 
     const invoke = new Function('env', code)(env) as (e: Expr) => Invocation; // eslint-disable-line no-new-func
 
     super(self + '', invoke, {
-      arity:    args.length,
+      arity,
       canonize: false,
       note:     impl.format({ html: true, lambda: ['', ' &mapsto; ', ''] }),
     });
@@ -1448,6 +1392,68 @@ function firstVar (expr: Expr) {
   while (expr instanceof App)
     expr = expr.fun;
   return expr instanceof FreeVar;
+}
+
+export function lambda2code (self: FreeVar|string, impl: Lambda):
+  { code: string, env: Record<string, Expr>, arity: number } {
+  // build invoke() from lambda
+  let count = 0;
+  const env: Record<string, Expr> = { };
+  const map: Map<Expr, string> = new Map();
+
+  if (self instanceof FreeVar) {
+    // might have self-reference
+    env[self.name] = self;
+    map.set(self, self.name);
+  }
+
+  const args: FreeVar[] = [];
+  let body: Expr = impl;
+  while (body instanceof Lambda) {
+    if (env[body.arg.name])
+      throw new Error('PureNative: conflicting argument name ' + body.arg.name);
+    env[body.arg.name] = body.arg;
+    map.set(body.arg, body.arg.name);
+    args.push(body.arg);
+    body = body.impl;
+  }
+
+  body = body.traverse({}, term => {
+    if (term instanceof App)
+      return; // descend
+    if (map.has(term))
+      return env[map.get(term)!];
+    if (term instanceof Named && term.name === self + '')
+      throw new Error('PureNative: definition subterm conflicts with self-reference: ' + term.name);
+    // TODO error message is misleading, think better
+    let name = term instanceof Named ? term.name : '';
+    while (name.length === 0 || env[name])
+      name = 'term' + (++count);
+    const placeholder = new FreeVar(name);
+    env[name] = term;
+    map.set(term, name);
+    return placeholder;
+  }) ?? body;
+
+  for (const arg of args.reverse())
+    body = new Lambda(arg, body);
+
+  const preamble = Object.keys(env)
+    .filter(k => k !== self + '')
+    .map(k => 'var ' + k + ' = env.' + k + ';')
+    .join('\n');
+
+  let text = body.format({
+    terse:    false,
+    lambda:   ['function(', ') { return ', '; }'],
+    brackets: ['.apply(', ')'],
+  });
+
+  if (self instanceof FreeVar)
+    text = text.replace(/{/, '{ var ' + self + ' = ' + 'this; ');
+
+  const code = preamble + '\nreturn ' + text + ';';
+  return { code, env, arity: args.length };
 }
 
 /**
