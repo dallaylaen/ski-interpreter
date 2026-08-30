@@ -1064,7 +1064,9 @@ export class Atomic extends Primitive {
   selfRef?: FreeVar;
 
   constructor (self: FreeVar|string, impl: Lambda) {
-    const { code, env, arity } = lambda2code(self, impl);
+    if (typeof self === 'string')
+      self = new FreeVar(self);
+    const { code, env, arity, selfRef } = lambda2code(self, impl);
 
     // console.log('Atomic: generated code for ' + self.name + ':\n' + code);
 
@@ -1076,7 +1078,7 @@ export class Atomic extends Primitive {
       note:     impl.format({ html: true, lambda: ['', ' &mapsto; ', ''] }),
     });
     this.source = impl;
-    if (self instanceof FreeVar)
+    if (selfRef)
       this.selfRef = self;
   }
 
@@ -1394,14 +1396,16 @@ function firstVar (expr: Expr) {
   return expr instanceof FreeVar;
 }
 
-export function lambda2code (self: FreeVar|string, impl: Lambda):
-  { code: string, env: Record<string, Expr>, arity: number } {
+export function lambda2code (self: FreeVar, impl: Lambda):
+  { code: string, env: Record<string, Expr>, arity: number, selfRef: boolean } {
   // build invoke() from lambda
   let count = 0;
   const env: Record<string, Expr> = { };
   const map: Map<Expr, string> = new Map();
 
-  if (self instanceof FreeVar) {
+  const selfRef = impl.any(e => e === self);
+
+  if (selfRef) {
     // might have self-reference
     env[self.name] = self;
     map.set(self, self.name);
@@ -1449,11 +1453,11 @@ export function lambda2code (self: FreeVar|string, impl: Lambda):
     brackets: ['.apply(', ')'],
   });
 
-  if (self instanceof FreeVar)
+  if (selfRef)
     text = text.replace(/{/, '{ var ' + self + ' = ' + 'this; ');
 
   const code = preamble + '\nreturn ' + text + ';';
-  return { code, env, arity: args.length };
+  return { code, env, arity: args.length, selfRef };
 }
 
 /**
