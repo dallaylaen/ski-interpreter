@@ -1398,65 +1398,92 @@ function firstVar (expr: Expr) {
 
 export function lambda2code (self: FreeVar, impl: Lambda):
   { code: string, env: Record<string, Expr>, arity: number, selfRef: boolean } {
-  // build invoke() from lambda
-  let count = 0;
-  const env: Record<string, Expr> = { };
-  const map: Map<Expr, string> = new Map();
-
   const selfRef = impl.any(e => e === self);
 
-  if (selfRef) {
-    // might have self-reference
-    env[self.name] = self;
-    map.set(self, self.name);
-  }
+  // map content:
+  //     self=>self - placeholder for `this`
+  //     argN=>argN - placeholders for the resulting function's arguments
+  //     (expr)=>termN - placeholder for constant expressions (not containing self/argN)
+  //          for these, env[map[expr].name] === expr
+  const env: Record<string, Expr> = {};
+  const map: Map<Expr, FreeVar> = new Map();
 
+  if (selfRef)
+    map.set(self, self);
+
+  // collect lambda arguments
   const args: FreeVar[] = [];
   let body: Expr = impl;
   while (body instanceof Lambda) {
-    if (env[body.arg.name])
-      throw new Error('PureNative: conflicting argument name ' + body.arg.name);
-    env[body.arg.name] = body.arg;
-    map.set(body.arg, body.arg.name);
-    args.push(body.arg);
+    const placeholder = new FreeVar('arg' + args.length);
+    map.set(body.arg, placeholder);
+    args.push(placeholder);
     body = body.impl;
   }
 
-  body = body.traverse({}, term => {
-    if (term instanceof App)
-      return; // descend
-    if (map.has(term))
-      return env[map.get(term)!];
-    if (term instanceof Named && term.name === self + '')
-      throw new Error('PureNative: definition subterm conflicts with self-reference: ' + term.name);
-    // TODO error message is misleading, think better
-    let name = term instanceof Named ? term.name : '';
-    while (name.length === 0 || env[name])
-      name = 'term' + (++count);
-    const placeholder = new FreeVar(name);
-    env[name] = term;
-    map.set(term, name);
-    return placeholder;
-  }) ?? body;
+  // a node "depends" on self/argN if it (or one of its subterms) is exactly
+  // one of the placeholders we already know about.
+  const known: Set<Expr> = new Set(map.keys());
+  const dependsOnKnown = (e: Expr): boolean => e.any(sub => known.has(sub));
 
-  for (const arg of args.reverse())
-    body = new Lambda(arg, body);
+  // replace all terms independent of self/argN with placeholders, and add them to env.
+  // termNames remembers already-assigned names for a given (identical) subterm,
+  // so the same constant isn't added to env twice.
+  let termCount = 0;
+  const termNames: Map<Expr, string> = new Map();
 
-  const preamble = Object.keys(env)
-    .filter(k => k !== self + '')
-    .map(k => 'var ' + k + ' = env.' + k + ';')
-    .join('\n');
+  const gen = (e: Expr): string => {
+    if (map.has(e)) {
+      const placeholder = map.get(e)!;
+      return placeholder === self ? 'self' : placeholder.name;
+    }
+    if (!dependsOnKnown(e)) {
+      let name = termNames.get(e);
+      if (name === undefined) {
+        name = 'term' + (termCount++);
+        termNames.set(e, name);
+        env[name] = e;
+      }
+      return name;
+    }
+    if (e instanceof App)
+      return gen(e.fun) + '.apply(' + gen(e.arg) + ')';
+    if (e instanceof Lambda)
+      return 'new env.Lambda(' + gen(e.arg) + ', ' + gen(e.impl) + ')';
+    // should be unreachable: any node not covered above must be either
+    // a known placeholder or independent of self/argN, both handled above.
+    throw new Error('Cannot generate code for term: ' + e);
+  };
 
-  let text = body.format({
-    terse:    false,
-    lambda:   ['function(', ') { return ', '; }'],
-    brackets: ['.apply(', ')'],
-  });
+  const bodyCode = gen(body);
 
+  // needed by the generated code to construct `new env.Lambda(arg, impl)` for nested lambdas;
+  // Function() bodies aren't lexically scoped, so it has to be passed in via env.
+  (env as Record<string, unknown>).Lambda = Lambda;
+
+  // generate preamble generating var from termN's
+  let preamble = '';
+  for (const name of termNames.values())
+    preamble += 'var ' + name + ' = env.' + name + ';\n';
+
+  // generate function signature from args[], optionally insert `var self=this;`
+  let code = 'return function(' + args[0].name + ') {\n';
   if (selfRef)
-    text = text.replace(/{/, '{ var ' + self + ' = ' + 'this; ');
+    code += 'var self = this;\n';
+  for (let i = 1; i < args.length; i++)
+    code += 'return function(' + args[i].name + ') {\n';
 
-  const code = preamble + '\nreturn ' + text + ';';
+  // generate function body from body, replacing application with foo.apply(bar)
+  //      and lambdas with new Lambda(arg, impl)
+  code += 'return ' + bodyCode + ';\n';
+
+  for (let i = 1; i < args.length; i++)
+    code += '};\n';
+  code += '};\n';
+
+  // combine all three into `const code`
+  code = preamble + code;
+
   return { code, env, arity: args.length, selfRef };
 }
 
