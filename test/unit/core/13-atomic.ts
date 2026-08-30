@@ -106,13 +106,33 @@ describe('Atomic', () => {
   });
 
   describe('can contain nested lambdas', () => {
-    const src = '@atomic ti = x->x(y->y)';
+    const src = '@atomic ti = x->y->y(z->x)';
     const ti = stripAlias(ski.parse(src));
 
     it('can infer', () => {
       const props = ti.infer();
-      expect(props.arity).to.equal(1);
-      expect(props.expr + '').to.equal('a->a(b->b)');
+      expect(props.arity).to.equal(2);
+      expect(props.expr + '').to.equal('a->b->b(c->a)');
+    });
+
+    it('reduces predictably', () => {
+      const { t, f } = SKI.vars();
+      t.expect(ti.run(t, SKI.I, f).expr);
+    });
+  });
+
+  describe('handles unsafe identifiers', () => {
+    const { x, y } = SKI.vars();
+    it('can have keywords', () => {
+      const src = '@atomic T = var->function->function(var)';
+      const unsafe = stripAlias(ski.parse(src));
+      expect(unsafe.run(x, y).expr + '').to.equal('y x');
+    });
+
+    it('can have non-ID subterms', () => {
+      const src = '@atomic T = x->+ x';
+      const unsafe = stripAlias(ski.parse(src));
+      expect(unsafe.run(SKI.church(5)).expr + '').to.equal('6');
     });
   });
 
