@@ -91,24 +91,23 @@ addNative(
   }
 );
 
-export type EngineOptions = {
-  allow?: string,
-  numbers?: boolean,
-  lambdas?: boolean,
-  atomic?: boolean,
-  experimental?: boolean,
-  terms?: { [key: string]: Expr | string } | string[],
-  annotate?: boolean,
-  addContext?: boolean,
-};
-
 export type ParseOptions = {
   env?: { [key: string]: Expr },
   scope?: object,
   numbers?: boolean,
   lambdas?: boolean,
+  atomic?: boolean,
+  experimental?: boolean,
   allow?: string,
   canonize?: boolean,
+  annotate?: boolean,
+  addContext?: boolean,
+};
+
+// Engine-wide defaults for ParseOptions, plus a one-off list of known terms
+// to pre-populate the interpreter with (see bulkAdd() for the accepted syntax).
+export type EngineOptions = ParseOptions & {
+  terms?: { [key: string]: Expr | string } | string[],
 };
 
 export type AddOptions = {
@@ -121,64 +120,68 @@ export type AddOptions = {
 export class Parser {
   /**
    *
-   * @param {{
-   *    allow?: string,
-   *    numbers?: boolean,
-   *    lambdas?: boolean,
-   *    terms?: { [key: string]: Expr|string} | string[],
-   *    annotate?: boolean,
-   * }} [options]
+   * @param {EngineOptions} [options]
+   * @param {string} [options.allow]
+   * @param {boolean} [options.numbers]
+   * @param {boolean} [options.lambdas]
+   * @param {boolean} [options.atomic]
+   * @param {boolean} [options.experimental]
+   * @param {boolean} [options.annotate]
+   * @param {boolean} [options.addContext]
+   * @param {{ [key: string]: Expr|string} | string[]} [options.terms]
    */
 
-  addContext: boolean;
-  annotate: boolean;
   known: Record<string, Named>;
   allow: Set<string>;
 
-  hasNumbers: boolean;
-  hasLambdas: boolean;
-  hasAtomic: boolean;
-  hasExperimental: boolean;
+  // Engine-wide defaults for ParseOptions, applied whenever a per-call
+  // option is not explicitly given.
+  options: Required<Omit<ParseOptions, 'env' | 'scope' | 'allow' | 'canonize'>>;
 
   constructor (options: EngineOptions = {}) {
-    this.annotate = !!options.annotate;
-    this.addContext = !!options.addContext;
+    const { terms, allow, ...defaults } = options;
+
     this.known = { ...builtin };
 
-    // Relax permissions before importing terms, restrict later
-    this.hasNumbers = true;
-    this.hasLambdas = true;
-    this.hasAtomic  = true;
+    this.options = {
+      annotate:     !!defaults.annotate,
+      addContext:   !!defaults.addContext,
+      // Relax permissions before importing terms, restrict later
+      numbers:      true,
+      lambdas:      true,
+      atomic:       true,
+      experimental: true,
+    };
     /** @type {Set<string>} */
     this.allow = new Set(Object.keys(this.known));
 
     // Import terms, if any. Omit native ones
-    if (Array.isArray(options.terms))
-      this.bulkAdd(options.terms);
-    else if (options.terms) {
-      for (const name in options.terms) {
+    if (Array.isArray(terms))
+      this.bulkAdd(terms);
+    else if (terms) {
+      for (const name in terms) {
         // Primitive terms already handled by allow
-        if (typeof options.terms[name] !== 'string' || !options.terms[name].match(/^Primitive:/))
-          this.add(name, options.terms[name]);
+        if (typeof terms[name] !== 'string' || !terms[name].match(/^Primitive:/))
+          this.add(name, terms[name]);
       }
     }
 
     // Finally, impose restrictions
     // We must do it after recreating terms, or else terms reliant on forbidden terms will fail
-    this.hasNumbers = options.numbers ?? true;
-    this.hasLambdas = options.lambdas ?? true;
-    this.hasAtomic  = options.atomic ?? false;
-    this.hasExperimental = !!options.experimental;
+    this.options.numbers      = defaults.numbers ?? true;
+    this.options.lambdas      = defaults.lambdas ?? true;
+    this.options.atomic       = defaults.atomic ?? false;
+    this.options.experimental = !!defaults.experimental;
 
-    if (options.allow)
-      this.restrict(options.allow);
+    if (allow)
+      this.restrict(allow);
   }
 
   /**
    *  Declare a new term
    * If the first argument is an Alias, it is added as is.
    * Otherwise, a new Alias or Primitive term (depending on impl type) is created.
-   * If note is not provided and this.annotate is true, an automatic note is generated.
+   * If note is not provided and this.options.annotate is true, an automatic note is generated.
    *
    * If impl is a function, it should have signature (Expr) => ... => Expr
    * (see typedef Partial at top of expr.js)
@@ -191,8 +194,8 @@ export class Parser {
    * @param {Alias|String} term
    * @param {String|Expr|function(Expr):Partial} [impl]
    * @param {object|string} [options]
-   * @param {string} [options.note] - optional annotation for the term, default is auto-generated if this.annotate is true
-   * @param {boolean} [options.canonize] - whether to canonize the term's implementation, default is this.annotate
+   * @param {string} [options.note] - optional annotation for the term, default is auto-generated if this.options.annotate is true
+   * @param {boolean} [options.canonize] - whether to canonize the term's implementation, default is this.options.annotate
    * @param {boolean} [options.fancy] - alternative HTML-friendly name for the term
    * @param {number} [options.arity] - custom arity for the term, default is inferred from the implementation
    * @return {SKI} chainable
@@ -202,7 +205,7 @@ export class Parser {
 
     // backward compat
     const opts: AddOptions = typeof options === 'string' ? { note: options, canonize: false } : (options ?? {});
-    named.annotate({ canonize: this.annotate, ...opts });
+    named.annotate({ canonize: this.options.annotate, ...opts });
 
     const old = this.known[named.name];
     if (old instanceof Alias)
@@ -417,14 +420,18 @@ export class Parser {
 
   /**
    * @param {string} source
-   * @param {Object} [options]
+   * @param {ParseOptions} [options]
    * @param [options.env] - additional
    * @param [options.scope] - assign this scope to unknown free variables
-   * @param {boolean} [options.numbers] - whether numbers are allowed
-   * @param {boolean} [options.lambdas] - whether lambdas are allowed
+   * @param {boolean} [options.numbers] - whether numbers are allowed, default is set by engine options
+   * @param {boolean} [options.lambdas] - whether lambdas are allowed, default is set by engine options
+   * @param {boolean} [options.atomic] - whether @atomic term definitions are allowed, default is set by engine options
+   * @param {boolean} [options.experimental] - whether experimental features are allowed, default is set by engine options
    * @param {string} [options.allow] - restrict known terms
    * @param [options.canonize] - whether to calculate canonical form, arity, and properties
    *                             of intermediate aliases
+   * @param {boolean} [options.addContext] - whether to attach parsing context to the result,
+   *                                          default is set by engine options
    * @return {Expr}
    */
   parse (source: string, options: ParseOptions = {}): Expr {
@@ -447,7 +454,7 @@ export class Parser {
       // console.log('parsed line:', item, '; got:', expr,'; jar now: ', jar);
     }
 
-    if (this.addContext) {
+    if (options.addContext ?? this.options.addContext) {
       // create a transparent alias to avoid mutating the original term
       if (expr instanceof Named)
         expr = new Alias(expr.name, expr, { inline: true });
@@ -483,8 +490,8 @@ export class Parser {
       return this._parseDef(isDef, env, options);
 
     const opt = {
-      numbers: options.numbers ?? this.hasNumbers,
-      lambdas: options.lambdas ?? this.hasLambdas,
+      numbers: options.numbers ?? this.options.numbers,
+      lambdas: options.lambdas ?? this.options.lambdas,
       allow:   restrict(this.allow, options.allow),
     };
     // make sure '+' usage is in sync with numerals
@@ -549,7 +556,7 @@ export class Parser {
       return new Alias(name, this.parseLine(source, env, options), { canonize: false, inline: true });
 
     if (tag === '@atomic') {
-      if (!this.hasAtomic && !this.hasExperimental)
+      if (!(options.atomic ?? this.options.atomic) && !(options.experimental ?? this.options.experimental))
         throw new Error('Please allow atomic terms explicitly in the interpreter ("atomic": true)');
       const self = new FreeVar(name); // no scope, self-bound placeholder
       const impl = this.parseLine(source, { ...env, [name]: self }, options);
@@ -565,10 +572,10 @@ export class Parser {
     return {
       version:  '2.12.1', // set to incremented package.json version whenever SKI serialization changes
       allow:    this.showRestrict('+'),
-      numbers:  this.hasNumbers,
-      lambdas:  this.hasLambdas,
-      annotate: this.annotate,
-      atomic:   this.hasAtomic,
+      numbers:  this.options.numbers,
+      lambdas:  this.options.lambdas,
+      annotate: this.options.annotate,
+      atomic:   this.options.atomic,
       terms:    this.declare(),
     }
   }

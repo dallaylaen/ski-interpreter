@@ -13,8 +13,8 @@ describe('SKI.toJSON', () => {
 
     const copy = new SKI(JSON.parse(str));
 
-    expect(copy.hasLambdas).to.equal(true);
-    expect(copy.hasNumbers).to.equal(false);
+    expect(copy.options.lambdas).to.equal(true);
+    expect(copy.options.numbers).to.equal(false);
     expect(copy.showRestrict('+')).to.equal(ski.showRestrict('+'));
 
     copy.parse('y x')
