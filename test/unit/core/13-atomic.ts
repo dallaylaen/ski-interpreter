@@ -136,7 +136,13 @@ describe('Atomic', () => {
     });
   });
 
-  describe('eqaulity', () => {
+  describe('handles more expressions', () => {
+    assertSource('@atomic X = a->aS(BBK)', [['X X x y', 'x'], ['X(XX)', 'S']]);
+    assertSource('@atomic N = a->b->c->d->b (a d c)', [['NII x y', 'y x'], ['N(NII) x y z', 'x (y z)']]);
+    assertSource('@atomic F = a->b->c->a b c', [['F (WI)(WI)', 'F(WI)(WI)']]);
+  });
+
+  describe('equality', () => {
     const ski2 = new SKI({ atomic: true });
     const T = stripAlias(ski.parse('@atomic T = x->y->y x'));
     const T2 = stripAlias(ski.parse('@atomic T = x->y->y x'));
@@ -161,7 +167,7 @@ describe('Atomic', () => {
   });
 });
 
-// move to test/lib?
+// TODO move to test/lib?
 /**
  * The parser may add an invisible eponymous Alias wrapper around a Named term
  * to protect the original term from modifications.
@@ -173,4 +179,20 @@ function stripAlias (expr: Expr): Expr {
   while (next instanceof Alias && next.impl instanceof Named && next.impl.name === next.name)
     next = next.impl;
   return next;
+}
+
+function assertSource (src: string, samples: [string, string][]): void {
+  it(`parses ${src}`, () => {
+    const ski = new SKI({ atomic: true });
+    const expr = ski.parse(src);
+
+    isInstanceOf(expr, Named);
+    const env = { [expr.name]: expr };
+
+    for (const [input, expected] of samples) {
+      const start = ski.parse(input, { env });
+      const end   = ski.parse(expected, { env });
+      end.expect(start.run().expr);
+    }
+  });
 }
