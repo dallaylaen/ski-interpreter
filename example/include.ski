@@ -1,0 +1,14 @@
+/**
+ *  `./bin/ski.js -i example/include.ski <command> ...`
+ *  to import all of these definitions prior to executing command
+ */
+
+T=CI;
+V=BCT;
+R=CC;
+M=WI;
+L=BWB;
+lst = BS(C(BB));
+nil = KI;
+@atomic Y = f->f(Yf);
+@atomic Z = f->x->f(Zf) x;
