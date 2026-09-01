@@ -435,24 +435,14 @@ export class Parser {
    * @return {Expr}
    */
   parse (source: string, options: ParseOptions = {}): Expr {
+    // yes this does happen
     if (typeof source !== 'string')
       throw new Error('parse: source must be a string, got ' + typeof source);
 
-    const lines = source.replace(/\/\/[^\n]*$/gm, ' ')
-      .replace(/\/\*.*?\*\//gs, ' ')
-      .trim()
-      .split(/\s*;[\s;]*/).filter( s => s.match(/\S/));
-
-    const jar = { ...options.env };
-
-    let expr: Expr = new Empty();
-    for (const item of lines) {
-      expr = this.parseLine(item, jar, options);
-      if (expr instanceof Named)
-        jar[expr.name] = expr;
-
-      // console.log('parsed line:', item, '; got:', expr,'; jar now: ', jar);
-    }
+    const { jar, list } = this._parse(source, options);
+    if (list.length === 0)
+      throw new Error('parse: empty expression found in source');
+    let expr = list[list.length - 1];
 
     if (options.addContext ?? this.options.addContext) {
       // create a transparent alias to avoid mutating the original term
@@ -466,7 +456,32 @@ export class Parser {
       };
     }
 
-    return postParse(expr); // throw error if expr is still Empty
+    return expr;
+  }
+
+  include (source: string, options: ParseOptions = {}): Named[] {
+    const { list } = this._parse(source, options);
+    return list.filter(e => e instanceof Named);
+  }
+
+  _parse (source: string, options: ParseOptions = {}): { list: Expr[], jar: Record<string, Expr> } {
+    const lines = source.replace(/\/\/[^\n]*$/gm, ' ')
+      .replace(/\/\*.*?\*\//gs, ' ')
+      .trim()
+      .split(/\s*;[\s;]*/).filter( s => s.match(/\S/));
+
+    const jar = { ...options.env };
+    const list: Expr[] = [];
+
+    for (const item of lines) {
+      const expr = this.parseLine(item, jar, options);
+      if (expr instanceof Named)
+        jar[expr.name] = expr;
+      // console.log('parsed line:', item, '; got:', expr,'; jar now: ', jar);
+      list.push(expr);
+    }
+
+    return { list, jar };
   }
 
   /**
