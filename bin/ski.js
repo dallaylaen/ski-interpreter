@@ -1,6 +1,7 @@
 #!/usr/bin/env -S node --stack-size=20600
 
 const fs = require('node:fs/promises');
+const fsSync = require('node:fs');
 const { Command } = require('commander');
 
 const { SKI } = require('../lib/ski-interpreter.cjs');
@@ -14,6 +15,7 @@ let verbose = false;
 let quiet = false;
 let declare = false;
 const defines = [];
+const includes = [];
 const engineOptions = {};
 /** @type {InstanceType<typeof SKI>} */
 let ski;
@@ -49,6 +51,9 @@ program
     () => { declare = true; })
   .option('-d, --define <name=expr>', 'Define a global alias (may be repeated)',
     (val) => { defines.push(val); })
+  .option('-i, --include <file>', 'Load a file with definitions (may be repeated)', (val) => {
+    includes.push(val);
+  })
   .option('-x|--experimental', 'Enable experimental features (may be unstable)', () => {
     engineOptions.experimental = true;
   })
@@ -172,6 +177,7 @@ program
     if (name === 'help' || name === 'quest-lint')
       return;
     ski = new SKI(engineOptions);
+    applyIncludes(ski);
     applyDefines(ski);
   })
   .parse(process.argv);
@@ -303,6 +309,29 @@ function startRepl () {
   });
 
   rl.prompt();
+}
+
+function applyIncludes (ski) {
+  for (const file of includes) {
+    let source;
+    try {
+      source = fsSync.readFileSync(file, 'utf8');
+    } catch (err) {
+      console.error(`ski: --include ${file}: ${err.message}`);
+      process.exit(2);
+    }
+
+    let terms;
+    try {
+      terms = ski.include(source);
+    } catch (err) {
+      console.error(`ski: --include ${file}: ${err.message}`);
+      process.exit(2);
+    }
+
+    for (const term of terms)
+      ski.add(term);
+  }
 }
 
 function applyDefines (ski) {
