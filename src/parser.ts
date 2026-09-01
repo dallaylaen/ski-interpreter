@@ -425,7 +425,7 @@ export class Parser {
    * @param [options.scope] - assign this scope to unknown free variables
    * @param {boolean} [options.numbers] - whether numbers are allowed, default is set by engine options
    * @param {boolean} [options.lambdas] - whether lambdas are allowed, default is set by engine options
-   * @param {boolean} [options.atomic] - whether @atomic term definitions are allowed, default is set by engine options
+   * @param {boolean} [options.atomic] - whether \@atomic term definitions are allowed, default is set by engine options
    * @param {boolean} [options.experimental] - whether experimental features are allowed, default is set by engine options
    * @param {string} [options.allow] - restrict known terms
    * @param [options.canonize] - whether to calculate canonical form, arity, and properties
