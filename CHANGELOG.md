@@ -5,6 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-09-02
+
+### BREAKING CHANGES
+* `Expr.toSKI()` and `Expr.toLambda()` dropped,
+  use `SKI.extras.toSKI(expr)` and `SKI.extras.toLambda(expr)` instead.
+* `SKI.extras.declare(expr)` dropped, use `expr.declare()` directly instead.
+* `Expr.diff()` dropped, use `expr.diag()` and an external diff/LCS implementation instead.
+* `SKI.extras.toposort()` dropped, replacement pending.
+* class `Native` renamed to `Primitive`.
+* `SKI.native = {S, K, I, ...}` renamed to `SKI.builtin = {S, K, I, ...}`. `SKI.X` shortcuts remain. 
+* Rename type `ParserOptions` to `EngineOptions`
+* `EngineOptions` now extends `ParseOptions`; `numbers`, `lambdas`, `atomic`, `experimental`,
+  `annotate`, and `addContext` are all configurable per `parse()`/`parseLine()` call
+  and default to the values given to the `Parser`/`SKI` constructor.
+* `format({ inventory })` no longer treats inline aliases specially per call; inline aliases
+  are now always inlined regardless of the inventory contents (fixes incorrect brackets bug).
+
+### Added
+
+* `Parser.include(source, options)` reads multiple definitions from a single source
+  and returns them as an array of named terms, without adding them to the interpreter.
+* `bin/ski.js`: `-i, --include <file>` now loads semicolon-separated term definitions from a file.
+  See `examples/include.ski` for an example.
+* `@atomic <name> = x -> ...` annotation declares a serializable named which 
+  reduces in one step and whose implementation is compiled directly into a 
+  native JS function (#18).
+  Must be allowed explicitly via `{ atomic: true }` or `{ experimental: true }`.
+* `Atomic` class implementing said terms. 
+* `@inline <name> = ...` annotation directly declares an inline alias, i.e. such that
+  it always behaves exactly like its content. 
+  Currently also requires `{ experimental: true }`. 
+* `bin/ski.js`: `-x, --experimental` flag enables experimental, possibly unstable syntax.
+
+### Changed
+
+* `Expr.equals(other)` re-implemented directly, without relying on `diff`
+* `ski.add(term, ...)` now accepts any `Named` term (previously only `Alias`), matching
+  what `bin/ski.js --define` already allowed.
+* Parser/SKI: `hasNumbers`, `hasLambdas`, `hasAtomic`, `hasExperimental`, `annotate`, `addContext`
+  properties replaced with a single `options` object (e.g. `ski.hasNumbers` -> `ski.options.numbers`).
+
+### Fixed
+
+* `SKI.declare()` / `ski.add()`: fixed several bugs around declaring and bulk-adding
+  atomic and alias terms.
+* `parseLine()` now handles declarations directly, removing stale duplicate code that
+  could mishandle them.
+
 ## [2.12.0] - 2026-08-11
 
 ### BREAKING CHANGES
