@@ -1,11 +1,10 @@
 import {
-  classes, control, FreeVar, Church, toposort,
+  classes, control, FreeVar, Church,
 } from './expr';
 import { Parser, builtin } from './parser';
 
 import * as quest from './quest';
 import { extras } from './extras';
-extras.toposort = toposort;
 
 export class SKI extends Parser {
   static builtin = builtin;
