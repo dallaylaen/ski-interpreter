@@ -35,7 +35,7 @@
     "bundle": "npm run bundle:cjs && npm run bundle:esm && npm run bundle:web && npm run bundle:site && npm run bundle:quest",
     "check": "npm run lint && npm run tsc && npm run test",
     "build": "npm run check && npm run bundle && npm run test:int",
-    "prepack": "rm -rf lib docs/build && npm run build && cp docs/build/js/ski-* lib/"
+    "prepack": "rm -rf lib docs/build && npm run build"
   },
   "files": [
     "package.json",
