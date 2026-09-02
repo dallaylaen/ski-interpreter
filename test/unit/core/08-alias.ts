@@ -4,7 +4,7 @@ import { Alias, App, Expr } from '../../../src/expr';
 import { isInstanceOf } from '../../lib/assert';
 
 describe('Alias', () => {
-  const ski = new SKI();
+  const ski = new SKI({ experimental: true });
   const { x, y, z } = SKI.vars();
 
   it('infers own properties', () => {

@@ -567,8 +567,11 @@ export class Parser {
         : new FreeVar(name, options.scope ?? FreeVar.global);
     }
 
-    if (tag === '@inline')
+    if (tag === '@inline') {
+      if (!(options.experimental ?? this.options.experimental))
+        throw new Error('Please allow @inline annotation explicitly via {"experimental": true}');
       return new Alias(name, this.parseLine(source, env, options), { canonize: false, inline: true });
+    }
 
     if (tag === '@atomic') {
       if (!(options.atomic ?? this.options.atomic) && !(options.experimental ?? this.options.experimental))
