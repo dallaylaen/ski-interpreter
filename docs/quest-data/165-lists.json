@@ -73,7 +73,7 @@
       "env": ["nil=KI", "lst=BS(C(BB))"],
       "input": "map",
       "cases": [
-        ["map f nil", "nil"],
+        ["map f nil true false", "false"],
         ["map f (lst a nil) g y", "g (f a) y"],
         ["map f (lst a(lst b (lst c nil))) g y", "g (f a) (g (f b) (g (f c) y))"]
       ]
