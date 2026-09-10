@@ -2,7 +2,7 @@
 
 import {
   Expr, Named, FormatOptions, TermInfo, toposort,
-  App, Alias, FreeVar, Lambda, control,
+  App, Alias, FreeVar, Lambda, control, InferOptions, Atomic,
 } from './expr';
 import { builtin } from './parser';
 import { Case, Quest } from './quest';
@@ -333,20 +333,7 @@ function * search<T> (seed: Expr[], options: SearchOptions, predicate: SearchCal
  * @return {IterableIterator<{expr: Expr, steps?: number, comment?: string}>}
  */
 function * toLambda (expr: Expr, options: { max?: number, maxArgs?: number } = {}) {
-  let cur: Expr | null = expr.traverse(e => {
-    // free var => self, don't bother
-    if (e instanceof FreeVar)
-      return e;
-    // compound => fall through
-    if (e instanceof App || e instanceof Lambda || e instanceof Alias)
-      return null;
-    // all other => infer
-    const guess = e.infer({ max: options.max, maxArgs: options.maxArgs });
-    // TODO just return the term itself? Not sure if assertion obligate.
-    if (!guess.normal)
-      throw new Error('Failed to infer an equivalent lambda term for ' + e);
-    return guess.expr;
-  }) ?? expr;
+  let cur: Expr | null = naiveCanonize(expr, options);
   const seen = new Set(); // prune irreducible
   let steps = 0;
   while (cur) {
@@ -379,23 +366,28 @@ function * toLambda (expr: Expr, options: { max?: number, maxArgs?: number } = {
  * @param {{max?: number}} [options]
  * @return {IterableIterator<{final: boolean, expr: Expr, steps: number}>}
  */
-function * toSKI (expr: Expr, options: {max?: number, maxArgs?: number} = {}) {
+function * toSKI (expr: Expr, options: InferOptions & { identity?: boolean } = {}) {
   // options are ignored completely, TODO remove
   // get rid of non-lambdas
-  let cur: Expr | null = expr.traverse(e => {
-    if (e instanceof FreeVar || e instanceof App || e instanceof Lambda || e instanceof Alias)
-      return null;
-    // TODO infer failed for atomic term? die...
-    return e.infer(options).expr;
-  }) ?? expr;
+  let cur: Expr | null = naiveCanonize(expr, options);
+
+  // TODO change defaults?
+  const identity = options.identity ?? false ? builtin.I : builtin.S.apply(builtin.K, builtin.K);
+  const kite = options.identity ?? false ? builtin.K.apply(builtin.I) : builtin.S.apply(builtin.K);
 
   let steps = 0;
   while (cur) {
     const next = cur.traverse({ order: 'LI' }, e => {
-      if (!(e instanceof Lambda) || (e.impl instanceof Lambda))
+      if (!(e instanceof Lambda) || e.impl instanceof Lambda)
         return null; // continue
+
       if (e.impl === e.arg)
-        return control.stop(builtin.I);
+        return control.stop(identity);
+
+      // special case for SK (don't want K(SKK) in output)
+      if (e.impl === identity && !options.identity)
+        return control.stop(kite);
+
       if (!e.impl.any(t => t === e.arg))
         return control.stop(builtin.K.apply(e.impl));
       // TODO use real assert here. e.impl contains e.arg and also isn't e.arg, in MUST be App.
@@ -445,6 +437,25 @@ function hasUpperHalf<T> (gen: number, list: T[][]): boolean {
       return true;
   }
   return false;
+}
+
+function naiveCanonize (expr: Expr, options: InferOptions): Expr {
+  return expr.traverse(e => {
+    if (e instanceof App || e instanceof Lambda || e instanceof FreeVar)
+      return null;
+    if (e instanceof Alias)
+      return control.redo(e.impl);
+    if (e instanceof Atomic && e.selfRef) {
+      const dbl = new FreeVar('a');
+      const M = new Lambda(dbl, dbl.apply(dbl));
+      const half = e.source.subst(e.selfRef, e.selfRef.apply(e.selfRef)) ?? e.source;
+      return M.apply(new Lambda(e.selfRef, naiveCanonize(half, options)) );
+    }
+    const guess = e.infer(options);
+    if (!guess.expr)
+      throw new Error('failed to canonize term ' + e);
+    return guess.expr;
+  }) ?? expr;
 }
 
 // --- Namespace export ---

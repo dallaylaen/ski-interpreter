@@ -5,13 +5,14 @@ import { extras } from '../../../src/extras';
 describe('extras.toSKI()', () => {
   const predictable: [string, string][] = [
     ['x->y->x', 'K'],
+    ['x->y->y', 'SK'],
     ['x->y->z->x z (y z)', 'S'],
-    ['x->x', 'I'],
-    ['x->x x', 'SII'],
-    ['M=x->x x; MM', 'SII(SII)'],
-    ['x->y->y x', 'S(K(SI))K'],
+    ['x->x', 'SKK'],
+    ['x->x x', 'S(SKK)(SKK)'],
+    ['M=x->x x; MM', 'S(SKK)(SKK)(S(SKK)(SKK))'],
+    ['x->y->y x', 'S(K(S(SKK)))K'],
     ['B', 'S(KS)K'],
-    ['3', 'S(S(K(S))(K))(S(S(K(S))(K))(I))'],
+    ['3', 'S(S(K(S))(K))(S(S(K(S))(K))(SKK))'],
   ];
   const canonical = [
     'C',
