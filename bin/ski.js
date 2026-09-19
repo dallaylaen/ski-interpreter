@@ -17,6 +17,7 @@ let declare = false;
 const defines = [];
 const includes = [];
 const engineOptions = {};
+const toSKIOptions = {};
 /** @type {InstanceType<typeof SKI>} */
 let ski;
 
@@ -89,6 +90,17 @@ program
   .description('Find a canonical form of the expression and its properties')
   .action(async (expression) => {
     inferExpression(await readExpression(expression));
+  });
+
+// To-SKI subcommand
+program
+  .command('to-ski <expression>')
+  .description('Rewrite the expression into S, K, and I combinators')
+  .option('--identity', 'Use plain I instead of SKK for the identity combinator', () => {
+    toSKIOptions.identity = true;
+  })
+  .action(async (expression) => {
+    toSKIExpression(await readExpression(expression));
   });
 
 program
@@ -408,6 +420,23 @@ function processLine (source, ski, onErr) {
   } catch (err) {
     onErr(err);
   }
+}
+
+function toSKIExpression (expression) {
+  const expr = ski.parse(expression);
+  const options = { ...runOptions, ...toSKIOptions };
+
+  let last;
+  for (const step of SKI.extras.toSKI(expr, options)) {
+    if (verbose)
+      console.log(formatExpr(step.expr) + (step.final ? '' : ';'));
+    last = step;
+  }
+
+  if (!verbose)
+    console.log(formatExpr(last.expr));
+  if (!quiet)
+    console.log(`// ${last.steps} step(s)`);
 }
 
 function inferExpression (expression) {
