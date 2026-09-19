@@ -38,109 +38,105 @@
     <td>B</td>
     <td>Bluebird</td>
     <td>S(KS)K</td>
-    <td>((S(KS))K)</td>
+    <td>S(KS)K</td>
   </tr>
   <tr>
     <td>&lambda;abcd.a(bcd)</td>
     <td>B<sub>1</sub></td>
     <td>Blackbird</td>
     <td>BBB</td>
-    <td>((S(K((S(KS))K)))((S(KS))K))</td>
+    <td>S(KS)(S(KK)(S(KS)K))</td>
   </tr>
   <tr>
     <td>&lambda;abcde.a(bcde)</td>
     <td>B<sub>2</sub></td>
     <td>Bunting</td>
     <td>B(BBB)B</td>
-    <td>((S(K((S(K((S(KS))K)))((S(KS))K))))((S(KS))K))</td>
+    <td>S(KS)(S(KK)(S(KS)(S(KK)(S(KS)K))))</td>
   </tr>
   <tr>
     <td>&lambda;abcd.a(b(cd))</td>
     <td>B<sub>3</sub></td>
     <td>Becard</td>
     <td>B(BB)B</td>
-    <td>((S(K((S(K((S(KS))K)))((S(KS))K))))((S(KS))K))</td>
+    <td>S(S(KS)(S(KK)(S(KS)(S(KK)(S(KS)K)))))(K(S(KS)K))</td>
   </tr>
   <tr>
     <td>&lambda;abc.acb</td>
     <td>C</td>
     <td>Cardinal</td>
     <td>S(BBS)(KK), RRR</td>
-    <td>((S((S(K((S(KS))K)))S))(KK))</td>
+    <td>S(S(KS)(S(KK)S))(KK)</td>
   </tr>
   <tr>
     <td>&lambda;abcd.ab(cd)</td>
     <td>D</td>
     <td>Dove</td>
     <td>BB</td>
-    <td>(S(K((S(KS))K)))</td>
+    <td>S(K(S(KS)))(S(KK))</td>
   </tr>
   <tr>
     <td>&lambda;abcde.abc(de)</td>
     <td>D<sub>1</sub></td>
     <td>Dickcissel</td>
     <td>B(BB)</td>
-    <td>(S(K(S(K((S(KS))K)))))</td>
+    <td>S(K(S(K(S(KS)))))(S(K(S(KK))))</td>
   </tr>
   <tr>
     <td>&lambda;abcde.a(bc)(de)</td>
     <td>D<sub>2</sub></td>
     <td>Dovekies</td>
     <td>BB(BB)</td>
-    <td>((S(K((S(KS))K)))(S(K((S(KS))K))))</td>
+    <td>S(K(S(K(S(KS)))))(S(K(S(K(S(KK)))))(S(KS)K))</td>
   </tr>
   <tr>
     <td>&lambda;abcde.ab(cde)</td>
     <td>E</td>
     <td>Eagle</td>
     <td>B(BBB)</td>
-    <td>(S(K((S(K((S(KS))K)))((S(KS))K))))</td>
+    <td>S(K(S(KS)))(S(K(S(KK)))(S(K(S(KS)))(S(KK))))</td>
   </tr>
   <tr>
     <td>&lambda;abcdefg.a(bcd)(efg)</td>
     <td>&#202;</td>
     <td>Bald Eagle</td>
     <td>B(BBB)(B(BBB))</td>
-    <td>((S(K((S(K((S(KS))K)))((S(KS))K))))(S(K((S(K((S(KS))K)))((S(KS))K)))))</td>
+    <td>S(K(S(K(S(K(S(KS)))))))(S(K(S(K(S(K(S(KK)))))))(S(K(S(K(S(K(S(KS)))))))(S(K(S(K(S(K(S(KK)))))))(S(KS)(S(KK)(S(KS)K))))))</td>
   </tr>
   <tr>
     <td>&lambda;abc.cba</td>
     <td>F</td>
     <td>Finch</td>
     <td>ETTET, CV</td>
-    <td>((S(K((S((SK)K))(K((S(K(S((SK)K))))K)))))((S(K((S(K((S(KS))K)))((S(KS))K))))((S(K(S((SK)K))))K)))</td>
+    <td>S(K(S(S(KS)(S(K(S(SKK)))K))))(S(KK)K)</td>
   </tr>
   <tr>
     <td>&lambda;abcd.ad(bc)</td>
     <td>G</td>
     <td>Goldfinch</td>
     <td>BBC</td>
-    <td>((S(K((S(KS))K)))((S((S(K((S(KS))K)))S))(KK)))</td>
+    <td>S(S(KS)(S(KK)(S(KS)(S(KK)S))))(K(S(KK)))</td>
   </tr>
   <tr>
     <td>&lambda;abc.abcb</td>
     <td>H</td>
     <td>Hummingbird</td>
     <td>BW(BC)</td>
-    <td>
-      ((S(K((S(K(S((S(K((S((SK)K))((SK)K))))((S(K((S(KS))K)))((S(K(S((SK)K))))K))))))K)))(S(K((S((S(K((S(KS))K)))S))(KK)))))
-    </td>
+    <td>S(S(KS)(S(KS)))(KK)</td>
   </tr>
   <tr>
     <td>&lambda;a.a</td>
     <td>I</td>
     <td>Identity Bird (aka Idiot)</td>
     <td>SKx, CKx, WK</td>
-    <td>((SK)K)</td>
+    <td>SKK</td>
   </tr>
   <tr>
     <td>&lambda;abcd.ab(adc)</td>
     <td>J</td>
     <td>Jay</td>
     <td>B(BC)(W(BC(B(BBB))))</td>
-    <td>
-      ((S(K(S(K((S((S(K((S(KS))K)))S))(KK))))))((S((S(K((S((SK)K))((SK)K))))((S(K((S(KS))K)))((S(K(S((SK)K))))K))))(K((S(K((S((S(K((S(KS))K)))S))(KK))))(S(K((S(K((S(KS))K)))((S(KS))K))))))))
-    </td>
+    <td>S(S(KS)(S(K(S(KS)))(S(K(S(KK)))(S(K(S(KS)))(S(KK))))))(S(KK)(S(S(KS)(S(KK)S))(KK)))</td>
   </tr>
   <tr>
     <td>&lambda;ab.a</td>
@@ -154,70 +150,70 @@
     <td>L</td>
     <td>Lark</td>
     <td>CBM, BWB, B(TM)B</td>
-    <td>((S((S(KS))K))(K((S((SK)K))((SK)K))))</td>
+    <td>S(S(KS)K)(K(S(SKK)(SKK)))</td>
   </tr>
   <tr>
     <td>&lambda;a.aa</td>
     <td>M</td>
     <td>Mockingbird</td>
     <td>SII, WI, LI</td>
-    <td>((S((SK)K))((SK)K))</td>
+    <td>S(SKK)(SKK)</td>
   </tr>
   <tr>
     <td>&lambda;ab.ab(ab)</td>
     <td>M<sub>2</sub></td>
     <td>Double Mockingbird</td>
     <td>BM, WS, SSI</td>
-    <td>(S(K((S((SK)K))((SK)K))))</td>
+    <td>SS(SKK)</td>
   </tr>
   <tr>
     <td>&lambda;ab.b(ab)</td>
     <td>O</td>
     <td>Owl</td>
     <td>SI, BW(CB)</td>
-    <td>(S((SK)K))</td>
+    <td>S(SKK)</td>
   </tr>
   <tr>
     <td>&lambda;abc.b(ac)</td>
     <td>Q</td>
     <td>Queer Bird</td>
     <td>CB</td>
-    <td>((S(K(S((S(KS))K))))K)</td>
+    <td>S(K(S(S(KS)K)))K</td>
   </tr>
   <tr>
     <td>&lambda;abc.a(cb)</td>
     <td>Q<sub>1</sub></td>
     <td>Quixotic Bird</td>
     <td>BCB</td>
-    <td>((S(K((S((S(K((S(KS))K)))S))(KK))))((S(KS))K))</td>
+    <td>S(S(KS)(S(KK)(S(KS)K)))(K(S(K(S(SKK)))K))</td>
   </tr>
   <tr>
     <td>&lambda;abc.b(ca)</td>
     <td>Q<sub>2</sub></td>
     <td>Quizzical Bird</td>
     <td>C(BCB)</td>
-    <td>((S(K(S((S(K((S((S(K((S(KS))K)))S))(KK))))((S(KS))K)))))K)</td>
+    <td>S(K(S(S(KS)K)))(S(KK)(S(K(S(SKK)))K))</td>
   </tr>
   <tr>
     <td>&lambda;abc.c(ab)</td>
     <td>Q<sub>3</sub></td>
     <td>Quirky Bird</td>
     <td>BT</td>
-    <td>(S(K((S(K(S((SK)K))))K)))</td>
+    <td>S(K(S(K(S(SKK)))))(S(KK))</td>
   </tr>
   <tr>
     <td>&lambda;abc.c(ba)</td>
     <td>Q<sub>4</sub></td>
     <td>Quacky Bird</td>
     <td>F*B</td>
-    <td>((S(K((S((S(K((S(KS))K)))S))(KK))))((S(K(S((S(K((S((S(K((S(KS))K)))S))(KK))))((S(KS))K)))))K))</td>
+    <td>S(K(S(K(S(SKK)))))(S(K(S(KK)))(S(K(S(SKK)))K))</td>
   </tr>
   <tr>
     <td>&lambda;abc.bca</td>
     <td>R</td>
     <td>Robin</td>
     <td>BBT, CC</td>
-    <td>((S(K((S(KS))K)))((S(K(S((SK)K))))K))</td>
+    <td>S(K(SS))(S(KK)K)</td>
   </tr>
   <tr>
     <td>&lambda;abc.ac(bc)</td>
@@ -231,35 +227,35 @@
     <td>T</td>
     <td>Thrush</td>
     <td>CI</td>
-    <td>((S(K(S((SK)K))))K)</td>
+    <td>S(K(S(SKK)))K</td>
   </tr>
   <tr>
     <td>&lambda;ab.b(aab)</td>
     <td>U</td>
     <td>Turing</td>
     <td>LO</td>
-    <td>((S(K(S((SK)K))))((S((SK)K))((SK)K)))</td>
+    <td>S(K(S(SKK)))(S(SKK)(SKK))</td>
   </tr>
   <tr>
     <td>&lambda;abc.cab</td>
     <td>V</td>
     <td>Vireo (aka Pairing)</td>
     <td>BCT, CF</td>
-    <td>((S(K((S((S(K((S(KS))K)))S))(KK))))((S(K(S((SK)K))))K))</td>
+    <td>S(S(KS)(S(KK)(S(KS)(S(K(S(SKK)))K))))(KK)</td>
   </tr>
   <tr>
     <td>&lambda;ab.abb</td>
     <td>W</td>
     <td>Warbler</td>
     <td>C(BMR), SS(SK), ST, CSI</td>
-    <td>(S(S)(SK))</td>
+    <td>SS(SK)</td>
   </tr>
   <tr>
     <td>&lambda;ab.baa</td>
     <td>W<sup>1</sup></td>
     <td>Converse Warbler</td>
     <td>CW</td>
-    <td>((S(K(S((S(K(S((S(K((S((SK)K))((SK)K))))((S(K((S(KS))K)))((S(K(S((SK)K))))K))))))K))))K)</td>
+    <td>S(S(KS)(S(K(S(SKK)))K))K</td>
   </tr>
   <tr>
     <td>&lambda;a.a(&lambda;a)</td>
@@ -273,92 +269,84 @@
     <td>I*</td>
     <td>Identity Bird Once Removed</td>
     <td>S(SK)</td>
-    <td>(S(SK))</td>
+    <td>SKK</td>
   </tr>
   <tr>
     <td>&lambda;abc.abcc</td>
     <td>W*</td>
     <td>Warbler Once Removed</td>
     <td>BW</td>
-    <td>(S(K((S(K(S((S(K((S((SK)K))((SK)K))))((S(K((S(KS))K)))((S(K(S((SK)K))))K))))))K)))</td>
+    <td>S(S(KS)(S(KS)))(K(SK))</td>
   </tr>
   <tr>
     <td>&lambda;abcd.abdc</td>
     <td>C*</td>
     <td>Cardinal Once Removed</td>
     <td>BC</td>
-    <td>(S(K((S((S(K((S(KS))K)))S))(KK))))</td>
+    <td>S(S(KS)(S(K(S(KS)))(S(K(S(KK)))(S(KS)))))(K(KK))</td>
   </tr>
   <tr>
     <td>&lambda;abcd.acdb</td>
     <td>R*</td>
     <td>Robin Once Removed</td>
     <td>C*C*</td>
-    <td>((S(K((S((S(K((S(KS))K)))S))(KK))))(S(K((S((S(K((S(KS))K)))S))(KK)))))</td>
+    <td>S(S(KS)(S(KK)(S(KS)(S(KS)))))(K(S(KK)K))</td>
   </tr>
   <tr>
     <td>&lambda;abcd.adcb</td>
     <td>F*</td>
     <td>Finch Once Removed</td>
     <td>BC*R*</td>
-    <td>
-      ((S(K(S(K((S((S(K((S(KS))K)))S))(KK))))))((S(K((S((S(K((S(KS))K)))S))(KK))))(S(K((S((S(K((S(KS))K)))S))(KK))))))
-    </td>
+    <td>S(S(KS)(S(KK)(S(KS)(S(K(S(KS)))(S(S(KS)(S(KK)S))(KK))))))(K(S(KK)K))</td>
   </tr>
   <tr>
     <td>&lambda;abcd.acbd</td>
     <td>V*</td>
     <td>Vireo Once Removed</td>
     <td>C*F*</td>
-    <td>
-      ((S(K((S((S(K((S(KS))K)))S))(KK))))((S(K(S(K((S((S(K((S(KS))K)))S))(KK))))))((S(K((S((S(K((S(KS))K)))S))(KK))))(S(K((S((S(K((S(KS))K)))S))(KK)))))))
-    </td>
+    <td>S(S(KS)(S(KK)S))(KK)</td>
   </tr>
   <tr>
     <td>&lambda;abc.abc</td>
     <td>I**</td>
     <td>Identity Bird Twice Removed</td>
     <td>BCC</td>
-    <td>&nbsp;</td>
+    <td>SKK</td>
   </tr>
   <tr>
     <td>&lambda;abcd.abcdd</td>
     <td>W**</td>
     <td>Warbler Twice Removed</td>
     <td>B(BW)</td>
-    <td>(S(K(S(K((S(K(S((S(K((S((SK)K))((SK)K))))((S(K((S(KS))K)))((S(K(S((SK)K))))K))))))K)))))</td>
+    <td>S(S(KS)(S(K(S(KS)))(S(K(S(KS))))))(K(K(SK)))</td>
   </tr>
   <tr>
     <td>&lambda;abcde.abced</td>
     <td>C**</td>
     <td>Cardinal Twice Removed</td>
     <td>BC*</td>
-    <td>(S(K(S(K((S((S(K((S(KS))K)))S))(KK))))))</td>
+    <td>S(S(KS)(S(K(S(KS)))(S(K(S(K(S(KS)))))(S(K(S(K(S(KK)))))(S(K(S(KS))))))))(K(K(KK)))</td>
   </tr>
   <tr>
     <td>&lambda;abcde.abdec</td>
     <td>R**</td>
     <td>Robin Twice Removed</td>
     <td>BR*</td>
-    <td>(S(K((S(K((S((S(K((S(KS))K)))S))(KK))))(S(K((S((S(K((S(KS))K)))S))(KK)))))))</td>
+    <td>S(S(KS)(S(K(S(KS)))(S(K(S(KK)))(S(K(S(KS)))(S(K(S(KS))))))))(K(K(S(KK)K)))</td>
   </tr>
   <tr>
     <td>&lambda;abcde.abedc</td>
     <td>F**</td>
     <td>Finch Twice Removed</td>
     <td>BF*</td>
-    <td>
-      (S(K((S(K(S(K((S((S(K((S(KS))K)))S))(KK))))))((S(K((S((S(K((S(KS))K)))S))(KK))))(S(K((S((S(K((S(KS))K)))S))(KK))))))))
-    </td>
+    <td>S(S(KS)(S(K(S(KS)))(S(K(S(KK)))(S(K(S(KS)))(S(K(S(K(S(KS)))))(S(S(KS)(S(K(S(KS)))(S(K(S(KK)))(S(KS)))))(K(KK))))))))(K(K(S(KK)K)))</td>
   </tr>
   <tr>
     <td>&lambda;abcde.abecd</td>
     <td>V**</td>
     <td>Vireo Twice Removed</td>
     <td>BV*</td>
-    <td>
-      (S(K((S(K((S((S(K((S(KS))K)))S))(KK))))((S(K(S(K((S((S(K((S(KS))K)))S))(KK))))))((S(K((S((S(K((S(KS))K)))S))(KK))))(S(K((S((S(K((S(KS))K)))S))(KK)))))))))
-    </td>
+    <td>S(S(KS)(S(K(S(KS)))(S(K(S(K(S(KS)))))(S(K(S(K(S(KK)))))(S(K(S(K(S(KS)))))(S(S(KS)(S(K(S(KS)))(S(K(S(KK)))(S(KS)))))(K(KK))))))))(K(K(KK)))</td>
   </tr>
   <tr>
     <td>&lambda;ab.b</td>
@@ -379,14 +367,14 @@
     <td>KM</td>
     <td>Konstant Mocker</td>
     <td>KM</td>
-    <td>(K((S((SK)K))((SK)K)))</td>
+    <td>K(S(SKK)(SKK))</td>
   </tr>
   <tr>
     <td>&lambda;ab.aa</td>
     <td>C(KM)</td>
     <td>Crossed Konstant Mocker</td>
     <td>C(KM), SBK</td>
-    <td>((S(K(S(K((S((SK)K))((SK)K))))))K)</td>
+    <td>S(KK)(S(SKK)(SKK))</td>
   </tr>
   <tr>
     <td>&nbsp;</td>
