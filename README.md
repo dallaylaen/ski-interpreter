@@ -106,6 +106,11 @@ npm install @dallaylaen/ski-interpreter
 
 * **`infer <expression>`** - try to find equivalent lambda expression and display its properties if found.
 
+* **`to-ski <expression>`** - rewrite the expression into `S`, `K`, and `I` combinators
+  * `--identity` - use plain `I` instead of `SKK` for the identity combinator
+  * `--verbose` - Show all rewrite steps
+  * Example: `ski to-ski "x->y->x"`
+
 * **`extract <expression> <known term> ...`** -
   Replace parts of the expression that are equivalent to the known terms with the respective terms. Known terms must be normalizable.
 
