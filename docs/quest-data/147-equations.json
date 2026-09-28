@@ -70,6 +70,19 @@
         ["f I x y", "x"],
         ["f S x", "x"]
       ]
+    },
+    {
+      "id": "hKLQIqMb",
+      "created_at": "2026-09-28T20:32:28Z",
+      "name": "be-to-see",
+      "intro": [
+        "Create a term that converts <code>B</code> to <code>C</code> and vice versa."
+      ],
+      "input": "f",
+      "cases": [
+        ["f B x y z", "x z y"],
+        ["f C x y z", "x (y z)"]
+      ]
     }
   ]
 }
