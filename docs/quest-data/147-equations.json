@@ -83,6 +83,30 @@
         ["f B x y z", "x z y"],
         ["f C x y z", "x (y z)"]
       ]
+    },
+    {
+      "id": "lIKR6YNW",
+      "created_at": "2026-10-01T10:58:50Z",
+      "name": "A small correction",
+      "intro": [
+        "<p>You noticed that two seniors on your team are using different conventions",
+        "for representing strings of booleans: ",
+        "One says true and false, i.e. <code>K</code> and <code>KI</code>, is the way,",
+        "while the other says 1 and 0, i.e. <code>I</code> and <code>KI</code>, are better.",
+        "(<i>We'll discuss the representation of numbers, or lists for that matter, in future chapters.</i>)</p>",
+        "<p>Anyways, neither wants to change their code. Luckily, 0 and false have the same representation.",
+        "Write a term <code>f</code> that converts <code>I</code> to <code>K</code>,",
+        "while leaving <code>KI</code> and <code>K</code> unchanged:</p>",
+        "<p><code>f K x y = x</code></p>",
+        "<p><code>f I x y = x</code></p>",
+        "<p><code>f (KI) x y = y</code></p>"
+      ],
+      "input": "f",
+      "cases": [
+        [ "f K x y", "x" ],
+        [ "f I x y", "x" ],
+        [ "f (KI) x y", "y" ]
+      ]
     }
   ]
 }
