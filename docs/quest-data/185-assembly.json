@@ -53,6 +53,26 @@
         ["V=BC(CI); t=K; f=KI; num (V f (V f (V f (V f f)))) + 0", "0"],
         ["V=BC(CI); t=K; f=KI; num (V t (V t (V f (V t f)))) + 0", "11"]
       ]
+    },
+    {
+      "id": "grPpPAUc",
+      "created_at": "2026-10-03T09:46:20Z",
+      "name": "Finding the truth",
+      "intro": [
+        "<p>Create a term that converts true (<code>K</code>), any positive number,",
+        "and a pair (<code>V a b</code>) to true(<code>K</code>),",
+        "and false (<code>KI</code>), zero (<code>KI</code>),",
+        "and an empty list (<code>KI</code>) to false (<code>KI</code>).</p>"
+      ],
+      "input": "f",
+      "cases": [
+        ["f (KI) true false", "false"],
+        ["f K true false", "true"],
+        ["V=BC(CI); f (V a b) true false", "true"],
+        ["f 1 true false", "true"],
+        ["f 2 true false", "true"],
+        ["f 5 true false", "true"]
+      ]
     }
   ]
 }
