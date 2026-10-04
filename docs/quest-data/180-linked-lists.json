@@ -64,6 +64,26 @@
         ["V=BC(CI); fold (V a (KI)) f x", "f a x"],
         ["V=BC(CI); fold (Va (Vb (Vc (KI)))) f x", "f a (f b (f c x))"]
       ]
+    },
+    {
+      "id": "43elxxWW",
+      "created_at": "2026-10-04T15:41:17Z",
+      "name": "Reverse a list",
+      "intro": [
+        "<p>Given a linked list, return a new list with the same elements in reverse order.</p>",
+        "<p>As usual, you can use <code>V==cons</code> and <code>nil</code> constants to represent",
+        "a pair and an empty list, respectively.</p>",
+        "Of course, you can combine <code>fold</code> and self-folding list reversal,",
+        "or you can implement it from scratch via fixed point combinator or even bare self-application."
+      ],
+      "env": ["V=BC(CI)", "nil=KI", "cons=V"],
+      "input": "reverse",
+      "cases": [
+        ["reverse (KI)", "KI"],
+        ["reverse (V a (KI))", "V a (KI)"],
+        ["reverse (V a (V b (KI)))", "V b (V a (KI))"],
+        ["reverse (V a (V b (V c (KI))))", "V c (V b (V a (KI)))"]
+      ]
     }
   ]
 }
