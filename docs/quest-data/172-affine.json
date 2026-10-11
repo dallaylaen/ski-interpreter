@@ -67,20 +67,19 @@
       ]
     },
     {
-      "id": "9AOyLk8v",
-      "created_at": "2025-07-23T00:08:30",
+      "id": "yen9UaVj",
+      "created_at": "2026-10-11T17:07:17Z",
       "name": "Triple trouble",
       "intro": [
-        "<p>Think <a href=\"#quest-ZCMoK02Q\">making</a> <code>W</code> from <code>M</code> was hard?",
-        "This time you are given <code>triple x = x x x</code> instead of <code>M</code>. Find <code>M</code>.</p>",
-        "<p><i>(Can you also build <code>W</code>?)</i></p>",
-        "<p>Of course you can't use any duplicating combinators except <code>triple</code>.</p>"
+        "<p>Think <a href=\"#quest-ZCMoK02Q\">making</a> <code>W</code> from <code>M</code> was hard?</p>",
+        "<p>This time you need to construct a non-duplicating term <code>&phi;</code> that,",
+        "given <code>triple = x->x x x</code>, produces <code>M = x->x x</code>:</p>",
+        "<p><code>&phi; triple x = x x</code></p>"
       ],
-      "env": ["triple=WW"],
-      "allow": "BCVIKT",
-      "input": "phi",
+      "input": { "name": "phi", "fancy": "&phi;" },
       "cases": [
-        [ "phi x", "x x" ]
+        [ { "caps": { "affine": true } }, "phi" ],
+        [ "phi (WW) x", "x x" ]
       ]
     },
     {
