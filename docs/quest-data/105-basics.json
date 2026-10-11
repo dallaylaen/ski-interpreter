@@ -77,6 +77,37 @@
       ]
     },
     {
+      "id": "rsUY4GmM",
+      "created_at": "2026-10-11T08:27:33Z",
+      "name": "Feeding a hungry birdie",
+      "intro": [
+        "<p>Given two known values <code>x</code> and <code>y</code>,",
+        "create a term that feeds them to an unknown function <code>f</code>:</p>",
+        "<p><code>&lt;your code&gt; f = f x y</code></p>"
+      ],
+      "env": [ "x", "y" ],
+      "input": { "name": "phi", "fancy":"&phi;" },
+      "cases": [
+        [ "phi f", "f x y" ]
+      ]
+    },
+    {
+      "id": "wcpx6W0d",
+      "created_at": "2026-10-11T08:27:33Z",
+      "name": "The funnel",
+      "intro": [
+        "<p>You are given 5 values, a1, a2, a3, a4, and a5.</p>",
+        "<p>Create a term that takes an unknown function <code>f</code>",
+        "and feeds it the 5 values in order:</p>",
+        "<p><code>&lt;your code&gt; f = f a1 a2 a3 a4 a5</code></p>"
+      ],
+      "env": [ "a1", "a2", "a3", "a4", "a5" ],
+      "input": { "name": "phi", "fancy":"&phi;" },
+      "cases": [
+        [ "phi f", "f a1 a2 a3 a4 a5" ]
+      ]
+    },
+    {
       "id": "T89a9q7G",
       "created_at": "2024-12-07T01:42:42",
       "name": "May the force be with you",
