@@ -107,7 +107,8 @@
         "<p>It's trivial to duplicate two variables if you can use duplicating terms,",
         "such as <code>W</code> or <code>M</code>, multiple times.",
         " But what if you can only use such term once?</p>",
-        "<p>Build a function <code>&phi;</code> such that <code>&phi; W a b = a a (b b)</code>.</p>"
+        "<p>Build a non-duplicating function <code>&phi;</code>",
+        "such that <code>&phi; W a b = a a (b b)</code>.</p>"
       ],
       "input": { "name": "phi", "fancy": "&phi;", "affine": true },
       "cases": [
