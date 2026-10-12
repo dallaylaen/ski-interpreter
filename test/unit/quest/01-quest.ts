@@ -217,12 +217,9 @@ describe('Quest', () => {
     const pass = quest.check('KI');
     expect(pass.pass).to.equal(true);
 
-    const unshileded = quest.check('SK');
-    expect(unshileded.pass).to.equal(false);
-    expect(unshileded.details[0].reason).to.match(/found.*\bS\b.*duplicate/);
+    const unshielded = quest.check('SK');
 
-    const shielded = quest.check('foo=SK; foo');
-    expect(shielded.pass).to.equal(true);
+    expect(unshielded.pass).to.equal(true);
   });
 
   it('displays allowed terms correctly', () => {

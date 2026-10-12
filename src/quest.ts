@@ -508,20 +508,18 @@ export class PropertyCase extends Case {
 
     if (this.isAffine) {
       // const initial: MaybeTerm|undefined = undefined;
-      const badGuy = start.fold<{ expr: Expr, props: TermInfo }|undefined>(
-        undefined, (acc, expr) => {
-          if (expr instanceof App || expr instanceof FreeVar)
-            return;
-          const props = expr.infer({ max: this.max });
-          if (!props.expr || props.duplicate)
-            return control.stop({ expr, props });
+      let badGuy: { expr: Expr, props: TermInfo } | undefined;
 
-          // don't descend into aliases EXCEPT that input is aliases too and we definitely descend into them
-          // so B=S(KS)K; B is affine (which it is) but S(KS)K alone isn't
-          if (expr instanceof Alias && input.indexOf(expr) < 0)
-            return control.prune(acc);
-        }
-      );
+      (start instanceof Alias ? start.impl : start).traverse({}, expr => {
+        const props = expr.infer({ max: this.max });
+        if (props.expr && !props.duplicate)
+          return control.prune();
+        if (props.expr && (expr instanceof App))
+          return; // continue descending
+        badGuy = { expr, props };
+        return control.stop();
+      });
+
       if (badGuy) {
         reason.push(
           'found unexpected subterm ' + badGuy.expr + (badGuy.props.expr
