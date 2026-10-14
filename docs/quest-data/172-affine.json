@@ -114,6 +114,22 @@
         [ { "caps": { "affine": true } }, "phi" ],
         [ "phi W a b", "a a (b b)"]
       ]
+    },
+    {
+      "id": "Ez9RNp0M",
+      "created_at": "2026-10-14T17:55:09Z",
+      "name": "Taming the infinity",
+      "intro": [
+        "<p>You are given a non-terminating fixed-point combinator, <code>Y</code>: ",
+        "<code>Y f = f(Y f) = f(f(Y f)) = ...</code>.</p>",
+        "<p>Build an affine combinator <code>f</code> that converts Y to M:",
+        "<code>f Y x = x x</code>.</p>"
+      ],
+      "input": "phi",
+      "cases": [
+        [ { "caps": { "affine": true } }, "phi"],
+        [ "phi (WS(BWB)) x", "x x" ]
+      ]
     }
   ]
 }
