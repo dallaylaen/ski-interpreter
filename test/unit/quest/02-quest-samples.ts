@@ -38,6 +38,36 @@ describe('Quest (samples)', () => {
     solution(quest, ['SI(KI)'], { pass: true });
     solution(quest, ['K(WI)'], { pass: false, reason: [undefined, /duplicate/] });
   });
+
+  batch(new Quest({
+    name:  'multiple inputs + lambda',
+    input: [
+      { name: 'X', lambdas: true, allow: 'I-I' },
+      { name: 'b', allow: 'XI' },
+      { name: 't', allow: 'XI' },
+    ],
+    cases: [
+      [{ caps: { linear: true } }, 'X'],
+      ['b x y z', 'x (y z)'],
+      ['t x y', 'y x'],
+    ],
+  }), quest => {
+    solution(quest, ['a->b->c->d->b (a d c)', 'X(XII)', 'XII'], { pass: true });
+    solution(quest,
+      ['a->a(b->c->d->b d (c d))(b->c->b)', 'X(X(X(XI))I(X(XI)))', 'X(X(XI))(X(XI)(X(X(XI))I))(X(XI))'],
+      { pass: false, reason: [/duplicate/, undefined, undefined] });
+    solution(quest, ['a->b->b a', 'XX', 'X'], { pass: false, reason: [undefined, /!=/, undefined] });
+  });
+
+  batch(new Quest({
+    name:  'wait for more args',
+    input: 'f',
+    cases: [['f x y z', 'x y z'], ['f (WI)(WI)', 'f (WI)(WI)']],
+  }), quest => {
+    solution(quest, ['BCC'], { pass: true });
+    solution(quest, ['I'], { pass: false, reason: [undefined, /failed/] });
+    solution(quest, ['C'], { pass: false, reason: [/.../, undefined] });
+  });
 });
 
 /*
