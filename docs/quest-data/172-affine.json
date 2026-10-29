@@ -109,7 +109,7 @@
         "<p>Build a non-duplicating function <code>&phi;</code>",
         "such that <code>&phi; W a b = a a (b b)</code>.</p>"
       ],
-      "input": { "name": "phi", "fancy": "&phi;", "affine": true },
+      "input": { "name": "phi", "fancy": "&phi;" },
       "cases": [
         [ { "caps": { "affine": true } }, "phi" ],
         [ "phi W a b", "a a (b b)"]
@@ -129,6 +129,69 @@
       "cases": [
         [ { "caps": { "affine": true } }, "phi"],
         [ "phi (WS(BWB)) x", "x x" ]
+      ]
+    },
+    {
+      "id": "uEjDdxIG",
+      "created_at": "2026-10-29T08:10:39Z",
+      "name": "Affine numbers design",
+      "intro": [
+        "<p>Church numerals are indeed very powerful, but they aren't the only way to represent numbers",
+        "in combinatory logic. Let's design a system with different properties.",
+        "Spoiler ahead: most likely you are going to end up with a variant of",
+        "<a href=\"https://en.wikipedia.org/wiki/Mogensen%E2%80%93Scott_encoding\" target=\"_blank\">Scott numerals</a>.</p>",
+        "<p>So, make numerals soch that <code>(cons a (cons b ...(cons z nil)...)) &lt;n&gt;</code>",
+        "returns the <code>n</code>-th element of the list, if it exists.</p>",
+        "<p>The <code>zero</code>, <code>succ</code>, <code>pred</code>, and <code>iszero</code>",
+        "should be defined as well, and should be affine.</p>",
+        "<p>Additionally, a non-affine (obviously) <code>fold</code> should be provided: ",
+        "<code>fold &lt;n&gt; f x = f (f ... {n times}... (f x) ...))</code>.",
+        "<code>fold</code> itself, <code>fold &lt;n&gt;</code>, and <code>fold &lt;n&gt; f</code>",
+        "should all terminate.</p>"
+      ],
+      "input": [
+        "zero",
+        "succ",
+        "pred",
+        "iszero",
+        "fold"
+      ],
+      "cases": [
+        [ { "caps": { "affine": true } }, "zero" ],
+        [ { "caps": { "affine": true } }, "succ" ],
+        [ { "caps": { "affine": true } }, "pred" ],
+        [ { "caps": { "affine": true } }, "iszero" ],
+
+        [ "iszero zero true false", "true"],
+        [ "iszero (succ zero) true false", "false"],
+        [ "iszero (succ (succ zero)) true false", "false"],
+        [ "iszero (5 succ zero) true false", "false"],
+        [ "iszero (3 pred (5 succ zero)) true false", "false"],
+        [ "iszero (3 pred (4 succ zero)) true false", "false"],
+        [ "iszero (5 pred (5 succ zero)) true false", "true"],
+        [ "iszero (6 pred (5 succ zero)) true false", "true"],
+        [ "iszero (7 pred (5 succ zero)) true false", "true"],
+
+        [ "V=BC(CI); nil = KI; (Va(Vb(Vc(Vd(Ve nil))))) (0 succ zero)", "a" ],
+        [ "V=BC(CI); nil = KI; (Va(Vb(Vc(Vd(Ve nil))))) (1 succ zero)", "b" ],
+        [ "V=BC(CI); nil = KI; (Va(Vb(Vc(Vd(Ve nil))))) (2 succ zero)", "c" ],
+        [ "V=BC(CI); nil = KI; (Va(Vb(Vc(Vd(Ve nil))))) (3 succ zero)", "d" ],
+        [ "V=BC(CI); nil = KI; (Va(Vb(Vc(Vd(Ve nil))))) (4 succ zero)", "e" ],
+        [ "V=BC(CI); nil = KI; (Va(Vb(Vc(Vd(Ve nil))))) (1 pred (4 succ zero))", "d" ],
+        [ "V=BC(CI); nil = KI; (Va(Vb(Vc(Vd(Ve nil))))) (2 pred (4 succ zero))", "c" ],
+        [ "V=BC(CI); nil = KI; (Va(Vb(Vc(Vd(Ve nil))))) (3 pred (4 succ zero))", "b" ],
+        [ "V=BC(CI); nil = KI; (Va(Vb(Vc(Vd(Ve nil))))) (4 pred (4 succ zero))", "a" ],
+        [ "V=BC(CI); nil = KI; (Va(Vb(Vc(Vd(Ve nil))))) (5 pred (4 succ zero))", "a" ],
+
+        [ "fold (0 succ zero) f x", "0 f x" ],
+        [ "fold (1 succ zero) f x", "1 f x" ],
+        [ "fold (2 succ zero) f x", "2 f x" ],
+        [ "fold (5 succ zero) f x", "5 f x" ],
+        [ "fold (3 pred (5 succ zero)) f x", "2 f x" ],
+
+        [ "fold (5 succ zero) f", "fold (5 succ zero) f" ],
+        [ "fold (5 succ zero)", "fold (5 succ zero)" ],
+        [ { "max": 100 }, "fold", "fold" ]
       ]
     }
   ]
