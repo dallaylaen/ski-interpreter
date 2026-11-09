@@ -847,6 +847,9 @@ function searchExpression (termStrs, targetSrcs, options) {
   const seed = terms.map(s => ski.parse(s));
   const pending = targets.slice();
 
+  // overridden below in verbose mode to avoid clobbering the in-progress line
+  let printFound = (text) => console.log(text);
+
   const checkTerm = (term) => {
     for (let i = pending.length - 1; i >= 0; i--) {
       const target = pending[i];
@@ -860,7 +863,7 @@ function searchExpression (termStrs, targetSrcs, options) {
         }
       }
       if (ok) {
-        console.log(`${target.label} = ${formatExpr(term)};`);
+        printFound(`${target.label} = ${formatExpr(term)};`);
         pending.splice(i, 1);
       }
     }
@@ -899,6 +902,14 @@ function searchExpression (termStrs, targetSrcs, options) {
       readline.clearLine(process.stdout, 0);
       readline.cursorTo(process.stdout, 0);
       process.stdout.write(text + (istty ? '' : '\n'));
+    }
+
+    // found-target messages are permanent output, so always clear any
+    // in-progress line first and terminate with a newline
+    printFound = (text) => {
+      readline.clearLine(process.stdout, 0);
+      readline.cursorTo(process.stdout, 0);
+      process.stdout.write(text + '\n');
     }
 
     const elapsed = () => ((Date.now() - t0) / 1000).toFixed(2);
