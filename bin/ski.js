@@ -131,12 +131,17 @@ program
 
 // Search subcommand
 program
-  .command('search <target> <terms...>')
-  .description('Search for an expression equivalent to target using known terms')
+  .command('search <terms...>')
+  .description('Search for an expression satisfying target condition(s) using known terms')
+  .option('-t, --target <condition>', 'Target condition to satisfy, syntax: '
+  + '"<id>: <expr> == <expr> [&& <expr> == <expr>]..." (may be repeated)',
+  (val, prev) => { prev.push(val); return prev; }, [])
   .option('--max-depth <number>', 'Limit search depth', toInt('--max-depth'))
   .option('--max-tries <number>', 'Limit total terms probed', toInt('--max-tries'))
-  .action(async (target, terms, options) => {
-    searchExpression(await readExpression(target), terms, options);
+  .action(async (terms, options) => {
+    if (!options.target.length && terms.length)
+      terms[0] = await readExpression(terms[0]);
+    searchExpression(terms, options.target, options);
   });
 
 // Quest-attempt subcommand
@@ -770,15 +775,96 @@ async function questCheck (files, solutionFile, fix) {
   }
 }
 
-function searchExpression (targetStr, termStrs, options) {
-  const target = ski.parse(targetStr);
-  const seed = termStrs.map(s => ski.parse(s));
+/**
+ * Parse a --target condition.
+ *
+ * Syntax: `<id> : <expr> == <expr> [&& <expr> == <expr>] ...`
+ * Shorthand: a plain `<expr>` (no top-level ':') is treated as `e: e == <expr>`,
+ * but is displayed/identified using the expression text itself (e.g. `-t K`
+ * is shown as `K`), rather than the generic internal placeholder name.
+ *
+ * @param {string} src
+ * @returns {{
+ *   label: string,
+ *   placeholder: InstanceType<typeof SKI.classes.FreeVar>,
+ *   conditions: [any, any][]
+ * }}
+ */
+function parseTarget (src) {
+  src = (src ?? '').trim();
+  if (!src)
+    throw new Error('--target: empty target condition');
 
-  const { expr } = target.infer();
-  if (!expr) {
-    console.error('target expression is not normalizable: ' + target);
-    process.exit(1);
+  const colonIdx = src.indexOf(':');
+  let id, rest, label;
+  if (colonIdx === -1) {
+    id = 'e';
+    rest = `e == ${src}`;
+    label = src;
+  } else {
+    id = src.slice(0, colonIdx).trim();
+    rest = src.slice(colonIdx + 1);
+    if (!/^(?:[A-Z]|[a-z_][a-zA-Z0-9_]*)$/.test(id))
+      throw new Error(`--target: invalid placeholder name '${id}' in: ${src}`);
+    label = id;
   }
+
+  const parts = rest.split('&&');
+  if (!parts.length)
+    throw new Error(`--target: no conditions found in: ${src}`);
+
+  const conditions = parts.map(part => {
+    const sides = part.split('==');
+    if (sides.length !== 2 || !sides[0].trim() || !sides[1].trim())
+      throw new Error(`--target: expected '<expr> == <expr>', got: ${part.trim()}`);
+    return [ski.parse(sides[0]), ski.parse(sides[1])];
+  });
+
+  const placeholder = new SKI.classes.FreeVar(id, SKI.classes.FreeVar.global);
+  return { label, placeholder, conditions };
+}
+
+function searchExpression (termStrs, targetSrcs, options) {
+  let terms = termStrs;
+  let targets;
+  if (targetSrcs.length)
+    targets = targetSrcs.map(parseTarget);
+  else {
+    const [first, ...rest] = terms;
+    targets = [parseTarget(first)];
+    terms = rest;
+  }
+
+  const seenNames = new Set();
+  for (const t of targets) {
+    if (seenNames.has(t.label)) {
+      console.error(`ski: search: duplicate target label '${t.label}'`);
+      process.exit(2);
+    }
+    seenNames.add(t.label);
+  }
+
+  const seed = terms.map(s => ski.parse(s));
+  const pending = targets.slice();
+
+  const checkTerm = (term) => {
+    for (let i = pending.length - 1; i >= 0; i--) {
+      const target = pending[i];
+      let ok = true;
+      for (const [left, right] of target.conditions) {
+        const l = (left.subst(target.placeholder, term) ?? left).infer(runOptions);
+        const r = (right.subst(target.placeholder, term) ?? right).infer(runOptions);
+        if (!l.expr || !r.expr || !l.expr.equals(r.expr)) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok) {
+        console.log(`${target.label} = ${formatExpr(term)};`);
+        pending.splice(i, 1);
+      }
+    }
+  };
 
   const gen = SKI.extras.search(
     seed,
@@ -791,7 +877,8 @@ function searchExpression (targetStr, termStrs, options) {
     (e, p) => {
       if (!p.expr)
         return { offset: -1 };
-      if (p.expr.equals(expr))
+      checkTerm(e);
+      if (pending.length === 0)
         return { found: true, stop: true };
     }
   );
@@ -823,15 +910,15 @@ function searchExpression (targetStr, termStrs, options) {
 
     const step = () => {
       const { value } = gen.next();
-      if (value.expr) {
-        printProgress(`// Found: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n${formatExpr(value.expr)}\n`);
-        clearInterval(bar);
-        process.exit(0);
-      }
       if (value.stop) {
         clearInterval(bar);
-        printProgress(`// Nothing found: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n`);
-        process.exit(1);
+        if (pending.length === 0)
+          printProgress(`// All targets satisfied: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n`);
+        else {
+          printProgress(`// Not satisfied: ${pending.map(t => t.label).join(', ')}: `
+            + `[${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n`);
+        }
+        process.exit(pending.length === 0 ? 0 : 1);
       }
       if (tick || value?.newGen) {
         printProgress(`// Progress: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s`);
@@ -842,15 +929,12 @@ function searchExpression (targetStr, termStrs, options) {
 
     step();
   } else {
-    let value;
-    for (value of gen) {
-      if (value.expr) {
-        console.log(formatExpr(value.expr));
-        process.exit(0);
-      }
-    }
+    for (const _ of gen) { /* side effects happen inside checkTerm() */ }
 
-    console.log('// Nothing found');
+    if (pending.length === 0)
+      process.exit(0);
+
+    console.log(`// Not satisfied: ${pending.map(t => t.label).join(', ')}`);
     process.exit(1);
   }
 }
