@@ -852,7 +852,7 @@ function searchExpression (termStrs, targetSrcs, options) {
   for (const t of targets) {
     const name = t.placeholder + '';
     if (seenNames.has(name)) {
-      console.error(`ski: search: duplicate target name '${t.label}'`);
+      console.error(`ski: search: duplicate target name '${name}'`);
       process.exit(2);
     }
     seenNames.add(name);
@@ -940,7 +940,7 @@ function searchExpression (termStrs, targetSrcs, options) {
         if (pending.length === 0)
           printProgress(`// All targets satisfied: [${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n`);
         else {
-          printProgress(`// Not satisfied: ${pending.map(t => t.label).join(', ')}: `
+          printProgress(`// Not satisfied: ${pending.map(t => t.placeholder).join(', ')}: `
             + `[${value.gen}] ${value.probed}/${value.total} in ${elapsed()}s\n`);
         }
         process.exit(pending.length === 0 ? 0 : 1);
@@ -959,7 +959,7 @@ function searchExpression (termStrs, targetSrcs, options) {
     if (pending.length === 0)
       process.exit(0);
 
-    console.log(`// Not satisfied: ${pending.map(t => t.label).join(', ')}`);
+    console.log(`// Not satisfied: ${pending.map(t => t.placeholder).join(', ')}`);
     process.exit(1);
   }
 }
