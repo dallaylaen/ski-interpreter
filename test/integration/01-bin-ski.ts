@@ -57,6 +57,17 @@ describe('ski CLI', () => {
     });
   });
 
+  describe('search', () => {
+    it('produces plausible search results', () => {
+      const { exitCode, stdout } = cli(['search', '-v', '-t', 'B', 'S', 'K']);
+      expect(stdout).to.match(/^B *= */m, 'output is a definition');
+      const expr = ski.parse(stdout);
+      const { a, b, c } = SKI.vars();
+      a.apply(b.apply(c)).expect(expr.run(a, b, c).expr);
+      expect(exitCode).to.equal(0);
+    });
+  });
+
   describe('error handling', () => {
     it('exits 2 and prints help on unknown subcommand', () => {
       const { exitCode, stderr, stdout } = cli(['no-such-command']);
