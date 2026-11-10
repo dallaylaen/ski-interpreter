@@ -805,32 +805,36 @@ function parseTarget (src) {
     throw new Error('--target: empty target condition');
 
   const colonIdx = src.indexOf(':');
-  let id, rest, label;
   if (colonIdx === -1) {
-    id = 'e';
-    rest = `e == ${src}`;
-    label = src;
-  } else {
-    id = src.slice(0, colonIdx).trim();
-    rest = src.slice(colonIdx + 1);
-    if (!/^(?:[A-Z]|[a-z_][a-zA-Z0-9_]*)$/.test(id))
-      throw new Error(`--target: invalid placeholder name '${id}' in: ${src}`);
-    label = id;
+    // plain expression
+    const placeholder = new SKI.classes.FreeVar(src);
+    return {
+      placeholder,
+      conditions: [[placeholder, ski.parse(src)]],
+    };
   }
+
+  const id = src.slice(0, colonIdx).trim();
+  const rest = src.slice(colonIdx + 1);
+  if (!/^(?:[A-Z]|[a-z_][a-zA-Z0-9_]*)$/.test(id))
+    throw new Error(`--target: invalid placeholder name '${id}' in: ${src}`);
 
   const parts = rest.split('&&');
   if (!parts.length)
     throw new Error(`--target: no conditions found in: ${src}`);
 
+  const placeholder = new SKI.classes.FreeVar(id);
+  const env = {};
+  env[id] = placeholder;
+
   const conditions = parts.map(part => {
     const sides = part.split('==');
     if (sides.length !== 2 || !sides[0].trim() || !sides[1].trim())
       throw new Error(`--target: expected '<expr> == <expr>', got: ${part.trim()}`);
-    return [ski.parse(sides[0]), ski.parse(sides[1])];
+    return [ski.parse(sides[0], { env } ), ski.parse(sides[1], { env })];
   });
 
-  const placeholder = new SKI.classes.FreeVar(id, SKI.classes.FreeVar.global);
-  return { label, placeholder, conditions };
+  return { placeholder, conditions };
 }
 
 function searchExpression (termStrs, targetSrcs, options) {
@@ -846,11 +850,12 @@ function searchExpression (termStrs, targetSrcs, options) {
 
   const seenNames = new Set();
   for (const t of targets) {
-    if (seenNames.has(t.label)) {
-      console.error(`ski: search: duplicate target label '${t.label}'`);
+    const name = t.placeholder + '';
+    if (seenNames.has(name)) {
+      console.error(`ski: search: duplicate target name '${t.label}'`);
       process.exit(2);
     }
-    seenNames.add(t.label);
+    seenNames.add(name);
   }
 
   const seed = terms.map(s => ski.parse(s));
@@ -872,7 +877,7 @@ function searchExpression (termStrs, targetSrcs, options) {
         }
       }
       if (ok) {
-        printFound(`${target.label} = ${formatExpr(term)};`);
+        printFound(`${target.placeholder} = ${formatExpr(term)};`);
         pending.splice(i, 1);
       }
     }
