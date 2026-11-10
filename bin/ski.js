@@ -132,7 +132,16 @@ program
 // Search subcommand
 program
   .command('search <terms...>')
-  .description('Search for an expression satisfying target condition(s) using known terms')
+  .summary('Try to build expression(s) with desired properties from seed term(s)')
+  .description(
+    'Try to build expression(s) with desired properties from seed term(s) \n'
+    + 'using brute force.\n'
+    + 'Terms are assumed equal if their inferred lambda expressions are equal.\n'
+    + 'A target term is denoted by either an equivalent expression,\n'
+    + 'or a set of equations (see -t below).\n'
+    + 'If no target is given, the first expression in the list is used as one.\n',
+    'Expressions are returned as <name> = <expr>.'
+  )
   .option('-t, --target <condition>', 'Target condition to satisfy, syntax: '
   + '"<id>: <expr> == <expr> [&& <expr> == <expr>]..." (may be repeated)',
   (val, prev) => { prev.push(val); return prev; }, [])
