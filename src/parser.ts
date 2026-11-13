@@ -64,9 +64,15 @@ function postParse (expr: Expr): Expr {
   return expr instanceof Empty ? expr.postParse() : expr;
 }
 
+const rexId = '(?:[A-Z]|[a-z_][a-z_0-9]*)';
+const rexTag = '(?:@[a-z][a-z_0-9]*)';
+
+// TODO rename to allTokens or smth
 const combChars = new Tokenizer(
-  '[()]', '[A-Z]', '[a-z_][a-z_0-9]*', '\\b[0-9]+\\b', '->', '\\+'
+  '[()]', rexId, '\\b[0-9]+\\b', '->', '\\+'
 );
+
+const consecutiveIds = new Tokenizer( rexId );
 
 // declare builtin combinators, available in all interpreters by default
 // at least 'K', 'S', 'I', and '+' should be available for number parsing and SKI.extras.toSKI to work
@@ -499,10 +505,9 @@ export class Parser {
    * @return {Expr} parsed expression
    */
   parseLine (source: string, env: { [key: string]: Expr } = {}, options: ParseOptions = {}): Expr {
-    const isDef = source.match(/^\s*(?:(@[a-z][-a-z_0-9]*)\s+)?([A-Z]|[a-z][a-z_0-9]*)\s*=\s*(.*)$/s);
-
-    if (isDef)
-      return this._parseDef(isDef, env, options);
+    const maybeDef = this._parseDef(source, env, options);
+    if (maybeDef)
+      return maybeDef;
 
     const opt = {
       numbers: options.numbers ?? this.options.numbers,
@@ -559,8 +564,53 @@ export class Parser {
     return postParse(stack.pop()!);
   }
 
-  _parseDef (parts: string[], env: Record<string, Expr>, options: ParseOptions): Expr {
-    const [_, tag, name, source] = parts;
+  _parseDef (str: string, env: Record<string, Expr>, options: ParseOptions): Expr | undefined {
+    // @tag? name [name ...] = .* $
+    const parts = str.match(
+      new RegExp(`^\\s*(${rexTag})?((?:\\s*${rexId})+)\\s*=\\s*(.*)$`, 's')
+    );
+    if (!parts)
+      return undefined; // proceed to normal parsing
+
+    const [_, tag, argBlob, source] = parts;
+    const [name, ...args] = consecutiveIds.split(argBlob);
+
+    // console.log('tag:', tag, 'name:', name, 'args:', args, 'source:', source);
+
+    if (args.length > 0) {
+      // reduction-based definition: f x y = <expr>
+      // always produces an @atomic term
+      if (tag)
+        throw new Error('No suitable tags exist for reduction-based definitions');
+      if (!(options.experimental ?? this.options.experimental) && !(options.atomic ?? this.options.atomic))
+        throw new Error('Please allow @atomic terms explicitly ("atomic": true)');
+
+      const placeholder = new FreeVar(name);
+      const argVar: FreeVar[] = [];
+      const xenv = { ...env }; // shallow copy
+      xenv[name] = placeholder;
+
+      const uniq = new Set([name]);
+      for (const s of args) {
+        if (uniq.has(s))
+          throw new Error('Duplicate argument name: ' + s);
+        uniq.add(s);
+        const v = new FreeVar(s);
+        argVar.push(v);
+        xenv[s] = v;
+      }
+
+      const body = this.parseLine(source, xenv, options);
+      let impl = new Lambda(argVar.pop()!, body);
+
+      while (argVar.length > 0)
+        impl = new Lambda(argVar.pop()!, impl);
+
+      // console.log(impl.diag());
+
+      return new Atomic(placeholder, impl);
+    }
+
     if (tag === undefined) {
       return source.match(/\S/)
         ? new Alias(name, this.parseLine(source, env, options))
@@ -575,7 +625,7 @@ export class Parser {
 
     if (tag === '@atomic') {
       if (!(options.atomic ?? this.options.atomic) && !(options.experimental ?? this.options.experimental))
-        throw new Error('Please allow atomic terms explicitly in the interpreter ("atomic": true)');
+        throw new Error('Please allow @atomic terms explicitly ("atomic": true)');
       const self = new FreeVar(name); // no scope, self-bound placeholder
       const impl = this.parseLine(source, { ...env, [name]: self }, options);
       if (!(impl instanceof Lambda))
