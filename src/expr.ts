@@ -1060,24 +1060,27 @@ export class Primitive extends Named {
 
 export class Atomic extends Primitive {
   source: Expr;
+  args: FreeVar[];
   /** the placeholder variable used for self-reference within `source`, if any */
   selfRef?: FreeVar;
 
-  constructor (self: FreeVar|string, impl: Lambda) {
+  constructor (self: FreeVar|string, args: FreeVar[], body: Expr) {
     if (typeof self === 'string')
       self = new FreeVar(self);
-    const { code, env, arity, selfRef } = lambda2code(self, impl);
+    const { code, env, arity, selfRef } = lambda2code(self, args, body);
 
     // console.log('Atomic: generated code for ' + self.name + ':\n' + code);
 
     const invoke = new Function('env', code)(env) as (e: Expr) => Invocation; // eslint-disable-line no-new-func
 
+    const impl = args2lambda(args, body);
     super(self + '', invoke, {
       arity,
       canonize: false,
       note:     impl.format({ html: true, lambda: ['', ' &mapsto; ', ''] }),
     });
-    this.source = impl;
+    this.source = impl; // TODO use args + body instead?
+    this.args = [...args];
     if (selfRef)
       this.selfRef = self;
   }
@@ -1389,6 +1392,16 @@ export class Alias extends Named {
 
 // utility functions dependent on Expr* classes, in alphabetical order
 
+function args2lambda (args: FreeVar[], body: Expr) : Lambda {
+  let lambda: Expr = body;
+  for (let i = args.length; i-- > 0; )
+    lambda = new Lambda(args[i], lambda ?? body);
+  if (lambda instanceof Lambda)
+    return lambda;
+
+  throw new Error('args2lambda: need at least one argument to build a lambda');
+}
+
 function firstVar (expr: Expr) {
   // yay premature optimization
   while (expr instanceof App)
@@ -1396,9 +1409,12 @@ function firstVar (expr: Expr) {
   return expr instanceof FreeVar;
 }
 
-export function lambda2code (self: FreeVar, impl: Lambda):
+export function lambda2code (self: FreeVar, args: FreeVar[], body: Expr):
   { code: string, env: Record<string, Expr>, arity: number, selfRef: boolean } {
-  const selfRef = impl.any(e => e === self);
+  if (args.length === 0)
+    throw new Error('Atomic term must have at least one argument');
+
+  const selfRef = body.any(e => e === self);
 
   // map content:
   //     self=>self - placeholder for `this`
@@ -1411,14 +1427,9 @@ export function lambda2code (self: FreeVar, impl: Lambda):
   if (selfRef)
     map.set(self, self);
 
-  // collect lambda arguments
-  const args: FreeVar[] = [];
-  let body: Expr = impl;
-  while (body instanceof Lambda) {
-    const placeholder = new FreeVar('arg' + args.length);
-    map.set(body.arg, placeholder);
-    args.push(placeholder);
-    body = body.impl;
+  for (let i = 0; i < args.length; i++) {
+    const placeholder = new FreeVar('arg' + i);
+    map.set(args[i], placeholder);
   }
 
   // a node "depends" on self/argN if it (or one of its subterms) is exactly
@@ -1433,10 +1444,10 @@ export function lambda2code (self: FreeVar, impl: Lambda):
   const termNames: Map<Expr, string> = new Map();
 
   const gen = (e: Expr): string => {
-    if (map.has(e)) {
-      const placeholder = map.get(e)!;
-      return placeholder === self ? 'self' : placeholder.name;
-    }
+    const tryMap = map.get(e);
+    if (tryMap)
+      return tryMap === self ? 'self' : tryMap.name;
+
     if (!dependsOnKnown(e)) {
       let name = termNames.get(e);
       if (name === undefined) {
@@ -1467,11 +1478,11 @@ export function lambda2code (self: FreeVar, impl: Lambda):
     preamble += 'var ' + name + ' = env.' + name + ';\n';
 
   // generate function signature from args[], optionally insert `var self=this;`
-  let code = 'return function(' + args[0].name + ') {\n';
+  let code = 'return function(' + gen(args[0]) + ') {\n';
   if (selfRef)
     code += 'var self = this;\n';
   for (let i = 1; i < args.length; i++)
-    code += 'return function(' + args[i].name + ') {\n';
+    code += 'return function(' + gen(args[i]) + ') {\n';
 
   // generate function body from body, replacing application with foo.apply(bar)
   //      and lambdas with new Lambda(arg, impl)

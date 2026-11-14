@@ -601,14 +601,8 @@ export class Parser {
       }
 
       const body = this.parseLine(source, xenv, options);
-      let impl = new Lambda(argVar.pop()!, body);
 
-      while (argVar.length > 0)
-        impl = new Lambda(argVar.pop()!, impl);
-
-      // console.log(impl.diag());
-
-      return new Atomic(placeholder, impl);
+      return new Atomic(placeholder, argVar, body);
     }
 
     if (tag === undefined) {
@@ -630,7 +624,8 @@ export class Parser {
       const impl = this.parseLine(source, { ...env, [name]: self }, options);
       if (!(impl instanceof Lambda))
         throw new Error('Primitive term must be defined via a lambda expression');
-      return new Atomic(self, impl);
+      const { args, body } = stripLambda(impl);
+      return new Atomic(self, args, body);
     }
 
     throw new Error(`Unsupported tag '${tag}'`);
@@ -647,6 +642,16 @@ export class Parser {
       terms:    this.declare(),
     }
   }
+}
+
+function stripLambda (expr: Lambda): {args: FreeVar[], body: Expr} {
+  const args = [];
+  let body: Expr = expr;
+  while (body instanceof Lambda) {
+    args.push(body.arg);
+    body = body.impl;
+  }
+  return { args, body };
 }
 
 function maybeAlias (name: string, impl: Expr): Named {

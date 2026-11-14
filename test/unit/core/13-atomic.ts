@@ -8,9 +8,9 @@ import { isInstanceOf } from '../../lib/assert';
 describe('Atomic', () => {
   const ski = new SKI({ atomic: true });
 
-  describe('new PureNative()', () => {
+  describe('new Atomic()', () => {
     const { x, y } = SKI.vars();
-    const M = new Atomic('M', new Lambda(x, x.apply(x)));
+    const M = new Atomic('M', [x], x.apply(x));
 
     it('has name', () => {
       expect(M.name).to.equal('M');
