@@ -14,6 +14,8 @@ describe('Atomic: supports legacy @atomic def', () => {
     const res = T.run(a, b);
     expect(res.steps).to.equal(1);
     b.apply(a).expect(res.expr);
+
+    ski.parse('T a b = b a').expect(T);
   });
 
   it('works for self-ref terms', () => {
@@ -29,5 +31,7 @@ describe('Atomic: supports legacy @atomic def', () => {
     f.apply(P, f).expect(res.expr);
 
     expect(P.declare()).to.match(/^P\s*x\s*=\s*x\s*P\s*x;?$/);
+
+    ski.parse('P x = x P x').expect(P);
   });
 });
