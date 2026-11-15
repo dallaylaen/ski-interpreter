@@ -41,9 +41,9 @@ describe('Parser: engine options as ParseOptions defaults', () => {
   it('honors atomic/experimental overrides per parse() call', () => {
     const ski = new SKI(); // atomic: false, experimental: false by default
 
-    expect(() => ski.parse('@atomic M = x->x x')).to.throw(/atomic terms explicitly/);
-    const m1 = ski.parse('@atomic M = x->x x', { atomic: true });
-    const m2 = ski.parse('@atomic M = x->x x', { experimental: true });
+    expect(() => ski.parse('M x = x x')).to.throw(/atomic terms explicitly/);
+    const m1 = ski.parse('M x = x x', { atomic: true });
+    const m2 = ski.parse('M x = x x', { experimental: true });
     isInstanceOf(m1, Named);
     isInstanceOf(m2, Named);
     expect((m1 as Named).name).to.equal('M');

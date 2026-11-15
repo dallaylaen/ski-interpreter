@@ -26,7 +26,7 @@ describe('Atomic', () => {
   });
 
   describe('T', () => {
-    const T = stripAlias(ski.parse('@atomic T = x->y->y x'));
+    const T = stripAlias(ski.parse('T x y = y x'));
 
     it('has correct type and name', () => {
       isInstanceOf(T, Atomic);
@@ -45,7 +45,7 @@ describe('Atomic', () => {
   });
 
   describe('iota', () => {
-    const iota = stripAlias(ski.parse('@atomic X = x->xSK'));
+    const iota = stripAlias(ski.parse('X x = xSK'));
 
     it('has type and name', () => {
       isInstanceOf(iota, Atomic);
@@ -66,7 +66,7 @@ describe('Atomic', () => {
   });
 
   describe('Y combinator', () => {
-    const Y = stripAlias(ski.parse('@atomic Y = f->f(Y f)'));
+    const Y = stripAlias(ski.parse('Y f = f(Y f)'));
 
     it('has predictable arity', () => {
       expect(Y.arity).to.equal(1);
@@ -117,7 +117,7 @@ describe('Atomic', () => {
   });
 
   describe('can contain nested lambdas', () => {
-    const src = '@atomic ti = x->y->y(z->x)';
+    const src = 'ti x y = y(z->x)';
     const ti = stripAlias(ski.parse(src));
 
     it('can infer', () => {
@@ -135,29 +135,29 @@ describe('Atomic', () => {
   describe('handles unsafe identifiers', () => {
     const { x, y } = SKI.vars();
     it('can have keywords', () => {
-      const src = '@atomic T = var->function->function(var)';
+      const src = 'T var function = function(var)';
       const unsafe = stripAlias(ski.parse(src));
       expect(unsafe.run(x, y).expr + '').to.equal('y x');
     });
 
     it('can have non-ID subterms', () => {
-      const src = '@atomic T = x->+ x';
+      const src = 'T x = + x';
       const unsafe = stripAlias(ski.parse(src));
       expect(unsafe.run(SKI.church(5)).expr + '').to.equal('6');
     });
   });
 
   describe('handles more expressions', () => {
-    assertSource('@atomic X = a->aS(BBK)', [['X X x y', 'x'], ['X(XX)', 'S']]);
-    assertSource('@atomic N = a->b->c->d->b (a d c)', [['NII x y', 'y x'], ['N(NII) x y z', 'x (y z)']]);
-    assertSource('@atomic F = a->b->c->a b c', [['F (WI)(WI)', 'F(WI)(WI)']]);
+    assertSource('X a = aS(BBK)', [['X X x y', 'x'], ['X(XX)', 'S']]);
+    assertSource('N a b c d = b (a d c)', [['NII x y', 'y x'], ['N(NII) x y z', 'x (y z)']]);
+    assertSource('F a b c = a b c', [['F (WI)(WI)', 'F(WI)(WI)']]);
   });
 
   describe('equality', () => {
     const ski2 = new SKI({ atomic: true });
-    const T = stripAlias(ski.parse('@atomic T = x->y->y x'));
-    const T2 = stripAlias(ski.parse('@atomic T = x->y->y x'));
-    const T3 = stripAlias(ski2.parse('@atomic T = x->y->y x'));
+    const T = stripAlias(ski.parse('T x y = y x'));
+    const T2 = stripAlias(ski.parse('T x y = y x'));
+    const T3 = stripAlias(ski2.parse('T x y = y x'));
 
     it('is equal to itself', () => {
       expect(T.equals(T)).to.equal(true);
@@ -172,7 +172,7 @@ describe('Atomic', () => {
     });
 
     it('is not equal to a different term', () => {
-      const iota = stripAlias(ski.parse('@atomic X = x->xSK'));
+      const iota = stripAlias(ski.parse('X x = xSK'));
       expect(T.equals(iota)).to.equal(false);
     });
   });

@@ -18,7 +18,7 @@ describe('extras.toLambda', () => {
   checkTerm('M=SII; MM', '(x->x x) (x->x x)');
   checkTerm('BC(CI)', 'a->b->c->c a b');
   checkTerm('T=CI; 5 (Ty) x', 'x y y y y y');
-  checkTerm('@atomic T=x->y->y x', 'a->b->b a');
+  checkTerm('T x y = y x', 'a->b->b a');
 
   checkTerm('5 K I', 'a->b->c->d->e->f->f');
   checkTerm('SB(SB(SB(SB(SB(KI))))) K I', 'a->b->c->d->e->f->f');
@@ -46,7 +46,7 @@ describe('extras.toLambda', () => {
   checkTerm('BS(C(BB))', 'a->b->c->d->c a(b c d)');
 
   // non-canonizable atomic
-  checkTerm('@atomic P=f->f P f', '(a->a a)(g->f->f (g g) f)');
+  checkTerm('P f = f P f', '(a->a a)(g->f->f (g g) f)');
 
   // no canonical form
   it('throws when there\'s not enough space for arguments', () => {

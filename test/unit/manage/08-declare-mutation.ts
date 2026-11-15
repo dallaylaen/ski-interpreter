@@ -9,7 +9,7 @@ describe('SKI: adding terms to an engine, step by step', () => {
     modifyEngine(ski, 'nil=KI', [['nil x y', 'y']]);
     modifyEngine(ski, 'T=CI', [['T x y', 'y x']]);
     modifyEngine(ski, 'V=BCT', [['V a b c', 'c a b']]);
-    modifyEngine(ski, '@atomic M=a->a a', [['M x', 'x x']]);
+    modifyEngine(ski, 'M a = a a', [['M x', 'x x']]);
     modifyEngine(ski, 'T', [['V a b c', 'c a b'], ['T a b', 'T=; T a b']], true);
   });
 
@@ -27,9 +27,9 @@ describe('SKI: adding terms to an engine, step by step', () => {
 
   describe('compound atomic terms', () => {
     const ski = new SKI({ atomic: true });
-    modifyEngine(ski, '@atomic P = x->y->x', [['P a b', 'a']]);
-    modifyEngine(ski, '@atomic Q = x->y->z->x z (y z)', [['Q a b c', 'a c (b c)'], ['QPPa', 'a']]);
-    modifyEngine(ski, '@atomic X = x->xQP', [['X(XX) a b', 'b']]);
+    modifyEngine(ski, 'P x y = x', [['P a b', 'a']]);
+    modifyEngine(ski, 'Q x y z = x z (y z)', [['Q a b c', 'a c (b c)'], ['QPPa', 'a']]);
+    modifyEngine(ski, 'X x = xQP', [['X(XX) a b', 'b']]);
   });
 });
 

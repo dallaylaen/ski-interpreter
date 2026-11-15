@@ -28,7 +28,7 @@ describe('Parser.bulkAdd', () => {
 
   it('can import @atomic terms', () => {
     const ski = new SKI({ atomic: true });
-    ski.bulkAdd(['@atomic V=a->b->f->f a b']);
+    ski.bulkAdd(['V a b f = f a b']);
 
     isInstanceOf(ski.getTerms().V, Atomic);
 

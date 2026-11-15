@@ -9,7 +9,7 @@ describe('expression samples evaluate correctly', () => {
   checkExpr( 'app of builtins', 'SK x y', 'y', 2 );
 
   checkExpr( 'alias', 'T=CI; T x y', 'y x', 3 );
-  checkExpr( 'atomic', '@atomic T=a->b->b a; T x y', 'y x', 1 );
+  checkExpr( 'atomic', 'T a b = b a; T x y', 'y x', 1 );
 
   checkExpr( 'nested alias', 'T=CI; V=BCT; V x y z', 'z x y', 6 );
 
@@ -17,7 +17,7 @@ describe('expression samples evaluate correctly', () => {
 
   // PII = T, PT = B - check it!
   checkExpr( 'self-application of aliased lambda', 'P = a->b->c->d->b(a d c); P(PII) x y z', 'x (y z)', 14 );
-  checkExpr( 'self-application of an atomic term', '@atomic P = a->b->c->d->b(a d c); P(PII) x y z', 'x (y z)', 4 );
+  checkExpr( 'self-application of an atomic term', 'P a b c d = b(a d c); P(PII) x y z', 'x (y z)', 4 );
   // ditto but no alias
   checkExpr( 'self-application of lambda via lambda', '(x->x(xII))(a->b->c->d->b(a d c)) x y z', 'x(y z)', 14 );
 

@@ -23,9 +23,9 @@ describe('SKI declare -> bulkAdd -> declare round-trip', () => {
   it('round-trips atomic terms', () => {
     const ski = new SKI({ atomic: true });
     ski.bulkAdd([
-      '@atomic T = x->y->y x',    // proper term
-      '@atomic iota = x->xSK',    // refers to other (native) terms
-      '@atomic P = x->x P x',     // self-referencing term
+      'T x y = y x',    // proper term
+      'iota x = xSK',    // refers to other (native) terms
+      'P x = x P x',     // self-referencing term
     ]);
 
     const decl1 = ski.declare();

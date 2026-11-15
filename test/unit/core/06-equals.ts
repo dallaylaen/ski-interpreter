@@ -18,10 +18,10 @@ describe('Expr.equals', () => {
 
   check('discarding lambdas', 'x->a', 'y->a', true);
 
-  check('atomic, no self-ref', '@atomic A=x->x', '@atomic A=y->y', true);
-  check('atomic, different impl', '@atomic A=x->x', '@atomic A=x->x x', false);
-  check('atomic, self-ref', '@atomic A=x->A', '@atomic A=x->A', true);
-  check('atomic, self-ref vs non-self-ref', '@atomic A=x->A', '@atomic A=x->x', false);
+  check('atomic, no self-ref', 'A x = x', 'A y = y', true);
+  check('atomic, different impl', 'A x = x', 'A x = x x', false);
+  check('atomic, self-ref', 'A x = A', 'A x = A', true);
+  check('atomic, self-ref vs non-self-ref', 'A x = A', 'A x = x', false);
 });
 
 function check (comment: string, src1: string|Expr, src2: string|Expr, expected: boolean) {
