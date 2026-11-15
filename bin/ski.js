@@ -233,8 +233,15 @@ function showHelp (topic) {
     - Bound variables are local to the lambda
 
     Definitions:
-    - name = expr  defines a new named term, e.g.
+    - Declare a new alias:
+      name = expr
       "T=CI", "false=KI"
+    - Declare a new atomic term:
+      name arg1 arg2 ... = expr
+      The right-hand side may contain the term itself,
+      in which case a self-referencing (possibly non-terminating)
+      term will be created.
+      "V a b c = c a b", "Y x = x (Y x)"
     - definitions can be prepended to expression, separated by semicolons, e.g.
       "T=CI; false=KI; T false x y"  is equivalent to "CI (KI) x y"
 
