@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-11-15
+
+### Added
+* `T x y = y x` now creates a new Atomic term (still requires 'experimental' flag or -x in cli)
+* `./bin/ski.js search` now accepts a `-t|--target` option. Syntax:
+`-t "foo: foo K == KI && foo (KI) == K"`.
+Equality is treated as lambda term equivalence (e.g. SK == KI is true).
+Multiple search targets may be specified.
+* More quests at the quest page.
+
+### Changed
+* `@atomic foo = x->y->y x` syntax is being phased out in favor of reduction-based one, but still supported.
+
+### Fixed
+* `./bin/ski.js eval -v` didn't bother to output the pre-last reduction, fixed.
+
 ## [3.0.2] - 2026-10-14
 
 ### Changed
