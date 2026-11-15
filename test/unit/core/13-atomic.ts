@@ -1,9 +1,9 @@
 import { expect } from 'chai';
-// import { isInstanceOf } from '../../lib/assert';
+
+import { isInstanceOf, stripAlias } from '../../lib/assert';
 
 import { SKI } from '../../../src';
-import { Alias, Expr, Lambda, Named, Atomic } from '../../../src/expr';
-import { isInstanceOf } from '../../lib/assert';
+import { Named, Atomic } from '../../../src/expr';
 
 describe('Atomic', () => {
   const ski = new SKI({ atomic: true });
@@ -78,31 +78,6 @@ describe('Atomic', () => {
       expect(trace[2]).to.equal('YWx x');
       expect(trace[3]).to.equal('W(YW)x x');
       expect(trace[4]).to.equal('YWx x x');
-    });
-  });
-
-  describe('supports legacy @atomic def', () => {
-    it('works for non self-ref', () => {
-      const src = '@atomic T = x->y->y x';
-      const T = ski.parse(src);
-      expect(T + '').to.equal('T');
-      const { a, b } = SKI.vars();
-      const res = T.run(a, b);
-      expect(res.steps).to.equal(1);
-      b.apply(a).expect(res.expr);
-    });
-
-    it('works for self-ref terms', () => {
-      const src = '@atomic P = x->xPx';
-      const P = ski.parse(src);
-
-      expect(P + '').to.equal('P');
-      const { f } = SKI.vars();
-      const res = P.run(f);
-      expect(res.steps).to.equal(1);
-      f.apply(P, f).expect(res.expr);
-
-      expect(P.declare()).to.match(/^P\s*x\s*=\s*x\s*P\s*x;?$/);
     });
   });
 
@@ -202,20 +177,6 @@ describe('Atomic', () => {
     });
   });
 });
-
-// TODO move to test/lib?
-/**
- * The parser may add an invisible eponymous Alias wrapper around a Named term
- * to protect the original term from modifications.
- * This function reveals the underlying term instead.
- * @param expr
- */
-function stripAlias (expr: Expr): Expr {
-  let next = expr;
-  while (next instanceof Alias && next.impl instanceof Named && next.impl.name === next.name)
-    next = next.impl;
-  return next;
-}
 
 function assertSource (src: string, samples: [string, string][]): void {
   it(`parses ${src}`, () => {

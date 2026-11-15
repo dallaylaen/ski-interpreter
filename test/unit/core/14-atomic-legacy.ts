@@ -1,14 +1,14 @@
 import { expect } from 'chai';
 
 import { SKI } from '../../../src';
-import { Alias, Expr, Lambda, Named, Atomic } from '../../../src/expr';
-
+import { stripAlias, isInstanceOf } from '../../lib/assert';
 
 describe('Atomic: supports legacy @atomic def', () => {
   const ski = new SKI({ atomic: true, experimental: true });
   it('works for non self-ref', () => {
     const src = '@atomic T = x->y->y x';
     const T = ski.parse(src);
+    isInstanceOf(stripAlias(T), SKI.classes.Atomic);
     expect(T + '').to.equal('T');
     const { a, b } = SKI.vars();
     const res = T.run(a, b);
@@ -19,6 +19,8 @@ describe('Atomic: supports legacy @atomic def', () => {
   it('works for self-ref terms', () => {
     const src = '@atomic P = x->xPx';
     const P = ski.parse(src);
+
+    isInstanceOf(stripAlias(P), SKI.classes.Atomic);
 
     expect(P + '').to.equal('P');
     const { f } = SKI.vars();
