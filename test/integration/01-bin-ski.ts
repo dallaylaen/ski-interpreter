@@ -24,11 +24,19 @@ describe('ski CLI', () => {
       expect(exitCode).to.equal(0);
     });
 
-    it('evaluates a simple expression', () => {
-      const { stdout, exitCode } = cli(['eval', 'CI x y']);
+    it('evaluates a simple expression, verbosely', () => {
+      const { stderr, stdout, exitCode } = cli(['eval', '-v', 'SKKx']);
       expect(exitCode).to.equal(0);
-      expect(stdout).to.match(/y x/);
-      backParse(stdout, 'y x', 'eval output should be parseable');
+      expect(stderr).to.equal('');
+      const lines = stdout.split(/\r?\n/);
+      expect(lines.length).to.equal(5, 'output:\n----\n' + stdout + '\n----');
+      expect(lines[0]).to.equal('SKKx;');
+      expect(lines[1]).to.equal('Kx(Kx);');
+      expect(lines[2]).to.match(/^\/\/ *2 +steps?.*\d+m?s/);
+      expect(lines[3]).to.equal('x');
+      expect(lines[4]).to.equal('', 'newline at end of output');
+
+      backParse(stdout, 'x', 'eval output should be parseable');
     });
 
     it('reads expression from stdin with -', () => {

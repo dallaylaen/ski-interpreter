@@ -425,9 +425,10 @@ function processLine (source, ski, onErr) {
     let state;
     if (verbose) {
       for (const next of expr.walk(runOptions)) {
-        if (state && !next.final)
+        if (state)
           console.log(state.expr.format(format) + ';');
-        state = next;
+        if (next)
+          state = next;
       }
     } else
       state = expr.run({ max: Infinity, ...runOptions });
