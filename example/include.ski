@@ -10,5 +10,5 @@ M=WI;
 L=BWB;
 lst = BS(C(BB));
 nil = KI;
-@atomic Y = f->f(Yf);
-@atomic Z = f->x->f(Zf) x;
+Y f = f(Yf);
+Z f x = f(Zf) x;
