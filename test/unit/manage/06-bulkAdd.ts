@@ -26,7 +26,7 @@ describe('Parser.bulkAdd', () => {
     ski.parse('c a b').expect(ski.parse('V a b c').run().expr);
   });
 
-  it('can import @atomic terms', () => {
+  it('can import atomic terms', () => {
     const ski = new SKI({ atomic: true });
     ski.bulkAdd(['V a b f = f a b']);
 

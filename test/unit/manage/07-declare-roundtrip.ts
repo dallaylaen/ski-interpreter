@@ -38,14 +38,13 @@ describe('SKI declare -> bulkAdd -> declare round-trip', () => {
     expect(decl2).to.deep.equal(decl1);
 
     // term behaviour should be preserved too.
-    // Primitive terms (including @atomic ones) are only ever equal to themselves,
+    // Primitive terms (including atomic ones) are only ever equal to themselves,
     // so compare the results of applying/running them rather than the bare terms.
     ski.parse('T a b').run().expr.expect(ski2.parse('T a b').run().expr);
     ski.parse('iota x').run().expr.expect(ski2.parse('iota x').run().expr);
 
-    // P is self-referencing and has no normal form. Also, unlike aliases, a @atomic term is
-    // only ever equal to itself (it's a distinct PureNative instance in each interpreter),
-    // so compare the string representation of a few reduction steps instead of using expect().
+    // P is self-referencing and has no normal form.
+    // So we compare a few steps for equality instead of terms themselves.
     const walk1 = ski.parse('P a').walk();
     const walk2 = ski2.parse('P a').walk();
     for (let i = 0; i < 2; i++)
