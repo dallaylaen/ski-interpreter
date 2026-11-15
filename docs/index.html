@@ -151,10 +151,9 @@
             </p>
             <p>
                 <span class="brand-new">New!</span>
-                Use <code>@atomic T=a->b->b a</code> to declare new atomic combinators that reduce in one step.
-                Other terms may be used in the definition, but the right-hand side must always start with abstraction (<code>-&gt;</code>).
-                Self-referencing definitions supported, too.
-                This is a highly experimental feature, please share your feedback in this
+                Use <code>T a b = b a</code> or even <code>Y x = x (Y x)</code>
+                to declare atomic (possibly self-referencing) combinators that reduce in one step.
+                The syntax is still experimental, please share your feedback in this
                 <a href="https://github.com/dallaylaen/ski-interpreter/issues/18" target="_blank">issue</a>.
             </p>
             <p>
@@ -199,9 +198,10 @@
                     returning <code>x(...{n times}...(x(y)...)</code>.
                 </li>
                 <li>
-                    New atomic combinators can be declared with <code>@atomic name = x-&gt;y-&gt;...&lt;expression&gt;</code>.
-                    The right-hand side must always start with an abstraction (<code>-&gt;</code>).
-                    Self-referencing definitions are supported.
+                    New atomic combinators can be declared via
+                    <code>name arg1 arg2 ... = &lt;expression&gt;</code>.
+                    If the right-hand side contains the term's name,
+                    a self-referencing term will be created.
                     This feature is highly experimental.
                 </li>
             </ul>
