@@ -2,7 +2,7 @@
 
 import {
   Expr, Named, FormatOptions, TermInfo, toposort,
-  App, Alias, FreeVar, Lambda, control, InferOptions, Atomic,
+  App, Alias, FreeVar, Lambda, control, InferOptions, Atomic, args2lambda,
 } from './expr';
 import { builtin } from './parser';
 import { Case, Quest } from './quest';
@@ -448,7 +448,8 @@ function naiveCanonize (expr: Expr, options: InferOptions): Expr {
     if (e instanceof Atomic && e.selfRef) {
       const dbl = new FreeVar('a');
       const M = new Lambda(dbl, dbl.apply(dbl));
-      const half = e.source.subst(e.selfRef, e.selfRef.apply(e.selfRef)) ?? e.source;
+      const lambda = args2lambda(e.args, e.body);
+      const half = lambda.subst(e.selfRef, e.selfRef.apply(e.selfRef)) ?? lambda;
       return M.apply(new Lambda(e.selfRef, naiveCanonize(half, options)) );
     }
     const guess = e.infer(options);

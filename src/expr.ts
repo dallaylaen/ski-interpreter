@@ -1059,14 +1059,28 @@ export class Primitive extends Named {
 }
 
 export class Atomic extends Primitive {
-  source: Expr;
   args: FreeVar[];
+  body: Expr;
   /** the placeholder variable used for self-reference within `source`, if any */
   selfRef?: FreeVar;
 
   constructor (self: FreeVar|string, args: FreeVar[], body: Expr) {
-    if (typeof self === 'string')
-      self = new FreeVar(self);
+    // mask variables to avoid clashing with terms present in other terms
+    const maskSelf = new FreeVar(self + '');
+    const maskArgs = args.map(x => new FreeVar(x + ''));
+    body = body.traverse(e => {
+      if (!(e instanceof FreeVar))
+        return; // descend further
+      for (let i = 0; i < args.length; i++) {
+        if (e === args[i])
+          return maskArgs[i];
+      }
+      if (e === self)
+        return maskSelf;
+    }) ?? body;
+    args = maskArgs;
+    self = maskSelf;
+
     const { code, env, arity, selfRef } = lambda2code(self, args, body);
 
     // console.log('Atomic: generated code for ' + self.name + ':\n' + code);
@@ -1079,32 +1093,35 @@ export class Atomic extends Primitive {
       canonize: false,
       note:     impl.format({ html: true, lambda: ['', ' &mapsto; ', ''] }),
     });
-    this.source = impl; // TODO use args + body instead?
     this.args = [...args];
+    this.body = body;
     if (selfRef)
       this.selfRef = self;
   }
 
   declareImpl (options: FormatOptions): string {
+    const space = options.space ?? ' ';
     return options.declaration![0]
-      + '@atomic ' + this.format(options)
-      + options.declaration![1] + this.source.format(options);
+      + this.format(options) + space + this.args.join(space)
+      + options.declaration![1] + this.body.format(options);
   }
 
   equals (other: Expr): boolean {
     if (!(other instanceof Atomic))
       return super.equals(other);
-    if (this.name !== other.name)
+    if (this.name !== other.name || this.arity !== other.arity)
       return false;
-    if (this.selfRef && other.selfRef)
-      return this.source.equals(other.source.subst(other.selfRef, this.selfRef) ?? other.source);
+    if (this.selfRef && other.selfRef) {
+      return zip(this.body, [this.selfRef, ...this.args], [other.selfRef, ...other.args])
+        .equals(other.body);
+    }
     if (!this.selfRef && !other.selfRef)
-      return this.source.equals(other.source);
+      return zip(this.body, this.args, other.args).equals(other.body);
     return false;
   }
 
   diag ( indent: string = ''): string {
-    return `${indent}Atomic ${this.name} = ${this.source}\n`;
+    return `${indent}Atomic ${this.name} ${this.args.join( )} = ${this.body}\n`;
   }
 }
 
@@ -1392,7 +1409,7 @@ export class Alias extends Named {
 
 // utility functions dependent on Expr* classes, in alphabetical order
 
-function args2lambda (args: FreeVar[], body: Expr) : Lambda {
+export function args2lambda (args: FreeVar[], body: Expr) : Lambda {
   let lambda: Expr = body;
   for (let i = args.length; i-- > 0; )
     lambda = new Lambda(args[i], lambda ?? body);
@@ -1622,7 +1639,9 @@ export function toposort (options: {list?: Expr|Expr[], env?: Record<string, Nam
       if (e instanceof Atomic) {
         if (e.selfRef)
           seen.add(e.selfRef);
-        rec(e.source);
+        for (const v of e.args)
+          seen.add(v);
+        rec(e.body);
       }
 
       // recurse. values in `env` will be auto-skipped because they're "seen"
@@ -1644,6 +1663,19 @@ export function toposort (options: {list?: Expr|Expr[], env?: Record<string, Nam
     list: out,
     env,
   };
+}
+
+function zip (expr: Expr, search: FreeVar[], replace: FreeVar[]): Expr {
+  if (search.length !== replace.length)
+    throw new Error('zip(): search and replace lengths not equal');
+  return expr.traverse(e => {
+    if (!(e instanceof FreeVar))
+      return;
+    for (let i = 0; i < search.length; i++) {
+      if (e.equals(search[i]))
+        return replace[i];
+    }
+  }) ?? expr;
 }
 
 export const classes = { Expr, App, Named, FreeVar, Primitive, Atomic, Lambda, Church, Alias };
