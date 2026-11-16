@@ -26,7 +26,8 @@ describe('Expr.equals', () => {
 
 function check (comment: string, src1: string|Expr, src2: string|Expr, expected: boolean) {
   describe(`${comment}: ${src1} ${expected ? '=' : '!'}= ${src2}`, () => {
-    const ski = new SKI({ experimental: true });
+    const ski = new SKI({ preset: 'full' });
+
     const expr1 = src1 instanceof Expr ? src1 : ski.parse(src1);
     const expr2 = src2 instanceof Expr ? src2 : ski.parse(src2);
 

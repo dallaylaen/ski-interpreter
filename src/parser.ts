@@ -97,17 +97,45 @@ addNative(
   }
 );
 
+export type Preset = 'minimal' | 'stable' | 'full';
+
 export type ParseOptions = {
-  env?: { [key: string]: Expr },
-  scope?: object,
+  // allowed constructs
+  preset?: Preset,
   numbers?: boolean,
   lambdas?: boolean,
   atomic?: boolean,
   experimental?: boolean,
+  // term restrictions
   allow?: string,
+  // expression post-processing
   canonize?: boolean,
   annotate?: boolean,
   addContext?: boolean,
+  // scope and environment
+  scope?: object,
+  env?: { [key: string]: Expr },
+};
+
+export const PRESETS: Record<Preset, ParseOptions> = {
+  minimal: {
+    numbers:      false,
+    lambdas:      false,
+    atomic:       false,
+    experimental: false,
+  },
+  stable: {
+    numbers:      true,
+    lambdas:      true,
+    atomic:       false,
+    experimental: false,
+  },
+  full: {
+    numbers:      true,
+    lambdas:      true,
+    atomic:       true,
+    experimental: true,
+  },
 };
 
 // Engine-wide defaults for ParseOptions, plus a one-off list of known terms
@@ -142,16 +170,15 @@ export class Parser {
 
   // Engine-wide defaults for ParseOptions, applied whenever a per-call
   // option is not explicitly given.
-  options: Required<Omit<ParseOptions, 'env' | 'scope' | 'allow' | 'canonize'>>;
+  options: ParseOptions;
 
   constructor (options: EngineOptions = {}) {
-    const { terms, allow, ...defaults } = options;
+    const { terms, allow, ...rest } = options;
+    const defaults = sanitizeOptions(rest, 'stable');
 
     this.known = { ...builtin };
 
     this.options = {
-      annotate:     !!defaults.annotate,
-      addContext:   !!defaults.addContext,
       // Relax permissions before importing terms, restrict later
       numbers:      true,
       lambdas:      true,
@@ -174,10 +201,12 @@ export class Parser {
 
     // Finally, impose restrictions
     // We must do it after recreating terms, or else terms reliant on forbidden terms will fail
-    this.options.numbers      = defaults.numbers ?? true;
-    this.options.lambdas      = defaults.lambdas ?? true;
-    this.options.atomic       = defaults.atomic ?? false;
+    this.options.numbers      = defaults.numbers;
+    this.options.lambdas      = defaults.lambdas;
+    this.options.atomic       = defaults.atomic;
     this.options.experimental = !!defaults.experimental;
+    this.options.annotate     = !!defaults.annotate;
+    this.options.addContext   = !!defaults.addContext;
 
     if (allow)
       this.restrict(allow);
@@ -445,6 +474,8 @@ export class Parser {
     if (typeof source !== 'string')
       throw new Error('parse: source must be a string, got ' + typeof source);
 
+    options = sanitizeOptions(options);
+
     const { jar, list } = this._parse(source, options);
     if (list.length === 0)
       throw new Error('parse: empty expression found in source');
@@ -582,7 +613,7 @@ export class Parser {
       // always produces an @atomic term
       if (tag)
         throw new Error('No suitable tags exist for reduction-based definitions');
-      if (!(options.experimental ?? this.options.experimental) && !(options.atomic ?? this.options.atomic))
+      if (!(options.atomic ?? this.options.atomic))
         throw new Error('Please allow @atomic terms explicitly ("atomic": true)');
 
       const placeholder = new FreeVar(name);
@@ -618,7 +649,7 @@ export class Parser {
     }
 
     if (tag === '@atomic') {
-      if (!(options.atomic ?? this.options.atomic) && !(options.experimental ?? this.options.experimental))
+      if (!(options.atomic ?? this.options.atomic))
         throw new Error('Please allow @atomic terms explicitly ("atomic": true)');
       const self = new FreeVar(name); // no scope, self-bound placeholder
       const impl = this.parseLine(source, { ...env, [name]: self }, options);
@@ -644,15 +675,7 @@ export class Parser {
   }
 }
 
-function stripLambda (expr: Lambda): {args: FreeVar[], body: Expr} {
-  const args = [];
-  let body: Expr = expr;
-  while (body instanceof Lambda) {
-    args.push(body.arg);
-    body = body.impl;
-  }
-  return { args, body };
-}
+// ---- Utility functions, in alphabetical order ----
 
 function maybeAlias (name: string, impl: Expr): Named {
   // Remove unnecessary extra aliases with the same name
@@ -661,4 +684,26 @@ function maybeAlias (name: string, impl: Expr): Named {
   if (impl instanceof Named && impl.name === name)
     return impl;
   return new Alias(name, impl, { canonize: true });
+}
+
+function sanitizeOptions (options: ParseOptions = {}, defaultPreset?: Preset): ParseOptions {
+  const { preset = defaultPreset } = options;
+  if (preset && !PRESETS[preset])
+    throw new Error(`Unknown preset '${preset}'`);
+  const ret = { ...(preset ? PRESETS[preset] : {}), ...options };
+  if (ret.experimental) {
+    // turn on all experimental features here
+    ret.atomic = true;
+  }
+  return ret;
+}
+
+function stripLambda (expr: Lambda): {args: FreeVar[], body: Expr} {
+  const args = [];
+  let body: Expr = expr;
+  while (body instanceof Lambda) {
+    args.push(body.arg);
+    body = body.impl;
+  }
+  return { args, body };
 }
