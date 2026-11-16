@@ -2,6 +2,7 @@
 
 const fs = require('node:fs/promises');
 const fsSync = require('node:fs');
+const { styleText } = require('node:util');
 const { Command } = require('commander');
 
 const { SKI } = require('../lib/ski-interpreter.cjs');
@@ -29,6 +30,7 @@ program
   .version(version)
   .option('-v, --verbose', 'Show all evaluation steps', () => { verbose = true; })
   .option('-q, --quiet', 'Suppress comment lines in output', () => { quiet = true; })
+  .option('--color', 'Colorize output', defaultColor)
   .option('--format <json>', 'Format for output expressions', setFormat)
   .option('--max <number>', 'Limit computation steps', raw => {
     const n = Number.parseInt(raw);
@@ -1050,6 +1052,12 @@ function setFormat (options) {
   if (!maybe.value)
     throw new Error('Invalid format options: ' + JSON.stringify(maybe.error));
   format = maybe.value;
+}
+
+function defaultColor () {
+  format.brackets ||= [styleText('blue', '('), styleText('blue', ')')];
+  format.redex ||= styleText(['yellow', 'red'], '\n').split('\n', 2);
+  format.var ||= styleText('green', '\n').split('\n', 2);
 }
 
 function readExpression (expr) {
