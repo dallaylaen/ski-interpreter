@@ -131,13 +131,11 @@ export class Quest {
     this.restrict = { allow, numbers: numbers ?? false, lambdas: lambdas ?? false };
     this.env = {};
 
-    const jar = {};
-
     // option.env is a list of expressions.
     // we suck all free variables + all term declarations from there into this.env
     // to feed it later to every case's parser.
     for (const term of env ?? []) {
-      const expr: Expr = this.engine.parse(term, { env: jar, scope: this });
+      const expr: Expr = this.engine.parse(term, { env: this.env, scope: this });
       if (expr instanceof Alias)
         this.env[expr.name] = new Alias(expr.name, expr.impl, { canonize: false });
         // Canonized aliases won't expand with insufficient arguments,
@@ -154,7 +152,9 @@ export class Quest {
     if (!this.input.length)
       throw new Error('Quest needs at least one input placeholder');
 
-    this.envFull = { ...this.env, ...jar };
+    // TODO as of current, there's no way to denote which env terms should be exposed,
+    //      so all of them are. Need to rethink the quest spec.
+    this.envFull = { ...this.env };
     for (const term of this.input) {
       if (term.name in this.envFull)
         throw new Error('input placeholder name is duplicated or clashes with env: ' + term.name);
