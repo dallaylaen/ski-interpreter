@@ -126,7 +126,7 @@ export class Quest {
 
     this.engine = engine ?? new Parser({ preset: 'stable' });
 
-    console.log('Engine: ', this.engine);
+    // console.log('Engine: ', this.engine);
 
     this.restrict = { allow, numbers: numbers ?? false, lambdas: lambdas ?? false };
     this.env = {};
