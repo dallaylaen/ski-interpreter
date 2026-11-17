@@ -60,10 +60,11 @@ type AnyGlobal = typeof globalThis & {
 
 const g = globalThis as AnyGlobal;
 
-// SKI_REPL=1 node -r ./index.js
+// SKI_REPL=1 node -r ./src
 if (g.process?.env.SKI_REPL) {
   g.SKI = SKI;
-  console.log('SKI_REPL activated, try `new SKI();`');
+  // eslint-disable-next-line no-console
+  console.log('. o O ( SKI_REPL activated, try `new SKI();` )');
 }
 
 // we're in a browser
