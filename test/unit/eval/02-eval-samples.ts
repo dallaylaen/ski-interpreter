@@ -55,14 +55,14 @@ function backPedal (start: string, end: string, steps?: number) {
   const expr = ski.parse(start);
   const target = ski.parse(end);
 
-  console.log('rechecking ' + start + ' vs ' + end);
+  /* sic, this is for output on a failed test */ console.log('rechecking ' + start + ' vs ' + end);
 
   for (const state of expr.walk()) {
-    console.log('step ' + state.steps + ': ' + state.expr);
-    console.log(state.expr.diag());
+    /* */ console.log('step ' + state.steps + ': ' + state.expr);
+    /* */ console.log(state.expr.diag());
     if (steps !== undefined && state.steps > steps)
       break;
   }
-  console.log('expected');
-  console.dir(target, { depth: Infinity });
+  /**/ console.log('expected');
+  /**/ console.dir(target, { depth: Infinity });
 }

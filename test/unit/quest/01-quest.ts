@@ -385,15 +385,15 @@ describe('Quest', () => {
   });
 
   // TODO it ('calculates weight of solution with aliases', () => {});
-  /*
 
-  // TODO uncomment & make pass
-
+/*
   describe ('quest with shielded variables in env', () => {
+    // TODO currently there is no way to partially expose env to the user;
+    //      need to rethink quest spec in such a way that it works.
     const quest = new Quest({
       title: 'first member of a pair',
       input: 'fst',
-      env: ["T=CI; V=BCT; pair=V x y"],
+      env:   ['T=CI', 'V=BCT', 'x', 'y', 'pair=V x y'], // user only gets T and pair here
       cases: [
         ['fst pair', 'x'],
       ],
@@ -401,14 +401,16 @@ describe('Quest', () => {
 
     it ('passes for a solution', () => {
       const result = quest.check('TK');
-      console.log(result);
+      console.log(SKI.extras.deepFormat(result));
       expect(result.pass).to.equal(true, 'should pass with correct solution');
     });
 
     it ('fails obviously wrong solution', () => {
       const result = quest.check('T(KI)');
       expect(result.pass).to.equal(true, 'should pass with correct solution');
-      console.log(result.details[0]);
+      expect(result.details.length).to.equal(1);
+
+      console.log(SKI.extras.deepFormat(result.details[0]));
     });
 
     it ('fails clever solution', () => {
@@ -417,5 +419,5 @@ describe('Quest', () => {
       console.log(result.details[0]);
     });
   });
-   */
+*/
 });

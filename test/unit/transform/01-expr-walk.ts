@@ -33,7 +33,7 @@ describe('Expr.walk', () => {
       for (const state of expr.walk()) {
         expect(end).to.equal(false, 'make sure we never run past last iteration');
 
-        console.log('step', state.steps, ':', state.expr.format({ terse: true }));
+        // console.log('step', state.steps, ':', state.expr.format({ terse: true }));
 
         // steps must be ascending
         expect(state.steps).to.be.within(n, Infinity);

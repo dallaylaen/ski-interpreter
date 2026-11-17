@@ -309,14 +309,7 @@ function describeTerm (
       });
 
       it('produces exactly expected properties', () => {
-        try {
-          expect(flags).to.deep.include(expected);
-        } catch (err) {
-          console.log('Term    :', term);
-          console.log('Expected:', expected);
-          console.log('Found   :', found);
-          throw err;
-        }
+        expect(flags).to.deep.include(expected, 'Term: ' + term);
       });
 
       if (lambda || flags.normal) {

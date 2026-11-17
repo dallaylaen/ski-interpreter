@@ -62,7 +62,7 @@ describe('SKI.toJSON', () => {
     const str = JSON.stringify(ski);
     const raw = JSON.parse(str);
 
-    console.log(raw.terms);
+    // console.log(raw.terms);
 
     declarationPreceedsUsage(raw.terms, 'SKB');
 
