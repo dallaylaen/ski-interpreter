@@ -59,7 +59,6 @@ export type QuestSpec = {
   lambdas?: boolean,
   env?: string[],
   engine?: Parser,
-  engineFull?: Parser,
 
   // metadata, also any fields not listed here will go to quest.meta.???
   id?: string | number,
@@ -109,7 +108,6 @@ export class Quest {
   input: (InputSpec & {placeholder: FreeVar})[];
   cases: Case[];
 
-  engineFull: Parser;
   engine: Parser;
   restrict: { allow?: string, numbers?: boolean, lambdas?: boolean };
   env: { [key: string]: Expr };
@@ -123,12 +121,13 @@ export class Quest {
   meta?: Record<string, unknown>;
 
   constructor (options: QuestSpec) {
-    const { input, cases, allow, numbers, lambdas, engine, engineFull, ...meta } = options;
+    const { input, cases, allow, numbers, lambdas, engine, ...meta } = options;
     const env = options.env ?? []; // backwards compatibility
 
-    //
-    this.engineFull = engineFull ?? new Parser();
-    this.engine = engine ?? this.engineFull;
+    this.engine = engine ?? new Parser({ preset: 'stable' });
+
+    console.log('Engine: ', this.engine);
+
     this.restrict = { allow, numbers: numbers ?? false, lambdas: lambdas ?? false };
     this.env = {};
 
@@ -138,12 +137,12 @@ export class Quest {
     // we suck all free variables + all term declarations from there into this.env
     // to feed it later to every case's parser.
     for (const term of env ?? []) {
-      const expr: Expr = this.engineFull.parse(term, { env: jar, scope: this });
+      const expr: Expr = this.engine.parse(term, { env: jar, scope: this });
       if (expr instanceof Alias)
         this.env[expr.name] = new Alias(expr.name, expr.impl, { canonize: false });
         // Canonized aliases won't expand with insufficient arguments,
         // causing correct solutions to fail, so alas...
-      else if (expr instanceof FreeVar)
+      else if (expr instanceof Named)
         this.env[expr.name] = expr;
       else
         throw new Error('Unsupported given variable type: ' + term);
@@ -215,7 +214,7 @@ export class Quest {
     } else
       o = { ...opt };
 
-    o.engine = o.engine  ?? this.engineFull;
+    o.engine = o.engine  ?? this.engine;
     o.env = o.env ?? this.envFull;
 
     const input = this.input.map( t => t.placeholder );
@@ -242,6 +241,7 @@ export class Quest {
     for (let i = 0; i < input.length; i++) {
       const spec = this.input[i];
       const impl = this.engine.parse(input[i], {
+        preset:  'minimal',
         env:     jar,
         allow:   spec.allow ?? this.restrict.allow,
         numbers: spec.numbers ?? this.restrict.numbers,
@@ -386,7 +386,8 @@ export abstract class Case {
   }
 
   parse (src: string) {
-    return new Subst(this.engine.parse(src, { env: this.env, scope: this  }), this.input);
+    // TODO allow: +... is awkward, should be 'allow: *' when engine supports that
+    return new Subst(this.engine.parse(src, { env: this.env, scope: this, allow: '+BCIKSW' }), this.input);
   }
 
   /**

@@ -255,6 +255,26 @@ describe('Quest', () => {
     JSON.stringify(failing); // doesn't die, TODO proper test
   });
 
+  it('allows atomic terms in declaration, but not in solution', () => {
+    const ski = new SKI({ preset: 'full' });
+    const quest = new Quest({
+      engine: ski,
+      input:  'phi',
+      allow:  'SK',
+      env:    ['V a b c = c a b'],
+      cases:  [
+        ['phi (V x y)', 'x'],
+      ],
+    });
+
+    const fail = quest.check('f x = x K');
+    expect(fail.pass).to.equal(false, 'should fail with atomic term in solution');
+    expect(fail.exception).to.match(/atomic/);
+
+    const pass = quest.check('S(SKK)(KK)');
+    expect(pass.pass).to.equal(true, 'should pass with atomic term in declaration');
+  });
+
   it('can self-check via a solution hash', () => {
     const quest = new Quest({
       id:    'foo1337',
