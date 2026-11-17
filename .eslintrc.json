@@ -70,6 +70,12 @@
       }
     },
     {
+      "files": [ "src/**/*.ts" ],
+      "rules": {
+        "no-console": "error"
+      }
+    },
+    {
       "files": [
         "test/types.test-d.ts"
       ],
