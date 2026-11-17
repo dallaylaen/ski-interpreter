@@ -135,7 +135,14 @@ export class Quest {
     // we suck all free variables + all term declarations from there into this.env
     // to feed it later to every case's parser.
     for (const term of env ?? []) {
-      const expr: Expr = this.engine.parse(term, { env: this.env, scope: this });
+      const expr: Expr = this.engine.parse(term, {
+        // allow as much as possible
+        env:     this.env,
+        scope:   this,
+        lambdas: true,
+        numbers: true,
+        allow:   '+BCIKSW',
+      });
       if (expr instanceof Alias)
         this.env[expr.name] = new Alias(expr.name, expr.impl, { canonize: false });
         // Canonized aliases won't expand with insufficient arguments,
