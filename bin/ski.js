@@ -22,6 +22,8 @@ const toSKIOptions = {};
 /** @type {InstanceType<typeof SKI>} */
 let ski;
 
+let search = SKI.extras.search;
+
 const program = new Command();
 
 program
@@ -149,6 +151,7 @@ program
   (val, prev) => { prev.push(val); return prev; }, [])
   .option('--max-depth <number>', 'Limit search depth', toInt('--max-depth'))
   .option('--max-tries <number>', 'Limit total terms probed', toInt('--max-tries'))
+  .option('--heap', 'Use experimental search engine', () => { search = SKI.extras.search2 })
   .action(async (terms, options) => {
     if (!options.target.length && terms.length)
       terms[0] = await readExpression(terms[0]);
@@ -893,7 +896,7 @@ function searchExpression (termStrs, targetSrcs, options) {
     }
   };
 
-  const gen = SKI.extras.search(
+  const gen = search(
     seed,
     {
       tries:            options.maxTries,
