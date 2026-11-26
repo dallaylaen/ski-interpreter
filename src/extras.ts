@@ -23,6 +23,18 @@ export type SearchCallbackResult<T> = {
   /** true = stop the search immediately */
   stop?: boolean;
 };
+
+/** lower score = better */
+export type ScoringWeights = {
+  normal?: number;
+  proper?: number;
+  duplicate?: number;
+  discard?: number;
+  arity?: number;
+  size?: number;
+  canonicalSize?: number;
+  steps?: number;
+};
 export type SearchOptions = {
   /** maximum generation to search for */
   depth?: number;
@@ -40,6 +52,8 @@ export type SearchOptions = {
   noskip?: boolean;
   /** minimum number of tries between progress yields, default 1000 */
   progressInterval?: number;
+  /** */
+  weights?: ScoringWeights;
 };
 export type SearchCallback<T> = (e: Expr, props: TermInfo) => (SearchCallbackResult<T> | number | undefined);
 /** Yielded by the search generator on every progress tick and on each found term. */
@@ -60,11 +74,11 @@ export type SearchProgress<T> = {
   total: number;
   /** The number of terms excluding duplicates. Will == total if noskip is true or infer is false. */
   probed: number;
-  /** The entire generation cache reference.
-   * This is actually a mutable value and should not be modified by the consumer,
-   * and deep-copied in case one wants a true snapshot.
+  /**  The entire search cache reference.
+   *   Should not be modified.
+   *   Depends on search implementation details and should NEVER be relied upon.
    */
-  cache: Expr[][];
+  cache: Readonly<unknown>;
 };
 
 export type EquivResult = {

@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { SKI } from '../../../src/index';
 import { Expr, TermInfo } from '../../../src/expr';
 import { SearchCallback, SearchOptions, SearchProgress } from '../../../src/extras';
+import { isInstanceOf } from '../../lib/assert';
 const { search } = SKI.extras;
 
 /**
@@ -37,15 +38,18 @@ describe('SKI.extras.search', () => {
       for (const p of gen) last = p;
       const { cache, total } = last!;
 
+      isInstanceOf(cache, Array, 'cache is an array');
+
       // console.log(SKI.extras.deepFormat(cache));
 
-      expect(Array.isArray(cache)).to.equal(true, 'cache is array');
       const uniq: Record<string, boolean> = {};
       const dupes: string[] = [];
 
       for (let g = 0; g < cache.length; g++) {
-        expect(Array.isArray(cache[g])).to.equal(true, 'level ' + g + ' is an array, not ' + typeof (cache[g]));
-        for (const item of cache[g]) {
+        const entry: Expr[]|unknown = cache[g];
+        isInstanceOf(entry, Array, 'level ' + g + ' is an array (or Expr, hopefully)');
+        for (const item of entry) {
+          expect(item).to.be.instanceOf(Expr);
           expect((item + '').replace(/[() ]/g, '').length).to.equal(g + 1, item + ' in gen ' + g);
           if (uniq[item + ''])
             dupes.push(item + '');
