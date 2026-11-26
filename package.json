@@ -22,9 +22,11 @@
     "ski": "bin/ski.js"
   },
   "scripts": {
+    "clean": "rm -rf lib docs/build",
     "lint": "npx eslint --ext .js,.ts src test bin",
     "tsc": "npx tsc",
     "test": "npm run tsc; npx nyc mocha --recursive test/unit",
+    "test:unit": "npx nyc mocha --recursive test/unit",
     "test:int": "npx mocha --recursive test/integration",
     "tsdoc": "npx typedoc --treatWarningsAsErrors --out docs/man --gitRevision \"$(git log -1 --format='%H' -- src/)\" src/*.ts",
     "bundle:web": "npx esbuild --bundle --minify --sourcemap --format=iife ./src/index.ts --outfile=docs/build/js/ski-interpreter.min.js",
@@ -33,9 +35,9 @@
     "bundle:site": "npx esbuild --bundle --minify --sourcemap ./site-src/index.js --outfile=docs/build/js/util.min.js",
     "bundle:quest": "npx esbuild --bundle --minify --sourcemap --format=iife ./site-src/index-quest.js --outfile=docs/build/js/ski-quest.min.js",
     "bundle": "npm run bundle:cjs && npm run bundle:esm && npm run bundle:web && npm run bundle:site && npm run bundle:quest",
-    "check": "npm run lint && npm run tsc && npm run test",
-    "build": "npm run check && npm run bundle && npm run test:int",
-    "prepack": "rm -rf lib docs/build && npm run build"
+    "check": "npm run lint && npm run tsc && npm run test:unit",
+    "build": "npm run clean && npm run check && npm run bundle && npm run tsdoc && npm run test:int",
+    "prepack": "npm run build"
   },
   "files": [
     "package.json",
