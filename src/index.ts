@@ -5,6 +5,7 @@ import { Parser, builtin } from './parser';
 
 import * as quest from './quest';
 import { extras } from './extras';
+import { search2 } from './search2';
 
 export class SKI extends Parser {
   static builtin = builtin;
@@ -45,7 +46,7 @@ export class SKI extends Parser {
     return new Church(n);
   }
 
-  static extras = extras;
+  static extras = { ...extras, search2 };
   static quest = quest;
 }
 
